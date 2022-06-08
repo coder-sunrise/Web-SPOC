@@ -170,12 +170,16 @@ class Grid extends PureComponent {
   }
 
   render() {
+    const { height } = this.props
     return (
       <CommonTableGrid
         forceRender
         style={{ margin: 0 }}
         type='queueProcessor'
         {...this.configs}
+        TableProps={{
+          height,
+        }}
       />
     )
   }

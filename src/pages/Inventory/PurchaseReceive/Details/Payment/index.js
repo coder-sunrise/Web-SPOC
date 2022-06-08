@@ -17,7 +17,7 @@ import Authorized from '@/utils/Authorized'
 import Grid from './Grid'
 import Header from './Header'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -45,7 +45,7 @@ const { Secured } = Authorized
       }
 
       const { purchaseOrderPayment } = podoPayment
-      newPurchaseOrderPayment = purchaseOrderPayment.map((o) => {
+      newPurchaseOrderPayment = purchaseOrderPayment.map(o => {
         let tempOutstandingAmount = {}
         if (o.id) {
           tempOutstandingAmount = {
@@ -100,7 +100,7 @@ const { Secured } = Authorized
       }
     })
 
-    paymentData.forEach((o) => {
+    paymentData.forEach(o => {
       o.clinicPaymentDto.paymentModeFK =
         o.clinicPaymentDto.creditCardId || undefined
       o.clinicPaymentDto.creditCardTypeFK =
@@ -113,7 +113,7 @@ const { Secured } = Authorized
         purchaseOrderId: values.id,
         paymentData,
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         if (onConfirm) onConfirm()
         if (r) {
@@ -122,7 +122,7 @@ const { Secured } = Authorized
             payload: {
               id: props.purchaseOrderDetails.id,
             },
-          }).then((v) => {
+          }).then(v => {
             dispatch({
               type: 'podoPayment/queryPodoPayment',
               payload: {
@@ -163,12 +163,12 @@ class index extends PureComponent {
 
   getTotalPaid = () => {
     const activeRows = this.props.values.purchaseOrderPayment.filter(
-      (payment) => !payment.isDeleted,
+      payment => !payment.isDeleted,
     )
     return _.sumBy(activeRows, 'paymentAmount') || 0
   }
 
-  render () {
+  render() {
     const {
       purchaseOrderDetails,
       rights,
@@ -183,9 +183,10 @@ class index extends PureComponent {
       currentBizSessionInfo && currentBizSessionInfo.id > 0
 
     let height =
-      mainDivHeight - 170 - $('.filterBar').height() ||
-      0 - $('.footerBar').height() ||
-      0
+      mainDivHeight -
+      170 -
+      ($('.filterPurchaseReceivePaymentBar').height() || 0) -
+      ($('.footerPurchaseReceivePaymentBar').height() || 0)
     if (height < 300) height = 300
     return (
       <AuthorizedContext.Provider
@@ -193,35 +194,40 @@ class index extends PureComponent {
           rights: isWriteOff === true || !hasActiveSession ? 'disable' : rights,
         }}
       >
-        <div className='filterBar'>
-          {!hasActiveSession && (
-            <div style={{ paddingTop: 5 }}>
-              <WarningSnackbar
-                variant='warning'
-                message='Action(s) is not allowed due to no active session was found.'
-              />
-            </div>
-          )}
-          <Header {...this.props} />
-        </div>
-        <GridContainer>
-          <Grid
-            {...this.props}
-            getTotalPaid={this.getTotalPaid}
-            height={height}
-          />
-        </GridContainer>
-        <div style={{ textAlign: 'center' }} className='footerBar'>
-          <ProgressButton
-            color='danger'
-            icon={null}
-            onClick={navigateDirtyCheck({
-              onProceed: this.onClickCancelPayment,
-            })}
+        <div>
+          <div className='filterPurchaseReceivePaymentBar'>
+            {!hasActiveSession && (
+              <div style={{ paddingTop: 5 }}>
+                <WarningSnackbar
+                  variant='warning'
+                  message='Action(s) is not allowed due to no active session was found.'
+                />
+              </div>
+            )}
+            <Header {...this.props} />
+          </div>
+          <GridContainer>
+            <Grid
+              {...this.props}
+              getTotalPaid={this.getTotalPaid}
+              height={height}
+            />
+          </GridContainer>
+          <div
+            style={{ textAlign: 'center' }}
+            className='footerPurchaseReceivePaymentBar'
           >
-            Cancel
-          </ProgressButton>
-          <ProgressButton onClick={this.props.handleSubmit} />
+            <ProgressButton
+              color='danger'
+              icon={null}
+              onClick={navigateDirtyCheck({
+                onProceed: this.onClickCancelPayment,
+              })}
+            >
+              Cancel
+            </ProgressButton>
+            <ProgressButton onClick={this.props.handleSubmit} />
+          </div>
         </div>
       </AuthorizedContext.Provider>
     )

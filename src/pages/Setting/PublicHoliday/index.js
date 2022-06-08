@@ -8,7 +8,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -20,11 +20,11 @@ const styles = (theme) => ({
 class PublicHoliday extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingPublicHoliday/query',
       payload: {
-        isActive:true,
+        isActive: true,
       },
     })
   }
@@ -38,17 +38,18 @@ class PublicHoliday extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingPublicHoliday, mainDivHeight = 700 } = this.props
 
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterPublicHolidayBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterPublicHolidayBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />
@@ -56,11 +57,9 @@ class PublicHoliday extends PureComponent {
           open={settingPublicHoliday.showModal}
           observe='PublicHolidayDetail'
           title={
-            settingPublicHoliday.entity ? (
-              'Edit Public Holiday'
-            ) : (
-              'Add Public Holiday'
-            )
+            settingPublicHoliday.entity
+              ? 'Edit Public Holiday'
+              : 'Add Public Holiday'
           }
           maxWidth='md'
           bodyNoPadding

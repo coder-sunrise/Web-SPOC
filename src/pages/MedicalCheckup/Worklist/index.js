@@ -16,11 +16,12 @@ const MedicalCheckupWorklistWithProvider = props => (
 )
 
 const ConnectedMedicalCheckupWorklistWithProvider = connect(
-  ({ medicalCheckupWorklist, codetable, clinicSettings, user }) => ({
+  ({ medicalCheckupWorklist, codetable, clinicSettings, user, global }) => ({
     medicalCheckupWorklist,
     codetable,
     clinicSettings: clinicSettings.settings || clinicSettings.default,
     user,
+    mainDivHeight: global.mainDivHeight,
   }),
 )(MedicalCheckupWorklistWithProvider)
 

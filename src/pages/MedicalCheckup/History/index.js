@@ -55,7 +55,11 @@ const saveColumnsSetting = (dispatch, columnsSetting) => {
   })
 }
 
-const History = ({ medicalCheckupWorklistHistory, user }) => {
+const History = ({
+  medicalCheckupWorklistHistory,
+  user,
+  mainDivHeight = 700,
+}) => {
   const {
     medicalCheckupWorklistHistoryColumnSetting = [],
   } = medicalCheckupWorklistHistory
@@ -378,7 +382,7 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
     showReportingDetails(row)
   }
   const columns = defaultColumns()
-  const height = window.innerHeight - 300
+  const height = mainDivHeight - 260
   return (
     <ProTable
       api={api}
@@ -464,7 +468,8 @@ const History = ({ medicalCheckupWorklistHistory, user }) => {
   )
 }
 
-export default connect(({ medicalCheckupWorklistHistory, user }) => ({
+export default connect(({ medicalCheckupWorklistHistory, user, global }) => ({
   medicalCheckupWorklistHistory,
   user,
+  mainDivHeight: global.mainDivHeight,
 }))(History)

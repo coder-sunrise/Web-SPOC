@@ -89,7 +89,14 @@ const styles = theme => ({
 
 @control()
 @connect(
-  ({ patient, codetable, loading, visitRegistration, clinicSettings }) => ({
+  ({
+    patient,
+    codetable,
+    loading,
+    visitRegistration,
+    clinicSettings,
+    global,
+  }) => ({
     patient,
     codetable,
     visitRegistration,
@@ -98,6 +105,7 @@ const styles = theme => ({
     refreshingBalance:
       loading.effects['patient/refreshChasBalance'] ||
       loading.effects['patient/refreshMedisaveBalance'],
+    mainDivHeight: global.mainDivHeight,
   }),
 )
 class Banner extends PureComponent {
@@ -1803,6 +1811,7 @@ class Banner extends PureComponent {
             isRetail={isRetail}
             activePreOrderItem={activePreOrderItems || pendingPreOrderItems}
             actualizePreOrderAccessRight={actualizePreOrderAccessRight}
+            {...this.props}
           />
         </CommonModal>
         <CommonModal

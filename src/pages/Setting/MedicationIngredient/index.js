@@ -10,7 +10,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -22,11 +22,11 @@ const styles = (theme) => ({
 class MedicationIngredient extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingMedicationIngredient/query',
       payload: {
-        isActive:true,
+        isActive: true,
       },
     })
   }
@@ -40,23 +40,28 @@ class MedicationIngredient extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingMedicationIngredient, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterMedicationIngredientBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterMedicationIngredientBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...this.props} height={height} />
         <CommonModal
           open={settingMedicationIngredient.showModal}
           observe='MedicationIngredientDetail'
-          title={settingMedicationIngredient.entity ? 'Edit Drug Ingredient' : 'Add Drug Ingredient'}
+          title={
+            settingMedicationIngredient.entity
+              ? 'Edit Drug Ingredient'
+              : 'Add Drug Ingredient'
+          }
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}

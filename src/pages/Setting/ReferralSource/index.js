@@ -10,7 +10,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -24,7 +24,7 @@ const styles = (theme) => ({
 class ReferralSource extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingReferralSource/query',
     })
@@ -39,16 +39,17 @@ class ReferralSource extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingReferralSource, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterReferralSourceBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterReferralSourceBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />
@@ -57,11 +58,9 @@ class ReferralSource extends PureComponent {
           open={settingReferralSource.showModal}
           observe='ReferralSourceDetail'
           title={
-            settingReferralSource.entity ? (
-              'Edit Referral Source'
-            ) : (
-              'Add Referral Source'
-            )
+            settingReferralSource.entity
+              ? 'Edit Referral Source'
+              : 'Add Referral Source'
           }
           maxWidth='md'
           bodyNoPadding

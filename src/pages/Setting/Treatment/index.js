@@ -10,7 +10,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -23,7 +23,7 @@ const styles = (theme) => ({
 class Treatment extends PureComponent {
   state = {}
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.props.dispatch({
       type: 'codetable/fetchCodes',
@@ -33,11 +33,11 @@ class Treatment extends PureComponent {
     })
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingTreatment/query',
       payload: {
-        isActive:true,
+        isActive: true,
       },
     })
   }
@@ -51,16 +51,16 @@ class Treatment extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingTreatment, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height = mainDivHeight - 120 - ($('.filterTreatmentBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterTreatmentBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...this.props} height={height} />

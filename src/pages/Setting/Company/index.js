@@ -153,11 +153,11 @@ class Supplier extends PureComponent {
         : name === 'supplier'
         ? 'Supplier'
         : 'Manufacturer'
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height = mainDivHeight - 120 - ($('.filterCompanyBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterCompanyBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid

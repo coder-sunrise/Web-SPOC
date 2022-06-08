@@ -19,7 +19,7 @@ import Details from './Details'
 
 const ClaimTracking = ({
   dispatch,
-  height,
+  mainDivHeight = 700,
   clinicSettings,
   patientProfileFK,
   values,
@@ -564,7 +564,7 @@ const ClaimTracking = ({
         api={api}
         defaultColumns={[]}
         search={false}
-        scroll={{ x: 2000, y: height - 260 }}
+        scroll={{ x: 2000, y: mainDivHeight - 340 }}
         pagination={{ defaultPageSize: 20, showSizeChanger: true }}
       />
 
@@ -589,6 +589,7 @@ const ClaimTracking = ({
   )
 }
 
-export default connect(({ clinicSettings }) => ({
+export default connect(({ clinicSettings, global }) => ({
   clinicSettings: clinicSettings.settings,
+  mainDivHeight: global.mainDivHeight,
 }))(ClaimTracking)

@@ -10,7 +10,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -22,7 +22,7 @@ const styles = (theme) => ({
 class SMSTemplate extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingSmsTemplate/query',
       payload: {
@@ -40,16 +40,17 @@ class SMSTemplate extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingSmsTemplate, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterTemplateMessageBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterTemplateMessageBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />

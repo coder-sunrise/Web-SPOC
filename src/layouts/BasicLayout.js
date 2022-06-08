@@ -254,11 +254,11 @@ class BasicLayout extends React.PureComponent {
     if (window.innerWidth >= 960) {
       this.setState({ mobileOpen: false })
     }
-    if (window.mainPanel) {
+    if (window) {
       this.props.dispatch({
         type: 'global/updateState',
         payload: {
-          mainDivHeight: window.mainPanel.offsetHeight - headerHeight,
+          mainDivHeight: window.innerHeight - headerHeight,
         },
       })
     }

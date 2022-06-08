@@ -10,7 +10,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -22,11 +22,11 @@ const styles = (theme) => ({
 class RevenueCategory extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingRevenue/query',
       payload: {
-        isActive:true,
+        isActive: true,
       },
     })
   }
@@ -40,16 +40,16 @@ class RevenueCategory extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingRevenue, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height = mainDivHeight - 120 - ($('.filterRevenueBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterRevenueBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />
@@ -58,11 +58,9 @@ class RevenueCategory extends PureComponent {
           open={settingRevenue.showModal}
           observe='RevenueDetail'
           title={
-            settingRevenue.entity ? (
-              'Edit Revenue Category'
-            ) : (
-              'Add Revenue Category'
-            )
+            settingRevenue.entity
+              ? 'Edit Revenue Category'
+              : 'Add Revenue Category'
           }
           maxWidth='md'
           bodyNoPadding

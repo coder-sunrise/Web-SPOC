@@ -42,7 +42,7 @@ const styles = () => ({
   mainDivHeight: global.mainDivHeight,
 }))
 class PatientDeposit extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       showDeleteConfirmation: false,
@@ -50,25 +50,29 @@ class PatientDeposit extends PureComponent {
       reportViewerOpen: false,
       reportID: undefined,
       reportParameters: {},
-      selectedTypeIds: [
-        -99,
-      ],
+      selectedTypeIds: [-99],
       hasActiveSession: true,
+      headerHeight: 0,
+      footerHeight: 0,
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.checkHasActiveSession()
     setTimeout(() => {
       this.searchResult()
     }, 10)
+    this.setState({
+      headerHeight: $('.filterPatientDepositBar').height(),
+      footerHeight: $('.footerPatientDepositBar').height(),
+    })
   }
 
   checkHasActiveSession = () => {
     const bizSessionPayload = {
       IsClinicSessionClosed: false,
     }
-    getBizSession(bizSessionPayload).then((result) => {
+    getBizSession(bizSessionPayload).then(result => {
       if (result) {
         const { data } = result.data
         this.setState({ hasActiveSession: data.length > 0 })
@@ -77,7 +81,10 @@ class PatientDeposit extends PureComponent {
   }
 
   searchResult = () => {
-    const { dispatch, patient: { entity: patientEntity } } = this.props
+    const {
+      dispatch,
+      patient: { entity: patientEntity },
+    } = this.props
 
     const patientId = patientEntity.id // Number(findGetParameter('pid'))
     dispatch({
@@ -85,12 +92,9 @@ class PatientDeposit extends PureComponent {
       payload: {
         code: 'ltdeposittransactiontype',
       },
-    }).then((r) => {
+    }).then(r => {
       const allids = r.reduce((p, c) => {
-        return [
-          ...p,
-          c.id,
-        ]
+        return [...p, c.id]
       }, [])
 
       this.setState({
@@ -109,40 +113,37 @@ class PatientDeposit extends PureComponent {
   }
 
   toggleReportViewer = (reportID, reportParameters = {}) => {
-    this.setState((prevState) => ({
+    this.setState(prevState => ({
       reportViewerOpen: !prevState.reportViewerOpen,
       reportID,
       reportParameters,
     }))
   }
 
-  handlePrintReceipt = (row) => {
+  handlePrintReceipt = row => {
     const reportID = 58
     this.toggleReportViewer(reportID, { transactionId: row.id })
   }
 
-  handleDeleteRow = async (row) => {
-    const { patient: { entity } } = this.props
+  handleDeleteRow = async row => {
+    const {
+      patient: { entity },
+    } = this.props
     if (entity && entity.isActive) {
       this.setState({ showDeleteConfirmation: true, deletingRow: row })
     }
   }
 
-  handleTypeChange = (opt) => {
+  handleTypeChange = opt => {
     this.setState({
-      selectedTypeIds:
-        !opt || opt.length === 0
-          ? [
-              -99,
-            ]
-          : opt,
+      selectedTypeIds: !opt || opt.length === 0 ? [-99] : opt,
     })
   }
 
   closeDeleteConfirmationModal = () =>
     this.setState({ showDeleteConfirmation: false, deletingRow: undefined })
 
-  confirmDelete = async (reason) => {
+  confirmDelete = async reason => {
     const { deletingRow } = this.state
 
     await this.props.dispatch({
@@ -156,13 +157,18 @@ class PatientDeposit extends PureComponent {
     this.searchResult()
   }
 
-  render () {
+  render() {
     const {
       patient: { entity, deposit },
       classes,
       mainDivHeight = 700,
     } = this.props
-    const { selectedTypeIds, showDeleteConfirmation } = this.state
+    const {
+      selectedTypeIds,
+      showDeleteConfirmation,
+      headerHeight,
+      footerHeight,
+    } = this.state
     const patientIsActive = entity && entity.isActive
 
     let transactionList = []
@@ -173,13 +179,13 @@ class PatientDeposit extends PureComponent {
 
       totalAmount = roundTo(
         patientDepositTransaction
-          .filter((f) => !f.isCancelled)
-          .map((row) => row.amount)
+          .filter(f => !f.isCancelled)
+          .map(row => row.amount)
           .reduce((p, c) => p + c, 0),
       )
       refundableAmount = roundTo(deposit.balance)
 
-      patientDepositTransaction.map((row) => {
+      patientDepositTransaction.map(row => {
         if (
           selectedTypeIds.includes(row.transactionTypeFK) ||
           selectedTypeIds.includes(-99)
@@ -197,10 +203,7 @@ class PatientDeposit extends PureComponent {
       fullWidth: false,
     }
 
-    let height =
-      mainDivHeight - 310 - $('.filterBar').height() ||
-      0 - $('.footerBar').height() ||
-      0
+    let height = mainDivHeight - 260 - (headerHeight || 0) - (footerHeight || 0)
     if (height < 300) height = 300
     return (
       <Authorized authority='patientdatabase.patientprofiledetails.patienthistory.deposit'>
@@ -214,9 +217,9 @@ class PatientDeposit extends PureComponent {
                   : depositAccessRight,
             }}
           >
-            <React.Fragment>
+            <div>
               <CardContainer hideHeader size='sm'>
-                <div className='filterBar'>
+                <div className='filterPatientDepositBar'>
                   {!this.state.hasActiveSession ? (
                     <div style={{ paddingTop: 5 }}>
                       <WarningSnackbar
@@ -255,7 +258,7 @@ class PatientDeposit extends PureComponent {
                     />
                   </GridItem>
                 </GridContainer>
-                <div className='footerBar'>
+                <div className='footerPatientDepositBar'>
                   <GridContainer>
                     <GridItem md={2} />
                     <GridItem md={10} style={{ marginTop: 10 }}>
@@ -308,7 +311,7 @@ class PatientDeposit extends PureComponent {
                   reportParameters={this.state.reportParameters}
                 />
               </CommonModal>
-            </React.Fragment>
+            </div>
           </Authorized.Context.Provider>
         )}
       </Authorized>

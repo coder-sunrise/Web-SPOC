@@ -33,7 +33,7 @@ class DrugAllergy extends PureComponent {
     this.props.dispatch({
       type: 'settingDrugAllergy/query',
       payload: {
-        isActive:true,
+        isActive: true,
       },
     })
   }
@@ -52,11 +52,12 @@ class DrugAllergy extends PureComponent {
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterDrugAllergyBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterDrugAllergyBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...this.props} height={height} />

@@ -10,7 +10,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -23,11 +23,11 @@ const styles = (theme) => ({
 class ServiceCenter extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingServiceCenter/query',
       payload: {
-        isActive:true,
+        isActive: true,
       },
     })
   }
@@ -41,16 +41,17 @@ class ServiceCenter extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingServiceCenter, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterServiceCenterBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterServiceCenterBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />
@@ -58,11 +59,9 @@ class ServiceCenter extends PureComponent {
           open={settingServiceCenter.showModal}
           observe='ServiceCenterDetail'
           title={
-            settingServiceCenter.entity ? (
-              'Edit Service Center'
-            ) : (
-              'Add Service Center'
-            )
+            settingServiceCenter.entity
+              ? 'Edit Service Center'
+              : 'Add Service Center'
           }
           maxWidth='md'
           bodyNoPadding

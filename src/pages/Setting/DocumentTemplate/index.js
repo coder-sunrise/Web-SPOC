@@ -11,7 +11,7 @@ import Grid from './Grid'
 import Detail from './Detail'
 import { DOCUMENT_CATEGORY } from '@/utils/constants'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -23,11 +23,11 @@ const styles = (theme) => ({
 class DocumentTemplate extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingDocumentTemplate/query',
       payload: {
-        isActive:true,
+        isActive: true,
       },
     })
   }
@@ -41,17 +41,24 @@ class DocumentTemplate extends PureComponent {
     })
   }
 
-  render () {
-    const { settingDocumentTemplate, mainDivHeight = 700, settingDocumentTemplate:{documentCategoryFK} } = this.props
+  render() {
+    const {
+      settingDocumentTemplate,
+      mainDivHeight = 700,
+      settingDocumentTemplate: { documentCategoryFK },
+    } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterDocumentTemplateBar').height() || 0)
     if (height < 300) height = 300
-    const isFullScreen = (settingDocumentTemplate.entity?.documentCategoryFK || documentCategoryFK) === DOCUMENT_CATEGORY.FORM
+    const isFullScreen =
+      (settingDocumentTemplate.entity?.documentCategoryFK ||
+        documentCategoryFK) === DOCUMENT_CATEGORY.FORM
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterDocumentTemplateBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />
@@ -59,9 +66,9 @@ class DocumentTemplate extends PureComponent {
           open={settingDocumentTemplate.showModal}
           observe='DocumentTemplateDetail'
           // title={this.getModalTitle(settingDocumentTemplate.entity)}
-          title={`${settingDocumentTemplate.entity
-            ? 'Edit '
-            : 'Add '}Document Template`}
+          title={`${
+            settingDocumentTemplate.entity ? 'Edit ' : 'Add '
+          }Document Template`}
           maxWidth='lg'
           fullScreen={isFullScreen}
           bodyNoPadding

@@ -19,7 +19,7 @@ import Details from './Details'
 
 const NonClaimableHistory = ({
   dispatch,
-  height,
+  mainDivHeight = 700,
   patientProfileFK,
   values,
 }) => {
@@ -221,7 +221,7 @@ const NonClaimableHistory = ({
         api={api}
         defaultColumns={[]}
         search={false}
-        scroll={{ x: 1200, y: height - 330 }}
+        scroll={{ x: 1200, y: mainDivHeight - 340 }}
         pagination={{ defaultPageSize: 20, showSizeChanger: true }}
       />
       {addNonClaimableHistoryDetailsRight.rights === 'enable' &&
@@ -264,6 +264,7 @@ const NonClaimableHistory = ({
   )
 }
 
-export default connect(({ clinicSettings }) => ({
+export default connect(({ clinicSettings, global }) => ({
   clinicSettings: clinicSettings.settings,
+  mainDivHeight: global.mainDivHeight,
 }))(NonClaimableHistory)

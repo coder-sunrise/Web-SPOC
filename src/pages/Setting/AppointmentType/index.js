@@ -11,7 +11,7 @@ import Filter from './Filter'
 import Form from './Form'
 import Grid from './Grid'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
   label: {
     fontSize: '1rem',
@@ -33,7 +33,7 @@ const AppointmentType = ({
     dispatch({
       type: 'settingAppointmentType/query',
       payload: {
-        isActive:true,
+        isActive: true,
         sorting: [
           { columnName: 'isDefault', direction: 'desc' },
           { columnName: 'displayValue', direction: 'asc' },
@@ -56,11 +56,12 @@ const AppointmentType = ({
   const formTitlePrefix =
     settingAppointmentType.entity === null ? 'Add' : 'Edit'
 
-  let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+  let height =
+    mainDivHeight - 120 - ($('.filterAppointmentTypeBar').height() || 0)
   if (height < 300) height = 300
   return (
     <CardContainer hideHeader>
-      <div className='filterBar'>
+      <div className='filterAppointmentTypeBar'>
         <Filter
           toggleModal={toggleModal}
           {...restProps}

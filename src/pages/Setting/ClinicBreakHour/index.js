@@ -8,7 +8,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -23,16 +23,16 @@ const styles = (theme) => ({
 class ClinicBreakHour extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingClinicBreakHour/query',
       payload: {
-        isActive:true,
+        isActive: true,
       },
     })
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.dispatch({
       type: 'settingClinicBreakHour/updateState',
       payload: {
@@ -51,17 +51,18 @@ class ClinicBreakHour extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingClinicBreakHour, theme, mainDivHeight = 700 } = this.props
 
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterClinicBreakHourBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterClinicBreakHourBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />
@@ -69,11 +70,9 @@ class ClinicBreakHour extends PureComponent {
           open={settingClinicBreakHour.showModal}
           observe='ClinicBreakHourDetail'
           title={
-            settingClinicBreakHour.entity ? (
-              'Edit Clinic Break Hour'
-            ) : (
-              'Add Clinic Break Hour'
-            )
+            settingClinicBreakHour.entity
+              ? 'Edit Clinic Break Hour'
+              : 'Add Clinic Break Hour'
           }
           maxWidth='md'
           bodyNoPadding

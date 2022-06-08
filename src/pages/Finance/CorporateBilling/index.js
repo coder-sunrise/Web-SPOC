@@ -15,7 +15,8 @@ const CorporateBilling = ({
   corporateBilling,
   mainDivHeight = 700,
 }) => {
-  let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+  let height =
+    mainDivHeight - 120 - ($('.filterCorporateBillingBar').height() || 0)
   if (height < 300) height = 300
 
   const onRowDoubleClick = row => {
@@ -33,7 +34,7 @@ const CorporateBilling = ({
 
   return (
     <CardContainer hideHeader>
-      <div className='filterBar'>
+      <div className='filterCorporateBillingBar'>
         <FilterBar {...props} />
       </div>
       <CorporateBillingGrid {...props} />

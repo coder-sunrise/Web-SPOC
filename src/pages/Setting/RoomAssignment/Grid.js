@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { compose } from 'redux'
 import { connect } from 'dva'
+import $ from 'jquery'
 import moment from 'moment'
 import {
   withFormikExtend,
@@ -29,6 +30,7 @@ const Grid = ({
   global,
   codetable,
   theme,
+  mainDivHeight = 700,
   ...restProps
 }) => {
   const [doctorOptions, setDoctorOptions] = useState([])
@@ -133,9 +135,15 @@ const Grid = ({
   //   codetable,
   //   restProps,
   // )
+  let height =
+    mainDivHeight -
+    120 -
+    ($('.filterRoomAssignmentBar').height() || 0) -
+    ($('.footerRoomAssignmentBar').height() || 0)
+  if (height < 300) height = 300
   return (
     <div>
-      <GridItem md={3}>
+      <GridItem md={3} className='filterRoomAssignmentBar'>
         <p>* Only doctor users can be assigned to a room</p>
       </GridItem>
       <EditableTableGrid
@@ -152,10 +160,16 @@ const Grid = ({
           onCommitChanges,
           onAddedRowsChange,
         }}
+        TableProps={{
+          height,
+        }}
         {...tableParas}
       />
 
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
+      <div
+        style={{ display: 'flex', justifyContent: 'center' }}
+        className='footerRoomAssignmentBar'
+      >
         <Button
           color='danger'
           onClick={navigateDirtyCheck({

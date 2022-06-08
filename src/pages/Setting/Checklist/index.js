@@ -10,7 +10,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Details'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -22,11 +22,11 @@ const styles = (theme) => ({
 class Checklist extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingChecklist/query',
       payload: {
-        isActive:true,
+        isActive: true,
       },
     })
   }
@@ -40,16 +40,16 @@ class Checklist extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingChecklist, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height = mainDivHeight - 120 - ($('.filterChecklistBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterChecklistBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />
@@ -57,13 +57,7 @@ class Checklist extends PureComponent {
         <CommonModal
           open={settingChecklist.showModal}
           observe='ChecklistDetail'
-          title={
-            settingChecklist.entity ? (
-              'Edit Checklist'
-            ) : (
-              'Add Checklist'
-            )
-          }
+          title={settingChecklist.entity ? 'Edit Checklist' : 'Add Checklist'}
           maxWidth='lg'
           bodyNoPadding
           onClose={this.toggleModal}

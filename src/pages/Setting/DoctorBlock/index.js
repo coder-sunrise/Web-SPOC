@@ -14,7 +14,7 @@ import { LoadingWrapper } from '@/components/_medisys'
 import Filter from './Filter'
 import Grid from './Grid'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -51,7 +51,7 @@ class DoctorBlock extends PureComponent {
       })
   }
 
-  handleEdit = (id) => {
+  handleEdit = id => {
     this.props
       .dispatch({
         type: 'doctorBlock/queryOne',
@@ -62,7 +62,7 @@ class DoctorBlock extends PureComponent {
       })
   }
 
-  confirmDelete = (id) => {
+  confirmDelete = id => {
     const { dispatch } = this.props
     dispatch({
       type: 'doctorBlock/delete',
@@ -74,7 +74,7 @@ class DoctorBlock extends PureComponent {
     })
   }
 
-  handleDelete = (id) => {
+  handleDelete = id => {
     const { dispatch } = this.props
     dispatch({
       type: 'global/updateAppState',
@@ -92,14 +92,15 @@ class DoctorBlock extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { showModal } = this.state
     const { doctorBlock, loading, dispatch, mainDivHeight = 700 } = this.props
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterDoctorBlockBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterDoctorBlockBar'>
           <Filter toggleModal={this.toggleModal} dispatch={dispatch} />
         </div>
         <LoadingWrapper loading={loading} text='Refreshing list...'>

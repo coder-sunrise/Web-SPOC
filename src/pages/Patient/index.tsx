@@ -249,6 +249,7 @@ const saveColumnsSetting = (dispatch, columnsSetting) => {
 const PatientIndex = ({
   dispatch,
   patient: { favPatDBColumnSetting = {}, onRefresh = false },
+  mainDivHeight = 700,
 }) => {
   const createPatProfileAccessRight = Authorized.check(
     'patientdatabase.newpatient',
@@ -367,15 +368,16 @@ const PatientIndex = ({
             },
           }
         }}
-        scroll={{ x: 1100, y: window.innerHeight - 300 }}
+        scroll={{ x: 1100, y: mainDivHeight - 260 }}
       />
     </div>
   )
 }
 
 // @ts-ignore
-export default connect(({ patient }) => {
+export default connect(({ patient, global }) => {
   return {
     patient,
+    mainDivHeight: global.mainDivHeight,
   }
 })(PatientIndex)

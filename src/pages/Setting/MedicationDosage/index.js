@@ -10,7 +10,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -23,11 +23,11 @@ const styles = (theme) => ({
 class MedicationDosage extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingMedicationDosage/query',
       payload: {
-        isActive:true,
+        isActive: true,
       },
     })
   }
@@ -41,16 +41,17 @@ class MedicationDosage extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingMedicationDosage, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterMedicationDosageBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterMedicationDosageBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />
@@ -59,11 +60,9 @@ class MedicationDosage extends PureComponent {
           open={settingMedicationDosage.showModal}
           observe='MedicationDosageDetail'
           title={
-            settingMedicationDosage.entity ? (
-              'Edit Medication Dosage'
-            ) : (
-              'Add Medication Dosage'
-            )
+            settingMedicationDosage.entity
+              ? 'Edit Medication Dosage'
+              : 'Add Medication Dosage'
           }
           maxWidth='md'
           bodyNoPadding
