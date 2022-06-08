@@ -189,6 +189,18 @@ export default createListViewModel({
         }
         return false
       },
+      *queryInvoiceHistoryDetails({ payload }, { call, put }) {
+        const response = yield call(service.queryInvoiceHistoryDetails, payload)
+
+        if (response.status === '200') {
+          yield put({
+            type: 'getInvoiceHistoryDetails',
+            payload: response,
+          })
+          return response
+        }
+        return false
+      },
       *saveUserPreference({ payload }, { call, put, select }) {
         const r = yield call(saveUserPreference, {
           ...payload,
@@ -332,120 +344,142 @@ export default createListViewModel({
           invoiceHistory: {
             entity: data,
             list: data.data.map(o => {
-              return {
-                ...o,
-                invoicePayer: o.invoicePayer.map(ip => {
-                  let paymentTxnList = []
-                  const {
-                    invoicePayment,
-                    invoicePayerWriteOff,
-                    creditNote,
-                    statementInvoice,
-                    patientDepositTransaction,
-                  } = ip
+              return { ...o, invoicePayer: [], invoiceDetail: {} }
+            }),
+          },
+        }
+      },
+      getInvoiceHistoryDetails(st, { payload }) {
+        const { data } = payload
+        return {
+          ...st,
+          invoiceHistory: {
+            ...st.invoiceHistory,
+            list: st.invoiceHistory.list.map(s => {
+              if (s.id === data.id) {
+                return {
+                  ...s,
+                  invoiceTotalAftGST: data.invoiceTotalAftGST,
+                  totalPayment: data.totalPayment,
+                  patientOutstanding: data.patientOutstanding,
+                  isLoad: true,
+                  invoiceDetail: { ...data.invoiceDetail },
+                  invoicePayer: data.invoicePayer.map(ip => {
+                    let paymentTxnList = []
+                    const {
+                      invoicePayment,
+                      invoicePayerWriteOff,
+                      creditNote,
+                      statementInvoice,
+                      patientDepositTransaction,
+                    } = ip
 
-                  // Payment
-                  paymentTxnList = (paymentTxnList || []).concat(
-                    (invoicePayment || []).map(z => {
-                      return {
-                        ...z,
-                        // id: z.id,
-                        type: 'Payment',
-                        itemID: z.receiptNo,
-                        date: z.paymentReceivedDate,
-                        amount: z.totalAmtPaid,
-                        isCancelled: z.isCancelled,
-                      }
-                    }),
-                  )
-
-                  // Write-Off
-                  paymentTxnList = (paymentTxnList || []).concat(
-                    (invoicePayerWriteOff || []).map(z => {
-                      return {
-                        ...z,
-                        // id: z.id,
-                        type: 'Write Off',
-                        itemID: z.writeOffCode,
-                        date: z.writeOffDate,
-                        amount: z.writeOffAmount,
-                        reason: z.writeOffReason,
-                        isCancelled: z.isCancelled,
-                      }
-                    }),
-                  )
-
-                  // Credit Note
-                  paymentTxnList = (paymentTxnList || []).concat(
-                    (creditNote || []).map(z => {
-                      return {
-                        ...z,
-                        // id: z.id,
-                        type: 'Credit Note',
-                        itemID: z.creditNoteNo,
-                        date: z.generatedDate,
-                        amount: z.totalAftGST,
-                        reason: z.remark,
-                        isCancelled: z.isCancelled,
-                      }
-                    }),
-                  )
-
-                  // Invoice PayerDepposit
-                  paymentTxnList = (paymentTxnList || []).concat(
-                    (patientDepositTransaction || []).map(z => {
-                      return {
-                        ...z,
-                        type: 'Deposit',
-                        itemID: z.depositTransactionNo,
-                        date: z.transactionDate,
-                        reason: z.remarks,
-                      }
-                    }),
-                  )
-
-                  // Statement Corporate Charges
-                  paymentTxnList = (paymentTxnList || []).concat(
-                    (statementInvoice || [])
-                      .filter(x => x.adminCharge > 0)
-                      .map(z => {
+                    // Payment
+                    paymentTxnList = (paymentTxnList || []).concat(
+                      (invoicePayment || []).map(z => {
                         return {
                           ...z,
                           // id: z.id,
-                          type: 'Corporate Charges',
-                          itemID: z.statementNo,
-                          date: z.statementDate,
-                          amount: z.adminCharge,
-                          reason: '',
-                          isCancelled: undefined,
+                          type: 'Payment',
+                          itemID: z.receiptNo,
+                          date: z.paymentReceivedDate,
+                          amount: z.totalAmtPaid,
+                          isCancelled: z.isCancelled,
                         }
                       }),
-                  )
+                    )
 
-                  // Statement Adjustment
-                  paymentTxnList = (paymentTxnList || []).concat(
-                    (statementInvoice || [])
-                      .filter(
-                        x => x.statementAdjustment && x.statementAdjustment > 0,
-                      )
-                      .map(z => {
+                    // Write-Off
+                    paymentTxnList = (paymentTxnList || []).concat(
+                      (invoicePayerWriteOff || []).map(z => {
                         return {
                           ...z,
                           // id: z.id,
-                          type: 'Statement Adjustment',
-                          itemID: z.statementNo,
-                          date: z.statementDate,
-                          amount: z.statementAdjustment,
-                          reason: '',
-                          isCancelled: undefined,
+                          type: 'Write Off',
+                          itemID: z.writeOffCode,
+                          date: z.writeOffDate,
+                          amount: z.writeOffAmount,
+                          reason: z.writeOffReason,
+                          isCancelled: z.isCancelled,
                         }
                       }),
-                  )
-                  return {
-                    ...ip,
-                    paymentTxnList,
-                  }
-                }),
+                    )
+
+                    // Credit Note
+                    paymentTxnList = (paymentTxnList || []).concat(
+                      (creditNote || []).map(z => {
+                        return {
+                          ...z,
+                          // id: z.id,
+                          type: 'Credit Note',
+                          itemID: z.creditNoteNo,
+                          date: z.generatedDate,
+                          amount: z.totalAftGST,
+                          reason: z.remark,
+                          isCancelled: z.isCancelled,
+                        }
+                      }),
+                    )
+
+                    // Invoice PayerDepposit
+                    paymentTxnList = (paymentTxnList || []).concat(
+                      (patientDepositTransaction || []).map(z => {
+                        return {
+                          ...z,
+                          type: 'Deposit',
+                          itemID: z.depositTransactionNo,
+                          date: z.transactionDate,
+                          reason: z.remarks,
+                        }
+                      }),
+                    )
+
+                    // Statement Corporate Charges
+                    paymentTxnList = (paymentTxnList || []).concat(
+                      (statementInvoice || [])
+                        .filter(x => x.adminCharge > 0)
+                        .map(z => {
+                          return {
+                            ...z,
+                            // id: z.id,
+                            type: 'Corporate Charges',
+                            itemID: z.statementNo,
+                            date: z.statementDate,
+                            amount: z.adminCharge,
+                            reason: '',
+                            isCancelled: undefined,
+                          }
+                        }),
+                    )
+
+                    // Statement Adjustment
+                    paymentTxnList = (paymentTxnList || []).concat(
+                      (statementInvoice || [])
+                        .filter(
+                          x =>
+                            x.statementAdjustment && x.statementAdjustment > 0,
+                        )
+                        .map(z => {
+                          return {
+                            ...z,
+                            // id: z.id,
+                            type: 'Statement Adjustment',
+                            itemID: z.statementNo,
+                            date: z.statementDate,
+                            amount: z.statementAdjustment,
+                            reason: '',
+                            isCancelled: undefined,
+                          }
+                        }),
+                    )
+                    return {
+                      ...ip,
+                      paymentTxnList,
+                    }
+                  }),
+                }
+              } else {
+                return { ...s }
               }
             }),
           },

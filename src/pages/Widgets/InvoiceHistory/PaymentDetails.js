@@ -61,10 +61,10 @@ class PaymentDetails extends Component {
   }
 
   refresh = () => {
-    const { refreshInvoiceList } = this.props
+    const { refreshInvoiceHistoryDetails, invoiceDetail } = this.props
 
-    if (refreshInvoiceList) {
-      refreshInvoiceList()
+    if (refreshInvoiceHistoryDetails) {
+      refreshInvoiceHistoryDetails(invoiceDetail.id)
     }
   }
 

@@ -2,6 +2,7 @@ import * as service from '@/services/common'
 
 const url = '/api/PatientHistory'
 const invoiceHistoryUrl = '/api/invoice/patient'
+const invoiceHistoryDetailsUrl = '/api/invoice/historyDetails'
 const queueUrl = '/api/queue'
 
 const fns = {
@@ -21,6 +22,9 @@ const fns = {
   },
   queryInvoiceHistory: params => {
     return service.queryList(invoiceHistoryUrl, params)
+  },
+  queryInvoiceHistoryDetails: params => {
+    return service.query(invoiceHistoryDetailsUrl, params)
   },
   queryPrevDoctorNotes: params => {
     return service.query(`${url}/PreviousDoctorNote/${params.visitId}`, params)

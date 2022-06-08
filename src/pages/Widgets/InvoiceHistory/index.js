@@ -89,8 +89,18 @@ const InvoiceHistory = ({
     dispatch({
       type: 'patientHistory/queryInvoiceHistory',
       payload: {
-        'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.Id': id,
+        apiCriteria: {
+          PatientProfileID: id,
+        },
         pagesize: 9999,
+      },
+    })
+  }
+  const refreshInvoiceHistoryDetails = invoiceId => {
+    dispatch({
+      type: 'patientHistory/queryInvoiceHistoryDetails',
+      payload: {
+        id: invoiceId,
       },
     })
   }
@@ -159,7 +169,7 @@ const InvoiceHistory = ({
       <PaymentDetails
         invoiceDetail={o.invoiceDetail}
         invoicePayer={o.invoicePayer}
-        refreshInvoiceList={refreshInvoiceList}
+        refreshInvoiceHistoryDetails={refreshInvoiceHistoryDetails}
         readOnly={!hasActiveSession}
         hasActiveSession={hasActiveSession}
         patientIsActive={entity.isActive}
@@ -177,10 +187,8 @@ const InvoiceHistory = ({
       totalPayment,
       patientOutstanding,
       invoiceTotalAftGST,
-      invoiceDetail = {},
+      visitOrderTemplateFK,
     } = row
-    const { visitOrderTemplateFK } = invoiceDetail
-
     return (
       <GridContainer>
         <GridItem sm={12}>
@@ -338,6 +346,8 @@ const InvoiceHistory = ({
             mode='multiple'
             collapses={list.map(o => {
               const returnValue = {
+                isLoad: o.isLoad,
+                key: o.id,
                 title: getTitle(o),
                 content: getContent(o),
               }
@@ -346,6 +356,11 @@ const InvoiceHistory = ({
                 row: o,
               }
             })}
+            onChange={(event, p, expanded) => {
+              if (expanded && !p.prop.isLoad) {
+                refreshInvoiceHistoryDetails(p.prop.key)
+              }
+            }}
           />
         </div>
 
