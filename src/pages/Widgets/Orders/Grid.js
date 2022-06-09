@@ -1538,7 +1538,7 @@ export default ({
                       key={1}
                       style={{
                         position: 'relative',
-                        color: 'rgba(0, 0, 0, 0.87)',
+                        color: 'rgba(0, 0, 0, 1)',
                       }}
                     >
                       {visit && visit.visitOrderTemplateFK && (

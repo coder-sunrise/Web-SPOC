@@ -89,8 +89,7 @@ const container = {
 }
 
 const boxShadow = {
-  boxShadow:
-    '0 10px 30px -12px rgba(0, 0, 0, 0.42), 0 4px 25px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2)',
+  boxShadow: 'none',
 }
 
 const card = {
@@ -100,7 +99,7 @@ const card = {
   margin: '25px 0',
   boxShadow: '0 1px 4px 0 rgba(0, 0, 0, 0.14)',
   borderRadius: '6px',
-  color: 'rgba(0, 0, 0, 0.87)',
+  color: 'rgba(0, 0, 0, 1)',
   background: '#fff',
 }
 
@@ -109,11 +108,11 @@ const defaultFont = {
   fontWeight: '300',
   lineHeight: '1.5em',
 }
-const fontColor = 'rgba(0, 0, 0, 0.87)'
+const fontColor = 'rgba(0, 0, 0, 1)'
 
 // const primaryColor = '#2196f3'
 // const primaryColor = '#9c27b0'
-const warningColor = '#ff9800'
+const warningColor = '#996600'
 // const dangerColor = '#f44336'
 // const successColor = '#25bc29'
 const infoColor = '#14bace'
@@ -126,9 +125,9 @@ const primaryColor = '#4255bd'
 const secondaryColor = '#1890ff'
 const successColor = '#389e0d'
 const dangerColor = '#cf1322'
-const hoverColor = '#d6e4ff'
-const tableEvenRowColor = '#f0f5ff'
-const accordionColor = '#daecf5'
+const hoverColor = '#c8dafd'
+const tableEvenRowColor = '#f0f8ff'
+const accordionColor = '#f0f8ff'
 
 const grayColors = [
   '#999',
@@ -156,8 +155,8 @@ const whiteColor = '#FFF'
 const borderColor = 'rgba(0, 0, 0, 0.12)'
 const border = `1px solid ${borderColor}`
 const primaryBoxShadow = {
-  boxShadow:
-    '0 12px 20px -10px rgba(28, 26, 124, 0.28), 0 4px 20px 0px rgba(0, 0, 0, 0.12), 0 7px 8px -5px rgba(28, 26, 124, 0.2)',
+  boxShadow: 'none',
+  // '0 12px 20px -10px rgba(28, 26, 124, 0.28), 0 4px 20px 0px rgba(0, 0, 0, 0.12), 0 7px 8px -5px rgba(28, 26, 124, 0.2)',
 }
 const infoBoxShadow = {
   boxShadow:

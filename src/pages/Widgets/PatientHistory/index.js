@@ -471,8 +471,8 @@ class PatientHistory extends Component {
     return (
       <div
         style={{
-          padding: '3px 0px 8px 0px',
-          height: 36,
+          padding: '5px 0px 4px 0px',
+          height: 40,
         }}
         onClick={() => {
           this.setState(preState => {
@@ -505,7 +505,6 @@ class PatientHistory extends Component {
                     fromModule === 'History' || fromModule === 'MedicalCheckup'
                       ? -12
                       : -16,
-                  marginLeft: 5,
                   height: 24,
                   width: 30,
                 }}
@@ -517,7 +516,7 @@ class PatientHistory extends Component {
                   label=''
                   checked={isSelect}
                   onChange={e => this.selectOnChange(e, row)}
-                  style={{ width: 20 }}
+                  style={{ width: 20, position: 'relative', top: 3 }}
                 />
               </div>
             )}
@@ -529,7 +528,10 @@ class PatientHistory extends Component {
               marginLeft: fromModule !== 'Consultation' ? -14 : 0,
             }}
           >
-            <span className='material-icons'>
+            <span
+              className='material-icons'
+              style={{ position: 'relative', top: 3 }}
+            >
               {this.state.activeKey.find(key => key === row.currentId)
                 ? 'expand_more'
                 : 'navigate_next'}
@@ -587,7 +589,11 @@ class PatientHistory extends Component {
                     <Tooltip title='Edit Consultation'>
                       <Button
                         color='primary'
-                        style={{ marginLeft: theme.spacing(2) }}
+                        style={{
+                          marginLeft: theme.spacing(2),
+                          position: 'relative',
+                          top: 3,
+                        }}
                         size='sm'
                         justIcon
                         onClick={event => {
@@ -656,7 +662,7 @@ class PatientHistory extends Component {
           style={{
             position: 'absolute',
             right: 0,
-            top: '-2px',
+            top: 0,
           }}
         >
           {isExistsVerifiedReport && (
@@ -677,7 +683,7 @@ class PatientHistory extends Component {
               </Tooltip>
             </div>
           )}
-          {isForInvoiceReplacement && (
+          {true && (
             <div
               style={{
                 display: 'inline-block',
@@ -2450,12 +2456,17 @@ class PatientHistory extends Component {
           >
             {loadVisits.length > 0 ? (
               <div>
-                <Collapse activeKey={activeKey} expandIconPosition={null}>
+                <Collapse
+                  style={{ border: 0 }}
+                  activeKey={activeKey}
+                  expandIconPosition={null}
+                >
                   {loadVisits.map(o => {
                     return (
                       <Collapse.Panel
                         header={this.getTitle(o)}
                         key={o.currentId}
+                        style={{ border: '1px solid #d9d9d9', borderRadius: 5 }}
                         className={customtyles.customPanel}
                       >
                         {this.getDetailPanel(o)}

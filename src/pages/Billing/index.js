@@ -1321,17 +1321,11 @@ class Billing extends Component {
         <div className={classes.accordionContainer}>
           <LoadingWrapper linear loading={dispenseLoading}>
             <Accordion
-              leftIcon
-              expandIcon={<SolidExpandMore fontSize='large' />}
               onChange={this.onExpandDispenseDetails}
               collapses={[
                 {
                   key: 0,
-                  title: (
-                    <h5 style={{ paddingLeft: 8, fontWeight: 'bold' }}>
-                      Dispensing Details
-                    </h5>
-                  ),
+                  title: 'Dispensing Details',
                   content: (
                     <div className={classes.dispenseContainer}>
                       <DispenseDetails
@@ -1364,11 +1358,7 @@ class Billing extends Component {
                 },
                 {
                   key: 1,
-                  title: (
-                    <h5 style={{ paddingLeft: 8, fontWeight: 'bold' }}>
-                      Invoice Payment Details
-                    </h5>
-                  ),
+                  title: 'Invoice Payment Details',
                   content: (
                     <div className={classes.dispenseContainer}>
                       <InvoicePaymentDetails

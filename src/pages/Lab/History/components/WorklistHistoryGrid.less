@@ -1,17 +1,29 @@
 .expandableRow {
-  background-color: rgb(250 250 250);
-  // color: white;
+  background-color: #daecf5;
 }
 
+.expandableRow > td {
+  background-color: #daecf5 !important;
+}
+
+.expandableRow .ant-table-cell-row-hover {
+  background-color: #daecf5 !important;
+}
 .table {
   overflow: scroll;
-  height: calc(100vh - 245px);
+  height: calc(100vh - 280px);
   :global {
-    .ant-table-tbody > tr:hover > td {
-      // background: unset;
+    .ant-table-tbody > tr:nth-child(odd) > td {
+      background: #daecf5 !important;
     }
-    .ant-table-tbody > tr:nth-child(odd) > td{
-      background-color: #daecf5;
+    .innerTable .ant-table {
+      margin: -4px -5px 0 25px !important;
+    }
+    .innerTable .ant-table-tbody > tr:nth-child(odd) > td {
+      background: transparent !important;
+    }
+    .innerTable .ant-table-tbody > tr:hover > td {
+      background: transparent !important;
     }
   }
 }

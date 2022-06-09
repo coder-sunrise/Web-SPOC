@@ -20,7 +20,8 @@ const styles = theme => ({
   bigviewBtn: {
     // width: 180,
     marginRight: 0,
-    minHeight: 75,
+    minHeight: 55,
+    padding: '0px 10px !important',
   },
   longTextBtn: {
     '& span': {

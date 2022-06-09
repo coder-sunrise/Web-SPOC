@@ -55,7 +55,7 @@ const tableStyle = theme => ({
     fontSize: "1.25em !important"
   },
   tableHeadCell: {
-    color: "rgba(0, 0, 0, 0.87)",
+    color: "rgba(0, 0, 0, 1)",
     border: "none !important"
   },
   tableCell: {
