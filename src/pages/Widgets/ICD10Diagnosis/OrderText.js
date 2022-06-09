@@ -83,7 +83,7 @@ const OrderText = ({ orders, classes, onSelectItem }) => {
 
     if (externalPrescription.length) {
       newOrderList.push({
-        type: 'Medication (Ext.)',
+        type: 'External Prescription',
         items: externalPrescription.map(row => row.subject),
       })
     }

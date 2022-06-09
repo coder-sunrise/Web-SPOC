@@ -4,6 +4,7 @@ import moment from 'moment'
 import numeral from 'numeral'
 import { currencySymbol, currencyFormat } from '@/utils/config'
 import { GridContainer, GridItem, TextField, Tooltip } from '@/components'
+import { orderItemTypes } from '@/utils/codes'
 import { VISIT_TYPE, RADIOLOGY_CATEGORY, LAB_CATEGORY } from '@/utils/constants'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import AmountSummary from './AmountSummary'
@@ -26,7 +27,7 @@ const wrapCellTextStyle = {
 }
 
 const drugMixtureIndicator = (row, right) => {
-  if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
+  if (!row.isDrugMixture) return null
 
   return <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
 }
@@ -69,7 +70,7 @@ const showCurrency = (value = 0) => {
   )
 }
 
-const baseColumns = classes => {
+const baseColumns = (classes, isFullScreen) => {
   return [
     {
       dataIndex: 'itemType',
@@ -91,13 +92,9 @@ const baseColumns = classes => {
           paddingRight += 34
           urgentRight = -paddingRight - 4
         }
-        let type = row.itemType
-        if (row.isDrugMixture) type = 'Drug Mixture'
-        else if (row.isOpenPrescription) type = 'Open Prescription'
-        else if (LAB_CATEGORY.indexOf(row.serviceCenterCategoryFK) >= 0)
-          type = 'LAB'
-        else if (RADIOLOGY_CATEGORY.indexOf(row.serviceCenterCategoryFK) >= 0)
-          type = 'Radiology'
+        const itemType = orderItemTypes.find(
+          t => t.type.toUpperCase() === (row.itemType || '').toUpperCase(),
+        )
         return (
           <div style={{ position: 'relative' }}>
             <div
@@ -107,7 +104,9 @@ const baseColumns = classes => {
                 paddingRight: paddingRight,
               }}
             >
-              {type}
+              <Tooltip title={row.itemType}>
+                <span>{itemType?.displayValue}</span>
+              </Tooltip>
               <div style={{ position: 'absolute', top: '-1px', right: '-4px' }}>
                 <div
                   style={{
@@ -157,7 +156,7 @@ const baseColumns = classes => {
     {
       dataIndex: 'itemName',
       title: 'Name',
-      width: 250,
+      width: isFullScreen ? 250 : 180,
       render: (text, row) => (
         <Tooltip
           title={
@@ -185,7 +184,7 @@ const baseColumns = classes => {
       dataIndex: 'quantity',
       title: 'Qty.',
       align: 'right',
-      width: 80,
+      width: 60,
       render: (text, row) => (
         <Tooltip
           title={<div>{`${numeral(row.quantity || 0).format('0,0.0')}`}</div>}
@@ -209,14 +208,14 @@ const baseColumns = classes => {
     {
       dataIndex: 'adjAmt',
       title: 'Adj.',
-      width: 90,
+      width: 70,
       align: 'right',
       render: (text, row) => showCurrency(row.adjAmt),
     },
     {
       dataIndex: 'totalAfterItemAdjustment',
       title: 'Total',
-      width: 90,
+      width: 80,
       align: 'right',
       render: (text, row) =>
         showCurrency(
@@ -230,7 +229,7 @@ const baseColumns = classes => {
 
 export default ({ current, theme, isFullScreen = true, classes }) => {
   let invoiceAdjustmentData = []
-  let columns = baseColumns(classes)
+  let columns = baseColumns(classes, isFullScreen)
 
   if (current.invoice) {
     const { invoiceAdjustment = [] } = current.invoice

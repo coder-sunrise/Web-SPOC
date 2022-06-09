@@ -2,22 +2,29 @@ import { Table } from 'antd'
 import numeral from 'numeral'
 import { currencySymbol } from '@/utils/config'
 import { roundTo } from '@/utils/utils'
+import { orderItemTypes } from '@/utils/codes'
 import { GridContainer, GridItem, Tooltip } from '@/components'
 import AmountSummary from '@/pages/Widgets/PatientHistory/AmountSummary'
+import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 const showMoney = (v = 0) => {
   if (v < 0)
     return (
       <span
-        style={{ fontWeight: 'bold', color: 'red' }}
+        style={{ fontWeight: 500, color: 'red' }}
       >{`(${currencySymbol}${numeral(v * -1.0).format('0.00')})`}</span>
     )
   return (
     <span
-      style={{ fontWeight: 'bold', color: 'darkblue' }}
+      style={{ fontWeight: 500, color: 'darkblue' }}
     >{`${currencySymbol}${numeral(v).format('0.00')}`}</span>
   )
 }
-const InvoicePaymentDetails = ({ invoice = {} }) => {
+const drugMixtureIndicator = (row, right) => {
+  if (!row.isDrugMixture) return null
+
+  return <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
+}
+const InvoicePaymentDetails = ({ invoice = {}, classes }) => {
   const { invoiceNo, invoiceItems = [], invoiceAdjustments = [] } = invoice
   return (
     <GridContainer hideHeader>
@@ -31,16 +38,77 @@ const InvoicePaymentDetails = ({ invoice = {} }) => {
           pagination={false}
           dataSource={invoiceItems.map(item => ({
             ...item,
-            outstanding: roundTo(
-              item.totalAfterGst - item.totalClaim - item.paidAmount,
-              2,
-            ),
+            outstanding:
+              (item.isPreOrder && !item.isChargeToday) || item.hasPaid
+                ? 0
+                : roundTo(
+                    item.totalAfterGst - item.totalClaim - item.paidAmount,
+                    2,
+                  ),
           }))}
           columns={[
             {
               dataIndex: 'itemType',
               title: 'Category ',
               width: 130,
+              render: (_, row) => {
+                let paddingRight = 0
+                if (row.isPreOrder) {
+                  paddingRight = 24
+                }
+                if (row.isDrugMixture) {
+                  paddingRight = 10
+                }
+                const itemType = orderItemTypes.find(
+                  t =>
+                    t.type.toUpperCase() === (row.itemType || '').toUpperCase(),
+                )
+                return (
+                  <div style={{ position: 'relative' }}>
+                    <div
+                      style={{
+                        wordWrap: 'break-word',
+                        whiteSpace: 'pre-wrap',
+                        paddingRight: paddingRight,
+                      }}
+                    >
+                      <Tooltip title={row.itemType}>
+                        <span>{itemType?.displayValue}</span>
+                      </Tooltip>
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '-1px',
+                          right: '-6px',
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: 'inline-block',
+                            position: 'relative',
+                          }}
+                        >
+                          {drugMixtureIndicator(row)}
+                        </div>
+                        {row.isPreOrder && (
+                          <Tooltip title='New Pre-Order'>
+                            <div
+                              className={classes.rightIcon}
+                              style={{
+                                borderRadius: 4,
+                                backgroundColor: '#4255bd',
+                                display: 'inline-block',
+                              }}
+                            >
+                              Pre
+                            </div>
+                          </Tooltip>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
+              },
             },
             {
               dataIndex: 'itemDescription',
@@ -89,7 +157,11 @@ const InvoicePaymentDetails = ({ invoice = {} }) => {
               align: 'right',
               width: 80,
               render: (_, row) => {
-                return showMoney(row.gstAmount)
+                return showMoney(
+                  (row.isPreOrder && !row.isChargeToday) || row.hasPaid
+                    ? 0
+                    : row.gstAmount,
+                )
               },
             },
             {
@@ -98,7 +170,11 @@ const InvoicePaymentDetails = ({ invoice = {} }) => {
               align: 'right',
               width: 110,
               render: (_, row) => {
-                return showMoney(row.totalAfterGst)
+                return showMoney(
+                  (row.isPreOrder && !row.isChargeToday) || row.hasPaid
+                    ? 0
+                    : row.totalAfterGst,
+                )
               },
             },
             {

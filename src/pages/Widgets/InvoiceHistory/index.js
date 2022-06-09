@@ -31,7 +31,7 @@ import { primaryColor } from '@/assets/jss'
 const styles = () => ({
   totalOSStyle: {
     textAlign: 'right',
-    fontWeight: 'bold',
+    fontWeight: 500,
     marginTop: 10,
     marginBottom: 10,
   },
@@ -45,13 +45,13 @@ const styles = () => ({
   titleOutput: {
     marginRight: 30,
     marginTop: 5,
-    fontWeight: 'bold',
+    fontWeight: 500,
     color: primaryColor,
   },
   titleNumberOutput: {
     marginRight: 30,
     marginTop: 3,
-    fontWeight: 'bold',
+    fontWeight: 500,
     width: 80,
   },
   titleBold: {

@@ -1,4 +1,4 @@
-export default (theme) => ({
+export default theme => ({
   title: {
     marginBottom: theme.spacing(1),
     fontSize: '1rem',
@@ -34,5 +34,16 @@ export default (theme) => ({
   errorMessage: {
     color: 'red',
     fontWeight: 500,
+  },
+  rightIcon: {
+    position: 'relative',
+    fontWeight: 600,
+    color: 'white',
+    fontSize: '0.7rem',
+    padding: '2px 3px',
+    height: 20,
+    cursor: 'pointer',
+    margin: '0px 1px',
+    lineHeight: '16px',
   },
 })

@@ -14,6 +14,7 @@ import { subscribeNotification } from '@/utils/realtime'
 import { ReportViewer } from '@/components/_medisys'
 import { getRawData } from '@/services/report'
 import { REPORT_ID } from '@/utils/constants'
+import { orderItemTypes } from '@/utils/codes'
 import Print from '@material-ui/icons/Print'
 import {
   GridContainer,
@@ -493,7 +494,7 @@ const Main = props => {
       if (!row.isDrugMixture && !row.inventoryFK) {
         type = 'Open Prescription'
       } else if (row.isExternalPrescription) {
-        type = 'Medication (Ext.)'
+        type = 'External Prescription'
       }
     }
     return type
@@ -900,7 +901,7 @@ const Main = props => {
         title: 'Type',
         width: 120,
         onCell: row => {
-          const mergeCell = isHiddenStock ? 13 : 14
+          const mergeCell = isHiddenStock ? 12 : 13
           if (row.isGroup)
             return {
               colSpan: mergeCell,
@@ -934,28 +935,21 @@ const Main = props => {
             )
           }
           const type = getType(row)
+          const itemType = orderItemTypes.find(
+            t => t.type.toUpperCase() === (type || '').toUpperCase(),
+          )
           return (
             <Tooltip title={type}>
-              <span>{type}</span>
+              <span>{itemType?.displayValue}</span>
             </Tooltip>
           )
         },
       },
       {
-        dataIndex: 'itemCode',
-        key: 'itemCode',
-        title: 'Code',
-        width: 100,
-        onCell: row => ({
-          colSpan: row.isGroup ? 0 : 1,
-          rowSpan: row.countNumber === 1 ? row.rowspan : 0,
-        }),
-      },
-      {
         dataIndex: 'itemName',
         key: 'itemName',
         title: 'Name',
-        width: 200,
+        width: 250,
         onCell: row => ({
           colSpan: row.isGroup ? 0 : 1,
           rowSpan: row.countNumber === 1 ? row.rowspan : 0,
@@ -968,7 +962,15 @@ const Main = props => {
           return (
             <div style={{ position: 'relative' }}>
               <div style={{ paddingRight: paddingRight }}>
-                <Tooltip title={row.itemName}>
+                <Tooltip
+                  title={
+                    <div>
+                      {`Code: ${row.itemCode}`}
+                      <br />
+                      {`Name: ${row.itemName}`}
+                    </div>
+                  }
+                >
                   <span>{row.itemName}</span>
                 </Tooltip>
                 <div
@@ -1016,12 +1018,7 @@ const Main = props => {
         dataIndex: 'quantity',
         key: 'quantity',
         name: 'quantity',
-        title: (
-          <div>
-            <p style={{ height: 16 }}>Ordered</p>
-            <p style={{ height: 16 }}>Qty.</p>
-          </div>
-        ),
+        title: 'Ord. Qty.',
         onCell: row => ({
           colSpan: row.isGroup ? 0 : 1,
           rowSpan: row.countNumber === 1 ? row.rowspan : 0,
@@ -1040,12 +1037,7 @@ const Main = props => {
       {
         dataIndex: 'dispenseQuantity',
         key: 'dispenseQuantity',
-        title: (
-          <div>
-            <p style={{ height: 16 }}>Dispensed</p>
-            <p style={{ height: 16 }}>Qty.</p>
-          </div>
-        ),
+        title: 'Disp. Qty.',
         width: 80,
         onCell: row => ({ colSpan: row.isGroup ? 0 : 1 }),
         align: 'right',
@@ -1246,7 +1238,7 @@ const Main = props => {
       {
         dataIndex: 'stockBalance',
         key: 'stockBalance',
-        title: 'Balance Qty.',
+        title: 'Bal. Qty.',
         width: 100,
         onCell: row => ({
           colSpan: row.isGroup ? 0 : 1,

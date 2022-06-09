@@ -71,6 +71,17 @@ const styles = theme => ({
     paddingTop: theme.spacing(1),
     paddingBottom: theme.spacing(1),
   },
+  rightIcon: {
+    position: 'relative',
+    fontWeight: 600,
+    color: 'white',
+    fontSize: '0.7rem',
+    padding: '2px 3px',
+    height: 20,
+    cursor: 'pointer',
+    margin: '0px 1px',
+    lineHeight: '16px',
+  },
 })
 
 const base64Prefix = 'data:image/jpeg;base64,'
@@ -231,7 +242,7 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
       }
     } else if (
       item.type === 'Open Prescription' ||
-      item.type === 'Medication (Ext.)'
+      item.type === 'External Prescription'
     ) {
       orderItems.push({
         ...defaultItem(item, 'NoNeedToDispense'),
@@ -812,6 +823,9 @@ class Billing extends Component {
 
     if (
       invoiceItems.find(item => {
+        if ((item.isPreOrder && !item.isChargeToday) || item.hasPaid) {
+          return false
+        }
         let totalClaim = 0
         invoicePayer.forEach(payer => {
           const selectInfo = (payer.invoicePayerItem || []).find(
@@ -1357,7 +1371,10 @@ class Billing extends Component {
                   ),
                   content: (
                     <div className={classes.dispenseContainer}>
-                      <InvoicePaymentDetails invoice={values.invoice} />
+                      <InvoicePaymentDetails
+                        invoice={values.invoice}
+                        {...this.props}
+                      />
                     </div>
                   ),
                 },
