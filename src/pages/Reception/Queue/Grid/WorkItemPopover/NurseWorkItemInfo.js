@@ -96,7 +96,7 @@ const NurseWorkItemInfo = props => {
               color: nurseWorkitem.priority === 'Urgent' ? 'red' : 'black',
             }}
           >
-            {nurseWorkitem.priority || '-'}
+            {nurseWorkitem.priority || 'Normal'}
           </td>
           <td
             style={{

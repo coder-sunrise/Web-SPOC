@@ -168,7 +168,7 @@ const LabWorkItemInfo = props => {
                           verticalAlign: 'top',
                         }}
                       >
-                        {labWorkitem.priority || '-'}
+                        {labWorkitem.priority || 'Normal'}
                       </td>
                     )}
                     <td style={{ width: 200, verticalAlign: 'top' }}>
