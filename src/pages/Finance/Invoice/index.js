@@ -37,15 +37,16 @@ class Invoice extends React.Component {
   }
   render() {
     const { classes, mainDivHeight = 700 } = this.props
+    console.log(mainDivHeight);
     let height =
-      window.innerHeight -
-      190 -
-      ($('.filterBar').height() || 0) -
-      ($('.footerBar').height() || 0)
+      mainDivHeight -
+      140 -
+      ($('.filterInvoiceBar').height() || 0) -
+      ($('.footerInvoiceBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterInvoiceBar'>
           <FilterBar {...this.props} />
         </div>
         <InvoiceDataGrid
@@ -53,7 +54,7 @@ class Invoice extends React.Component {
           {...this.props}
           height={height}
         />
-        <div className='footerBar'>
+        <div className='footerInvoiceBar'>
           <p className={classes.footerNote}>
             Note: Total Payment is the sum total of the payment amount of payers
           </p>

@@ -83,8 +83,8 @@ const Detail = ({
     dispatch({
       type: 'clinicSettings/query',
     })
+    checkHasActiveSession()
     if (consumableDetail.currentId) {
-      checkHasActiveSession()
       dispatch({
         type: 'consumableDetail/updateState',
         payload: {

@@ -10,7 +10,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -22,11 +22,11 @@ const styles = (theme) => ({
 class ConsumableUOM extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingConsumableUOM/query',
       payload: {
-        isActive:true,
+        isActive: true,
       },
     })
   }
@@ -40,16 +40,17 @@ class ConsumableUOM extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingConsumableUOM, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterConsumableUOMBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterConsumableUOMBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />
@@ -58,11 +59,9 @@ class ConsumableUOM extends PureComponent {
           open={settingConsumableUOM.showModal}
           observe='ConsumableUOMDetail'
           title={
-            settingConsumableUOM.entity ? (
-              'Edit Consumable UOM'
-            ) : (
-              'Add Consumable UOM'
-            )
+            settingConsumableUOM.entity
+              ? 'Edit Consumable UOM'
+              : 'Add Consumable UOM'
           }
           maxWidth='md'
           bodyNoPadding

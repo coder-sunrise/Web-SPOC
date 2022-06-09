@@ -134,16 +134,22 @@ class CorporateBillingDetails extends PureComponent {
             </div>
             <GridContainer style={{ marginTop: 18 }}>
               <GridItem
-                md={ableToViewByAuthority('finance.addcopayerpayment') ? 9 : 12}
+                md={
+                  ableToViewByAuthority('finance.addpastsessioncopayerpayment')
+                    ? 9
+                    : 12
+                }
               >
                 <InvoiceListing
                   {...this.props}
                   isEnableAddPayment={ableToViewByAuthority(
-                    'finance.addcopayerpayment',
+                    'finance.addpastsessioncopayerpayment',
                   )}
                 />
               </GridItem>
-              {ableToViewByAuthority('finance.addcopayerpayment') && (
+              {ableToViewByAuthority(
+                'finance.addpastsessioncopayerpayment',
+              ) && (
                 <GridItem md={3}>
                   <Payment {...this.props} searchCompany={this.searchCompany} />
                 </GridItem>

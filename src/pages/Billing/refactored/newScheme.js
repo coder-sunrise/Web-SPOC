@@ -420,7 +420,7 @@ const Scheme = ({
                         handlePrinterClick={onPrinterClick}
                         readOnly={shouldDisable()}
                         isEnableDeletePayment={ableToViewByAuthority(
-                          'finance.deletecopayerpayment',
+                          'finance.deletecurrentsessioncopayerpayment',
                         )}
                         isEnableDeleteCreditNote={ableToViewByAuthority(
                           'finance.deletecopayercreditnote',
@@ -432,7 +432,9 @@ const Scheme = ({
             </GridItem>
             <GridItem md={7} style={{ marginTop: 6 }}>
               <div>
-                {ableToViewByAuthority('finance.addcopayerpayment') && (
+                {ableToViewByAuthority(
+                  'finance.addcurrentsessioncopayerpayment',
+                ) && (
                   <Button
                     {...ButtonProps}
                     disabled={

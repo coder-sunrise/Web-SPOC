@@ -25,6 +25,7 @@ const PaymentActions = ({
   readOnly,
   isEnableWriteOffinInvoice,
   visitOrderTemplateFK,
+  isFromPastSession = false,
 }) => {
   const [showPrintInvoiceMenu, setShowPrintInvoiceMenu] = useState(false)
   const ButtonProps = {
@@ -34,11 +35,16 @@ const PaymentActions = ({
     size: 'sm',
   }
   const isEnableAddPayment = () => {
-    if (type === PayerType.PATIENT)
-      return ableToViewByAuthority('finance.addpatientpayment')
-    return ableToViewByAuthority('finance.addcopayerpayment')
+    //can't add payment for current session invoice
+    if (!isFromPastSession) return false
+    if (type === PayerType.PATIENT) {
+      return ableToViewByAuthority('finance.addpastsessionpatientpayment')
+    }
+    return ableToViewByAuthority('finance.addpastsessioncopayerpayment')
   }
   const isEnableAddCreditNote = () => {
+    //can't add Credit Note for current session invoice
+    if (!isFromPastSession) return false
     if (type === PayerType.PATIENT)
       return ableToViewByAuthority('finance.addpatientcreditnote')
     return ableToViewByAuthority('finance.addcopayercreditnote')
@@ -65,7 +71,7 @@ const PaymentActions = ({
           Add Cr. Note
         </Button>
       )}
-      {type === PayerType.PATIENT && (
+      {type === PayerType.PATIENT && isFromPastSession && (
         <Button
           onClick={() => handleTransferToDeposit(invoicePayerFK)}
           disabled={!handleTransferToDeposit || readOnly}
@@ -76,6 +82,7 @@ const PaymentActions = ({
         </Button>
       )}
       {isEnableWriteOffinInvoice &&
+        isFromPastSession &&
         ableToViewByAuthority('finance.createwriteoff') &&
         type === PayerType.PATIENT && (
           <Button
@@ -88,6 +95,7 @@ const PaymentActions = ({
           </Button>
         )}
       {type === PayerType.COPAYER_REAL &&
+        isFromPastSession &&
         ableToViewByAuthority('finance.transfercopayerbalancetopatient') && (
           <Button
             onClick={() => handleTransferClick(invoicePayerFK, type)}

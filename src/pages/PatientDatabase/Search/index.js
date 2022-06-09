@@ -20,16 +20,13 @@ const { Secured } = Authorized
 @compare('patientSearch')
 @Secured('patientdatabase/searchpatient')
 class PatientSearch extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
-    const showPatient = (row) => {
+    const showPatient = row => {
       const viewPatProfileAccessRight = Authorized.check(
         'patientdatabase.patientprofiledetails',
       )
-      const disableRights = [
-        'disable',
-        'hidden',
-      ]
+      const disableRights = ['disable', 'hidden']
       if (
         !this.props.history ||
         (viewPatProfileAccessRight &&
@@ -46,7 +43,7 @@ class PatientSearch extends PureComponent {
         }),
       )
     }
-    this.defaultAction = (row) => (
+    this.defaultAction = row => (
       <Tooltip title='View Patient Profile' placement='bottom'>
         <span>
           <Authorized authority='patientdatabase.patientprofiledetails'>
@@ -68,7 +65,7 @@ class PatientSearch extends PureComponent {
     this.defaultOnDblClick = showPatient
   }
 
-  componentDidMount () {
+  componentDidMount() {
     if (!this.props.disableQueryOnLoad) {
       this.props.dispatch({
         type: 'patientSearch/query',
@@ -82,7 +79,7 @@ class PatientSearch extends PureComponent {
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.dispatch({
       type: 'patientSearch/updateState',
       payload: {
@@ -91,7 +88,7 @@ class PatientSearch extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { props } = this
     const {
       classes,
@@ -104,15 +101,17 @@ class PatientSearch extends PureComponent {
 
     let height = 0
     if (simple) {
-      height = mainDivHeight - 330 - ($('.filterBar').height() || 0)
+      height =
+        mainDivHeight - 330 - ($('.filterPatientSearchBar').height() || 0)
     } else {
-      height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+      height =
+        mainDivHeight - 120 - ($('.filterPatientSearchBar').height() || 0)
     }
     if (height < 300) height = 300
     const newChildren = (
       <React.Fragment>
-        <div style={{maxWidth : 1000}}>
-          <FilterBar {...restProps} simple={simple}/>
+        <div style={{ maxWidth: 1000 }} className='filterPatientSearchBar'>
+          <FilterBar {...restProps} simple={simple} />
         </div>
         <Grid
           simple={simple}

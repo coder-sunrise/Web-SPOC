@@ -11,7 +11,7 @@ import Grid from './Grid'
 import Detail from './Detail'
 import { tagCategory } from '@/utils/codes'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -24,11 +24,11 @@ const styles = (theme) => ({
 @withSettingBase({ modelName: 'settingTag' })
 class Tag extends PureComponent {
   state = {}
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingTag/query',
       payload: {
-        isActive:true,
+        isActive: true,
       },
     })
   }
@@ -42,35 +42,44 @@ class Tag extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingTag, mainDivHeight = 700, clinicSettings } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height = mainDivHeight - 120 - ($('.filterTagBar').height() || 0)
     if (height < 300) height = 300
 
     let tagCategoryOptions =
-      clinicSettings.settings.isEnableLabModule || clinicSettings.settings.isEnableRadiologyModule
+      clinicSettings.settings.isEnableLabModule ||
+      clinicSettings.settings.isEnableRadiologyModule
         ? tagCategory
-        : tagCategory.filter((c) => c.value != 'Service')
+        : tagCategory.filter(c => c.value != 'Service')
 
     return (
       <CardContainer hideHeader>
-        <div className="filterBar">
-          <Filter {...cfg} {...this.props} tagCategoryOptions={tagCategoryOptions} />
+        <div className='filterTagBar'>
+          <Filter
+            {...cfg}
+            {...this.props}
+            tagCategoryOptions={tagCategoryOptions}
+          />
         </div>
         <Grid {...cfg} {...this.props} height={height} />
         <CommonModal
           open={settingTag.showModal}
-          observe="TagDetail"
+          observe='TagDetail'
           title={settingTag.entity ? 'Edit Tag' : 'Add Tag'}
-          maxWidth="md"
+          maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
         >
-          <Detail {...cfg} {...this.props} tagCategoryOptions={tagCategoryOptions} />
+          <Detail
+            {...cfg}
+            {...this.props}
+            tagCategoryOptions={tagCategoryOptions}
+          />
         </CommonModal>
       </CardContainer>
     )

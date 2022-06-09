@@ -106,11 +106,13 @@ class LabTrackingDetails extends PureComponent {
 
     let tableHeight
     if (resultType === PATIENT_LAB.LAB_TRACKING) {
-      tableHeight = mainDivHeight - 120 - ($('.filterBar').height() || 0)
+      tableHeight =
+        mainDivHeight - 130 - ($('.filterLabTrackingBar').height() || 0)
     } else if (resultType === PATIENT_LAB.CONSULTATION) {
-      tableHeight = mainDivHeight - 80 - ($('.filterBar').height() || 0)
+      tableHeight =
+        mainDivHeight - 80 - ($('.filterLabTrackingBar').height() || 0)
     } else {
-      tableHeight = height - 290 - ($('.filterBar').height() || 0)
+      tableHeight = height - 260 - ($('.filterLabTrackingBar').height() || 0)
     }
 
     if (tableHeight < 300) tableHeight = 300
@@ -127,7 +129,7 @@ class LabTrackingDetails extends PureComponent {
 
     return (
       <div>
-        <div className='filterBar'>
+        <div className='filterLabTrackingBar'>
           <FilterBar
             dispatch={dispatch}
             IsOverallGrid={IsOverallGrid}

@@ -80,13 +80,11 @@ class InventoryAdjustment extends PureComponent {
       toggleModal: this.toggleModal,
     }
     let height =
-      mainDivHeight - 110 - $('.filterBar').height() ||
-      0 - $('.footerBar').height() ||
-      0
+      mainDivHeight - 120 - ($('.filterInventoryAdjustmentBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterInventoryAdjustmentBar'>
           <Filter {...cfg} {...this.props} toggleModel={this.toggleModal} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />

@@ -30,7 +30,7 @@ import { primaryColor } from '@/assets/jss'
 
 const styles = () => ({
   totalOSStyle: {
-    float: 'right',
+    textAlign: 'right',
     fontWeight: 'bold',
     marginTop: 10,
     marginBottom: 10,
@@ -89,13 +89,24 @@ const InvoiceHistory = ({
     dispatch({
       type: 'patientHistory/queryInvoiceHistory',
       payload: {
-        'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.Id': id,
+        apiCriteria: {
+          PatientProfileID: id,
+        },
         pagesize: 9999,
+      },
+    })
+  }
+  const refreshInvoiceHistoryDetails = invoiceId => {
+    dispatch({
+      type: 'patientHistory/queryInvoiceHistoryDetails',
+      payload: {
+        id: invoiceId,
       },
     })
   }
 
   const [showPrintInvoiceMenu, setShowPrintInvoiceMenu] = useState(undefined)
+  const [headerHeight, setHeaderHeight] = useState(0)
 
   const { settings = [] } = clinicSettings
   const { isEnableVisitationInvoiceReport = false } = settings
@@ -116,6 +127,10 @@ const InvoiceHistory = ({
   useEffect(() => {
     checkHasActiveSession()
     refreshInvoiceList()
+
+    if ($('.filterInvoiceHistoryBar').height()) {
+      setHeaderHeight($('.filterInvoiceHistoryBar').height())
+    }
   }, [])
 
   const [showReport, setShowReport] = useState({
@@ -159,12 +174,13 @@ const InvoiceHistory = ({
       <PaymentDetails
         invoiceDetail={o.invoiceDetail}
         invoicePayer={o.invoicePayer}
-        refreshInvoiceList={refreshInvoiceList}
+        refreshInvoiceHistoryDetails={refreshInvoiceHistoryDetails}
         readOnly={!hasActiveSession}
         hasActiveSession={hasActiveSession}
         patientIsActive={entity.isActive}
         dispatch={dispatch}
         patientPayer={o.invoiceDetail?.patientPayer}
+        isClinicSessionClosed={o.isClinicSessionClosed}
       />
     )
   }
@@ -176,10 +192,8 @@ const InvoiceHistory = ({
       totalPayment,
       patientOutstanding,
       invoiceTotalAftGST,
-      invoiceDetail = {},
+      visitOrderTemplateFK,
     } = row
-    const { visitOrderTemplateFK } = invoiceDetail
-
     return (
       <GridContainer>
         <GridItem sm={12}>
@@ -309,12 +323,12 @@ const InvoiceHistory = ({
     }, 0)
   }
 
-  let height = mainDivHeight - 230 - ($('.filterBar').height() || 0)
+  let height = mainDivHeight - 260 - headerHeight
   if (height < 300) height = 300
   return (
     <div>
       <CardContainer hideHeader size='sm'>
-        <div className='filterBar'>
+        <div className='filterInvoiceHistoryBar'>
           {!hasActiveSession ? (
             <div style={{ paddingTop: 5 }}>
               <WarningSnackbar
@@ -332,11 +346,13 @@ const InvoiceHistory = ({
             <NumberInput text currency value={getTotalPatientOS()} />
           </div>
         </div>
-        <div style={{ height, marginTop: 50, overflow: 'auto' }}>
+        <div style={{ maxHeight: height, overflow: 'auto' }}>
           <Accordion
             mode='multiple'
             collapses={list.map(o => {
               const returnValue = {
+                isLoad: o.isLoad,
+                key: o.id,
                 title: getTitle(o),
                 content: getContent(o),
               }
@@ -345,6 +361,11 @@ const InvoiceHistory = ({
                 row: o,
               }
             })}
+            onChange={(event, p, expanded) => {
+              if (expanded && !p.prop.isLoad) {
+                refreshInvoiceHistoryDetails(p.prop.key)
+              }
+            }}
           />
         </div>
 

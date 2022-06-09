@@ -162,16 +162,14 @@ class FormListingDetails extends PureComponent {
     const { showModal, formTemplates } = formListing
 
     let height =
-      mainDivHeight - 110 - $('.filterBar').height() ||
-      0 - $('.footerBar').height() ||
-      0
+      mainDivHeight - 120 - ($('.filterFormListingBar').height() || 0)
     if (height < 300) height = 300
     return (
       <div>
         {formFrom === FORM_FROM.FORMMODULE && (
           <CardContainer hideHeader>
             <React.Fragment>
-              <div className='filterBar'>
+              <div className='filterFormListingBar'>
                 <FilterBar {...this.props} />
               </div>
               <FormModuleGrid

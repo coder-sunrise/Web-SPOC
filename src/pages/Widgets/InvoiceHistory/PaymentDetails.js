@@ -61,10 +61,10 @@ class PaymentDetails extends Component {
   }
 
   refresh = () => {
-    const { refreshInvoiceList } = this.props
+    const { refreshInvoiceHistoryDetails, invoiceDetail } = this.props
 
-    if (refreshInvoiceList) {
-      refreshInvoiceList()
+    if (refreshInvoiceHistoryDetails) {
+      refreshInvoiceHistoryDetails(invoiceDetail.id)
     }
   }
 
@@ -385,6 +385,7 @@ class PaymentDetails extends Component {
       patientIsActive,
       clinicSettings,
       patientPayer,
+      isClinicSessionClosed,
     } = this.props
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
@@ -445,6 +446,7 @@ class PaymentDetails extends Component {
                     hasActiveSession={hasActiveSession}
                     patientIsActive={patientIsActive}
                     visitOrderTemplateFK={invoiceDetail?.visitOrderTemplateFK}
+                    isFromPastSession={isClinicSessionClosed}
                   />
                 )
               })

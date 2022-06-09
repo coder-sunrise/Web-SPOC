@@ -18,7 +18,7 @@ import WriteOff from './components/Modal/WriteOff'
 import DuplicateRG from './components/Modal/DuplicateRG'
 import { getAccessRight } from './variables'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
   buttonGroup: {
     marginTop: theme.spacing(2),
@@ -46,14 +46,12 @@ class ReceivingGoods extends Component {
     selectedRowId: '',
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { dispatch, receivingGoodsList } = this.props
     dispatch({
       type: 'receivingGoodsList/query',
       payload: {
-        sorting: [
-          { columnName: 'receivingGoodsNo', direction: 'asc' },
-        ],
+        sorting: [{ columnName: 'receivingGoodsNo', direction: 'asc' }],
         lgteql_receivingGoodsDate:
           receivingGoodsList.filterSearch.transactionDates[0],
         lsteql_receivingGoodsDate:
@@ -62,22 +60,22 @@ class ReceivingGoods extends Component {
     })
   }
 
-  printRGReport = (rowId) => {
+  printRGReport = rowId => {
     this.setState({ selectedRowId: rowId })
     this.toggleReport()
   }
 
-  onSelectionChange = (selection) => this.setState({ selectedRows: selection })
+  onSelectionChange = selection => this.setState({ selectedRows: selection })
 
   onWriteOffClick = () => this.setState({ showWriteOff: true })
 
-  onDuplicateRGClick = (rowId) => {
+  onDuplicateRGClick = rowId => {
     const { dispatch, receivingGoodsList } = this.props
     const { list } = receivingGoodsList
     dispatch({
       type: 'receivingGoodsList/updateState',
       payload: {
-        entity: list.find((o) => o.id === rowId),
+        entity: list.find(o => o.id === rowId),
       },
     })
     this.setState({ showDuplicateRG: true })
@@ -89,12 +87,12 @@ class ReceivingGoods extends Component {
 
   closeDuplicateRGModal = () => this.setState({ showDuplicateRG: false })
 
-  onSubmitWriteOff = (writeOffReason) => {
+  onSubmitWriteOff = writeOffReason => {
     this.closeWriteOffModal()
     this.handleBatchWriteOff(writeOffReason)
   }
 
-  handleBatchWriteOff = (writeOffReason) => {
+  handleBatchWriteOff = writeOffReason => {
     const { selectedRows } = this.state
     const { dispatch } = this.props
     dispatch({
@@ -103,7 +101,7 @@ class ReceivingGoods extends Component {
         receivingGoodsIds: selectedRows,
         writeOffReason,
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         this.handleResetSelection()
         notification.success({
@@ -142,12 +140,12 @@ class ReceivingGoods extends Component {
   }
 
   toggleReport = () => {
-    this.setState((preState) => ({
+    this.setState(preState => ({
       showReport: !preState.showReport,
     }))
   }
 
-  render () {
+  render() {
     const { classes, dispatch, mainDivHeight = 700 } = this.props
     const actionProps = {
       handleWriteOff: this.onWriteOffClick,
@@ -157,11 +155,15 @@ class ReceivingGoods extends Component {
       handlePrintRGReport: this.printRGReport,
     }
     const { showWriteOff, showDuplicateRG, selectedRows } = this.state
-    let height = mainDivHeight - 170 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight -
+      120 -
+      ($('.filterReceivingGoodsBar').height() || 0) -
+      ($('.footerReceivingGoodsBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterReceivingGoodsBar'>
           <FilterBar
             actions={actionProps}
             dispatch={dispatch}
@@ -194,7 +196,7 @@ class ReceivingGoods extends Component {
         >
           <DuplicateRG actions={actionProps} {...this.props} />
         </CommonModal>
-        <GridItem md={4} className={classes.buttonGroup}>
+        <div className='footerReceivingGoodsBar' style={{ marginTop: 10 }}>
           <Button
             color='primary'
             onClick={this.onWriteOffClick}
@@ -202,7 +204,7 @@ class ReceivingGoods extends Component {
           >
             Write-Off
           </Button>
-        </GridItem>
+        </div>
 
         <CommonModal
           open={this.state.showReport}

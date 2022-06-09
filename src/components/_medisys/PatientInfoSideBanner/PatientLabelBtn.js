@@ -101,7 +101,7 @@ const PatientLabelButton = ({
         contactAddress.length > 0
           ? contactAddress.find(x => x.isMailing) ||
             contactAddress.find(x => x.isPrimary) ||
-            contactAddress[0]
+            _.sortBy(contactAddress, 'createDate')[0]
           : {}
       data.MailingInformation = [
         {

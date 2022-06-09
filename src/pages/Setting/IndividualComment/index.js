@@ -75,11 +75,12 @@ class IndividualComment extends PureComponent {
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterIndividualCommentBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterIndividualCommentBar'>
           <Filter {...cfg} {...this.props} onQuery={this.onQuery} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />

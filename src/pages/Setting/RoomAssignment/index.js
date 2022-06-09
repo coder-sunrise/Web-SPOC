@@ -8,17 +8,18 @@ import { CardContainer, withSettingBase } from '@/components'
 
 import Grid from './Grid'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingRoomAssignment,codetable }) => ({
+@connect(({ settingRoomAssignment, codetable, global }) => ({
   settingRoomAssignment,
   codetable,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({ modelName: 'settingRoomAssignment' })
 class RoomAssignment extends PureComponent {
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingRoomAssignment/query',
       payload: {
@@ -34,7 +35,7 @@ class RoomAssignment extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     return (
       <CardContainer hideHeader>
         <Grid {...this.props} />

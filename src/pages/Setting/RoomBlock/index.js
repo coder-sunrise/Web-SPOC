@@ -13,7 +13,7 @@ import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -42,7 +42,7 @@ class RoomBlock extends PureComponent {
       })
   }
 
-  handleEdit = (id) => {
+  handleEdit = id => {
     this.props
       .dispatch({
         type: 'roomBlock/queryOne',
@@ -53,7 +53,7 @@ class RoomBlock extends PureComponent {
       })
   }
 
-  confirmDelete = (id) => {
+  confirmDelete = id => {
     const { dispatch } = this.props
     dispatch({
       type: 'roomBlock/delete',
@@ -65,7 +65,7 @@ class RoomBlock extends PureComponent {
     })
   }
 
-  handleDelete = (id) => {
+  handleDelete = id => {
     const { dispatch } = this.props
     dispatch({
       type: 'global/updateAppState',
@@ -77,17 +77,17 @@ class RoomBlock extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { showModal } = this.state
     const { roomBlock, loading, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height = mainDivHeight - 120 - ($('.filterRoomBlockBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterRoomBlockBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <LoadingWrapper loading={loading} text='Refreshing list...'>

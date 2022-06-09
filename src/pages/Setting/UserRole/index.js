@@ -171,7 +171,7 @@ class UserRole extends React.Component {
   render() {
     const { classes, mainDivHeight = 700, clinicSettings } = this.props
     const { showUserProfileForm, openPopper } = this.state
-    let height = mainDivHeight - 100 - ($('.filterBar').height() || 0)
+    let height = mainDivHeight - 120 - ($('.filterUserRoleBar').height() || 0)
     if (height < 300) height = 300
 
     const {
@@ -190,7 +190,7 @@ class UserRole extends React.Component {
 
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterUserRoleBar'>
           <GridContainer>
             <GridItem md={4}>
               <FastField

@@ -158,7 +158,7 @@ class AppointmentHistory extends PureComponent {
   render() {
     const { previousAppt } = this.state
     const { mainDivHeight = 700 } = this.props
-    let height = mainDivHeight - 300
+    let height = mainDivHeight - 310
     if (height < 300) height = 300
 
     return (

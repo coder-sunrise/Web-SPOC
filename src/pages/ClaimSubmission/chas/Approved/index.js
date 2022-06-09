@@ -140,9 +140,10 @@ class ApprovedCHAS extends React.Component {
     const { showCollectPayment } = this.state
     const { selectedRows } = this.state
     let height =
-      mainDivHeight - 256 - $('.filterBar').height() ||
-      0 - $('.footerBar').height() ||
-      0
+      mainDivHeight -
+      185 -
+      ($('.filterChasApprovedBar').height() || 0) -
+      ($('.footerChasApprovedBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer
@@ -152,29 +153,27 @@ class ApprovedCHAS extends React.Component {
           marginRight: 5,
         }}
       >
-        <div className='filterBar'>
+        <div className='filterChasApprovedBar'>
           <BaseSearchBar
             dispatch={dispatch}
             values={values}
             modelsName='chasClaimSubmissionApproved'
           >
-            <GridItem md={12}>
-              <FastField
-                name='chasClaimStatusCode'
-                render={args => {
-                  return (
-                    <Select
-                      label={formatMessage({
-                        id: 'claimsubmission.invoiceClaim.claimStatus',
-                      })}
-                      options={approvedStatus}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-          </BaseSearchBar>{' '}
+            <FastField
+              name='chasClaimStatusCode'
+              render={args => {
+                return (
+                  <Select
+                    label={formatMessage({
+                      id: 'claimsubmission.invoiceClaim.claimStatus',
+                    })}
+                    options={approvedStatus}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </BaseSearchBar>
         </div>
         <LoadingWrapper linear loading={isLoading} text='Get status...'>
           <GridContainer>
@@ -204,7 +203,7 @@ class ApprovedCHAS extends React.Component {
             </GridItem>
           </GridContainer>
         </LoadingWrapper>
-        <div className='footerBar'>
+        <div className='footerChasApprovedBar'>
           <GridContainer>
             <GridItem md={12} style={{ marginTop: 10 }}>
               <p className={classes.footerNote}>

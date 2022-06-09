@@ -132,12 +132,13 @@ class PurchaseRequest extends Component {
       handleDelete: this.onDeleteRow,
     }
     const { selectedRows, isLoading } = this.state
-    let height = mainDivHeight - 170 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight - 120 - ($('.filterPurchaseRequestBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
         <LoadingWrapper linear loading={isLoading} text='Loading...'>
-          <div className='filterBar'>
+          <div className='filterPurchaseRequestBar'>
             <FilterBar
               actions={actionProps}
               dispatch={dispatch}

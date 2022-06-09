@@ -25,6 +25,7 @@ const styles = (theme) => ({
 const NotificationComponent = ({
   notifications = [],
   systemMessage = {},
+  unreadTotalRecords = 0,
   dispatch,
   classes,
   theme,
@@ -112,13 +113,7 @@ const NotificationComponent = ({
       visible={showNotification}
     >
       <Badge
-        badgeContent={
-          notifications.filter(
-            o =>
-              TYPES.find(t => !t.excludeBadgeCount && (!t.id || o.type === t.id)) &&
-              !o.read,
-          ).length + totalUnReadCount
-        }
+        badgeContent={unreadTotalRecords + totalUnReadCount}
         color='primary'
         anchorOrigin={{
           vertical: 'top',

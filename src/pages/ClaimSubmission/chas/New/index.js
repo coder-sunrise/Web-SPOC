@@ -116,9 +116,10 @@ class NewCHAS extends React.Component {
     const { isLoading, selectedRows } = this.state
     const { list } = chasClaimSubmissionNew || []
     let height =
-      mainDivHeight - 230 - $('.filterBar').height() ||
-      0 - $('.footerBar').height() ||
-      0
+      mainDivHeight -
+      185 -
+      ($('.filterChasNewBar').height() || 0) -
+      ($('.footerChasNewBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer
@@ -128,7 +129,7 @@ class NewCHAS extends React.Component {
           marginRight: 5,
         }}
       >
-        <div className='filterBar'>
+        <div className='filterChasNewBar'>
           <BaseSearchBar
             dispatch={dispatch}
             values={values}
@@ -159,7 +160,7 @@ class NewCHAS extends React.Component {
               />
             </GridItem>
           </GridContainer>
-          <div className='footerBar'>
+          <div className='footerChasNewBar'>
             <GridContainer>
               <GridItem md={12} className={classes.buttonGroup}>
                 <Tooltip

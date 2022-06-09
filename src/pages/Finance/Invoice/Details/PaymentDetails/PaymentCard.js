@@ -59,6 +59,7 @@ const PaymentCard = ({
   hasActiveSession,
   isEnableWriteOffinInvoice,
   visitOrderTemplateFK,
+  isFromPastSession = false,
   actions: { handleVoidClick, handlePrinterClick, ...buttonActions },
 }) => {
   let _payerName = (
@@ -95,11 +96,16 @@ const PaymentCard = ({
     )
   }
   const isEnableDeletePayment = () => {
-    if (payerTypeFK === INVOICE_PAYER_TYPE.PATIENT)
-      return ableToViewByAuthority('finance.deletepatientpayment')
-    return ableToViewByAuthority('finance.deletecopayerpayment')
+    //can't delete payment for current session invoice
+    if (!isFromPastSession) return false
+    if (payerTypeFK === INVOICE_PAYER_TYPE.PATIENT) {
+      return ableToViewByAuthority('finance.deletepastsessionpatientpayment')
+    }
+    return ableToViewByAuthority('finance.deletepastsessioncopayerpayment')
   }
   const isEnableDeleteCreditNote = () => {
+    //can't delete credit note for current session invoice
+    if (!isFromPastSession) return false
     if (payerTypeFK === INVOICE_PAYER_TYPE.PATIENT)
       return ableToViewByAuthority('finance.deletepatientcreditnote')
     return ableToViewByAuthority('finance.deletecopayercreditnote')
@@ -137,6 +143,7 @@ const PaymentCard = ({
             hasActiveSession={hasActiveSession}
             handlePrinterClick={handlePrinterClick}
             visitOrderTemplateFK={visitOrderTemplateFK}
+            isFromPastSession={isFromPastSession}
             {...buttonActions}
           />
         </GridItem>

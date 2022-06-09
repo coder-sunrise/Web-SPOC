@@ -73,11 +73,11 @@ import _ from 'lodash'
         : [],
       remainOutstanding:
         invoice.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT
-          ? _.sumBy(invoicePayerItem, 'outstanding')
+          ? roundTo(_.sumBy(invoicePayerItem, 'outstanding'))
           : invoice.outstandingBalance,
       currentPayable:
         invoice.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT
-          ? _.sumBy(invoicePayerItem, 'outstanding')
+          ? roundTo(_.sumBy(invoicePayerItem, 'outstanding'))
           : invoice.outstandingBalance,
     }
     if (isGroupPayment && visitGroupStatusDetails.length > 0) {
@@ -111,8 +111,8 @@ import _ from 'lodash'
         selectedRows: invoicePayerItem
           .filter(x => x.outstanding > 0)
           .map(x => x.id),
-        remainOutstanding: _.sumBy(invoicePayerItem, 'outstanding'),
-        currentPayable: _.sumBy(invoicePayerItem, 'outstanding'),
+        remainOutstanding: roundTo(_.sumBy(invoicePayerItem, 'outstanding')),
+        currentPayable: roundTo(_.sumBy(invoicePayerItem, 'outstanding')),
       }
     }
     return newValues
@@ -405,9 +405,11 @@ class AddPayment extends Component {
 
     let outstanding = outstandingBalance
     if (payerTypeFK === INVOICE_PAYER_TYPE.PATIENT) {
-      outstanding = _.sumBy(
-        invoicePayerItem.filter(x => selectedRows.indexOf(x.id) >= 0),
-        'totalPaidAmount',
+      outstanding = roundTo(
+        _.sumBy(
+          invoicePayerItem.filter(x => selectedRows.indexOf(x.id) >= 0),
+          'totalPaidAmount',
+        ),
       )
       setFieldValue('currentPayable', outstanding)
     }
@@ -427,8 +429,10 @@ class AddPayment extends Component {
         rounding(clinicSettings, totalPaid),
       )
       if (isGroupPayment) {
-        const otherPayment = _.sumBy(paymentList, p =>
-          p.paymentModeFK !== PAYMENT_MODE.CASH ? p.amt || 0 : 0,
+        const otherPayment = roundTo(
+          _.sumBy(paymentList, p =>
+            p.paymentModeFK !== PAYMENT_MODE.CASH ? p.amt || 0 : 0,
+          ),
         )
         let tempOtherPayment = otherPayment
         //rouding os for per invoice then sum
@@ -860,15 +864,16 @@ class AddPayment extends Component {
                   values.paymentList.length === 0 ||
                   disabledPayment ||
                   (values.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT &&
-                    invoicePayerItem.find(
+                    (invoicePayerItem.find(
                       x =>
                         selectedRows.indexOf(x.id) >= 0 &&
                         x.totalPaidAmount > x.allowMaxPaid,
-                    )) ||
-                  !invoicePayerItem.find(
-                    x =>
-                      selectedRows.indexOf(x.id) >= 0 && x.totalPaidAmount > 0,
-                  )
+                    ) ||
+                      !invoicePayerItem.find(
+                        x =>
+                          selectedRows.indexOf(x.id) >= 0 &&
+                          x.totalPaidAmount > 0,
+                      )))
                 }
               >
                 Confirm

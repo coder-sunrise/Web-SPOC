@@ -18,7 +18,7 @@ import Authorized from '@/utils/Authorized'
 import Grid from './Grid'
 import Header from './Header'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
 })
 
@@ -36,7 +36,7 @@ const { Secured } = Authorized
     let newReceivingGoodsPayment = []
     if (rgPayment) {
       const { receivingGoodsPayment } = rgPayment
-      newReceivingGoodsPayment = receivingGoodsPayment.map((o) => {
+      newReceivingGoodsPayment = receivingGoodsPayment.map(o => {
         let tempOutstandingAmount = {}
         if (o.id) {
           tempOutstandingAmount = {
@@ -88,7 +88,7 @@ const { Secured } = Authorized
       }
     })
 
-    paymentData.forEach((o) => {
+    paymentData.forEach(o => {
       o.clinicPaymentDto.paymentModeFK =
         o.clinicPaymentDto.creditCardId || undefined
       o.clinicPaymentDto.creditCardTypeFK =
@@ -101,7 +101,7 @@ const { Secured } = Authorized
         receivingGoodsId: values.id,
         paymentData,
       },
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         if (onConfirm) onConfirm()
         if (r) {
@@ -110,7 +110,7 @@ const { Secured } = Authorized
             payload: {
               id: props.receivingGoodsDetails.id,
             },
-          }).then((v) => {
+          }).then(v => {
             dispatch({
               type: 'rgPayment/queryRGPayment',
               payload: {
@@ -151,19 +151,21 @@ class index extends PureComponent {
 
   getTotalPaid = () => {
     const activeRows = this.props.values.receivingGoodsPayment.filter(
-      (payment) => !payment.isDeleted && !payment.isCancelled,
+      payment => !payment.isDeleted && !payment.isCancelled,
     )
     return _.sumBy(activeRows, 'paymentAmount') || 0
   }
 
   isPaymentUpdated = () => {
-    const { values: { receivingGoodsPayment } } = this.props
-    if (receivingGoodsPayment.find((item) => item.id <= 0 || item.isUpdate))
+    const {
+      values: { receivingGoodsPayment },
+    } = this.props
+    if (receivingGoodsPayment.find(item => item.id <= 0 || item.isUpdate))
       return true
     return false
   }
 
-  render () {
+  render() {
     const {
       receivingGoodsDetails,
       rights,
@@ -177,7 +179,11 @@ class index extends PureComponent {
     const hasActiveSession =
       currentBizSessionInfo && currentBizSessionInfo.id > 0
 
-    let height = mainDivHeight - 170 - ($('.filterBar').height() || 0)
+    let height =
+      mainDivHeight -
+      170 -
+      ($('.filterReceivingGoodsPaymentBar').height() || 0) -
+      ($('.footerReceivingGoodsPaymentBar').height() || 0)
     if (height < 300) height = 300
     return (
       <AuthorizedContext.Provider
@@ -185,39 +191,42 @@ class index extends PureComponent {
           rights: isWriteOff === true || !hasActiveSession ? 'disable' : rights,
         }}
       >
-        <div className='filterBar'>
-          {!hasActiveSession && (
-            <div style={{ paddingTop: 5 }}>
-              <WarningSnackbar
-                variant='warning'
-                message='Action(s) is not allowed due to no active session was found.'
-              />
-            </div>
-          )}
-          <Header {...this.props} getTotalPaid={this.getTotalPaid} />
-        </div>
-        <GridContainer>
+        <div>
+          <div className='filterReceivingGoodsPaymentBar'>
+            {!hasActiveSession && (
+              <div style={{ paddingTop: 5 }}>
+                <WarningSnackbar
+                  variant='warning'
+                  message='Action(s) is not allowed due to no active session was found.'
+                />
+              </div>
+            )}
+            <Header {...this.props} getTotalPaid={this.getTotalPaid} />
+          </div>
+
           <Grid
             {...this.props}
             getTotalPaid={this.getTotalPaid}
             height={height}
           />
-        </GridContainer>
 
-        {this.isPaymentUpdated() && (
-          <div style={{ textAlign: 'center' }}>
-            <Button
-              color='danger'
-              icon={null}
-              onClick={navigateDirtyCheck({
-                onProceed: this.onClickCancelPayment,
-              })}
-            >
-              Cancel
-            </Button>
-            <ProgressButton onClick={this.props.handleSubmit} />
+          <div className='footerReceivingGoodsPaymentBar'>
+            {this.isPaymentUpdated() && (
+              <div style={{ textAlign: 'center' }}>
+                <Button
+                  color='danger'
+                  icon={null}
+                  onClick={navigateDirtyCheck({
+                    onProceed: this.onClickCancelPayment,
+                  })}
+                >
+                  Cancel
+                </Button>
+                <ProgressButton onClick={this.props.handleSubmit} />
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </AuthorizedContext.Provider>
     )
   }

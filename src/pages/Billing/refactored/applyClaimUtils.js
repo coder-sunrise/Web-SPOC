@@ -343,13 +343,7 @@ export const getInvoiceItemsWithClaimAmount = (
 
 export const computeTotalForAllSavedClaim = (sum, payer) =>
   payer._isConfirmed && !payer.isCancelled
-    ? sum +
-      payer.invoicePayerItem.reduce(
-        (subtotal, item) =>
-          subtotal +
-          (item.claimAmountBeforeGST ? item.claimAmountBeforeGST : 0),
-        0,
-      )
+    ? sum + payer.payerDistributedAmt
     : sum
 
 export const updateOriginalInvoiceItemList = (
@@ -696,6 +690,8 @@ export const updateInvoicePayerPayableBalance = (
   list,
   updatedIndex,
   autoApply = false,
+  gstValue,
+  invoice,
 ) => {
   const result = list.reduce((_payers, payer, index) => {
     // dp nothing when payer isCancelled
@@ -720,18 +716,15 @@ export const updateInvoicePayerPayableBalance = (
         }
       })
       let autoApplyMessage = {}
+      const total = roundTo(
+        payer.invoicePayerItem.reduce(
+          (total, item) => total + item.claimAmountBeforeGST,
+          0,
+        ),
+      )
       if (autoApply) {
-        const total = roundTo(
-          payer.invoicePayerItem.reduce(
-            (total, item) => total + item.claimAmountBeforeGST,
-            0,
-          ),
-        )
-        const gstAmount = roundTo(total * 0.07)
         autoApplyMessage = {
           payerDistributedAmtBeforeGST: total,
-          gstAmount: gstAmount,
-          payerOutstanding: total + gstAmount,
           isModified: true,
           _isConfirmed: true,
           _isEditing: false,
@@ -804,6 +797,35 @@ export const updateInvoicePayerPayableBalance = (
     ]
   }, [])
 
+  // recalculate GST
+  result.forEach(payer => {
+    payer.gstAmount = roundTo(
+      (payer.payerDistributedAmtBeforeGST * gstValue) / 100,
+    )
+  })
+  const isFullyClaimed =
+    _.sumBy(
+      result.filter(t => !t.isCancelled),
+      'payerDistributedAmtBeforeGST',
+    ) === invoice.totalAftAdj
+  if (isFullyClaimed) {
+    const lastGstAmount = _.last(result.filter(x => !x.isCancelled)).gstAmount
+    _.last(result.filter(x => !x.isCancelled)).gstAmount =
+      invoice.gstAmount -
+      (_.sumBy(
+        result.filter(x => !x.isCancelled),
+        'gstAmount',
+      ) -
+        lastGstAmount)
+  }
+  result.forEach(payer => {
+    if (!payer.isCancelled) {
+      payer.payerOutstanding =
+        payer.payerDistributedAmtBeforeGST + payer.gstAmount
+      payer.payerDistributedAmt =
+        payer.payerDistributedAmtBeforeGST + payer.gstAmount
+    }
+  })
   return result
 }
 

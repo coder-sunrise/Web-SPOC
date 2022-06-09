@@ -29,7 +29,7 @@ class Resource extends PureComponent {
     this.props.dispatch({
       type: 'settingResource/query',
       payload: {
-        isActive:true,
+        isActive: true,
       },
     })
   }
@@ -51,11 +51,11 @@ class Resource extends PureComponent {
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height = mainDivHeight - 110 - ($('.filterBar').height() || 0)
+    let height = mainDivHeight - 120 - ($('.filterResourceBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterResourceBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />

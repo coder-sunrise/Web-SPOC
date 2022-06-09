@@ -15,10 +15,7 @@ const Consumable = ({
   values,
   setActiveTab,
 }) => {
-  const [
-    tableParas,
-    setTableParas,
-  ] = useState({
+  const [tableParas, setTableParas] = useState({
     columns: [
       { name: 'code', title: 'Code' },
       { name: 'displayValue', title: 'Name' },
@@ -33,10 +30,7 @@ const Consumable = ({
     leftColumns: [],
   })
 
-  const [
-    colExtensions,
-    setColExtensions,
-  ] = useState([
+  const [colExtensions, setColExtensions] = useState([
     { columnName: 'code', width: 130 },
     {
       columnName: 'favouriteSupplier',
@@ -84,10 +78,7 @@ const Consumable = ({
     values,
   }
 
-  const [
-    consumableList,
-    setConsumableList,
-  ] = useState([])
+  const [consumableList, setConsumableList] = useState([])
 
   const gridProps = {
     ...filterProps,
@@ -102,7 +93,7 @@ const Consumable = ({
     dispatch({
       type: 'consumable/query',
       payload: {
-        isActive:true,
+        isActive: true,
         sorting: [
           { columnName: 'effectiveEndDate', direction: 'desc' },
           { columnName: 'displayValue', direction: 'asc' },
@@ -127,7 +118,9 @@ const Consumable = ({
         marginRight: 5,
       }}
     >
-      <FilterBar {...filterProps} />
+      <div className='filterconsumableBar'>
+        <FilterBar {...filterProps} />
+      </div>
       <Grid {...gridProps} />
     </CardContainer>
   )

@@ -90,9 +90,10 @@ class DraftCHAS extends React.Component {
 
     const { selectedRows } = this.state
     let height =
-      mainDivHeight - 230 - $('.filterBar').height() ||
-      0 - $('.footerBar').height() ||
-      0
+      mainDivHeight -
+      185 -
+      ($('.filterChasDraftBar').height() || 0) -
+      ($('.footerChasDraftBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer
@@ -102,7 +103,7 @@ class DraftCHAS extends React.Component {
           marginRight: 5,
         }}
       >
-        <div className='filterBar'>
+        <div className='filterChasDraftBar'>
           <BaseSearchBar
             hideInvoiceDate
             dispatch={dispatch}
@@ -134,7 +135,7 @@ class DraftCHAS extends React.Component {
             />
           </GridItem>
         </GridContainer>
-        <div className='footerBar'>
+        <div className='footerChasDraftBar'>
           <GridContainer>
             <GridItem md={12} className={classes.buttonGroup}>
               <Tooltip

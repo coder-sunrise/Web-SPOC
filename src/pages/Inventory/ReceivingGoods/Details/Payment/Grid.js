@@ -17,7 +17,7 @@ const receivingGoodsPaymentSchema = Yup.object().shape({
   paymentDate: Yup.date().required(),
   paymentAmount: Yup.number()
     .min(0)
-    .max(Yup.ref('outstandingAmt'), (e) => {
+    .max(Yup.ref('outstandingAmt'), e => {
       return `Payment Amount must be less than or equal to ${e.max.toFixed(2)}`
     })
     .required(),
@@ -29,41 +29,22 @@ const Grid = ({
   values,
   setFieldValue,
   getTotalPaid,
-  receivingGoodsDetails: { receivingGoods: { totalAftGST } },
+  receivingGoodsDetails: {
+    receivingGoods: { totalAftGST },
+  },
   height,
 }) => {
-  const [
-    creditCardTypeList,
-    setCreditCardTypeList,
-  ] = useState([])
-  const [
-    paymentModeList,
-    setPaymentModeList,
-  ] = useState([])
-  const [
-    selection,
-    setSelection,
-  ] = useState([])
+  const [creditCardTypeList, setCreditCardTypeList] = useState([])
+  const [paymentModeList, setPaymentModeList] = useState([])
+  const [selection, setSelection] = useState([])
 
-  const [
-    showDeleteConfirmation,
-    setShowDeleteConfirmation,
-  ] = useState(false)
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
 
-  const [
-    allRows,
-    setAllRows,
-  ] = useState()
+  const [allRows, setAllRows] = useState()
 
-  const [
-    deletedRow,
-    setDeletedRow,
-  ] = useState()
+  const [deletedRow, setDeletedRow] = useState()
 
-  const [
-    obj,
-    setObj,
-  ] = useState({})
+  const [obj, setObj] = useState({})
 
   const getCreditCardList = async () => {
     dispatch({
@@ -71,7 +52,7 @@ const Grid = ({
       payload: {
         code: 'ctCreditCardType',
       },
-    }).then((v) => {
+    }).then(v => {
       setCreditCardTypeList(v)
     })
   }
@@ -81,66 +62,55 @@ const Grid = ({
       payload: {
         code: 'ctPaymentMode',
       },
-    }).then((v) => {
+    }).then(v => {
       setPaymentModeList(v)
     })
   }
 
-  useEffect(
-    () => {
-      if (paymentModeList.length > 0 && creditCardTypeList.length > 0) {
-        let tempList = []
-        paymentModeList.forEach((o) => {
-          if (o.displayValue === 'Credit Card') {
-            let tempId = 9999
-            creditCardTypeList.forEach((i) => {
-              tempList.push({
-                value: tempId + o.id,
-                name: `${o.displayValue} (${i.name})`,
-                typeId: i.id,
-                type: i.name,
-                creditCardId: o.id,
-                creditCardTypeName: i.name,
-                paymentModeTypeName: o.displayValue,
-              })
-              tempId += 1
-            })
-          } else {
+  useEffect(() => {
+    if (paymentModeList.length > 0 && creditCardTypeList.length > 0) {
+      let tempList = []
+      paymentModeList.forEach(o => {
+        if (o.displayValue === 'Credit Card') {
+          let tempId = 9999
+          creditCardTypeList.forEach(i => {
             tempList.push({
-              value: o.id,
-              name: o.displayValue,
+              value: tempId + o.id,
+              name: `${o.displayValue} (${i.name})`,
+              typeId: i.id,
+              type: i.name,
+              creditCardId: o.id,
+              creditCardTypeName: i.name,
               paymentModeTypeName: o.displayValue,
             })
-          }
-        })
+            tempId += 1
+          })
+        } else {
+          tempList.push({
+            value: o.id,
+            name: o.displayValue,
+            paymentModeTypeName: o.displayValue,
+          })
+        }
+      })
 
-        setSelection(tempList)
-      }
-    },
-    [
-      paymentModeList,
-      creditCardTypeList,
-    ],
-  )
+      setSelection(tempList)
+    }
+  }, [paymentModeList, creditCardTypeList])
 
   useEffect(() => {
     getCreditCardList()
     getPaymentModeList()
   }, [])
 
-  useEffect(
-    () => {
-      dispatch({
-        type: 'global/updateState',
-        payload: {
-          commitCount: (commitCount += 1),
-        },
-      })
-    },
-    [
-      selection,
-    ],
-  )
+  useEffect(() => {
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        commitCount: (commitCount += 1),
+      },
+    })
+  }, [selection])
   const compareString = (a = '', b = '') => a.localeCompare(b)
   const tableParas = {
     columns: [
@@ -157,7 +127,7 @@ const Grid = ({
         disabled: true,
         compare: compareString,
         width: 120,
-        render: (row) => {
+        render: row => {
           const { isCancelled = false, cancelReason } = row
           if (isCancelled)
             return (
@@ -180,8 +150,8 @@ const Grid = ({
           moment().formatUTC(),
         ],
         format: dateFormatLong,
-        isDisabled: (row) => row.id > 0,
-        render: (row) => {
+        isDisabled: row => row.id > 0,
+        render: row => {
           const { isCancelled = false } = row
 
           if (isCancelled)
@@ -200,8 +170,8 @@ const Grid = ({
         width: 200,
         options: selection,
         sortingEnabled: false,
-        isDisabled: (row) => row.id > 0,
-        onChange: (p) => {
+        isDisabled: row => row.id > 0,
+        onChange: p => {
           const { option, row } = p
           if (option) {
             row.typeId = option.typeId
@@ -210,12 +180,10 @@ const Grid = ({
             row.creditCardTypeName = option.creditCardTypeName
           }
         },
-        render: (row) => {
+        render: row => {
           const { isCancelled = false } = row
 
-          const selectMode = selection.find(
-            (x) => x.value === row.paymentModeFK,
-          )
+          const selectMode = selection.find(x => x.value === row.paymentModeFK)
           if (isCancelled)
             return (
               <span style={{ textDecorationLine: 'line-through' }}>
@@ -230,8 +198,8 @@ const Grid = ({
         columnName: 'referenceNo',
         compare: compareString,
         width: 180,
-        isDisabled: (row) => row.id > 0,
-        render: (row) => {
+        isDisabled: row => row.id > 0,
+        render: row => {
           const { isCancelled = false } = row
 
           if (isCancelled)
@@ -246,10 +214,10 @@ const Grid = ({
       },
       {
         columnName: 'paymentAmount',
-        isDisabled: (row) => row.id > 0,
+        isDisabled: row => row.id > 0,
         align: 'right',
         width: 140,
-        render: (row) => {
+        render: row => {
           const { isCancelled = false } = row
           return (
             <NumberInput
@@ -264,8 +232,8 @@ const Grid = ({
       {
         columnName: 'remark',
         compare: compareString,
-        isDisabled: (row) => row.id > 0,
-        render: (row) => {
+        isDisabled: row => row.id > 0,
+        render: row => {
           const { isCancelled = false } = row
 
           if (isCancelled)
@@ -281,7 +249,7 @@ const Grid = ({
     ],
   }
 
-  const voidPayment = (reason) => {
+  const voidPayment = reason => {
     deletedRow.isDeleted = false
     deletedRow.isCancelled = true
     deletedRow.isUpdate = true
@@ -292,7 +260,7 @@ const Grid = ({
 
   const onCommitChanges = ({ rows, deleted }) => {
     if (deleted) {
-      const currentRow = rows.find((v) => v.id === deleted[0])
+      const currentRow = rows.find(v => v.id === deleted[0])
       if (currentRow.paymentNo) {
         setAllRows(rows)
         setDeletedRow(currentRow)
@@ -300,13 +268,11 @@ const Grid = ({
         setShowDeleteConfirmation(true)
       } else {
         currentRow.isDeleted = true
-        const setRows = rows.filter(
-          (o) => o.id > 0 || (o.isNew && !o.isDeleted),
-        )
+        const setRows = rows.filter(o => o.id > 0 || (o.isNew && !o.isDeleted))
         setFieldValue('receivingGoodsPayment', setRows)
       }
     } else {
-      const newRows = rows.map((o) => {
+      const newRows = rows.map(o => {
         if (o.isNew && !o.isDeleted) {
           const outstandingAmt =
             totalAftGST - getTotalPaid() + (o.paymentAmount || 0)
@@ -328,9 +294,9 @@ const Grid = ({
     return rows
   }
   const closeDeleteConfirmationModal = () => setShowDeleteConfirmation(false)
-  const onAddedRowsChange = (addedRows) => {
+  const onAddedRowsChange = addedRows => {
     const outstandingAmt = totalAftGST - getTotalPaid()
-    return addedRows.map((row) => ({
+    return addedRows.map(row => ({
       paymentDate: moment(),
       outstandingAmt: roundTo(outstandingAmt),
       paymentAmount: roundTo(outstandingAmt),
@@ -355,7 +321,7 @@ const Grid = ({
           showDeleteCommand: true,
           onCommitChanges,
           onAddedRowsChange,
-          isDeletable: (row) => !row.isCancelled,
+          isDeletable: row => !row.isCancelled,
         }}
         {...tableParas}
         TableProps={{
@@ -370,7 +336,7 @@ const Grid = ({
         maxWidth='sm'
       >
         <DeleteConfirmation
-          handleSubmit={(reason) => voidPayment(reason)}
+          handleSubmit={reason => voidPayment(reason)}
           {...obj}
         />
       </CommonModal>

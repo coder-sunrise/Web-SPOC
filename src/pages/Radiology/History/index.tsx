@@ -48,8 +48,14 @@ const api = {
 
 const style = theme => ({})
 
-const orderDateForm = moment(moment().add(-1, 'week').toDate()).formatUTC()
-const orderDateTo = moment().endOf('day').formatUTC(false)
+const orderDateForm = moment(
+  moment()
+    .add(-1, 'week')
+    .toDate(),
+).formatUTC()
+const orderDateTo = moment()
+  .endOf('day')
+  .formatUTC(false)
 
 const saveColumnsSetting = (dispatch, columnsSetting) => {
   dispatch({
@@ -296,6 +302,8 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
             onClick={() => {
               setDetailsId(rest.id)
             }}
+            justIcon
+            size='small'
             type='primary'
             icon={<UnorderedListOutlined />}
           />
@@ -544,6 +552,7 @@ const RadiologyWorklistHistoryIndex = ({
   codetable,
   clinicSettings,
   classes,
+  mainDivHeight = 700,
 }) => {
   const dispatch = useDispatch()
   const { detailsId, setDetailsId } = useContext(WorklistContext)
@@ -682,6 +691,8 @@ const RadiologyWorklistHistoryIndex = ({
                     onClick={() => {
                       setDetailsId(row.id)
                     }}
+                    justIcon
+                    size='small'
                     type='primary'
                     icon={<UnorderedListOutlined />}
                   />
@@ -707,8 +718,14 @@ const RadiologyWorklistHistoryIndex = ({
               ...values,
               apiCriteria: {
                 _accessionNo: searchAccessionNo,
-                _orderDateForm: searchOrderDateForm ? moment(moment(searchOrderDateForm).toDate()).formatUTC(): undefined ,
-                _orderDateTo: searchOrderDateTo ? moment(searchOrderDateTo).endOf('day').formatUTC(false) : undefined ,
+                _orderDateForm: searchOrderDateForm
+                  ? moment(moment(searchOrderDateForm).toDate()).formatUTC()
+                  : undefined,
+                _orderDateTo: searchOrderDateTo
+                  ? moment(searchOrderDateTo)
+                      .endOf('day')
+                      .formatUTC(false)
+                  : undefined,
                 _searchValue: searchPatient,
                 _visitType:
                   searchVisitType?.indexOf(-99) > -1
@@ -736,7 +753,7 @@ const RadiologyWorklistHistoryIndex = ({
               },
             }
           }}
-          scroll={{ x: 1100 }}
+          scroll={{ x: 1100, y: mainDivHeight - 340 }}
         />
       </PageContainer>
       <RadiologyDetails />
@@ -753,10 +770,11 @@ const HistoryIndex = props => (
 )
 
 const historyIndex = compose(
-  connect(({ radiologyHisotry, codetable, clinicSettings }) => ({
+  connect(({ radiologyHisotry, codetable, clinicSettings, global }) => ({
     radiologyHisotry,
     codetable,
     clinicSettings: clinicSettings.settings || clinicSettings.default,
+    mainDivHeight: global.mainDivHeight,
   })),
 )(HistoryIndex)
 

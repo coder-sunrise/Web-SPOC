@@ -73,11 +73,11 @@ class Deposit extends Component {
     const { props } = this
     const { classes, mainDivHeight = 700, ...restProps } = props
 
-    let height = mainDivHeight - 100 - ($('.filterBar').height() || 0)
+    let height = mainDivHeight - 110 - ($('.filterDepositBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterBar'>
+        <div className='filterDepositBar'>
           {!this.state.hasActiveSession ? (
             <div style={{ paddingTop: 5 }}>
               <WarningSnackbar

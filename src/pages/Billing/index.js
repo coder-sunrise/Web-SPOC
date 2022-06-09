@@ -293,12 +293,7 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
         const { invoicePayer = [], visitPurposeFK } = billing.entity
 
         const finalClaim = invoicePayer.reduce(
-          (totalClaim, payer) =>
-            totalClaim +
-            payer.invoicePayerItem.reduce(
-              (subtotal, item) => subtotal + item.claimAmount,
-              0,
-            ),
+          (totalClaim, payer) => totalClaim + payer.payerDistributedAmt,
           0,
         )
         const finalPayable = roundTo(
@@ -581,6 +576,7 @@ class Billing extends Component {
     backtoQueue = false,
   ) => {
     const { dispatch, values, resetForm, patient } = this.props
+    await this.calculateOutstandingBalance(null)
     const {
       visitStatus,
       invoicePayer = [],
@@ -698,13 +694,17 @@ class Billing extends Component {
   calculateOutstandingBalance = async invoicePayment => {
     const { values, setFieldValue } = this.props
 
-    const totalPaid = invoicePayment.reduce((totalAmtPaid, payment) => {
-      // || !payment.id is in order to include current payment
-      if ((!payment.isCancelled && payment.id) || !payment.id)
-        return totalAmtPaid + payment.totalAmtPaid
-      return totalAmtPaid
-    }, 0)
+    const totalPaid = (invoicePayment || values.invoicePayment).reduce(
+      (totalAmtPaid, payment) => {
+        // || !payment.id is in order to include current payment
+        if ((!payment.isCancelled && payment.id) || !payment.id)
+          return totalAmtPaid + payment.totalAmtPaid
+        return totalAmtPaid
+      },
+      0,
+    )
     const newOutstandingBalance = roundTo(values.finalPayable - totalPaid)
+    console.log(newOutstandingBalance)
     await setFieldValue('invoice', {
       ...values.invoice,
       outstandingBalance: newOutstandingBalance,

@@ -96,9 +96,10 @@ class SubmittedMedisave extends React.Component {
     const { isLoading, selectedRows } = this.state
     const { list } = medisaveClaimSubmissionSubmitted || []
     let height =
-      mainDivHeight - 230 - $('.filterBar').height() ||
-      0 - $('.footerBar').height() ||
-      0
+      mainDivHeight -
+      185 -
+      ($('.filterMedisaveSubmittedBar').height() || 0) -
+      ($('.footerMedisaveSubmittedBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer
@@ -108,7 +109,7 @@ class SubmittedMedisave extends React.Component {
           marginRight: 5,
         }}
       >
-        <div className='filterBar'>
+        <div className='filterMedisaveSubmittedBar'>
           <BaseSearchBar
             dispatch={dispatch}
             values={values}
@@ -137,7 +138,7 @@ class SubmittedMedisave extends React.Component {
               />
             </GridItem>
           </GridContainer>
-          <div className='footerBar'>
+          <div className='footerMedisaveSubmittedBar'>
             <GridContainer>
               <GridItem md={12} className={classes.buttonGroup}>
                 <ProgressButton

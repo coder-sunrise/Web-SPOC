@@ -104,7 +104,7 @@ const Medication = ({ dispatch, history, medication, values }) => {
     dispatch({
       type: 'medication/query',
       payload: {
-        isActive:true,
+        isActive: true,
         sorting: [
           { columnName: 'effectiveEndDate', direction: 'desc' },
           { columnName: 'displayValue', direction: 'asc' },
@@ -121,7 +121,7 @@ const Medication = ({ dispatch, history, medication, values }) => {
         marginRight: 5,
       }}
     >
-      <div className='filterBar'>
+      <div className='filtermedicationBar'>
         <FilterBar {...filterProps} />
       </div>
       <Grid {...gridProps} />
