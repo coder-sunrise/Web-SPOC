@@ -647,6 +647,7 @@ export default ({
       total: currentVisitOrderTemplate.total,
       totalAfterItemAdjustment: currentVisitOrderTemplate.totalAftAdj,
       type: type,
+      priority: 'Normal',
       unitPrice: currentVisitOrderTemplate.unitPrice,
       visitPurposeFK: currentVisitOrderTemplate.visitOrderTemplateFK,
       visitOrderTemplateItemFK: currentVisitOrderTemplate.id,
