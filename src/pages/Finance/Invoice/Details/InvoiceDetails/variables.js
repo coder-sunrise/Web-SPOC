@@ -10,7 +10,7 @@ const wrapCellTextStyle = {
 }
 
 const drugMixtureIndicator = (row, right) => {
-  if (row.itemType !== 'Medication' || !row.isDrugMixture) return null
+  if (!row.isDrugMixture) return null
 
   return <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
 }

@@ -13,6 +13,7 @@ import {
   serverDateFormat,
   notification,
   EditableTableGrid,
+  Tooltip,
 } from '@/components'
 import withFormikExtend from '@/components/Decorator/withFormikExtend'
 // sub component
@@ -22,6 +23,7 @@ import {
   INVOICE_PAYER_TYPE,
   INVOICE_ITEM_TYPE,
 } from '@/utils/constants'
+import { orderItemTypes } from '@/utils/codes'
 import { getBizSession } from '@/services/queue'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import PayerHeader from './PayerHeader'
@@ -669,7 +671,10 @@ class AddPayment extends Component {
                     rows={invoicePayerItem}
                     forceRender
                     columns={[
-                      { name: 'itemType', title: 'Category' },
+                      {
+                        name: 'itemType',
+                        title: 'Category',
+                      },
                       { name: 'itemName', title: 'Name' },
                       { name: 'invoiceNo', title: 'Invoice No.' },
                       {
@@ -691,6 +696,18 @@ class AddPayment extends Component {
                         disabled: true,
                         sortingEnabled: false,
                         width: 140,
+                        render: row => {
+                          const itemType = orderItemTypes.find(
+                            t =>
+                              t.type.toUpperCase() ===
+                              (row.itemType || '').toUpperCase(),
+                          )
+                          return (
+                            <Tooltip title={row.itemType}>
+                              <span>{itemType?.displayValue}</span>
+                            </Tooltip>
+                          )
+                        },
                       },
                       {
                         columnName: 'itemName',

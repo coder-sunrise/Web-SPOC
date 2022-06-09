@@ -18,7 +18,7 @@ import {
 import LowStockInfo from '@/pages/Widgets/Orders/Detail/LowStockInfo'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import PackageDrawdownInfo from '@/pages/Widgets/Orders/Detail/PackageDrawdownInfo'
-import { InventoryTypes } from '@/utils/codes'
+import { InventoryTypes, orderItemTypes } from '@/utils/codes'
 import CONSTANTS from './DispenseDetails/constants'
 import Cross from '@material-ui/icons/HighlightOff'
 import { UnorderedListOutlined, CheckOutlined } from '@ant-design/icons'
@@ -41,12 +41,12 @@ const showMoney = (v = 0) => {
   if (v < 0)
     return (
       <span
-        style={{ fontWeight: 'bold', color: 'red' }}
+        style={{ fontWeight: 500, color: 'red' }}
       >{`(${currencySymbol}${numeral(v * -1.0).format('0.00')})`}</span>
     )
   return (
     <span
-      style={{ fontWeight: 'bold', color: 'darkblue' }}
+      style={{ fontWeight: 500, color: 'darkblue' }}
     >{`${currencySymbol}${numeral(v).format('0.00')}`}</span>
   )
 }
@@ -371,7 +371,7 @@ export const DispenseItemsColumns1 = (
       key: 'isCheckActualize',
       width: 50,
       onCell: row => {
-        const mergeCell = viewOnly ? 15 : 17
+        const mergeCell = viewOnly ? 14 : 16
         if (row.isGroup)
           return {
             colSpan: mergeCell,
@@ -425,7 +425,7 @@ export const DispenseItemsColumns1 = (
         if (row.isGroup) {
           let mergeCell = 0
           if (!isShowDispenseActualie || viewOnly)
-            mergeCell = viewOnly ? 15 : 16
+            mergeCell = viewOnly ? 14 : 15
           return {
             colSpan: mergeCell,
             style: { backgroundColor: 'rgb(240, 248, 255)' },
@@ -465,6 +465,9 @@ export const DispenseItemsColumns1 = (
         } else if (row.isPreOrder || row.isExclusive) {
           paddingRight = 24
         }
+        const itemType = orderItemTypes.find(
+          t => t.type.toUpperCase() === (row.type || '').toUpperCase(),
+        )
         return (
           <div
             style={{
@@ -475,7 +478,7 @@ export const DispenseItemsColumns1 = (
             }}
           >
             <Tooltip title={row.type}>
-              <span>{row.type}</span>
+              <span>{itemType?.displayValue}</span>
             </Tooltip>
             <div style={{ position: 'absolute', top: '-1px', right: '-6px' }}>
               {row.isPreOrder && (
@@ -526,16 +529,6 @@ export const DispenseItemsColumns1 = (
       },
     },
     {
-      dataIndex: 'code',
-      key: 'code',
-      title: 'Code',
-      width: 100,
-      onCell: row => ({
-        colSpan: row.isGroup ? 0 : 1,
-        rowSpan: row.countNumber === 1 ? row.rowspan : 0,
-      }),
-    },
-    {
       dataIndex: 'name',
       key: 'name',
       title: 'Name',
@@ -545,8 +538,9 @@ export const DispenseItemsColumns1 = (
       }),
       render: (_, row) => {
         const isShowStockIndicator =
-          ['Medication', 'Medication (Ext.)', 'Vaccination'].indexOf(row.type) >
-          -1
+          ['Medication', 'External Prescription', 'Vaccination'].indexOf(
+            row.type,
+          ) > -1
         let paddingRight = 0
         if (isShowStockIndicator) {
           paddingRight = 10
@@ -561,7 +555,15 @@ export const DispenseItemsColumns1 = (
               top: 2,
             }}
           >
-            <Tooltip title={row.name}>
+            <Tooltip
+              title={
+                <div>
+                  {`Code: ${row.code}`}
+                  <br />
+                  {`Name: ${row.name}`}
+                </div>
+              }
+            >
               <span>{row.name}</span>
             </Tooltip>
             <div style={{ position: 'absolute', top: 0, right: '-10px' }}>
@@ -570,9 +572,11 @@ export const DispenseItemsColumns1 = (
                   ...row,
                   isDrugMixture: false,
                   type:
-                    row.type === 'Medication (Ext.)' ? 'Medication' : row.type,
+                    row.type === 'External Prescription'
+                      ? 'Medication'
+                      : row.type,
                 },
-                ['Medication', 'Medication (Ext.)'].indexOf(row.type) > -1
+                ['Medication', 'External Prescription'].indexOf(row.type) > -1
                   ? 'inventoryMedicationFK'
                   : 'inventoryVaccinationFK',
                 -20,
@@ -595,12 +599,7 @@ export const DispenseItemsColumns1 = (
     {
       dataIndex: 'quantity',
       key: 'quantity',
-      title: (
-        <div>
-          <p style={{ height: 16 }}>Ordered</p>
-          <p style={{ height: 16 }}>Qty.</p>
-        </div>
-      ),
+      title: 'Ord. Qty.',
       onCell: row => ({
         colSpan: row.isGroup ? 0 : 1,
         rowSpan: row.countNumber === 1 ? row.rowspan : 0,
@@ -619,12 +618,7 @@ export const DispenseItemsColumns1 = (
     {
       dataIndex: 'dispenseQuantity',
       key: 'dispenseQuantity',
-      title: (
-        <div>
-          <p style={{ height: 16 }}>Dispensed</p>
-          <p style={{ height: 16 }}>Qty.</p>
-        </div>
-      ),
+      title: 'Disp. Qty.',
       width: 85,
       onCell: row => ({ colSpan: row.isGroup ? 0 : 1 }),
       align: 'right',
@@ -798,7 +792,7 @@ export const DispenseItemsColumns1 = (
     {
       dataIndex: 'stockBalance',
       key: 'stockBalance',
-      title: 'Balance Qty.',
+      title: 'Bal. Qty.',
       width: 100,
       onCell: row => ({
         colSpan: row.isGroup ? 0 : 1,
@@ -915,7 +909,11 @@ export const DispenseItemsColumns1 = (
       align: 'right',
       width: 100,
       render: (_, row) => {
-        return showMoney(row.adjAmt)
+        return showMoney(
+          (row.isPreOrder && !row.isChargeToday) || row.hasPaid
+            ? 0
+            : row.adjAmt,
+        )
       },
     },
     {
@@ -1096,8 +1094,9 @@ export const DispenseItemsColumnExtensions = (
       sortingEnabled: false,
       render: row => {
         const isShowStockIndicator =
-          ['Medication', 'Medication (Ext.)', 'Vaccination'].indexOf(row.type) >
-          -1
+          ['Medication', 'External Prescription', 'Vaccination'].indexOf(
+            row.type,
+          ) > -1
         let paddingRight = 0
         if (isShowStockIndicator) {
           paddingRight = 10
@@ -1119,9 +1118,11 @@ export const DispenseItemsColumnExtensions = (
                   ...row,
                   isDrugMixture: false,
                   type:
-                    row.type === 'Medication (Ext.)' ? 'Medication' : row.type,
+                    row.type === 'External Prescription'
+                      ? 'Medication'
+                      : row.type,
                 },
-                ['Medication', 'Medication (Ext.)'].indexOf(row.type) > -1
+                ['Medication', 'External Prescription'].indexOf(row.type) > -1
                   ? 'inventoryMedicationFK'
                   : 'inventoryVaccinationFK',
                 -20,
@@ -1226,6 +1227,9 @@ export const DispenseItemsColumnExtensions = (
       align: 'right',
       type: 'currency',
       sortingEnabled: false,
+      render: row => {
+        return showMoney(row.adjAmt)
+      },
     },
     {
       columnName: 'dispenseUOM',
@@ -1640,6 +1644,9 @@ export const ServiceColumns1 = (
           paddingRight += 34
           urgentRight = -paddingRight
         }
+        const itemType = orderItemTypes.find(
+          t => t.type.toUpperCase() === (row.type || '').toUpperCase(),
+        )
         return (
           <div
             style={{
@@ -1649,7 +1656,9 @@ export const ServiceColumns1 = (
               justifyContent: 'space-between',
             }}
           >
-            <span style={{ width: 80 }}>{row.type}</span>
+            <Tooltip title={row.type}>
+              <span style={{ width: 80 }}>{itemType?.displayValue}</span>
+            </Tooltip>
             <Space
               direction='horizontal'
               align='end'

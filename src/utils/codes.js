@@ -1429,24 +1429,18 @@ export const ReportsOnCompletePayment = [
   { code: ReportsOnCompletePaymentOption.Receipt, description: 'Receipt' },
 ]
 const initRoomAssignment = async () => {
-                                         // The local identity feature overwrited
-                                         return
-                                         const accessRight = Authorized.check(
-                                           'settings.clinicsetting.roomassignment',
-                                         )
-                                         if (
-                                           accessRight &&
-                                           accessRight.rights === 'enable'
-                                         ) {
-                                           await window.g_app._store.dispatch({
-                                             type:
-                                               'settingRoomAssignment/query',
-                                             payload: {
-                                               pagesize: 9999,
-                                             },
-                                           })
-                                         }
-                                       }
+  // The local identity feature overwrited
+  return
+  const accessRight = Authorized.check('settings.clinicsetting.roomassignment')
+  if (accessRight && accessRight.rights === 'enable') {
+    await window.g_app._store.dispatch({
+      type: 'settingRoomAssignment/query',
+      payload: {
+        pagesize: 9999,
+      },
+    })
+  }
+}
 
 const scribbleTypes = [
   { type: 'history', typeFK: SCRIBBLE_NOTE_TYPE.HISTORY },
@@ -2065,6 +2059,18 @@ const visitDoctorConsultationStatusColor = [
   { value: VISITDOCTOR_CONSULTATIONSTATUS.COMPLETED, color: '#777' },
 ]
 
+const orderItemTypes = [
+  { type: 'Medication', displayValue: 'Med' },
+  { type: 'Open Prescription', displayValue: 'Med(Opn)' },
+  { type: 'External Prescription', displayValue: 'Med(Ext)' },
+  { type: 'Consumable', displayValue: 'Con' },
+  { type: 'Vaccination', displayValue: 'Vac' },
+  { type: 'Service', displayValue: 'Svc' },
+  { type: 'Radiology', displayValue: 'Rad' },
+  { type: 'Lab', displayValue: 'Lab' },
+  { type: 'Drug Mixture', displayValue: 'Med(Mix)' },
+]
+
 export {
   appointmentStatus,
   status,
@@ -2106,4 +2112,5 @@ export {
   examinationSteps,
   individualCommentGroup,
   visitDoctorConsultationStatusColor,
+  orderItemTypes,
 }

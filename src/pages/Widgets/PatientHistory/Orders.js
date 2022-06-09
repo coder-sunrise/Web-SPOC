@@ -5,6 +5,7 @@ import tablestyles from './PatientHistoryStyle.less'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import { Tooltip } from '@/components'
 import { FileCopySharp } from '@material-ui/icons'
+import { orderItemTypes } from '@/utils/codes'
 
 const wrapCellTextStyle = {
   wordWrap: 'break-word',
@@ -12,7 +13,7 @@ const wrapCellTextStyle = {
 }
 
 const drugMixtureIndicator = (row, right) => {
-  if (row.type !== 'Medication' || !row.isDrugMixture) return null
+  if (!row.isDrugMixture) return null
 
   return <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
 }
@@ -53,7 +54,12 @@ const showCurrency = (value = 0) => {
     </div>
   )
 }
-export default ({ current, classes, showDrugLabelRemark }) => {
+export default ({
+  current,
+  classes,
+  showDrugLabelRemark,
+  isFullScreen = true,
+}) => {
   return (
     <div style={{ marginBottom: 8, marginTop: 8 }}>
       <Table
@@ -81,6 +87,14 @@ export default ({ current, classes, showDrugLabelRemark }) => {
                 paddingRight += 34
                 urgentRight = -paddingRight - 4
               }
+
+              let type = row.type
+              if (row.isDrugMixture) {
+                type = 'Drug Mixture'
+              }
+              const itemType = orderItemTypes.find(
+                t => t.type.toUpperCase() === (type || '').toUpperCase(),
+              )
               return (
                 <div style={{ position: 'relative' }}>
                   <div
@@ -90,7 +104,9 @@ export default ({ current, classes, showDrugLabelRemark }) => {
                       paddingRight: paddingRight,
                     }}
                   >
-                    {row.isDrugMixture ? 'Drug Mixture' : row.type}
+                    <Tooltip title={type}>
+                      <span>{itemType?.displayValue}</span>
+                    </Tooltip>
                     <div
                       style={{
                         position: 'absolute',
@@ -148,7 +164,7 @@ export default ({ current, classes, showDrugLabelRemark }) => {
           {
             dataIndex: 'name',
             title: 'Name',
-            width: 200,
+            width: isFullScreen ? 250 : 140,
             render: (text, row) => (
               <Tooltip
                 title={
@@ -174,7 +190,6 @@ export default ({ current, classes, showDrugLabelRemark }) => {
                 <div style={wrapCellTextStyle}>{text}</div>
               </Tooltip>
             ),
-            width: 200,
           },
           {
             dataIndex: 'remarks',
@@ -230,7 +245,7 @@ export default ({ current, classes, showDrugLabelRemark }) => {
             dataIndex: 'quantity',
             title: 'Qty.',
             align: 'right',
-            width: 80,
+            width: 60,
             render: (text, row) => (
               <Tooltip
                 title={
@@ -261,14 +276,14 @@ export default ({ current, classes, showDrugLabelRemark }) => {
           {
             dataIndex: 'adjAmt',
             title: 'Adj.',
-            width: 90,
+            width: 70,
             align: 'right',
             render: (text, row) => showCurrency(row.adjAmt),
           },
           {
             dataIndex: 'totalAfterItemAdjustment',
             title: 'Total',
-            width: 90,
+            width: 80,
             align: 'right',
             render: (text, row) =>
               showCurrency(
