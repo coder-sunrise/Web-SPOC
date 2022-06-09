@@ -37,7 +37,6 @@ class Invoice extends React.Component {
   }
   render() {
     const { classes, mainDivHeight = 700 } = this.props
-    console.log(mainDivHeight);
     let height =
       mainDivHeight -
       140 -
