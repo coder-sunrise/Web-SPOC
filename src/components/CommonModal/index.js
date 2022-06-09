@@ -206,7 +206,6 @@ class CommonModal extends React.PureComponent {
     const obs = Array.isArray(this.props.observe)
       ? this.props.observe
       : [this.props.observe]
-    // console.log({ obs })
     for (let i = 0; i < obs.length; i++) {
       const o = obs[i]
       const ob = window.g_app._store.getState().formik[o]

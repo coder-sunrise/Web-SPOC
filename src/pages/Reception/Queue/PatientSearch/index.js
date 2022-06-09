@@ -94,7 +94,7 @@ class PatientSearch extends PureComponent {
       },
       {
         columnName: 'action',
-        width: 120,
+        width: 115,
         align: 'center',
         render: row => this.Cell(row),
       },
