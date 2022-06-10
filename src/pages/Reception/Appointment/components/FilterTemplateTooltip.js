@@ -205,11 +205,11 @@ const Templates = ({
         {selectedTemplateId && (
           <GridContainer gutter={0} style={{ marginTop: 10 }}>
             <GridItem xs={12}>
-              {false && (
+              {/* {false && (
                 <ProgressButton onClick={() => saveFilterTemplate()}>
                   Replace
                 </ProgressButton>
-              )}
+              )} */}
 
               <Button color='danger' onClick={onDeleteTemplate}>
                 <Delete />
