@@ -109,32 +109,66 @@ class Checklist extends React.Component {
     input = JSON.parse(JSON.stringify(input))
     // processing here
     let output = ''
+    let selectSubject = []
     Object.keys(input).forEach(sub => {
       const obss = input[sub]
       if (obss) {
-        output += `<strong>${sub}</strong><br /><br />`
+        let observations = []
         Object.keys(obss).forEach(obs => {
           const obsObj = obss[obs]
           if (obsObj) {
-            output += `${obs}<br />`
+            const isShowTitle = obs.substr(0, obs.indexOf('-'))
+            const title = obs.substr(obs.indexOf('-') + 1)
+            let remarks
+            let nature
+
             const nats = obss[obs]['Nature']
             if (nats) {
               if (typeof nats === 'string') {
-                output += ` - ${nats}<br />`
+                nature = `- ${nats}<br />`
               }
-              if (typeof nats === 'object') {
-                const panels = nats.map(n => ' - ' + n).join('<br />')
-                output += `${panels}<br />`
+              if (typeof nats === 'object' && nats.length) {
+                const panels = nats.map(n => '- ' + n).join('<br />')
+                nature = `${panels}<br />`
               }
             }
-            const rem = obss[obs]['Remarks'] // see checklistmodal
-            if (rem) output += `${rem}<br />`
+            const rem = obss[obs]['Remarks']
+            if (rem && rem.trim().length) {
+              remarks = `${rem}<br />`
+            }
 
-            output += `<br />`
+            if (nature || remarks) {
+              observations.push({
+                isShowTitle: isShowTitle,
+                title: title,
+                nature: nature,
+                remarks: remarks,
+              })
+            }
           }
         })
+        if (observations.length) {
+          selectSubject.push({ name: sub, selectObservation: observations })
+        }
       }
-      output += `<br />`
+    })
+    selectSubject.forEach(subject => {
+      if (subject.selectObservation) {
+        output += `<strong>${subject.name}</strong><br /><br />`
+        subject.selectObservation.forEach(observation => {
+          if (observation.isShowTitle === 'true') {
+            output += `${observation.title}<br />`
+          }
+          if (observation.nature) {
+            output += observation.nature
+          }
+          if (observation.remarks) {
+            output += observation.remarks
+          }
+          output += `<br />`
+        })
+        output += `<br />`
+      }
     })
     this.props.onChecklistConfirm(output)
   }
