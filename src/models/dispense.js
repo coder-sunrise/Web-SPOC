@@ -566,7 +566,7 @@ const getDispenseItems = (clinicSettings, entity = {}) => {
       }
     } else if (
       item.type === 'Open Prescription' ||
-      item.type === 'Medication (Ext.)'
+      item.type === 'External Prescription'
     ) {
       orderItems.push({
         ...defaultItem(item, 'NoNeedToDispense'),

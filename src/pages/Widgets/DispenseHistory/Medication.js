@@ -11,7 +11,7 @@ import { FileCopySharp } from '@material-ui/icons'
 
 export default ({ classes, current, fieldName = '', clinicSettings }) => {
   const drugMixtureIndicator = (row, right) => {
-    if (row.type !== 'Medication' || !row.isDrugMixture) return null
+    if (!row.isDrugMixture) return null
 
     return (
       <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />

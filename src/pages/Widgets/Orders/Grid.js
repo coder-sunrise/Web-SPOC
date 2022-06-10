@@ -17,6 +17,7 @@ import {
 } from '@/utils/utils'
 import { currencySymbol, currencyFormat } from '@/utils/config'
 import { Link } from 'umi'
+import { orderItemTypes } from '@/utils/codes'
 
 import numeral from 'numeral'
 import {
@@ -646,6 +647,7 @@ export default ({
       total: currentVisitOrderTemplate.total,
       totalAfterItemAdjustment: currentVisitOrderTemplate.totalAftAdj,
       type: type,
+      priority: 'Normal',
       unitPrice: currentVisitOrderTemplate.unitPrice,
       visitPurposeFK: currentVisitOrderTemplate.visitOrderTemplateFK,
       visitOrderTemplateItemFK: currentVisitOrderTemplate.id,
@@ -1536,7 +1538,7 @@ export default ({
                       key={1}
                       style={{
                         position: 'relative',
-                        color: 'rgba(0, 0, 0, 0.87)',
+                        color: 'rgba(0, 0, 0, 1)',
                       }}
                     >
                       {visit && visit.visitOrderTemplateFK && (
@@ -1674,20 +1676,41 @@ export default ({
             width: 135,
             render: row => {
               const otype = orderTypes.find(o => o.value === row.type)
-              let texts = []
+              let texts
+              let displayText
 
               if (row.type === '1') {
-                if (row.isDrugMixture === true) texts = 'Drug Mixture'
-                else {
-                  texts = [
-                    otype.name,
-                    row.isExternalPrescription === true ? '(Ext.)' : '',
+                if (row.isDrugMixture === true) {
+                  const itemType = orderItemTypes.find(
+                    t => t.type.toUpperCase() === 'Drug Mixture'.toUpperCase(),
+                  )
+                  texts = 'Drug Mixture'
+                  displayText = itemType.displayValue
+                } else {
+                  let typeName = otype.name
+                  if (row.isExternalPrescription === true)
+                    typeName = 'External Prescription'
+                  const itemType = orderItemTypes.find(
+                    t =>
+                      t.type.toUpperCase() === (typeName || '').toUpperCase(),
+                  )
+                  texts = [typeName, row.isActive ? '' : '(Inactive)'].join(' ')
+                  displayText = [
+                    itemType.displayValue,
                     row.isActive ? '' : '(Inactive)',
                   ].join(' ')
                 }
               } else {
+                const itemType = orderItemTypes.find(
+                  t =>
+                    t.type.toUpperCase() === (otype.name || '').toUpperCase(),
+                )
                 texts = [
                   otype.name,
+                  row.type === '5' || row.isActive ? '' : '(Inactive)',
+                ].join(' ')
+                displayText = [
+                  itemType.displayValue,
                   row.type === '5' || row.isActive ? '' : '(Inactive)',
                 ].join(' ')
               }
@@ -1731,7 +1754,7 @@ export default ({
                     }}
                   >
                     <Tooltip title={texts}>
-                      <span>{texts}</span>
+                      <span>{displayText}</span>
                     </Tooltip>
                     <div
                       style={{

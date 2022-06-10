@@ -73,9 +73,9 @@ const styles = () => ({
     },
   },
   orange: {
-    backgroundColor: '#ff9800',
+    backgroundColor: '#996600',
     '&:hover': {
-      backgroundColor: color('#ff9800')
+      backgroundColor: color('#996600')
         .darken(0.2)
         .hex(),
     },

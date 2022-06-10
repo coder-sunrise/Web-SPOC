@@ -336,6 +336,9 @@ class CommonTableGrid extends PureComponent {
           footer: {
             fontSize: 'inherit',
           },
+          body: {
+            color: '#000000',
+          },
         },
         EditCell: {
           cell: {
@@ -422,7 +425,6 @@ class CommonTableGrid extends PureComponent {
         Table: {
           table: {
             // tableLayout: 'auto',
-
             // borderCollapse: 'collapse',
           },
           stickyTable: {
@@ -439,6 +441,9 @@ class CommonTableGrid extends PureComponent {
           footer: {
             fontSize: 'inherit',
             lineHeight: '1em',
+          },
+          body: {
+            color: '#000000',
           },
         },
 

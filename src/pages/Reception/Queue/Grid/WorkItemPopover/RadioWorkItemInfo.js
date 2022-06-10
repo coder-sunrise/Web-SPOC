@@ -101,7 +101,7 @@ const RadioWorkItemInfo = props => {
               color: workItem.priority === 'Urgent' ? 'red' : 'black',
             }}
           >
-            {workItem.priority || '-'}
+            {workItem.priority || 'Normal'}
           </td>
           <td
             style={{

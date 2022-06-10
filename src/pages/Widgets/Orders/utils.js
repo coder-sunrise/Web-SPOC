@@ -149,7 +149,7 @@ const getCautionAlertContent = (
                       if (
                         LAB_CATEGORY.indexOf(row.serviceCenterCategoryFK) >= 0
                       ) {
-                        return 'LAB'
+                        return 'Lab'
                       }
                       return 'Radiology'
                     }

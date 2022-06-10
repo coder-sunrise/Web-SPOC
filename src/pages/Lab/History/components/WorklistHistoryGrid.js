@@ -333,7 +333,7 @@ export const WorklistHistoryGrid = ({ labWorklistHistory }) => {
             }
           }
         }}
-        className='noBgTable'
+        className='noBgTable innerTable'
         bordered
         columns={columns}
         dataSource={groupedTestPanels}

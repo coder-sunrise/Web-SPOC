@@ -22,6 +22,7 @@ import {
 import { showErrorNotification } from '@/utils/error'
 import { roundTo } from '@/utils/utils'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
+import { orderItemTypes } from '@/utils/codes'
 // sub components
 import CrNoteForm from '@/pages/Finance/Invoice/components/modal/AddCrNote/CrNoteForm'
 import Summary from '@/pages/Finance/Invoice/components/modal/AddCrNote/Summary'
@@ -430,6 +431,10 @@ class AddCrNote extends Component {
                 if (row.isDrugMixture) {
                   paddingRight = 10
                 }
+                const itemType = orderItemTypes.find(
+                  t =>
+                    t.type.toUpperCase() === (row.itemType || '').toUpperCase(),
+                )
                 return (
                   <div style={{ position: 'relative' }}>
                     <div
@@ -439,7 +444,9 @@ class AddCrNote extends Component {
                         paddingRight: paddingRight,
                       }}
                     >
-                      {row.itemType}
+                      <Tooltip title={row.itemType}>
+                        <span>{itemType?.displayValue}</span>
+                      </Tooltip>
                       <div
                         style={{
                           position: 'absolute',
