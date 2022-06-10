@@ -375,6 +375,7 @@ const PharmacyWorklistHistoryIndex = ({
         <ProTable
           actionRef={actionRef}
           rowSelection={false}
+          tableClassName='custom_pro'
           onRow={row => {
             return {
               onDoubleClick: () => {

@@ -87,7 +87,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       defaultSortOrder: 'descend',
       sorter: true,
       search: false,
-      width: 120,
+      width: 140,
       fixed: 'left',
       render: (_dom: any, entity: any) => {
         return (
@@ -224,7 +224,7 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       dataIndex: 'visitType',
       sorter: true,
       search: false,
-      width: 85,
+      width: 150,
       render: (_dom: any, entity: any) => {
         const vt = (visitPurpose || []).find(x => x.id === entity.visitType)
         return vt?.code
@@ -240,11 +240,11 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
     },
     {
       key: 'radiographer',
-      title: 'Radiology Technologist',
+      title: 'Technologist',
       dataIndex: 'radiographer',
       sorter: false,
       search: false,
-      width: 130,
+      width: 180,
     },
     {
       key: 'modality',
@@ -647,6 +647,7 @@ const RadiologyWorklistHistoryIndex = ({
     <Fragment>
       <PageContainer pageHeaderRender={false}>
         <ProTable
+          tableClassName='custom_pro'
           onRow={row => {
             return {
               onDoubleClick: () => {
