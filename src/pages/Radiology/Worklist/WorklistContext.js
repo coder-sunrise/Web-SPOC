@@ -129,22 +129,19 @@ export const WorklistContextProvider = props => {
         pagesize: 9999,
         apiCriteria: {
           searchValue: searchValue,
-          visitType: visitType
-            ? visitType.filter(t => t !== -99).join(',')
+          visitType: !visitType?.includes(-99)
+            ? visitType?.join(',')
             : undefined,
-          modality: modality
-            ? modality.filter(t => t !== -99).join(',')
-            : undefined,
+          modality: !modality?.includes(-99) ? modality?.join(',') : undefined,
           filterFrom: dateFrom,
           filterTo: dateTo
             ? moment(dateTo)
                 .endOf('day')
                 .formatUTC(false)
             : undefined,
-          visitDoctor:
-            visitDoctor && !visitDoctor.includes(-99)
-              ? visitDoctor.join(',')
-              : undefined,
+          visitDoctor: !visitDoctor?.includes(-99)
+            ? visitDoctor?.join(',')
+            : undefined,
           isUrgent: isUrgent,
           clinicianProfileId: isMyPatientOnly ? clinicianProfile.id : undefined,
         },
