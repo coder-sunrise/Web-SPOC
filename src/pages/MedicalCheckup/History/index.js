@@ -388,6 +388,7 @@ const History = ({
       api={api}
       rowSelection={false}
       columns={columns}
+      tableClassName='custom_pro'
       options={{ density: false, reload: false }}
       search={{
         span: 5,

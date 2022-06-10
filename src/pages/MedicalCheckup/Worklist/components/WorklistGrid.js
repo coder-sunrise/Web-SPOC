@@ -614,6 +614,7 @@ const WorklistGrid = ({
         <ProTable
           rowSelection={false}
           columns={columns}
+          tableClassName='custom_pro'
           search={false}
           options={{ density: false, reload: false }}
           dataSource={workitems}
