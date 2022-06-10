@@ -13,7 +13,7 @@ import {
 import { Paper, Tooltip, IconButton } from '@material-ui/core'
 import ReOrder from '@material-ui/icons/Reorder'
 
-import { hoverColor, tableEvenRowColor } from 'mui-pro-jss'
+import { hoverColor, tableEvenRowColor, fontColor } from 'mui-pro-jss'
 import ArrowDropDown from '@material-ui/icons/ArrowDropDown'
 import ArrowDropUp from '@material-ui/icons/ArrowDropUp'
 import {
@@ -96,7 +96,7 @@ const cellStyle = {
 }
 
 // console.log(colorManipulator)
-const styles = (theme) => ({
+const styles = theme => ({
   tableCursorPointer: {
     cursor: 'default',
   },
@@ -108,9 +108,11 @@ const styles = (theme) => ({
       //   0.01,
       // ),
       backgroundColor: '#ffffff',
+      color: fontColor,
     },
     '& > tbody > tr:nth-of-type(even):not(.group)': {
       backgroundColor: tableEvenRowColor,
+      color: fontColor,
     },
     // '& > tbody > tr.group': {
     //   backgroundColor: color(tableEvenRowColor).lighten(0.5).hex(),

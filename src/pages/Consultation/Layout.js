@@ -710,7 +710,11 @@ class Layout extends PureComponent {
                       {this.state.mode === 'edit' && (
                         <div className={`${classes.blockHeader} dragable`}>
                           <div
-                            style={{ height: 25, backgroundColor: '#e6e6e6' }}
+                            style={{
+                              height: 30,
+                              padding: '3px 0',
+                              backgroundColor: '#e6e6e6',
+                            }}
                           >
                             <span className={classes.blockName}>{w.name}</span>
 

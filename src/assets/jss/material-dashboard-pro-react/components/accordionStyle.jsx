@@ -1,4 +1,4 @@
-import { primaryColor, accordionColor, blackColor } from 'mui-pro-jss'
+import { primaryColor, accordionColor,hoverColor, blackColor } from 'mui-pro-jss'
 import color from 'color'
 
 const accordionStyle = theme => ({
@@ -14,30 +14,29 @@ const accordionStyle = theme => ({
   },
   expansionPanelExpanded: {
     margin: '0 !important',
+    marginBottom: '10 !important',
   },
   expansionPanelSummary: {
     minHeight: 'auto !important',
     // backgroundColor: 'transparent',
     borderBottom: '1px solid #ddd',
-    padding: '10px 15px 10px 0px',
+    padding: '8px 15px 8px 0px',
     // borderTopLeftRadius: '3px',
     // borderTopRightRadius: '3px',
     // color: '#3C4858',
     '&:hover': {
       color: blackColor,
-      background: color(accordionColor)
-        .darken(0.2)
+      background: color(hoverColor) 
         .hex(),
-      boxShadow:
-        '0 14px 26px -12px rgba(28, 26, 124, 0.42), 0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(28, 26, 124, 0.2)',
+      // boxShadow:
+      //   '0 14px 26px -12px rgba(28, 26, 124, 0.42), 0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(28, 26, 124, 0.2)',
     },
     color: blackColor,
     background: color(accordionColor).hex(),
   },
   expansionPanelSummaryExpaned: {
     color: blackColor,
-    background: color(accordionColor)
-      .darken(0.2)
+    background: color(hoverColor) 
       .hex(),
     '& $expansionPanelSummaryExpandIcon': {
       [theme.breakpoints.up('md')]: {

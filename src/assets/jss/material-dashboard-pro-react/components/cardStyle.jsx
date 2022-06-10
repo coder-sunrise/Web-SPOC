@@ -8,7 +8,7 @@ const cardStyle = {
     marginBottom: 8,
     marginTop: 8,
     borderRadius: '6px',
-    color: 'rgba(0, 0, 0, 0.87)',
+    color: 'rgba(0, 0, 0, 1)',
     background: '#fff',
     // width: '100%',
     boxShadow: '0 1px 4px 0 rgba(0, 0, 0, 0.28)',

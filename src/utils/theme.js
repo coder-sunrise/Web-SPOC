@@ -105,7 +105,7 @@ const sharedOverrides = {
       '&.Mui-expanded': {
         margin: 0,
         marginTop: '8px !important',
-
+        marginBottom: '8px !important',
         // marginTop: 'inherit',
         '&:first-child': {
           marginTop: '0px !important',
@@ -233,7 +233,7 @@ const sharedOverrides = {
   MuiTooltip: {
     tooltip: {
       backgroundColor: '#ffffff',
-      color: 'rgba(0, 0, 0, 0.87)',
+      color: 'rgba(0, 0, 0, 1)',
       boxShadow:
         '0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12)',
     },

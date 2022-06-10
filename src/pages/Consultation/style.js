@@ -1,6 +1,6 @@
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
   root: {
     position: 'relative',
@@ -54,8 +54,9 @@ const styles = (theme) => ({
   },
   blockName: {
     lineHeight: '26px',
-    fontWeight: 400,
+    fontWeight: 500,
     float: 'left',
+    color: '#000000',
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
   },
