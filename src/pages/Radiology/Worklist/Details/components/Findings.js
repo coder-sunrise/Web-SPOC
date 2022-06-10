@@ -139,7 +139,12 @@ export const Findings = ({
     })
   }
 
-  const scribbleNoteDrawing = ({ subject, temp, thumbnail = null, origin = null }) => {
+  const scribbleNoteDrawing = ({
+    subject,
+    temp,
+    thumbnail = null,
+    origin = null,
+  }) => {
     const { category, arrayName, categoryIndex } = scribbleNoteState
     const fields = [item]
 
@@ -323,7 +328,8 @@ export const Findings = ({
               buttonProps={{ disabled: isReadOnly }}
               checklistCategory={CHECKLIST_CATEGORY.RADIOLOGY}
               buttonStyle={{ marginRight: '0px' }}
-              onChecklistConfirm={checklist => {
+              onChecklistConfirm={(checklist = '') => {
+                if (!checklist.trim().length) return
                 const current = getHtmlFromEditorState(editorState)
                 const appended = current + ' ' + checklist
 
