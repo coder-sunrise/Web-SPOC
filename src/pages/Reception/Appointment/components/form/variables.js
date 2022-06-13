@@ -76,7 +76,7 @@ export const AppointmentDataColExtensions = (apptTimeIntervel, disabled) => [
   {
     columnName: 'endTime',
     isReactComponent: true,
-    width: 220,
+    width: 135,
     render: ApptDuration,
   },
   {

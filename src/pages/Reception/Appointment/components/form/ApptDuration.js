@@ -56,93 +56,89 @@ const ApptDuration = ({ row, columnConfig, cellProps }) => {
   const [focused, setFocused] = useState(false)
 
   return (
-    <GridContainer>
-      <GridItem xs={5}>
-        <Select
-          inputProps={{
-            onMouseUp: e => {
-              if (!focused) {
-                setFocused(true)
-                if (typeof e.target.click === 'function') e.target.click()
-              }
-            },
-          }}
-          value={row.apptDurationHour}
-          options={hourOptions}
-          {...restProps}
-          error={
-            row.apptDurationHour !== undefined ? '' : 'This is a required field'
-          }
-          onChange={e => {
-            const { commitChanges } = control
-            row.apptDurationHour = e
-            setEndTime(row)
-            validSchema(row)
+    <div>
+      <Select
+        inputProps={{
+          onMouseUp: e => {
+            if (!focused) {
+              setFocused(true)
+              if (typeof e.target.click === 'function') e.target.click()
+            }
+          },
+        }}
+        value={row.apptDurationHour}
+        options={hourOptions}
+        {...restProps}
+        error={
+          row.apptDurationHour !== undefined ? '' : 'This is a required field'
+        }
+        onChange={e => {
+          const { commitChanges } = control
+          row.apptDurationHour = e
+          setEndTime(row)
+          validSchema(row)
 
-            commitChanges({
-              changed: {
-                [row.id]: {
-                  endTime: row.endTime,
-                },
+          commitChanges({
+            changed: {
+              [row.id]: {
+                endTime: row.endTime,
               },
-            })
-          }}
-          onBlur={() => {
-            debounceBlur(true)
-          }}
-          onFocus={() => {
-            debounceBlur(false)
-          }}
-          dropdownMatchSelectWidth={false}
-          dropdownStyle={{
-            width: 60,
-          }}
-        />
-      </GridItem>
-      <GridItem xs={6}>
-        <Select
-          inputProps={{
-            onMouseUp: e => {
-              if (!focused) {
-                setFocused(true)
-                if (typeof e.target.click === 'function') e.target.click()
-              }
             },
-          }}
-          value={row.apptDurationMinute}
-          options={minuteOptions}
-          {...restProps}
-          error={
-            row.apptDurationMinute !== undefined
-              ? ''
-              : 'This is a required field'
-          }
-          onChange={e => {
-            const { commitChanges } = control
-            row.apptDurationMinute = e
-            setEndTime(row)
-            validSchema(row)
-            commitChanges({
-              changed: {
-                [row.id]: {
-                  endTime: row.endTime,
-                },
+          })
+        }}
+        onBlur={() => {
+          debounceBlur(true)
+        }}
+        onFocus={() => {
+          debounceBlur(false)
+        }}
+        dropdownMatchSelectWidth={false}
+        dropdownStyle={{
+          width: 60,
+        }}
+        style={{ display: 'inline-block', width: 50, marginRight: 10 }}
+      />
+      <Select
+        inputProps={{
+          onMouseUp: e => {
+            if (!focused) {
+              setFocused(true)
+              if (typeof e.target.click === 'function') e.target.click()
+            }
+          },
+        }}
+        value={row.apptDurationMinute}
+        options={minuteOptions}
+        {...restProps}
+        error={
+          row.apptDurationMinute !== undefined ? '' : 'This is a required field'
+        }
+        onChange={e => {
+          const { commitChanges } = control
+          row.apptDurationMinute = e
+          setEndTime(row)
+          validSchema(row)
+          commitChanges({
+            changed: {
+              [row.id]: {
+                endTime: row.endTime,
               },
-            })
-          }}
-          onBlur={() => {
-            debounceBlur(true)
-          }}
-          onFocus={() => {
-            debounceBlur(false)
-          }}
-          dropdownMatchSelectWidth={false}
-          dropdownStyle={{
-            width: 90,
-          }}
-        />
-      </GridItem>
-    </GridContainer>
+            },
+          })
+        }}
+        onBlur={() => {
+          debounceBlur(true)
+        }}
+        onFocus={() => {
+          debounceBlur(false)
+        }}
+        dropdownMatchSelectWidth={false}
+        dropdownStyle={{
+          width: 90,
+        }}
+        style={{ display: 'inline-block', width: 75 }}
+      />
+    </div>
   )
 }
 export default memo(ApptDuration)
