@@ -899,7 +899,7 @@ const Main = props => {
         dataIndex: 'invoiceItemTypeFK',
         key: 'invoiceItemTypeFK',
         title: 'Type',
-        width: 120,
+        width: 105,
         onCell: row => {
           const mergeCell = isHiddenStock ? 12 : 13
           if (row.isGroup)

@@ -506,7 +506,7 @@ class Scribble extends React.Component {
       await setTimeout(() => {
         // wait for 1 milli second for img to set src successfully
       }, 100)
-      const thumbnailSize = { width: 100, height: 49 }
+      const thumbnailSize = { width: 275, height: 150 }
       const thumbnail = getThumbnail(imgEle, thumbnailSize)
       const thumbnailData = thumbnail.toDataURL(`image/jpeg`)
 
