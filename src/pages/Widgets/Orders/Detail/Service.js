@@ -1335,7 +1335,7 @@ class Service extends PureComponent {
                   value={editService.newServiceName}
                   disabled={!editServiceId || isStartedService}
                   label='New Service Display Name'
-                  maxLength={200}
+                  maxLength={40}
                   onChange={e => {
                     editService.newServiceName = e.target.value
                     setFieldValue('serviceItems', [...serviceItems])

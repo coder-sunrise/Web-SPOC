@@ -1310,7 +1310,7 @@ class Lab extends PureComponent {
                   value={editService.newServiceName}
                   disabled={!editServiceId || isStartedLab}
                   label='New Service Display Name'
-                  maxLength={200}
+                  maxLength={40}
                   onChange={e => {
                     editService.newServiceName = e.target.value
                     setFieldValue('labItems', [...labItems])
