@@ -683,7 +683,7 @@ class PatientHistory extends Component {
               </Tooltip>
             </div>
           )}
-          {true && (
+          {isForInvoiceReplacement && (
             <div
               style={{
                 display: 'inline-block',
