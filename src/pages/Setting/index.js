@@ -216,10 +216,14 @@ class SystemSetting extends PureComponent {
     const isMultiple = searchText.length > 0
     const activeConfig = isMultiple
       ? {
-          activedKeys: actives,
+          // activedKeys: actives,
         }
       : { active: actives[0] }
     const menus = this.menus().filter(item => item.itemCount > 0)
+    const defaultActiveArr = []
+    this.menus().forEach((_, index) => {
+      defaultActiveArr.push(index)
+    })
 
     const { mainDivHeight = 700 } = global
     let height = mainDivHeight - 50 - ($('.filterSettingBar').height() || 0)
@@ -237,7 +241,7 @@ class SystemSetting extends PureComponent {
         </div>
         <div style={{ maxHeight: height, overflow: 'auto' }}>
           <Accordion
-            defaultActive={0}
+            defaultActive={defaultActiveArr}
             mode={isMultiple ? 'multiple' : 'default'}
             {...activeConfig}
             onChange={this.onAccordionChange}
