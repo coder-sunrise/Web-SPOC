@@ -75,7 +75,7 @@ const baseColumns = (classes, isFullScreen) => {
     {
       dataIndex: 'itemType',
       title: 'Type',
-      width: 140,
+      width: 105,
       render: (text, row) => {
         let paddingRight = 0
         if (row.isPreOrder && row.isExclusive) {
