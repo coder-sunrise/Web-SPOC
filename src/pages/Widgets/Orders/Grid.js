@@ -1672,7 +1672,7 @@ export default ({
         columnExtensions={[
           {
             columnName: 'type',
-            width: 135,
+            width: 105,
             render: row => {
               const otype = orderTypes.find(o => o.value === row.type)
               let texts

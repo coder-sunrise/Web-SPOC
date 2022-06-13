@@ -420,7 +420,7 @@ export const DispenseItemsColumns1 = (
       dataIndex: 'type',
       key: 'type',
       title: 'Type',
-      width: 120,
+      width: 105,
       onCell: row => {
         if (row.isGroup) {
           let mergeCell = 0
@@ -1657,7 +1657,7 @@ export const ServiceColumns1 = (
             }}
           >
             <Tooltip title={row.type}>
-              <span style={{ width: 80 }}>{itemType?.displayValue}</span>
+              <span style={{ width: 40 }}>{itemType?.displayValue}</span>
             </Tooltip>
             <Space
               direction='horizontal'
