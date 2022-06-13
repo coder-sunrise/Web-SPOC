@@ -87,7 +87,7 @@ const styles = theme => ({
     height: 28,
   },
   checkServiceLabel: {
-    maxWidth: 150,
+    maxWidth: 425,
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -949,7 +949,7 @@ class Lab extends PureComponent {
                       <div className={classes.selectedServiceLabel}>
                         <div
                           style={{
-                            maxWidth: 150,
+                            maxWidth: 430,
                             display: 'inline-block',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
@@ -1310,7 +1310,7 @@ class Lab extends PureComponent {
                   value={editService.newServiceName}
                   disabled={!editServiceId || isStartedLab}
                   label='New Service Display Name'
-                  maxLength={200}
+                  maxLength={40}
                   onChange={e => {
                     editService.newServiceName = e.target.value
                     setFieldValue('labItems', [...labItems])
