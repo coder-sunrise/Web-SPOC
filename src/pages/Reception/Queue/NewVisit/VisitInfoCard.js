@@ -346,7 +346,7 @@ const VisitInfoCard = ({
               _.intersection(
                 template.visitOrderTemplate_Copayers.map(x => x.copayerFK),
                 patientCopayers,
-              ) > 0
+              ).length > 0
             ) {
               availableVisitOrderTemplate.push({
                 ...template,
