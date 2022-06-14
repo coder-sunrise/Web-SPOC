@@ -14,7 +14,7 @@ import Search from '@material-ui/icons/Search'
 import { VisitTypeTag } from '@/components/_medisys'
 // material ui
 import { withStyles, Link } from '@material-ui/core'
-import { Tooltip } from 'antd'
+import { Tooltip } from '@/components'
 // common components
 import {
   CardContainer,
@@ -684,18 +684,18 @@ class PatientHistory extends Component {
             </div>
           )}
           {isForInvoiceReplacement && (
-            <div
-              style={{
-                display: 'inline-block',
-                marginRight: 10,
-                position: 'relative',
-                top: 6,
-              }}
-            >
-              <Tooltip title='Replacement Invoice'>
+            <Tooltip title='For Invoice Replacement'>
+              <div
+                style={{
+                  display: 'inline-block',
+                  marginRight: 10,
+                  position: 'relative',
+                  top: 6,
+                }}
+              >
                 <InvoiceReplacement />
-              </Tooltip>
-            </div>
+              </div>
+            </Tooltip>
           )}
           <div style={{ display: 'inline-block', width: 40, marginRight: 10 }}>
             {visitPurposeFK && <VisitTypeTag type={visitPurposeFK} />}
