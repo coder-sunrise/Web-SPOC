@@ -35,16 +35,18 @@ class Service extends PureComponent {
       type: 'settingClinicService/query',
       payload: {
         'ServiceFKNavigation.isActive': true,
+        pagesize: 9999,
       },
     })
     this.props.dispatch({
       type: 'settingClinicService/getServiceCenter',
-      payload: {},
+      payload: { pagesize: 9999 },
     })
     this.props.dispatch({
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctexaminationitem',
+        pagesize: 9999,
       },
     })
   }
