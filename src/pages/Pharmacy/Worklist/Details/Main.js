@@ -1714,7 +1714,7 @@ const Main = props => {
   return (
     <div>
       <GridContainer>
-        <GridItem md={12} style={{ marginTop: 8 }}>
+        <GridItem md={12} style={{ marginTop: 30 }}>
           <PharmacySteps
             statusHistory={statusHistory}
             currentStatusFK={workitem.statusFK}
