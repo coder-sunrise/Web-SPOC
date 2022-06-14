@@ -53,19 +53,21 @@ const checkAnyInternalLabServiceCenter = (
   currentServiceCenters = [],
   allServiceCenters = [],
 ) => {
-  const internalLabServiceCenterIds = allServiceCenters
-    .filter(
-      sc => RadioAndLabCategories.internalLab === sc.serviceCenterCategoryFK,
-    )
-    .map(sc => sc.id)
+       const internalLabServiceCenterIds = allServiceCenters
+         .filter(
+           sc =>
+             RadioAndLabCategories.internalLab === sc.serviceCenterCategoryFK,
+         )
+         .map(sc => sc.id)
 
-  const hasInternalLabServiceCenter =
-    currentServiceCenters.findIndex(sc =>
-      internalLabServiceCenterIds.includes(sc.serviceCenterFK),
-    ) !== -1
+       const hasInternalLabServiceCenter =
+         _.intersection(
+           internalLabServiceCenterIds,
+           currentServiceCenters.map(x => x.serviceCenterFK),
+         ).length > 0
 
-  return hasInternalLabServiceCenter
-}
+       return hasInternalLabServiceCenter
+     }
 
 const itemSchema = Yup.object().shape({
   serviceCenterFK: Yup.string().required(),
