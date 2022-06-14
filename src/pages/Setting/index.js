@@ -150,6 +150,14 @@ class SystemSetting extends PureComponent {
     })
   }
 
+  menusKeys = () => {
+    let menusKeys = []
+    this.menus().forEach((_, index) => {
+      menusKeys.push(index)
+    })
+    return menusKeys
+  }
+  
   setActivePanelKey = activeKeys => {
     const { dispatch, systemSetting } = this.props
     const { filterValues } = systemSetting
@@ -186,7 +194,7 @@ class SystemSetting extends PureComponent {
       type: 'systemSetting/updateState',
       payload: {
         filterValues: {
-          actives: [0],
+          actives: this.menusKeys(),
           searchText: e.target.value.toLowerCase(),
         },
       },
@@ -216,14 +224,10 @@ class SystemSetting extends PureComponent {
     const isMultiple = searchText.length > 0
     const activeConfig = isMultiple
       ? {
-          // activedKeys: actives,
+          activedKeys: actives,
         }
       : { active: actives[0] }
     const menus = this.menus().filter(item => item.itemCount > 0)
-    const defaultActiveArr = []
-    this.menus().forEach((_, index) => {
-      defaultActiveArr.push(index)
-    })
 
     const { mainDivHeight = 700 } = global
     let height = mainDivHeight - 50 - ($('.filterSettingBar').height() || 0)
@@ -241,7 +245,7 @@ class SystemSetting extends PureComponent {
         </div>
         <div style={{ maxHeight: height, overflow: 'auto' }}>
           <Accordion
-            defaultActive={defaultActiveArr}
+            defaultActive={0}
             mode={isMultiple ? 'multiple' : 'default'}
             {...activeConfig}
             onChange={this.onAccordionChange}
