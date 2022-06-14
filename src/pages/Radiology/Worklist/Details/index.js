@@ -304,7 +304,7 @@ const RadiologyDetails = () => {
         maxWidth='lg'
       >
         <GridContainer
-          style={{ height: !isReadOnly ? 700 : undefined, overflowY: 'scroll' }}
+          style={{ height: !isReadOnly ? 750 : undefined, overflowY: 'scroll' }}
         >
           {!isReadOnly && (
             <GridItem md={12}>

@@ -360,26 +360,23 @@ export const SpecimenDetails = ({
         showFooter={true}
         maxWidth='lg'
       >
-        <div>
+        <div
+          style={{
+            height: 750,
+            overflowY: 'scroll',
+          }}
+        >
           <Form
             form={form}
             initialValues={{ ...entity }}
             onValuesChange={(_, values) => setFormValues(values)}
           >
-            <GridContainer
-              style={{
-                height: 700,
-                alignItems: 'start',
-                overflowY: 'scroll',
-              }}
-            >
+            <div style={{ padding: 8, paddingTop: 0 }}>
+              <Banner isDisposePatientEntity={isDisposePatientEntity} />
+            </div>
+            <GridContainer>
               <React.Fragment>
-                <GridItem md={12}>
-                  <div style={{ padding: 8 }}>
-                    <Banner isDisposePatientEntity={isDisposePatientEntity} />
-                  </div>
-                </GridItem>
-                <GridItem md={12}>
+                <GridItem md={12} style={{ marginTop: 30 }}>
                   <SpecimenDetailsStep timeline={entity.timeline} />
                 </GridItem>
                 <GridItem md={12}>
