@@ -150,6 +150,14 @@ class SystemSetting extends PureComponent {
     })
   }
 
+  menusKeys = () => {
+    let menusKeys = []
+    this.menus().forEach((_, index) => {
+      menusKeys.push(index)
+    })
+    return menusKeys
+  }
+  
   setActivePanelKey = activeKeys => {
     const { dispatch, systemSetting } = this.props
     const { filterValues } = systemSetting
@@ -186,7 +194,7 @@ class SystemSetting extends PureComponent {
       type: 'systemSetting/updateState',
       payload: {
         filterValues: {
-          actives: [0],
+          actives: this.menusKeys(),
           searchText: e.target.value.toLowerCase(),
         },
       },
