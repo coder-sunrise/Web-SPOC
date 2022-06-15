@@ -71,6 +71,7 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
     updateByUser,
     updateDate,
     resourceName,
+    visitPurposeValue,
     preOrder = [],
   } = popoverEvent
 
@@ -177,6 +178,9 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
           />
         </GridItem>
         <GridItem md={12}>
+          <TextField disabled label='Visit Purpose' value={visitPurposeValue} />
+        </GridItem>
+        <GridItem md={12}>
           <TextField
             disabled
             multiline
@@ -185,9 +189,11 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
             value={appointmentRemarks}
           />
         </GridItem>
-        <GridItem md={12}>
-          <span>Pre-Order : {preOrderStr}</span>
-        </GridItem>
+        {preOrderStr.trim().length > 0 && (
+          <GridItem md={12}>
+            <span>Pre-Order : {preOrderStr}</span>
+          </GridItem>
+        )}
       </GridContainer>
     </div>
   )

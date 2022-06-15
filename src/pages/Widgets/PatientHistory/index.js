@@ -14,7 +14,7 @@ import Search from '@material-ui/icons/Search'
 import { VisitTypeTag } from '@/components/_medisys'
 // material ui
 import { withStyles, Link } from '@material-ui/core'
-import { Tooltip } from 'antd'
+import { Tooltip } from '@/components'
 // common components
 import {
   CardContainer,
@@ -683,19 +683,19 @@ class PatientHistory extends Component {
               </Tooltip>
             </div>
           )}
-          {true && (
-            <div
-              style={{
-                display: 'inline-block',
-                marginRight: 10,
-                position: 'relative',
-                top: 6,
-              }}
-            >
-              <Tooltip title='Replacement Invoice'>
+          {isForInvoiceReplacement && (
+            <Tooltip title='For Invoice Replacement'>
+              <div
+                style={{
+                  display: 'inline-block',
+                  marginRight: 10,
+                  position: 'relative',
+                  top: 6,
+                }}
+              >
                 <InvoiceReplacement />
-              </Tooltip>
-            </div>
+              </div>
+            </Tooltip>
           )}
           <div style={{ display: 'inline-block', width: 40, marginRight: 10 }}>
             {visitPurposeFK && <VisitTypeTag type={visitPurposeFK} />}
@@ -1275,7 +1275,9 @@ class PatientHistory extends Component {
           o => o.type === notesType.fieldName,
         )
         const filterScribbleNotes = scribbleNotes.filter(
-          sn => sn.scribbleNoteTypeFK === scribbleType?.typeFK,
+          sn =>
+            sn.scribbleNoteTypeFK === scribbleType?.typeFK &&
+            sn.signedByUserFK === note.signedByUserFK,
         )
 
         for (let indexSN = 0; indexSN < filterScribbleNotes.length; indexSN++) {
@@ -2107,7 +2109,7 @@ class PatientHistory extends Component {
                   style={{
                     width: !isFullScreen ? 160 : 240,
                     display: 'inline-Block',
-                    marginBottom: -10,
+                    marginBottom: -16,
                   }}
                   {...args}
                   allowClear={true}
@@ -2150,7 +2152,7 @@ class PatientHistory extends Component {
                   style={{
                     width: !isFullScreen ? 150 : 240,
                     display: 'inline-Block',
-                    marginBottom: -10,
+                    marginBottom: -16,
                   }}
                   options={this.getCategoriesOptions()}
                   {...args}

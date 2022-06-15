@@ -1796,6 +1796,7 @@ class Banner extends PureComponent {
           maxWidth='lg'
         >
           <SelectPreOrder
+            {...this.props}
             disabled={
               !(
                 from === 'Appointment' ||
@@ -1812,7 +1813,6 @@ class Banner extends PureComponent {
             isRetail={isRetail}
             activePreOrderItem={activePreOrderItems || pendingPreOrderItems}
             actualizePreOrderAccessRight={actualizePreOrderAccessRight}
-            {...this.props}
           />
         </CommonModal>
         <CommonModal

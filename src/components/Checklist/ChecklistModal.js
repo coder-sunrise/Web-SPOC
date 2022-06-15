@@ -13,6 +13,7 @@ import {
   CommonModal,
   TextField,
   withFormikExtend,
+  RadioGroup,
 } from '@/components'
 import { Form, Checkbox, Row, Col, Tabs, Collapse, Radio } from 'antd'
 import ChecklistSubject from '@/pages/Setting/Checklist/Details/ChecklistSubject'
@@ -24,12 +25,14 @@ const ChecklistModal = ({ selectedChecklist, onConfirm, onClose, open }) => {
   const [checklistState, setChecklistState] = useState([])
   const [form] = Form.useForm()
 
-  const onCloseModal = () => onClose()
-  const updateEditor = values => onConfirm(values)
-
+  const onCloseModal = () => {
+    onClose()
+    form.resetFields()
+  }
   const onFinish = () => {
     const values = form.getFieldsValue(true)
-    updateEditor(values)
+    onConfirm(values)
+    form.resetFields()
   }
 
   return (
@@ -69,6 +72,7 @@ const ChecklistModal = ({ selectedChecklist, onConfirm, onClose, open }) => {
                       displayValue,
                       isHasMultiNature,
                       isHasRemark,
+                      isWithTitleForInterpretation,
                     } = observation
                     const orderedNature = _.orderBy(
                       checklistNature,
@@ -78,7 +82,11 @@ const ChecklistModal = ({ selectedChecklist, onConfirm, onClose, open }) => {
                     return (
                       <Collapse.Panel header={displayValue} key={i}>
                         <Form.Item
-                          name={[subject.displayValue, displayValue, 'Nature']}
+                          name={[
+                            subject.displayValue,
+                            `${isWithTitleForInterpretation}-${displayValue}`,
+                            'Nature',
+                          ]}
                         >
                           {isHasMultiNature ? (
                             <Checkbox.Group>
@@ -96,24 +104,24 @@ const ChecklistModal = ({ selectedChecklist, onConfirm, onClose, open }) => {
                               })}
                             </Checkbox.Group>
                           ) : (
-                            <Radio.Group>
-                              {orderedNature.map((nature, index) => {
-                                return (
-                                  <div>
-                                    <Radio
-                                      value={nature.displayValue}
-                                      style={{ lineHeight: '32px' }}
-                                    >
-                                      {nature.displayValue}
-                                    </Radio>
-                                  </div>
-                                )
-                              })}
-                            </Radio.Group>
+                            <RadioGroup
+                              isAllowReset
+                              label=''
+                              vertical
+                              options={orderedNature.map(nature => ({
+                                value: nature.displayValue,
+                                label: nature.displayValue,
+                              }))}
+                              itemStyle={{ margin: 0 }}
+                            />
                           )}
                         </Form.Item>
                         <Form.Item
-                          name={[subject.displayValue, displayValue, 'Remarks']}
+                          name={[
+                            subject.displayValue,
+                            `${isWithTitleForInterpretation}-${displayValue}`,
+                            'Remarks',
+                          ]}
                         >
                           {isHasRemark && <TextField label='Remarks' />}
                         </Form.Item>

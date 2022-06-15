@@ -66,6 +66,7 @@ class RadioGroup extends React.Component {
       textField = 'label',
       disabled,
       inputClass,
+      itemStyle,
       ...resetProps
     } = this.props
     return (
@@ -88,6 +89,7 @@ class RadioGroup extends React.Component {
                       : classes.checkboxAndRadioHorizontal
                   }`}
                   key={o[valueField]}
+                  style={itemStyle}
                 >
                   <Radio
                     value={o[valueField]}

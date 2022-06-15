@@ -53,19 +53,21 @@ const checkAnyInternalLabServiceCenter = (
   currentServiceCenters = [],
   allServiceCenters = [],
 ) => {
-  const internalLabServiceCenterIds = allServiceCenters
-    .filter(
-      sc => RadioAndLabCategories.internalLab === sc.serviceCenterCategoryFK,
-    )
-    .map(sc => sc.id)
+       const internalLabServiceCenterIds = allServiceCenters
+         .filter(
+           sc =>
+             RadioAndLabCategories.internalLab === sc.serviceCenterCategoryFK,
+         )
+         .map(sc => sc.id)
 
-  const hasInternalLabServiceCenter =
-    currentServiceCenters.findIndex(sc =>
-      internalLabServiceCenterIds.includes(sc.serviceCenterFK),
-    ) !== -1
+       const hasInternalLabServiceCenter =
+         _.intersection(
+           internalLabServiceCenterIds,
+           currentServiceCenters.map(x => x.serviceCenterFK),
+         ).length > 0
 
-  return hasInternalLabServiceCenter
-}
+       return hasInternalLabServiceCenter
+     }
 
 const itemSchema = Yup.object().shape({
   serviceCenterFK: Yup.string().required(),
@@ -123,7 +125,13 @@ const testPanelSchema = Yup.object().shape({
 
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
-    displayValue: Yup.string().required(),
+    displayValue: Yup.string()
+      .test(
+        'len',
+        'Service name cannot exceed 40 characters.',
+        val => val && val.length <= 40,
+      )
+      .required(),
     serviceCategoryFK: Yup.string().required(),
     revenueCategoryFK: Yup.string().required(),
     effectiveDates: Yup.array()
@@ -333,6 +341,7 @@ class Detail extends PureComponent {
       serviceCategoryFK,
       ctService_Tag = [],
       isRequiredSpecimen = false,
+      id,
     } = this.props.values
     const { dispatch } = this.props
 
@@ -352,6 +361,13 @@ class Detail extends PureComponent {
         })
       }
     })
+    if (id) {
+      setTimeout(async () => {
+        if (!_.isEmpty(await this.props.validateForm())) {
+          this.props.handleSubmit()
+        }
+      }, 100)
+    }
   }
 
   checkHasActiveSession = async () => {

@@ -899,7 +899,7 @@ const Main = props => {
         dataIndex: 'invoiceItemTypeFK',
         key: 'invoiceItemTypeFK',
         title: 'Type',
-        width: 120,
+        width: 105,
         onCell: row => {
           const mergeCell = isHiddenStock ? 12 : 13
           if (row.isGroup)
@@ -1266,6 +1266,21 @@ const Main = props => {
           colSpan: row.isGroup ? 0 : 1,
           rowSpan: row.groupNumber === 1 ? row.groupRowSpan : 0,
         }),
+        render: (_, row) => {
+          let instruction
+          if (row.invoiceItemTypeFK !== 1) {
+            instruction = row.instruction
+          } else {
+            instruction = row.language.isShowFirstValue
+              ? row.instruction
+              : row.secondInstruction
+          }
+          return (
+            <Tooltip title={instruction}>
+              <span>{instruction}</span>
+            </Tooltip>
+          )
+        },
       },
       {
         dataIndex: 'drugInteraction',
@@ -1714,7 +1729,7 @@ const Main = props => {
   return (
     <div>
       <GridContainer>
-        <GridItem md={12} style={{ marginTop: 8 }}>
+        <GridItem md={12} style={{ marginTop: 30 }}>
           <PharmacySteps
             statusHistory={statusHistory}
             currentStatusFK={workitem.statusFK}

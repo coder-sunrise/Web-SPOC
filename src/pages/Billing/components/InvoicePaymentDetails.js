@@ -50,7 +50,7 @@ const InvoicePaymentDetails = ({ invoice = {}, classes }) => {
             {
               dataIndex: 'itemType',
               title: 'Category ',
-              width: 130,
+              width: 105,
               render: (_, row) => {
                 let paddingRight = 0
                 if (row.isPreOrder) {
