@@ -755,6 +755,9 @@ class Main extends React.Component {
     this.fetchCodeTables()
   }
   componentDidMount() {
+    let patientBannerHeight =
+      document.getElementById('patientBanner').offsetHeight || 0
+    this.setState({ patientBannerHeight })
     // initRoomAssignment()
     setTimeout(() => {
       this.props.setFieldValue('fakeField', 'setdirty')
