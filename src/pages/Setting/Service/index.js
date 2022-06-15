@@ -35,7 +35,6 @@ class Service extends PureComponent {
       type: 'settingClinicService/query',
       payload: {
         'ServiceFKNavigation.isActive': true,
-        pagesize: 9999,
       },
     })
     this.props.dispatch({

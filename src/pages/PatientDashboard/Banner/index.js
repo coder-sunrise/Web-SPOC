@@ -943,6 +943,7 @@ class Banner extends PureComponent {
   }
   expandOrCollespe = () => {
     this.setState({ isExpanded: !this.state.isExpanded })
+    this.props.setPatientBannerHeight()
   }
 
   render() {

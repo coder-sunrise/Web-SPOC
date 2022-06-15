@@ -514,7 +514,13 @@ class Layout extends PureComponent {
   render() {
     const { state, props } = this
     const { currentLayout } = state
-    const { classes, diagnosis, clinicSettings, ...restProps } = props
+    const {
+      classes,
+      diagnosis,
+      clinicSettings,
+      patientBannerHeight,
+      ...restProps
+    } = props
     const {
       theme,
       height,
@@ -606,7 +612,7 @@ class Layout extends PureComponent {
               marginTop: 0,
               position: 'sticky',
               overflowY: 'auto',
-              top: headerHeight + this.state.bannerHeight || 0,
+              top: headerHeight + patientBannerHeight || 0,
               zIndex: 1000,
               borderRadius: 0,
               marginBottom: 0,

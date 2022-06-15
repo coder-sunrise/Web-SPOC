@@ -731,6 +731,18 @@ class Detail extends PureComponent {
     return hiddenFields
   }
 
+  validationOfFormFields = fieldArray => {
+    let errorArr = []
+    fieldArray.forEach(item =>
+      '_errors' in item && item.isDeleted !== true && item._errors.length > 0
+        ? errorArr.push(item)
+        : null,
+    )
+    if (errorArr.length > 0) {
+      return true
+    }
+    return false
+  }
   render() {
     const { props } = this
 
@@ -743,6 +755,11 @@ class Detail extends PureComponent {
       ctService_Tag,
       errors,
     } = props
+    let settingsFiledArray = [
+      ...this.state.modalitySettings,
+      ...this.state.serviceSettings,
+      ...this.state.testPanels,
+    ]
 
     const { ctService_TestPanel: originalTestPanels } = props.initialValues
 
@@ -755,8 +772,9 @@ class Detail extends PureComponent {
     } = this.state
     const serviceSettingsErrMsg = errors.ctServiceCenter_ServiceNavigation
     const testPanelErrMsg = errors.ctService_TestPanel
-    const shoudDisableSaveButton =
-      serviceSettings.filter(row => !row.isDeleted).length === 0
+    const shoudDisableSaveButton = () =>
+      serviceSettings.filter(row => !row.isDeleted).length === 0 ||
+      this.validationOfFormFields(settingsFiledArray)
     const { settings = [] } = clinicSettings
     const labAndRadiologySetting =
       settings.isEnableLabModule || settings.isEnableRadiologyModule
@@ -1197,7 +1215,7 @@ class Detail extends PureComponent {
             onConfirm: props.handleSubmit,
             confirmBtnText: 'Save',
             confirmProps: {
-              disabled: shoudDisableSaveButton,
+              disabled: shoudDisableSaveButton(),
             },
           })}
       </React.Fragment>

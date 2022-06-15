@@ -286,7 +286,7 @@ const autoPrintSelection = async (action, props) => {
                                       .add(-systemTimeZoneInt, 'hour')
                                       .formatUTC(false),
                                     _dobIn: false,
-                                    _orderDateIn : false,
+                                    _orderDateIn: false,
                                   })),
                                   PrescriptionInfo: r.PrescriptionInfo.map(
                                     x => ({
@@ -294,7 +294,7 @@ const autoPrintSelection = async (action, props) => {
                                       updateDate: moment(x.updateDate)
                                         .add(-systemTimeZoneInt, 'hour')
                                         .formatUTC(false),
-                                      _updateDateIn : false,
+                                      _updateDateIn: false,
                                     }),
                                   ),
                                 }),
@@ -303,7 +303,8 @@ const autoPrintSelection = async (action, props) => {
                         Copies: item.Copies,
                         Token: token,
                         BaseUrl: process.env.url,
-                      }})
+                      }
+                    })
                     handlePrint(JSON.stringify(printedData))
                     dispatch({ type: 'consultation/closeModal' })
                   })
@@ -746,6 +747,7 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
 class Main extends React.Component {
   state = {
     recording: true,
+    patientBannerHeight: '',
   }
 
   constructor(props) {
@@ -815,7 +817,7 @@ class Main extends React.Component {
       payload: { code: 'userpreference' },
     })
   }
-  shouldComponentUpdate = nextProps => {
+  shouldComponentUpdate = (nextProps, nextState) => {
     if (nextProps.values.id !== this.props.values.id) return true
     if (nextProps.consultation.version !== this.props.consultation.version)
       return true
@@ -860,6 +862,9 @@ class Main extends React.Component {
       return true
     }
 
+    if (nextState.patientBannerHeight !== this.state.patientBannerHeight) {
+      return true
+    }
     return false
   }
 
@@ -879,6 +884,13 @@ class Main extends React.Component {
     })
   }
 
+  setPatientBannerHeight = () => {
+    setTimeout(() => {
+      let patientBannerHeight =
+        document.getElementById('patientBanner').offsetHeight || 0
+      this.setState({ patientBannerHeight })
+    })
+  }
   pauseConsultation = async () => {
     const { validateForm, handleSubmit } = this.props
     const isFormValid = await validateForm()
@@ -1461,7 +1473,10 @@ class Main extends React.Component {
   }
 
   render() {
-    const { props, state } = this
+    const {
+      props,
+      state: { patientBannerHeight },
+    } = this
     const {
       classes,
       theme,
@@ -1515,6 +1530,7 @@ class Main extends React.Component {
         <PatientBanner
           from='Consultation'
           onSelectPreOrder={this.onSelectPreOrder}
+          setPatientBannerHeight={this.setPatientBannerHeight}
           activePreOrderItems={draftPreOrderItem}
           extraCmt={this.getExtraComponent}
           {...this.props}
@@ -1523,6 +1539,7 @@ class Main extends React.Component {
           <Layout
             {...this.props}
             rights={matches.rights}
+            patientBannerHeight={patientBannerHeight}
             onSaveLayout={this.saveLayout}
             onLoadTemplate={this.loadTemplate}
             onSaveTemplate={this.saveTemplate}
