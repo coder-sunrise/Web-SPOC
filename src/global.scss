@@ -996,11 +996,11 @@ textarea[class*='MuiInputBase-input-'] {
   background-color: #f0f5ff;
 }
 .noBgTable .ant-table-tbody tr:nth-child(odd) {
-  background-color: transparent !important;
+  background-color: white !important;
 }
 
 .noBgTable .ant-table-tbody tr:nth-child(odd) td {
-  background-color: transparent;
+  background-color: white;
 }
 .e-listbox-wrapper .e-list-item:nth-child(even) {
   background-color: #f0f5ff;
