@@ -181,18 +181,11 @@ class Layout extends PureComponent {
 
   componentDidMount() {
     this.setBannerHeight()
-    let _timer = setInterval(() => {
-      const bannerHeight = document.getElementById('patientBanner').offsetHeight
-      this.setState({
-        bannerHeight,
-      })
-    }, 50)
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.delayedResize)
     $(window.mainPanel).css('overflow', 'auto')
-    clearInterval(_timer)
 
     this.state.currentLayout.widgets.map(id => {
       const w = widgets.find(o => o.id === id)
@@ -521,7 +514,13 @@ class Layout extends PureComponent {
   render() {
     const { state, props } = this
     const { currentLayout } = state
-    const { classes, diagnosis, clinicSettings, ...restProps } = props
+    const {
+      classes,
+      diagnosis,
+      clinicSettings,
+      patientBannerHeight,
+      ...restProps
+    } = props
     const {
       theme,
       height,
@@ -613,7 +612,7 @@ class Layout extends PureComponent {
               marginTop: 0,
               position: 'sticky',
               overflowY: 'auto',
-              top: headerHeight + this.state.bannerHeight || 0,
+              top: headerHeight + patientBannerHeight || 0,
               zIndex: 1000,
               borderRadius: 0,
               marginBottom: 0,
