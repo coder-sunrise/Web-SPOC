@@ -1266,6 +1266,21 @@ const Main = props => {
           colSpan: row.isGroup ? 0 : 1,
           rowSpan: row.groupNumber === 1 ? row.groupRowSpan : 0,
         }),
+        render: (_, row) => {
+          let instruction
+          if (row.invoiceItemTypeFK !== 1) {
+            instruction = row.instruction
+          } else {
+            instruction = row.language.isShowFirstValue
+              ? row.instruction
+              : row.secondInstruction
+          }
+          return (
+            <Tooltip title={instruction}>
+              <span>{instruction}</span>
+            </Tooltip>
+          )
+        },
       },
       {
         dataIndex: 'drugInteraction',
