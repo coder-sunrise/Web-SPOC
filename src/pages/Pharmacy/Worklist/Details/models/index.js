@@ -809,7 +809,7 @@ export default createFormViewModel({
           const clinicSettings = yield select(st => st.clinicSettings)
           const orderItems = getPharmacyItems(
             codetable,
-            clinicSettings,
+            clinicSettings.settings,
             pharmacyDetails.entity,
           )
           if (pharmacyDetails.fromModule === 'Main') {
@@ -831,7 +831,7 @@ export default createFormViewModel({
           } else {
             const partialItems = getPartialPharmacyItems(
               codetable,
-              clinicSettings,
+              clinicSettings.settings,
               pharmacyDetails.entity,
             )
             const defaultExpandedGroups = _.uniqBy(

@@ -1275,7 +1275,9 @@ class PatientHistory extends Component {
           o => o.type === notesType.fieldName,
         )
         const filterScribbleNotes = scribbleNotes.filter(
-          sn => sn.scribbleNoteTypeFK === scribbleType?.typeFK,
+          sn =>
+            sn.scribbleNoteTypeFK === scribbleType?.typeFK &&
+            sn.signedByUserFK === note.signedByUserFK,
         )
 
         for (let indexSN = 0; indexSN < filterScribbleNotes.length; indexSN++) {
@@ -2107,7 +2109,7 @@ class PatientHistory extends Component {
                   style={{
                     width: !isFullScreen ? 160 : 240,
                     display: 'inline-Block',
-                    marginBottom: -10,
+                    marginBottom: -16,
                   }}
                   {...args}
                   allowClear={true}
@@ -2150,7 +2152,7 @@ class PatientHistory extends Component {
                   style={{
                     width: !isFullScreen ? 150 : 240,
                     display: 'inline-Block',
-                    marginBottom: -10,
+                    marginBottom: -16,
                   }}
                   options={this.getCategoriesOptions()}
                   {...args}
