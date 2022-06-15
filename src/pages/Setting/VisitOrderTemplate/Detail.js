@@ -1,6 +1,7 @@
 import React, { PureComponent, Fragment } from 'react'
 import _ from 'lodash'
 import Yup from '@/utils/yup'
+import { connect } from 'dva'
 import {
   withFormikExtend,
   FastField,
@@ -15,17 +16,31 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
 import { CALENDAR_RESOURCE } from '@/utils/constants'
 
 import { DoctorLabel } from '@/components/_medisys'
+@connect(({ codetable }) => ({ codetable }))
 @withFormikExtend({
-  mapPropsToValues: ({ settingVisitOrderTemplate }) => {
+  mapPropsToValues: ({ settingVisitOrderTemplate, codetable }) => {
+    console.log(codetable)
     return {
       ...(settingVisitOrderTemplate.entity ||
         settingVisitOrderTemplate.default),
-      selectedResources: (
-        settingVisitOrderTemplate.entity?.visitOrderTemplate_Resources || []
-      ).map(x => x.resourceFK),
-      selectedCopayers: (
-        settingVisitOrderTemplate.entity?.visitOrderTemplate_Copayers || []
-      ).map(x => x.copayerFK),
+      selectedResources: _.concat(
+        (
+          settingVisitOrderTemplate.entity?.visitOrderTemplate_Resources || []
+        ).map(x => x.resourceFK),
+        settingVisitOrderTemplate.entity?.visitOrderTemplate_Resources
+          ?.length === codetable?.ctresource?.length
+          ? [-99]
+          : [],
+      ),
+      selectedCopayers: _.concat(
+        (
+          settingVisitOrderTemplate.entity?.visitOrderTemplate_Copayers || []
+        ).map(x => x.copayerFK),
+        settingVisitOrderTemplate.entity?.visitOrderTemplate_Copayers
+          ?.length === codetable?.ctcopayer?.length
+          ? [-99]
+          : [],
+      ),
     }
   },
   validationSchema: Yup.object().shape({

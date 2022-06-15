@@ -986,6 +986,8 @@ class Billing extends Component {
             },
           },
         })
+      } else if (!values.invoice.isBillingSaved) {
+        saveAndPrint()
       } else {
         this.onShowReport(reportID, { visitGroup, ...parametrPayload })
       }
