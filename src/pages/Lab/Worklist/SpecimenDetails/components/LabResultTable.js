@@ -128,7 +128,7 @@ export const LabResultTable = ({
       width: 175,
       editable: true,
       render: (record = {}, text, onSave) => {
-        console.log('record.shouldFlag', record.shouldFlag)
+        // console.log('record.shouldFlag', record.shouldFlag)
         if (isReadonly)
           return record.shouldFlag ? (
             <React.Fragment>
@@ -145,16 +145,33 @@ export const LabResultTable = ({
 
         if (testpanelItem?.resultTypeFK === LAB_RESULT_TYPE.NUMERIC) {
           return (
-            <div>
-              <InputNumber
-                style={{ color: record.shouldFlag ? 'red' : 'black' }}
-                defaultValue={text}
-                controls={false}
-                onPressEnter={onSave}
-                onBlur={onSave}
-              />
-              {record.shouldFlag && <FlagIndicator />}
-            </div>
+            <Form.Item
+              name='NumericInput'
+              rules={[
+                testpanelItem.code !== 'CRP_Quant' && {
+                  pattern: new RegExp(/^[0-9]*[.]?[0-9]*$/),
+                  message: 'Invalid format.',
+                },
+                testpanelItem.code === 'CRP_Quant' && {
+                  pattern: new RegExp(/^([<]?[0]*[.]?[5]|[0-9]*[.]?[0-9])*$/),
+                  message: 'Invalid format.',
+                },
+              ]}
+            >
+              <div>
+                <Input
+                  style={{
+                    color: record.shouldFlag ? 'red' : 'black',
+                    width: 100,
+                  }}
+                  defaultValue={text}
+                  controls={false}
+                  onPressEnter={onSave}
+                  onBlur={onSave}
+                />
+                {record.shouldFlag && <FlagIndicator />}
+              </div>
+            </Form.Item>
           )
         } else if (testpanelItem?.resultTypeFK === LAB_RESULT_TYPE.STRING) {
           const options = ctresultoption
@@ -198,6 +215,12 @@ export const LabResultTable = ({
 
   const checkShouldFlag = (finalResult, refereneceRangeId, testPanelItemId) => {
     const testPanelItem = cttestpanelitem.find(x => x.id === testPanelItemId)
+
+    const currentResultOption = ctresultoption.find(
+      x =>
+        x.testPanelItemFK === testPanelItemId && x.resultOption === finalResult,
+    )
+
     if (finalResult === null || finalResult === undefined || finalResult === '')
       return false
 
@@ -208,6 +231,9 @@ export const LabResultTable = ({
       const currentRange = ctnumericreferencerange.find(
         x => x.id === refereneceRangeId,
       )
+
+      if (currentResultOption) return currentResultOption.shouldFlag
+
       const hasMetMinimumRange = currentRange.isMinValInclusive
         ? parseFloat(finalResult) >= currentRange.referenceRangeMin
         : parseFloat(finalResult) > currentRange.referenceRangeMin
@@ -218,11 +244,6 @@ export const LabResultTable = ({
 
       return !hasMetMinimumRange || !hasMetMaximumRange
     } else if (testPanelItem.resultTypeFK === LAB_RESULT_TYPE.STRING) {
-      const currentResultOption = ctresultoption.find(
-        x =>
-          x.testPanelItemFK === testPanelItemId &&
-          x.resultOption === finalResult,
-      )
       return currentResultOption.shouldFlag
     } else {
       return false
@@ -241,7 +262,7 @@ export const LabResultTable = ({
     )
 
     newData.splice(index, 1, { ...item, ...row, shouldFlag })
-    console.log('newData', newData)
+    // console.log('newData', newData)
     onChange(newData)
   }
 
