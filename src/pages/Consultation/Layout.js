@@ -612,7 +612,11 @@ class Layout extends PureComponent {
               marginTop: 0,
               position: 'sticky',
               overflowY: 'auto',
-              top: headerHeight + patientBannerHeight || 0,
+              top:
+                headerHeight +
+                (patientBannerHeight === 0
+                  ? this.state.bannerHeight
+                  : this.props.patientBannerHeight),
               zIndex: 1000,
               borderRadius: 0,
               marginBottom: 0,
