@@ -37,7 +37,7 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
         type: 'select',
         labelField: 'name',
         valueField: 'value',
-        width: 180,
+        width: 130,
         options: () => preOrderItemCategory,
         isDisabled: () => true,
         render: row => {
@@ -120,7 +120,7 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
       {
         columnName: 'orderDate',
         type: 'date',
-        width: 150,
+        width: 140,
         render: row => {
           return (
             <span>{moment(row.orderDate).format('DD MMM YYYY HH:mm')}</span>
@@ -143,7 +143,7 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
       },
       {
         columnName: 'apptDate',
-        width: 150,
+        width: 140,
         type: 'date',
         sortingEnabled: false,
         render: row => {
@@ -194,6 +194,7 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
       {
         columnName: 'actualizedDate',
         type: 'date',
+        width: 140,
         render: row => {
           return (
             <span>

@@ -1,4 +1,5 @@
 import React from 'react'
+import numeral from 'numeral'
 // common components
 import { ReportDataGrid } from '@/components/_medisys'
 import { Tooltip } from '@/components'
@@ -26,9 +27,11 @@ const Summary = ({ reportDatas }) => {
       width: 150,
       align: 'right',
       render: row => {
+        const displayQty = `${numeral(row.total).format('0.0')} ${row.uom ||
+          ''}`
         return (
-          <Tooltip title={`${row.total}.0 ${row.uom || ''}`}>
-            <span>{`${row.total}.0 ${row.uom || ''}`}</span>
+          <Tooltip title={displayQty}>
+            <span>{displayQty}</span>
           </Tooltip>
         )
       },

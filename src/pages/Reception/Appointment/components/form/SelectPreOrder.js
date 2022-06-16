@@ -6,6 +6,7 @@ import { qtyFormat } from '@/utils/config'
 import { CommonTableGrid, Button, CardContainer, Tooltip } from '@/components'
 import { queryList as queryAppointments } from '@/services/calendar'
 import { InventoryTypes } from '@/utils/codes'
+import { showCurrency } from '@/utils/utils'
 
 const SelectPreOrder = ({
   activePreOrderItem = [],
@@ -150,19 +151,12 @@ const SelectPreOrder = ({
             sortingEnabled: false,
             width: 120,
             render: row => {
+              const displayQty = `${numeral(row.quantity).format(
+                '0.0',
+              )} ${row.dispenseUOM || ''}`
               return (
-                <Tooltip
-                  title={
-                    <span>
-                      {row.id < 0 ? row.quantity : row.quantity.toFixed(1)}{' '}
-                      {row.dispenseUOM}
-                    </span>
-                  }
-                >
-                  <span>
-                    {row.id < 0 ? row.quantity : row.quantity.toFixed(1)}{' '}
-                    {row.dispenseUOM}
-                  </span>
+                <Tooltip title={displayQty}>
+                  <span>{displayQty}</span>
                 </Tooltip>
               )
             },
@@ -187,12 +181,12 @@ const SelectPreOrder = ({
           },
           {
             columnName: 'amount',
-            width: 100,
+            width: 80,
             type: 'currency',
             sortingEnabled: false,
             isDisabled: () => true,
             render: row => {
-              return row.hasPaid === 'Yes' ? row.amount : '-'
+              return row.hasPaid === 'Yes' ? showCurrency(row.amount) : '-'
             },
           },
           { columnName: 'hasPaid', sortingEnabled: false, width: 50 },

@@ -10,7 +10,7 @@ export default createFormViewModel({
     service,
     state: {
       entity: '',
-      selectedIndex: '',
+      selectedItemUid: '',
       Note: {
         notesScribbleArray: [],
       },

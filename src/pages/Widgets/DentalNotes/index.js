@@ -18,6 +18,7 @@ import {
 import {
   errMsgForOutOfRange as errMsg,
   navigateDirtyCheck,
+  getUniqueId,
 } from '@/utils/utils'
 import UploadAttachment from './UploadAttachment'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
@@ -114,7 +115,7 @@ class DentalNotes extends Component {
       type: 'scriblenotes/updateState',
       payload: {
         entity: '',
-        selectedIndex: '',
+        selectedItemUid: '',
         ClinicianNote: {
           notesScribbleArray: [],
         },
@@ -160,9 +161,11 @@ class DentalNotes extends Component {
       //   subject: values,
       //   scribbleNoteLayers: temp,
       // }
-
-      newArrayItems[scriblenotes.selectedIndex].subject = values
-      newArrayItems[scriblenotes.selectedIndex].scribbleNoteLayers = temp
+      const updateItem = newArrayItems.find(
+        x => x.uid === scriblenotes.selectedItemUid,
+      )
+      updateItem.subject = values
+      updateItem.scribbleNoteLayers = temp
 
       dispatch({
         type: 'scriblenotes/updateState',
@@ -214,6 +217,7 @@ class DentalNotes extends Component {
         },
       })
       previousData.push({
+        uid: getUniqueId(),
         scribbleNoteTypeFK: categoryIndex,
         scribbleNoteTypeName: category,
         subject: values,
@@ -234,7 +238,9 @@ class DentalNotes extends Component {
     // let planArray = scriblenotes.Plan.planScribbleArray
     const tempArrayItems = [...scriblenotes[category][arrayName]]
     const newArrayItems = []
-    const deleteItem = tempArrayItems[scriblenotes.selectedIndex]
+    const deleteItem = tempArrayItems.find(
+      x => x.uid === scriblenotes.selectedItemUid,
+    )
 
     for (let i = 0; i < tempArrayItems.length; i++) {
       if (tempArrayItems[i] !== deleteItem) {
@@ -335,7 +341,6 @@ class DentalNotes extends Component {
   }
 
   updateAttachments = args => ({ added, deleted }) => {
-    // console.log({ added, deleted }, args)
     const { form, field } = args
 
     let updated = [...(field.value || [])]
@@ -432,7 +437,7 @@ class DentalNotes extends Component {
                             type: 'scriblenotes/updateState',
                             payload: {
                               entity: '',
-                              selectedIndex: '',
+                              selectedItemUid: '',
                               ClinicianNote: {
                                 notesScribbleArray: clinicianNote,
                               },
@@ -614,7 +619,10 @@ class DentalNotes extends Component {
             toggleScribbleModal={this.toggleScribbleModal}
             scribbleData={this.state.selectedData}
             deleteScribbleNote={this.deleteScribbleNote}
-            scribbleNoteType={scribbleTypes.find(x=>x.typeFK === this.state.categoryIndex)?.type}
+            scribbleNoteType={
+              scribbleTypes.find(x => x.typeFK === this.state.categoryIndex)
+                ?.type
+            }
           />
         </CommonModal>
       </div>

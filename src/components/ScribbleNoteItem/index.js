@@ -127,10 +127,12 @@ class ScribbleNoteItem extends React.Component {
             </div>
             <Divider className={classes.divider} />
             <div className={classes.listContainer}>
-              {_.orderBy(scribbleNoteArray,(x)=>x?.subject.toLowerCase(),['asc']).map((item, i) => {
+              {_.orderBy(scribbleNoteArray, x => x?.subject?.toLowerCase(), [
+                'asc',
+              ]).map(item => {
                 return (
                   <ListItem
-                    key={`scribble-${item.id}`}
+                    key={`scribble-${item.uid}`}
                     title={item.subject}
                     classes={classes}
                     onClick={() => {
@@ -146,7 +148,7 @@ class ScribbleNoteItem extends React.Component {
                         window.g_app._store.dispatch({
                           type: 'scriblenotes/updateState',
                           payload: {
-                            selectedIndex: i,
+                            selectedItemUid: item.uid,
                             showScribbleModal: true,
                             editEnable: true,
                             entity: item,
@@ -171,8 +173,9 @@ class ScribbleNoteItem extends React.Component {
                             const newArrayItems = [
                               ...scriblenotes[category][arrayName],
                             ]
-                            newArrayItems[i].scribbleNoteLayers =
-                              v.scribbleNoteLayers
+                            newArrayItems.find(
+                              x => x.uid === item.uid,
+                            ).scribbleNoteLayers = v.scribbleNoteLayers
 
                             this.props.dispatch({
                               type: 'scriblenotes/updateState',
@@ -187,7 +190,7 @@ class ScribbleNoteItem extends React.Component {
                             window.g_app._store.dispatch({
                               type: 'scriblenotes/updateState',
                               payload: {
-                                selectedIndex: i,
+                                selectedItemUid: item.uid,
                                 showScribbleModal: true,
                                 editEnable: true,
                                 entity: v,

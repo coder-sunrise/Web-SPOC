@@ -11,7 +11,7 @@ import {
   GridItem,
   TextField,
 } from '@/components'
-import { navigateDirtyCheck } from '@/utils/utils'
+import { navigateDirtyCheck, getUniqueId } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import CannedText from './CannedText'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
@@ -105,7 +105,7 @@ class ClinicalNotes extends Component {
     const { fields } = config
     const payload = {
       entity: '',
-      selectedIndex: '',
+      selectedItemUid: '',
       ...fields.reduce(
         (_result, field) => ({
           ..._result,
@@ -158,9 +158,12 @@ class ClinicalNotes extends Component {
 
     if (scriblenotes.editEnable) {
       const newArrayItems = [...scriblenotes[category][arrayName]]
-      newArrayItems[scriblenotes.selectedIndex].subject = subject
-      newArrayItems[scriblenotes.selectedIndex].scribbleNoteLayers = temp
-      newArrayItems[scriblenotes.selectedIndex].thumbnail = thumbnail
+      const updateItem = newArrayItems.find(
+        x => x.uid === scriblenotes.selectedItemUid,
+      )
+      updateItem.subject = subject
+      updateItem.scribbleNoteLayers = temp
+      updateItem.thumbnail = thumbnail
 
       dispatch({
         type: 'scriblenotes/updateState',
@@ -175,14 +178,12 @@ class ClinicalNotes extends Component {
       dispatch({
         type: 'scriblenotes/upsert',
         payload: {
-          id: newArrayItems[scriblenotes.selectedIndex].scribbleNoteFK,
-          scribbleNoteTypeFK:
-            newArrayItems[scriblenotes.selectedIndex].scribbleNoteTypeFK,
+          id: updateItem.scribbleNoteFK,
+          scribbleNoteTypeFK: updateItem.scribbleNoteTypeFK,
           scribbleNoteLayers: temp.map(t => {
             return {
               ...t,
-              scribbleNoteFK:
-                newArrayItems[scriblenotes.selectedIndex].scribbleNoteFK,
+              scribbleNoteFK: updateItem.scribbleNoteFK,
             }
           }),
           subject,
@@ -197,6 +198,7 @@ class ClinicalNotes extends Component {
       }, [])
     } else {
       const newData = {
+        uid: getUniqueId(),
         subject,
         thumbnail,
         origin,
@@ -243,15 +245,12 @@ class ClinicalNotes extends Component {
       {},
     )
     const tempArrayItems = [...scriblenotes[category][arrayName]]
-    const deleteItem = tempArrayItems[scriblenotes.selectedIndex]
+    const deleteItem = tempArrayItems.find(
+      x => x.uid === scriblenotes.selectedItemUid,
+    )
     const updatedCategoryScribbleArray = currentScribbleNoteData[
       category
-    ].filter((_, index) => index !== scriblenotes.selectedIndex)
-
-    dispatch({
-      type: 'scriblenotes/removeScribble',
-      payload: deleteItem.scribbleNoteFK,
-    })
+    ].filter(x => x.uid !== scriblenotes.selectedItemUid)
 
     dispatch({
       type: 'scriblenotes/updateState',
@@ -512,7 +511,7 @@ class ClinicalNotes extends Component {
 
             const payload = {
               entity: '',
-              selectedIndex: '',
+              selectedItemUid: '',
               ...fields.reduce((_result, field) => {
                 const scribbles = values.corScribbleNotes.filter(
                   o => o.scribbleNoteTypeFK === field.scribbleNoteTypeFK,

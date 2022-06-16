@@ -26,17 +26,19 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
       <GridContainer>
         <GridContainer alignItems='flex-end'>
           <GridItem md={3}>
-            <FastField
-              name='patientCriteria'
-              render={args => (
-                <TextField
-                  {...args}
-                  label={formatMessage({
-                    id: 'reception.queue.patientSearchPlaceholder',
-                  })}
-                />
-              )}
-            />
+            <div style={{ position: 'relative', top: '-3px' }}>
+              <FastField
+                name='patientCriteria'
+                render={args => (
+                  <TextField
+                    {...args}
+                    label={formatMessage({
+                      id: 'reception.queue.patientSearchPlaceholder',
+                    })}
+                  />
+                )}
+              />
+            </div>
           </GridItem>
           <ReportDateRangePicker
             fromDateLabel='Order Date From'
@@ -160,13 +162,15 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
             />
           </GridItem>
           <GridItem md={2}>
-            <Button
-              color='primary'
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-            >
-              Generate Report
-            </Button>
+            <div style={{ position: 'relative', top: '-6px' }}>
+              <Button
+                color='primary'
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+              >
+                Generate Report
+              </Button>
+            </div>
           </GridItem>
         </GridContainer>
       </GridContainer>

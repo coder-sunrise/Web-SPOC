@@ -1912,6 +1912,8 @@ class PatientHistory extends Component {
               style={{
                 display: 'inline-Block',
                 marginLeft: 10,
+                position: 'relative',
+                top: fromModule === 'PatientHistory' ? '-4px' : '0px',
               }}
             >
               <Field
@@ -1938,7 +1940,11 @@ class PatientHistory extends Component {
               <Field
                 name='isAllDate'
                 render={args => (
-                  <Checkbox {...args} label='All Date' style={{ width: 70 }} />
+                  <Checkbox
+                    {...args}
+                    label='All Date'
+                    style={{ width: fromModule === 'PatientHistory' ? 75 : 70 }}
+                  />
                 )}
               />
             </div>
