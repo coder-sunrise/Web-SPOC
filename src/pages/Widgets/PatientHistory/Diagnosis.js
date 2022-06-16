@@ -81,7 +81,7 @@ export default ({
     {
       dataIndex: 'validityDays',
       title: 'Validity (Days)',
-      width: 120,
+      width: 110,
       render: text => <div style={wrapCellTextStyle}>{text}</div>,
     },
     {

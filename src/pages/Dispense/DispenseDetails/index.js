@@ -1098,7 +1098,7 @@ const DispenseDetails = ({
                         dispenseItems,
                       )}
                 </div>
-                <div style={{ position: 'relative' }}>
+                <div style={{ position: 'relative', overflowX: 'auto' }}>
                   <AntdTable
                     className={customtyles.table}
                     size='small'
@@ -1143,7 +1143,7 @@ const DispenseDetails = ({
                   ? ''
                   : actualizeSelectedItemButton('Service', service)}
               </div>
-              <div style={{ position: 'relative' }}>
+              <div style={{ position: 'relative', overflowX: 'auto' }}>
                 <AntdTable
                   className={customtyles.table}
                   size='small'
@@ -1194,14 +1194,16 @@ const DispenseDetails = ({
               <div>
                 <h5>Other Orders</h5>
               </div>
-              <AntdTable
-                className={customtyles.table}
-                size='small'
-                bordered
-                pagination={false}
-                dataSource={otherOrder}
-                columns={OtherOrdersColumns1(onPrint)}
-              />
+              <div style={{ overflowX: 'auto' }}>
+                <AntdTable
+                  className={customtyles.table}
+                  size='small'
+                  bordered
+                  pagination={false}
+                  dataSource={otherOrder}
+                  columns={OtherOrdersColumns1(onPrint)}
+                />
+              </div>
             </div>
 
             {false &&

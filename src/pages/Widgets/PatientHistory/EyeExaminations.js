@@ -135,7 +135,7 @@ const showColorVisionTest = (corEyeExaminations = []) => {
     return true
   return false
 }
-export default ({ current }) => {
+export default ({ current, isFullScreen = true }) => {
   const { corEyeExaminations = [] } = current
   return (
     <div style={{ marginBottom: 8, marginTop: 8 }}>
@@ -161,12 +161,13 @@ export default ({ current }) => {
               {
                 dataIndex: 'type',
                 title: 'Eye/Distance',
-                width: 140,
+                width: !isFullScreen ? 100 : 140,
               },
               {
                 dataIndex: 'bareEye5',
                 title: '5m (Bare Eye)',
                 align: 'center',
+                width: !isFullScreen ? 105 : undefined,
               },
               {
                 dataIndex: 'correctedVision5',
@@ -177,6 +178,7 @@ export default ({ current }) => {
                 dataIndex: 'bareEye50',
                 title: '50cm (Bare Eye)',
                 align: 'center',
+                width: !isFullScreen ? 120 : undefined,
               },
               {
                 dataIndex: 'correctedVision50',
@@ -205,22 +207,25 @@ export default ({ current }) => {
               {
                 dataIndex: 'type',
                 title: 'Eye/Test Result',
-                width: 140,
+                width: !isFullScreen ? 120 : 140,
               },
               {
                 dataIndex: 'firstResult',
                 title: '1st Result (mmHg)',
                 align: 'center',
+                width: !isFullScreen ? 135 : undefined,
               },
               {
                 dataIndex: 'secondResult',
                 title: '2nd Result (mmHg)',
                 align: 'center',
+                width: !isFullScreen ? 140 : undefined,
               },
               {
                 dataIndex: 'thirdResult',
                 title: '3rd Result (mmHg)',
                 align: 'center',
+                width: !isFullScreen ? 140 : undefined,
               },
               {
                 dataIndex: 'averageResult',
@@ -261,7 +266,11 @@ export default ({ current }) => {
             </div>
             <div>
               <div
-                style={{ fontWeight: 'inherit', color: 'rgba(0, 0, 0, 0.54)' }}
+                style={{
+                  fontWeight: 'inherit',
+                  color: 'rgba(0, 0, 0, 0.54)',
+                  lineHeight: '18px',
+                }}
               >
                 Remarks
               </div>

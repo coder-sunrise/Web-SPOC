@@ -532,6 +532,7 @@ export const DispenseItemsColumns1 = (
       dataIndex: 'name',
       key: 'name',
       title: 'Name',
+      width: 200,
       onCell: row => ({
         colSpan: row.isGroup ? 0 : 1,
         rowSpan: row.countNumber === 1 ? row.rowspan : 0,
@@ -793,7 +794,7 @@ export const DispenseItemsColumns1 = (
       dataIndex: 'stockBalance',
       key: 'stockBalance',
       title: 'Bal. Qty.',
-      width: 100,
+      width: 80,
       onCell: row => ({
         colSpan: row.isGroup ? 0 : 1,
         rowSpan: row.countNumber === 1 ? row.rowspan : 0,
@@ -1705,6 +1706,7 @@ export const ServiceColumns1 = (
     {
       dataIndex: 'description',
       key: 'description',
+      width: 250,
       title: 'Name',
       render: (_, row) => {
         const { code = '', description = '', unitPrice = 0 } = row
@@ -1745,13 +1747,13 @@ export const ServiceColumns1 = (
       dataIndex: 'instruction',
       key: 'instruction',
       title: 'Instructions',
-      width: 180,
+      width: 230,
     },
     {
       dataIndex: 'remarks',
       key: 'remarks',
       title: 'Remarks',
-      width: 180,
+      width: 230,
     },
     {
       dataIndex: 'quantity',
@@ -1878,8 +1880,9 @@ export const OtherOrdersColumns1 = onPrint => [
     dataIndex: 'description',
     key: 'description',
     title: 'Name',
+    width: 700,
   },
-  { dataIndex: 'remarks', key: 'remarks', title: 'Remarks' },
+  { dataIndex: 'remarks', key: 'remarks', title: 'Remarks', width: 700 },
   {
     dataIndex: 'action',
     key: 'action',

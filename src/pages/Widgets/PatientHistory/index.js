@@ -1901,7 +1901,7 @@ class PatientHistory extends Component {
                   style={{
                     width: fromModule === 'MedicalCheckup' ? 170 : 200,
                     display: 'inline-Block',
-                    marginBottom: -16,
+                    marginBottom: -12,
                   }}
                   {...args}
                   allowClear={true}
@@ -1929,10 +1929,17 @@ class PatientHistory extends Component {
                 )}
               />
             </div>
-            <div style={{ display: 'inline-Block', marginLeft: 10 }}>
+            <div
+              style={{
+                display: 'inline-Block',
+                marginLeft: 10,
+              }}
+            >
               <Field
                 name='isAllDate'
-                render={args => <Checkbox {...args} label='All Date' />}
+                render={args => (
+                  <Checkbox {...args} label='All Date' style={{ width: 70 }} />
+                )}
               />
             </div>
             <Field
@@ -1946,7 +1953,8 @@ class PatientHistory extends Component {
                   style={{
                     width: fromModule === 'MedicalCheckup' ? 168 : 240,
                     display: 'inline-Block',
-                    marginBottom: -16,
+                    marginBottom: -12,
+                    marginLeft: 10,
                   }}
                   options={this.getCategoriesOptions()}
                   {...args}
@@ -1961,7 +1969,7 @@ class PatientHistory extends Component {
                     width: fromModule === 'MedicalCheckup' ? 180 : 240,
                     display: 'inline-Block',
                     marginLeft: 10,
-                    marginBottom: -16,
+                    marginBottom: -12,
                   }}
                   label='Doctors'
                   mode='multiple'
@@ -1980,7 +1988,14 @@ class PatientHistory extends Component {
                 />
               )}
             />
-            <div style={{ display: 'inline-Block', marginLeft: 5 }}>
+            <div
+              style={{
+                display: 'inline-Block',
+                marginLeft: 10,
+                position: 'relative',
+                top: '-5px',
+              }}
+            >
               <ProgressButton
                 color='primary'
                 size='sm'
@@ -2109,7 +2124,7 @@ class PatientHistory extends Component {
                   style={{
                     width: !isFullScreen ? 160 : 240,
                     display: 'inline-Block',
-                    marginBottom: -16,
+                    marginBottom: -12,
                   }}
                   {...args}
                   allowClear={true}
@@ -2119,6 +2134,7 @@ class PatientHistory extends Component {
             <div
               style={{
                 display: 'inline-Block',
+                marginLeft: 5,
               }}
             >
               <Field
@@ -2126,7 +2142,7 @@ class PatientHistory extends Component {
                 render={args => (
                   <DateRangePicker
                     style={{
-                      width: !isFullScreen ? 240 : 300,
+                      width: !isFullScreen ? 210 : 300,
                     }}
                     label='Visit Date From'
                     label2='To'
@@ -2136,10 +2152,17 @@ class PatientHistory extends Component {
                 )}
               />
             </div>
-            <div style={{ display: 'inline-Block', marginLeft: 10 }}>
+            <div
+              style={{
+                display: 'inline-Block',
+                marginLeft: 5,
+              }}
+            >
               <Field
                 name='isAllDate'
-                render={args => <Checkbox {...args} label='All Date' />}
+                render={args => (
+                  <Checkbox {...args} label='All Date' style={{ width: 70 }} />
+                )}
               />
             </div>
             <Field
@@ -2152,7 +2175,8 @@ class PatientHistory extends Component {
                   style={{
                     width: !isFullScreen ? 150 : 240,
                     display: 'inline-Block',
-                    marginBottom: -16,
+                    marginLeft: 5,
+                    marginBottom: -12,
                   }}
                   options={this.getCategoriesOptions()}
                   {...args}
@@ -2166,8 +2190,8 @@ class PatientHistory extends Component {
                   style={{
                     width: !isFullScreen ? 150 : 240,
                     display: 'inline-Block',
-                    marginLeft: 10,
-                    marginBottom: -16,
+                    marginLeft: 5,
+                    marginBottom: -12,
                   }}
                   label='Doctors'
                   mode='multiple'
@@ -2185,7 +2209,15 @@ class PatientHistory extends Component {
                 />
               )}
             />
-            <div style={{ display: 'inline-Block', marginLeft: 5 }}>
+            <div
+              style={{
+                display: 'inline-Block',
+                marginLeft: 5,
+                position: 'relative',
+                top: '-5px',
+                lineHeight: '46px',
+              }}
+            >
               <ProgressButton
                 color='primary'
                 size='sm'

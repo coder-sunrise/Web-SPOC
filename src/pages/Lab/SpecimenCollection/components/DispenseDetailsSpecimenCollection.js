@@ -89,6 +89,7 @@ const DispenseDetailsSpecimenCollection = ({
     },
     {
       dataIndex: 'testPanelNames',
+      width: 910,
       key: 'testPanelNames',
       title: 'Test Panels',
     },
@@ -395,14 +396,16 @@ const DispenseDetailsSpecimenCollection = ({
         <div>
           <h5>Lab Specimen Collection</h5>
         </div>
-        <Table
-          className={customtyles.table}
-          size='small'
-          bordered
-          pagination={false}
-          dataSource={labSpecimens}
-          columns={columns1}
-        />
+        <div style={{ overflowX: 'auto' }}>
+          <Table
+            className={customtyles.table}
+            size='small'
+            bordered
+            pagination={false}
+            dataSource={labSpecimens}
+            columns={columns1}
+          />
+        </div>
       </div>
       {false && (
         <TableData
