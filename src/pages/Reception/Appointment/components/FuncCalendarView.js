@@ -589,11 +589,11 @@ const CalendarView = ({
           }display:inline-block;padding:0px 4px;background-color:${bgResourceColor ||
             'white'};color:${
             bgResourceColor ? 'white' : 'black'
-          }">${totalBalCapacity}</div>`
+          };font-size:15px;">${totalBalCapacity}</div>`
         }
       })
       if (resourceList) {
-        event.element.innerHTML = `<div style="position:relative;">${event.element.innerHTML}<div title="${tooltip}" style="position:absolute;right:4px;top:0px;border:1px solid #ccc;">${resourceList}</div></div>`
+        event.element.innerHTML = `<div style="position:relative;">${event.element.innerHTML}<div title="${tooltip}" style="position:absolute;right:2px;top:-2px;border:1px solid #ccc;">${resourceList}</div></div>`
       }
     }
   }

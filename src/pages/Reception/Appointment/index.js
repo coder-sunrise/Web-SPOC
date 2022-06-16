@@ -579,9 +579,14 @@ class Appointment extends React.PureComponent {
     } else if (view === CALENDAR_VIEWS.WEEK) {
       calendarView = 'week'
     }
-    const dateFrom = moment(date)
-      .startOf(calendarView)
-      .formatUTC()
+    const dateFrom =
+      view !== CALENDAR_VIEWS.MONTH
+        ? moment(date)
+            .startOf(calendarView)
+            .formatUTC()
+        : moment()
+            .startOf('day')
+            .formatUTC()
     const dateTo = moment(date)
       .endOf(calendarView)
       .startOf('day')
