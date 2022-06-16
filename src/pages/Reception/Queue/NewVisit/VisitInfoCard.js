@@ -328,7 +328,7 @@ const VisitInfoCard = ({
   const getAvailableOrderTemplate = () => {
     let availableVisitOrderTemplate = []
     var patientCopayers = patientInfo?.patientScheme
-      ?.filter(x => !x.isExpired && x.isCopayerActive)
+      ?.filter(x => !x.isExpired || x.isCopayerActive)
       ?.map(x => x.copayerFK)
     if (patientInfo) {
       visitOrderTemplateOptions
