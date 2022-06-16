@@ -377,15 +377,15 @@ class Detail extends PureComponent {
                                 <div
                                   style={{
                                     position: 'relative',
-                                    paddingRight: 10,
+                                    paddingRight: 16,
                                   }}
                                 >
                                   <SyncfusionTimePicker
                                     step={apptTimeIntervel}
                                     value={row.startTime}
                                     style={{ margin: 0 }}
-                                    min='07:00'
-                                    max='22:00'
+                                    min='06:30'
+                                    max='22:30'
                                     onChange={e => {
                                       if (!this.isTimeChange(row.startTime, e))
                                         return
@@ -412,7 +412,7 @@ class Detail extends PureComponent {
                                     style={{
                                       position: 'absolute',
                                       right: '-6px',
-                                      top: 10,
+                                      top: 8,
                                     }}
                                   >
                                     {(startError || startRangeError) && (
@@ -439,7 +439,7 @@ class Detail extends PureComponent {
                                     style={{
                                       position: 'absolute',
                                       left: '-25px',
-                                      top: 10,
+                                      top: 6,
                                     }}
                                   >
                                     To
@@ -448,8 +448,8 @@ class Detail extends PureComponent {
                                     step={apptTimeIntervel}
                                     style={{ margin: 0 }}
                                     value={row.endTime}
-                                    min='07:00'
-                                    max='22:00'
+                                    min='06:30'
+                                    max='22:30'
                                     onChange={e => {
                                       if (!this.isTimeChange(row.endTime, e))
                                         return
@@ -467,8 +467,8 @@ class Detail extends PureComponent {
                                   <div
                                     style={{
                                       position: 'absolute',
-                                      right: '-6px',
-                                      top: 10,
+                                      right: '-12px',
+                                      top: 8,
                                     }}
                                   >
                                     {(endError ||
