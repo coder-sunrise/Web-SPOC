@@ -38,7 +38,7 @@ const patientResultTabs = props => {
   if (viewLabResultsRight.rights === 'enable') {
     options.push({
       name: <span>Lab Results</span>,
-      content: <LabResults {...props} />,
+      content: <LabResults {...props} height={props.height - 170} />,
     })
   }
   if (viewExternalTrackingRight.rights === 'enable') {
