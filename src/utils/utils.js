@@ -992,7 +992,7 @@ const sortAdjustment = (a, b) => {
 
 const calculateGSTAdj = ({
   isGSTInclusive = false,
-  activeRows,
+  activeOrderRows,
   totalAfterAdj,
   gstValue = 0,
   gstAmtField = 'gstAmount',
@@ -1003,13 +1003,13 @@ const calculateGSTAdj = ({
   }
 
   const totalItemizedGST = roundTo(
-    activeRows.map(i => i[gstAmtField]).reduce(sumReducer, 0),
+    activeOrderRows.map(i => i[gstAmtField]).reduce(sumReducer, 0),
   )
   const diff = roundTo(gst - totalItemizedGST)
 
   // include the diff of GST value only to the last items
-  activeRows.forEach((r, index) => {
-    if (index === activeRows.length - 1) {
+  activeOrderRows.forEach((r, index) => {
+    if (index === activeOrderRows.length - 1) {
       r[gstAmtField] += diff
       if (!isGSTInclusive) {
         r.totalAfterGST += diff
@@ -1024,7 +1024,7 @@ const calculateGSTAdj = ({
 }
 
 const calculateAmount = (
-  rows,
+  allOrderRows,
   adjustments,
   {
     itemFkField = 'invoiceItemFK',
@@ -1040,23 +1040,23 @@ const calculateAmount = (
   } = {},
 ) => {
   let gst = 0
-  rows
+  allOrderRows
     .filter(o => !o.isDeleted && o.isPreOrder && !o.hasPaid)
     .forEach(r => {
       r[adjustedField] = r[totalField]
       r[gstField] = r[adjustedField]
       r[gstAmtField] = 0
     })
-  const activeRows = rows.filter(
+  const activeOrderRows = allOrderRows.filter(
     o => !o.isDeleted && (!o.isPreOrder || o.isChargeToday) && !o.hasPaid,
   )
   const activeAdjustments = adjustments.filter(o => !o.isDeleted)
 
   const total = roundTo(
-    activeRows.map(o => o[totalField]).reduce(sumReducer, 0),
+    activeOrderRows.map(o => o[totalField]).reduce(sumReducer, 0),
   )
 
-  activeRows.forEach(r => {
+  activeOrderRows.forEach(r => {
     r.weightage = r[totalField] / total || 0
     // console.log(r[totalField], total, r.weightage)
 
@@ -1064,18 +1064,28 @@ const calculateAmount = (
 
     // console.log(r)
   })
-  if (total === 0 && activeRows[0]) {
-    activeRows[0].weightage = 1
+  if (total === 0 && activeOrderRows[0]) {
+    activeOrderRows[0].weightage = 1
   }
+  // using for calculate the total adjustment from the beginning
+  // total - totalAdjustment will be use for calculate the next adjustment amount
+  let totalAdjustment = 0
   activeAdjustments
     .filter(o => !o.isDeleted)
     .forEach((fa, i) => {
-      activeRows.forEach(o => {
+      activeOrderRows.forEach(o => {
         o.subAdjustment = 0
       })
       let adjAmount = 0
+      // the finale adjustment amount for on adjustment always equal to the sub total before previous adjusmtent
+      // not sum of each item invoice adjustment;
+      if (fa.adjType === 'Percentage') {
+        adjAmount = roundTo((fa.adjValue / 100) * (total + totalAdjustment))
+      } else {
+        adjAmount = roundTo(fa.adjValue)
+      }
       let otherItemsAdjAmount = 0
-      activeRows.forEach((r, j) => {
+      activeOrderRows.forEach((r, j) => {
         // console.log(r.weightage * fa.adjAmount, r)
         let adj = 0
         let initalRowToal = r[totalField]
@@ -1084,7 +1094,7 @@ const calculateAmount = (
         }
         if (fa.adjType === 'ExactAmount') {
           // --- If is last item, should use [totalAdjAmount] - [sum of other items adj amt] ---//
-          if (activeRows.length - 1 === j) {
+          if (activeOrderRows.length - 1 === j) {
             adj = roundTo(fa.adjValue - otherItemsAdjAmount)
           } else {
             adj = roundTo(Math.abs(r.weightage) * Math.abs(fa.adjValue), 2)
@@ -1092,30 +1102,34 @@ const calculateAmount = (
             if (fa.adjValue < 0) adj = -adj
           }
         } else if (fa.adjType === 'Percentage') {
-          adj = roundTo((Math.abs(fa.adjValue) / 100) * Math.abs(initalRowToal))
-
-          if (fa.adjValue < 0) adj = -adj
+          // for percentage, the remaining of adjustment amount of current adjustment will assign to the last time
+          adj = roundTo(fa.adjValue / 100) * initalRowToal
+          if (activeOrderRows.length - 1 === j) {
+            adj = roundTo(Math.abs(adjAmount) - Math.abs(otherItemsAdjAmount))
+          }
+          if (fa.adjValue < 0 && adj > 0) adj = -adj
         }
         // console.log(r.subAdjustment + adj, r.subAdjustment, adj)
-        adjAmount += adj
+        // adjAmount += adj
         // r[adjustedField] = roundTo(r[adjustedField] + adj)
         // r.subAdjustment += adj
         r[`adjustmen${i}`] = adj
         r[adjustedField] = roundTo(initalRowToal + adj)
         otherItemsAdjAmount += roundTo(adj)
       })
-      if (fa.adjType === 'Percentage') fa.adjAmount = roundTo(adjAmount)
+      fa.adjAmount = adjAmount
+      totalAdjustment += fa.adjAmount
     })
-  // activeRows.forEach((r) => {
+  // activeOrderRows.forEach((r) => {
   //   r[adjustedField] = roundTo(r[adjustedField])
   // })
   const totalAfterAdj = roundTo(
-    activeRows.map(o => o[adjustedField]).reduce(sumReducer, 0),
+    activeOrderRows.map(o => o[adjustedField]).reduce(sumReducer, 0),
   )
 
   if (gstValue) {
     if (isGSTInclusive) {
-      activeRows.forEach(r => {
+      activeOrderRows.forEach(r => {
         gst += roundTo(
           r[adjustedField] - r[adjustedField] / (1 + gstValue / 100),
         )
@@ -1123,7 +1137,7 @@ const calculateAmount = (
     } else {
       gst = roundTo((totalAfterAdj * gstValue) / 100)
     }
-    activeRows.forEach(r => {
+    activeOrderRows.forEach(r => {
       if (isGSTInclusive) {
         r[gstField] = r[adjustedField]
         r[gstAmtField] = roundTo(
@@ -1136,12 +1150,12 @@ const calculateAmount = (
       // console.log(r[gstField], r[gstAmtField])
     })
   } else {
-    activeRows.forEach(r => {
+    activeOrderRows.forEach(r => {
       r[gstAmtField] = 0
       r[gstField] = r[adjustedField]
     })
   }
-  // console.log({ activeRows, adjustments })
+  // console.log({ activeOrderRows, adjustments })
   const mapInvoiceItemAdjustment = (adjustment, index) => invoiceItem => {
     let itemAdj
     if (adjustment.invoiceItemAdjustment)
@@ -1159,26 +1173,26 @@ const calculateAmount = (
   }
 
   const { gst: absoluteGST, gstAdjustment } = calculateGSTAdj({
-    activeRows,
+    activeOrderRows,
     totalAfterAdj,
     gstValue,
     isGSTInclusive,
   })
   const r = {
-    rows,
+    allOrderRows,
     adjustments: adjustments
       .map((o, index) => ({
         ...o,
         index,
         sequence: index + 1,
-        [invoiceItemAdjustmentField]: activeRows.map(
+        [invoiceItemAdjustmentField]: activeOrderRows.map(
           mapInvoiceItemAdjustment(o, index),
         ),
       }))
       .sort(sortAdjustment),
     summary: {
       subTotal: roundTo(
-        activeRows.map(row => row[totalField]).reduce(sumReducer, 0),
+        activeOrderRows.map(row => row[totalField]).reduce(sumReducer, 0),
       ),
       gst: absoluteGST,
       gstAdj: gstAdjustment,
