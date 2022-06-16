@@ -356,6 +356,9 @@ class Main extends Component {
     const { dispatch, dispense, values, history } = this.props
     const { location } = history
     const { query } = location
+    if (query.backToDispense) {
+      return
+    }
     const { visitPurposeFK } = values
     const addOrderList = [VISIT_TYPE.OTC]
     const shouldShowAddOrderModal = addOrderList.includes(visitPurposeFK)
@@ -363,7 +366,7 @@ class Main extends Component {
     if (shouldShowAddOrderModal) {
       this.handleOrderModal()
     }
-    if (visitPurposeFK !== VISIT_TYPE.OTC) {
+    if (visitPurposeFK !== VISIT_TYPE.OTC && values.id) {
       dispatch({
         type: `consultation/editOrder`,
         payload: {
@@ -613,11 +616,11 @@ class Main extends Component {
       dispense,
       clinicSettings,
       visitRegistration,
+      history,
     } = this.props
     if (!dispense.queryCodeTablesDone || this.state.hasShowOrderModal) {
       return
     }
-
     const { entity = {} } = visitRegistration
     const { visit = {} } = entity
     const {
@@ -634,13 +637,17 @@ class Main extends Component {
       vaccination.length === 0
     const accessRights = Authorized.check('queue.dispense.editorder')
     const noClinicalObjectRecord = !values.clinicalObjectRecordFK
+
+    const { location } = history
+    const { query } = location
     if (
       accessRights &&
       accessRights.rights !== 'hidden' &&
       (visit.visitPurposeFK === VISIT_TYPE.BF ||
         visit.visitPurposeFK === VISIT_TYPE.MC) &&
       isEmptyDispense &&
-      noClinicalObjectRecord
+      noClinicalObjectRecord &&
+      !query.backToDispense
     ) {
       this.setState(
         prevState => {
