@@ -19,7 +19,6 @@ import { DoctorLabel } from '@/components/_medisys'
 @connect(({ codetable }) => ({ codetable }))
 @withFormikExtend({
   mapPropsToValues: ({ settingVisitOrderTemplate, codetable }) => {
-    console.log(codetable)
     return {
       ...(settingVisitOrderTemplate.entity ||
         settingVisitOrderTemplate.default),
