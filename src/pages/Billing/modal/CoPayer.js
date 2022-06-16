@@ -204,7 +204,7 @@ class CoPayer extends Component {
         0,
       ),
     )
-    const totalGst = roundTo((totalClaimAmountBeforeGST * gstValue) / 100) 
+    const totalGst = roundTo((totalClaimAmountBeforeGST * gstValue) / 100)
     const returnValue = {
       invoicePayerItem,
       payerDistributedAmtBeforeGST: totalClaimAmountBeforeGST,
@@ -308,7 +308,7 @@ class CoPayer extends Component {
 
     return (
       <div className={classes.container}>
-        <GridContainer>
+        <GridContainer style={{ height: 700, overflow: 'auto' }}>
           <GridItem md={4} className={classes.dropdown}>
             <FastField
               name='coPayer'

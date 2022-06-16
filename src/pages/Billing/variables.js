@@ -3,6 +3,7 @@ import Info from '@material-ui/icons/Info'
 import { Tooltip } from '@/components'
 import { INVOICE_ITEM_TYPE } from '@/utils/constants'
 import { roundTo } from '@/utils/utils'
+import { Tag } from 'antd'
 
 export const SchemeInvoicePayerColumn = [
   { name: 'itemType', title: 'Category' },
@@ -24,6 +25,18 @@ export const ApplyClaimsColumnExtension = [
     columnName: 'itemType',
     width: 150,
     disabled: true,
+    render: row => {
+      return (
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span>{row.itemType}</span>
+          <Tooltip title='Visit Purpose Item' placement='right'>
+            <Tag style={{ marginRight: 0 }} color='blue'>
+              V.P.
+            </Tag>
+          </Tooltip>
+        </div>
+      )
+    },
   },
   { columnName: 'itemName', disabled: true },
   {
@@ -68,17 +81,24 @@ export const CoPayerColumns = [
     name: 'claimAmountBeforeGST',
     title: 'Claim Amount',
   },
-  // {
-  //   hidden: true,
-  //   name: 'gstAmount',
-  //   title: 'GST Amount',
-  // },
 ]
 
 export const CoPayerColExtensions = [
   {
     columnName: 'itemType',
     disabled: true,
+    render: row => {
+      return (
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span>{row.itemType}</span>
+          <Tooltip title='Visit Purpose Item' placement='right'>
+            <Tag style={{ marginRight: 0 }} color='blue'>
+              V.P.
+            </Tag>
+          </Tooltip>
+        </div>
+      )
+    },
   },
   {
     columnName: 'itemName',
