@@ -598,9 +598,8 @@ const CalendarView = ({
     }
   }
 
-  const eventClick = event => {
-    handleDoubleClick(event.event)
-    event.cancel = true
+  const eventDoubleClick = event => {
+    handleDoubleClick(event)
   }
 
   const [eventAction, setEventAction] = useState(undefined)
@@ -628,7 +627,7 @@ const CalendarView = ({
         resources={resources}
         timeScale={{ interval: apptTimeIntervel * 2, slotCount: 2 }}
         cellDoubleClick={cellDoubleClick}
-        eventClick={eventClick}
+        eventDoubleClick={eventDoubleClick}
         eventRendered={_eventColors}
         renderCell={renderCell}
         cellTemplate={slot => {

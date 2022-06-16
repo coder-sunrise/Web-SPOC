@@ -1326,6 +1326,7 @@ const Main = props => {
         dataIndex: 'remarks',
         key: 'remarks',
         title: 'Remarks',
+        width: 300,
         onCell: row => ({
           colSpan: row.isGroup ? 0 : 1,
           rowSpan: row.countNumber === 1 ? row.rowspan : 0,
@@ -1900,14 +1901,16 @@ const Main = props => {
               Pending Items
             </div>
           )}
-          <AntdTable
-            className={customtyles.table}
-            size='small'
-            bordered
-            pagination={false}
-            dataSource={getGroupDispenseItem('PendingItems')}
-            columns={getColumns('PendingItems', onPendingValueChange)}
-          />
+          <div style={{ overflowX: 'auto' }}>
+            <AntdTable
+              className={customtyles.table}
+              size='small'
+              bordered
+              pagination={false}
+              dataSource={getGroupDispenseItem('PendingItems')}
+              columns={getColumns('PendingItems', onPendingValueChange)}
+            />
+          </div>
         </div>
       )}
       {pharmacyDetails.fromModule === 'History' && (
@@ -1917,14 +1920,16 @@ const Main = props => {
               Completed Items
             </div>
           )}
-          <AntdTable
-            className={customtyles.table}
-            size='small'
-            bordered
-            pagination={false}
-            dataSource={getGroupDispenseItem('CompletedItems')}
-            columns={getColumns('CompletedItems', onPendingValueChange)}
-          />
+          <div style={{ overflowX: 'auto' }}>
+            <AntdTable
+              className={customtyles.table}
+              size='small'
+              bordered
+              pagination={false}
+              dataSource={getGroupDispenseItem('CompletedItems')}
+              columns={getColumns('CompletedItems', onPendingValueChange)}
+            />
+          </div>
         </div>
       )}
       <GridContainer style={{ marginTop: 10 }}>

@@ -6,12 +6,13 @@ import { Tooltip } from '@/components'
 import tablestyles from './PatientHistoryStyle.less'
 import { hasValue, getHistoryValueForBoolean } from './config'
 
-export default ({ current }) => {
+export default ({ current, isFullScreen = true }) => {
   const { patientNoteVitalSigns = [] } = current
   const generalColumns = [
     {
       dataIndex: 'temperatureC',
       title: 'Temperature',
+      width: !isFullScreen ? 100 : undefined,
       render: (text, row) => (
         <span>
           {hasValue(row.temperatureC)
@@ -24,7 +25,8 @@ export default ({ current }) => {
     },
     {
       dataIndex: 'bpSysMMHG',
-      title: 'Blood Presure SYS',
+      title: 'BP SYS',
+      width: !isFullScreen ? 90 : undefined,
       render: (text, row) => (
         <span>
           {hasValue(row.bpSysMMHG)
@@ -38,7 +40,8 @@ export default ({ current }) => {
 
     {
       dataIndex: 'bpDiaMMHG',
-      title: 'Blood Presure DIA',
+      title: 'BP DIA',
+      width: !isFullScreen ? 90 : undefined,
       render: (text, row) => (
         <span>
           {hasValue(row.bpDiaMMHG)
@@ -52,6 +55,7 @@ export default ({ current }) => {
     {
       dataIndex: 'pulseRateBPM',
       title: 'Pulse',
+      width: !isFullScreen ? 80 : undefined,
       render: (text, row) => (
         <span>
           {hasValue(row.pulseRateBPM)
@@ -65,6 +69,7 @@ export default ({ current }) => {
     {
       dataIndex: 'saO2',
       title: 'SaO2',
+      width: !isFullScreen ? 70 : undefined,
       render: (text, row) => (
         <span>
           {hasValue(row.saO2)
@@ -78,6 +83,7 @@ export default ({ current }) => {
     {
       dataIndex: 'weightKG',
       title: 'Weight',
+      width: !isFullScreen ? 70 : undefined,
       render: (text, row) => (
         <span>
           {hasValue(row.weightKG)
@@ -91,6 +97,7 @@ export default ({ current }) => {
     {
       dataIndex: 'heightCM',
       title: 'Height',
+      width: !isFullScreen ? 70 : undefined,
       render: (text, row) => (
         <span>
           {hasValue(row.heightCM)
@@ -110,7 +117,7 @@ export default ({ current }) => {
             ? `${numeral(row.bmi).format('0.0')} ${formatMessage({
                 id: 'reception.queue.visitRegistration.bmi.suffix',
               })}`
-            : '0.0'}
+            : '-'}
         </span>
       ),
     },
@@ -146,7 +153,7 @@ export default ({ current }) => {
     },
     {
       dataIndex: 'headCircumference',
-      title: 'Head Circumference',
+      title: 'Head Circum.',
       render: (text, row) => (
         <span>
           {hasValue(row.headCircumference)
@@ -160,7 +167,7 @@ export default ({ current }) => {
     },
     {
       dataIndex: 'chestCircumference',
-      title: 'Chest Circumference',
+      title: 'Chest Circum.',
       render: (text, row) => (
         <span>
           {hasValue(row.chestCircumference)
@@ -176,7 +183,7 @@ export default ({ current }) => {
     },
     {
       dataIndex: 'waistCircumference',
-      title: 'Waist Circumference',
+      title: 'Waist Circum.',
       render: (text, row) => {
         if (row.isChild || row.isPregnancy)
           return (

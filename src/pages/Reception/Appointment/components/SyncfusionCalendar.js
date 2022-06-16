@@ -61,7 +61,10 @@ class SyncfusionCalendar extends React.PureComponent {
       { text: 'Cut', iconCss: 'e-icons e-cut', id: 'Cut' },
       { text: 'Paste', iconCss: 'e-icons e-paste', id: 'Paste' },
     ]
-    this.state = { previousDate: undefined, selectedData: undefined }
+    this.state = {
+      previousDate: undefined,
+      selectedData: undefined,
+    }
   }
 
   resourceHeaderTemplate = props => {
@@ -125,7 +128,7 @@ class SyncfusionCalendar extends React.PureComponent {
       timeScale,
       onViewChange,
       cellDoubleClick,
-      eventClick,
+      eventDoubleClick,
       eventRendered,
       renderCell,
       resourceIdAccessor,
@@ -187,7 +190,13 @@ class SyncfusionCalendar extends React.PureComponent {
                   }
                 }
               }}
-              eventClick={eventClick}
+              eventClick={event => {
+                event.cancel = true
+              }}
+              popupOpen={event => {
+                event.cancel = true
+                eventDoubleClick(event.data)
+              }}
               cellDoubleClick={cellDoubleClick}
               cellClick={event => {
                 event.cancel = true

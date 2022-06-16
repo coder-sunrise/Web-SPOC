@@ -65,7 +65,7 @@ export default ({
       },
       {
         dataIndex: 'clinicNote',
-        title: 'clinic Notes',
+        title: 'Clinic Notes',
         render: (_, row) => (
           <div>
             {selectNoteTypes.map(noteType => {
