@@ -559,6 +559,13 @@ export default createFormViewModel({
           }
         })
 
+        data.corScribbleNotes = data.corScribbleNotes.map(scribbleNote => {
+          return {
+            ...scribbleNote,
+            uid: getUniqueId(),
+          }
+        })
+
         yield put({
           type: 'diagnosis/updateState',
           payload: {

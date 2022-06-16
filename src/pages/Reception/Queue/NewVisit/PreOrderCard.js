@@ -22,6 +22,7 @@ import { qtyFormat } from '@/utils/config'
 import CommonTableGrid from '@/components/CommonTableGrid'
 import { ContactSupportOutlined } from '@material-ui/icons'
 import { Delete } from '@material-ui/icons'
+import { showCurrency } from '@/utils/utils'
 const { queryList, query } = service
 const styles = theme => ({
   ...basicStyle(theme),
@@ -89,11 +90,12 @@ class PreOrderCard extends PureComponent {
               width: 120,
               sortingEnabled: false,
               render: row => {
+                const displayQty = `${numeral(row.quantity).format(
+                  '0.0',
+                )} ${row.dispenseUOM || ''}`
                 return (
-                  <Tooltip
-                    title={<span>{`${row.quantity} ${row.dispenseUOM}`}</span>}
-                  >
-                    <span>{`${row.quantity} ${row.dispenseUOM}`}</span>
+                  <Tooltip title={<span>{displayQty}</span>}>
+                    <span>{displayQty}</span>
                   </Tooltip>
                 )
               },
@@ -106,7 +108,7 @@ class PreOrderCard extends PureComponent {
               columnName: 'orderDate',
               sortingEnabled: false,
               type: 'date',
-              width: 180,
+              width: 140,
               render: row => {
                 return (
                   <span>
@@ -121,12 +123,12 @@ class PreOrderCard extends PureComponent {
             },
             {
               columnName: 'amount',
-              width: 100,
+              width: 80,
               type: 'currency',
               sortingEnabled: false,
               isDisabled: () => true,
               render: row => {
-                return row.hasPaid ? row.amount : '-'
+                return row.hasPaid ? showCurrency(row.amount) : '-'
               },
             },
             {

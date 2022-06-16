@@ -9,10 +9,10 @@ import { queryList as queryAppointments } from '@/services/calendar'
 import Authorized from '@/utils/Authorized'
 import { LoadingWrapper } from '@/components/_medisys'
 import { APPOINTMENT_STATUSOPTIONS } from '@/utils/constants'
+import { showCurrency } from '@/utils/utils'
 import { InventoryTypes } from '@/utils/codes'
 import { futureApptTableParams, previousApptTableParams } from './variables'
 import { Delete } from '@material-ui/icons'
-
 const PreOrder = ({ values, deletePreOrderItem, disabled }) => {
   const {
     currentAppointment: { appointmentPreOrderItem = [] },
@@ -86,19 +86,12 @@ const PreOrder = ({ values, deletePreOrderItem, disabled }) => {
             sortingEnabled: false,
             width: 120,
             render: row => {
+              const displayQty = `${numeral(row.quantity).format(
+                '0.0',
+              )} ${row.dispenseUOM || ''}`
               return (
-                <Tooltip
-                  title={
-                    <span>
-                      {row.id < 0 ? row.quantity : row.quantity.toFixed(1)}{' '}
-                      {row.dispenseUOM}
-                    </span>
-                  }
-                >
-                  <span>
-                    {row.id < 0 ? row.quantity : row.quantity.toFixed(1)}{' '}
-                    {row.dispenseUOM}
-                  </span>
+                <Tooltip title={displayQty}>
+                  <span>{displayQty}</span>
                 </Tooltip>
               )
             },
@@ -108,12 +101,12 @@ const PreOrder = ({ values, deletePreOrderItem, disabled }) => {
           { columnName: 'remarks', sortingEnabled: false },
           {
             columnName: 'amount',
-            width: 100,
+            width: 80,
             type: 'currency',
             sortingEnabled: false,
             isDisabled: () => true,
             render: row => {
-              return row.hasPaid === 'Yes' ? row.amount : '-'
+              return row.hasPaid === 'Yes' ? showCurrency(row.amount) : '-'
             },
           },
           { columnName: 'hasPaid', sortingEnabled: false, width: 50 },

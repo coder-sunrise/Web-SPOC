@@ -1529,6 +1529,19 @@ const getMappedVisitType = (visitpurpose, visitTypeSettingsObj) => {
 const getNameWithTitle = (title, name) =>
   `${title && name.trim().length ? `${title}. ` : ''}${name || ''}`
 
+const showCurrency = (value = 0) => {
+  if (value >= 0)
+    return (
+      <div style={{ color: 'darkBlue', fontWeight: 500 }}>
+        {`${config.currencySymbol}${numeral(value).format('0,0.00')}`}
+      </div>
+    )
+  return (
+    <div style={{ color: 'red', fontWeight: 500 }}>
+      {`(${config.currencySymbol}${numeral(value * -1).format('0,0.00')})`}
+    </div>
+  )
+}
 export {
   sleep,
   sumReducer,
@@ -1562,6 +1575,7 @@ export {
   getMappedVisitType,
   ableToViewByAuthority,
   getNameWithTitle,
+  showCurrency,
   // toUTC,
   // toLocal,
 }

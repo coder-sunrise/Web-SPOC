@@ -1,10 +1,12 @@
 import React, { PureComponent } from 'react'
+import numeral from 'numeral'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { ReportDataGrid } from '@/components/_medisys'
 import { filter } from 'lodash'
 import moment from '@medisys/utils/node_modules/moment'
 import { Tooltip } from '@/components'
+import { showCurrency } from '@/utils/utils'
 
 class PreOrderList extends PureComponent {
   render() {
@@ -39,19 +41,22 @@ class PreOrderList extends PureComponent {
 
     const preOrderListingDetailsColsExtension = [
       { columnName: 'patientName', sortingEnabled: false, width: 120 },
-      { columnName: 'referrenceNo', sortingEnabled: false, width: 100 },
-      { columnName: 'accountNo', sortingEnabled: false, width: 100 },
+      { columnName: 'referrenceNo', sortingEnabled: false, width: 90 },
+      { columnName: 'accountNo', sortingEnabled: false, width: 90 },
       { columnName: 'type', sortingEnabled: false, width: 100 },
-      { columnName: 'itemName', sortingEnabled: false, width: 140 },
+      { columnName: 'itemName', sortingEnabled: false },
       {
         columnName: 'quantity',
         sortingEnabled: false,
         width: 120,
         align: 'right',
         render: row => {
+          const displayQty = `${numeral(row.quantity).format(
+            '0.0',
+          )} ${row.uom || ''}`
           return (
-            <Tooltip title={`${row.quantity}.0 ${row.uom || ''}`}>
-              <span>{`${row.quantity}.0 ${row.uom || ''}`}</span>
+            <Tooltip title={displayQty}>
+              <span>{displayQty}</span>
             </Tooltip>
           )
         },
@@ -80,7 +85,7 @@ class PreOrderList extends PureComponent {
         },
         width: 140,
       },
-      { columnName: 'remarks', sortingEnabled: false, width: 120 },
+      { columnName: 'remarks', sortingEnabled: false, width: 140 },
       {
         columnName: 'apptDate',
         type: 'date',
@@ -107,22 +112,20 @@ class PreOrderList extends PureComponent {
       {
         columnName: 'amount',
         sortingEnabled: false,
-        width: 120,
+        width: 80,
         type: 'currency',
         currency: true,
         render: row => {
           return (
             <Tooltip
-              title={row.paid === 'Yes' ? `$${row.amount.toFixed(2)}` : '-'}
+              title={row.paid === 'Yes' ? showCurrency(row.amount) : '-'}
             >
-              <span>
-                {row.paid === 'Yes' ? `$${row.amount.toFixed(2)}` : '-'}
-              </span>
+              <span>{row.paid === 'Yes' ? showCurrency(row.amount) : '-'}</span>
             </Tooltip>
           )
         },
       },
-      { columnName: 'paid', sortingEnabled: false, width: 80 },
+      { columnName: 'paid', sortingEnabled: false, width: 50 },
       {
         columnName: 'actualizedDate',
         type: 'date',
@@ -146,7 +149,7 @@ class PreOrderList extends PureComponent {
           )
         },
       },
-      { columnName: 'preOrderItemStatus', sortingEnabled: false, width: 120 },
+      { columnName: 'preOrderItemStatus', sortingEnabled: false, width: 100 },
     ]
 
     let FuncProps = {
