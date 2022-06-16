@@ -63,6 +63,7 @@ import styles from './style'
 import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
 import { getRawData } from '@/services/report'
 import * as config from '@/utils/config'
+import './Main.css'
 
 const discardMessage = 'Discard consultation?'
 const onPageLeaveMessage = 'Do you want to save consultation notes?'
@@ -1525,7 +1526,7 @@ class Main extends React.Component {
     })
 
     return (
-      <div className={classes.root}>
+      <div className={classes.root} id='ConsultationMainContainer'>
         <PatientBanner
           from='Consultation'
           onSelectPreOrder={this.onSelectPreOrder}
