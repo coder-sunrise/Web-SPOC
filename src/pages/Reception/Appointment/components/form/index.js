@@ -97,6 +97,7 @@ const gridValidationSchema = Yup.object().shape({
     ctcalendarresource: codetable.ctcalendarresource,
     ctresource: codetable.ctresource,
     codetable: codetable,
+    mainDivHeight: global.mainDivHeight,
   }),
 )
 @withFormikExtend({
@@ -1375,115 +1376,119 @@ class Form extends React.PureComponent {
             <GridContainer
               className={classnames(classes.formContent)}
               alignItems='flex-start'
-              style={{
-                height: this.props.height - (this.state.bannerHeight || 0), // - 100,
-                overflow: 'auto',
-              }}
             >
-              <GridItem container xs={12} md={6}>
-                <GridItem container xs md={12} justify='flex-start'>
-                  <PatientInfoInput
-                    disabled={disablePatientInfo}
-                    isEdit={values.id}
-                    onViewPatientProfileClick={this.onViewPatientProfile}
-                    onSearchPatientClick={this.onSearchPatient}
-                    onCreatePatientClick={this.togglePatientProfileModal}
-                    onRegisterToVisitClick={navigateDirtyCheck({
-                      redirectUrl: this.getVisregUrl(),
-                      onProceed: () => registerToVisit(),
-                    })}
-                    patientContactNo={values.patientContactNo}
-                    patientName={values.patientName}
-                    patientProfileFK={values.patientProfileFK}
-                    patientIsActive={patientIsActive}
-                    appointmentStatusFK={currentAppointment.appointmentStatusFk}
-                    values={values}
-                    hasActiveSession={this.state.hasActiveSession}
-                    containsPrimaryClinician={this.containsPrimaryClinician()}
+              <GridItem
+                container
+                xs={12}
+                md={6}
+                style={{
+                  maxHeight:
+                    this.props.mainDivHeight -
+                    (this.state.bannerHeight || 0) -
+                    16,
+                  overflow: 'auto',
+                }}
+              >
+                <PatientInfoInput
+                  disabled={disablePatientInfo}
+                  isEdit={values.id}
+                  onViewPatientProfileClick={this.onViewPatientProfile}
+                  onSearchPatientClick={this.onSearchPatient}
+                  onCreatePatientClick={this.togglePatientProfileModal}
+                  onRegisterToVisitClick={navigateDirtyCheck({
+                    redirectUrl: this.getVisregUrl(),
+                    onProceed: () => registerToVisit(),
+                  })}
+                  patientContactNo={values.patientContactNo}
+                  patientName={values.patientName}
+                  patientProfileFK={values.patientProfileFK}
+                  patientIsActive={patientIsActive}
+                  appointmentStatusFK={currentAppointment.appointmentStatusFk}
+                  values={values}
+                  hasActiveSession={this.state.hasActiveSession}
+                  containsPrimaryClinician={this.containsPrimaryClinician()}
+                />
+                <AppointmentDateInput
+                  disabled={_disableAppointmentDate}
+                  visitOrderTemplateOptions={visitOrderTemplateOptions}
+                  patientProfileFK={values.patientProfileFK}
+                  values={values}
+                  onVisitPurposeSelected={this.onVisitPurposeSelected}
+                  patientProfile={patientProfile}
+                />
+                <GridItem xs md={12} className={classes.verticalSpacing}>
+                  <AppointmentDataGrid
+                    validationSchema={gridValidationSchema}
+                    disabled={disableDataGrid}
+                    appointmentDate={currentAppointment.appointmentDate}
+                    data={_datagrid}
+                    handleCommitChanges={this.onCommitChanges}
+                    handleEditingRowsChange={this.onEditingRowsChange}
+                    editingRows={editingRows}
+                    selectedSlot={selectedSlot}
+                    checkAddResource={this.checkAddResource}
                   />
-                  <AppointmentDateInput
-                    disabled={_disableAppointmentDate}
-                    visitOrderTemplateOptions={visitOrderTemplateOptions}
-                    patientProfileFK={values.patientProfileFK}
-                    values={values}
-                    onVisitPurposeSelected={this.onVisitPurposeSelected}
-                    patientProfile={patientProfile}
-                  />
-                  <GridItem xs md={12} className={classes.verticalSpacing}>
-                    <AppointmentDataGrid
-                      validationSchema={gridValidationSchema}
-                      disabled={disableDataGrid}
-                      appointmentDate={currentAppointment.appointmentDate}
-                      data={_datagrid}
-                      handleCommitChanges={this.onCommitChanges}
-                      handleEditingRowsChange={this.onEditingRowsChange}
-                      editingRows={editingRows}
-                      selectedSlot={selectedSlot}
-                      checkAddResource={this.checkAddResource}
-                    />
-                  </GridItem>
-                  <GridItem xs md={12}>
-                    <div style={{ position: 'relative' }}>
-                      <span>Appointment Remarks</span>
-                      <Field
-                        name='currentAppointment.appointmentRemarks'
-                        render={args => (
-                          <OutlinedTextField
-                            {...args}
-                            disabled={disableDataGrid}
-                            rows='5'
-                            multiline
-                            maxLength={2000}
-                            label=''
-                            className={classes.apptRemarksMultiline}
-                          />
-                        )}
-                      />
-                      <CannedTextButton
-                        buttonType='text'
-                        disabled={disableDataGrid}
-                        cannedTextTypeFK={CANNED_TEXT_TYPE.APPOINTMENTREMARKS}
-                        style={{
-                          position: 'absolute',
-                          top: -5,
-                          right: -7,
-                        }}
-                        handleSelectCannedText={cannedText => {
-                          const remarks = currentAppointment.appointmentRemarks
-                          const newRemaks = `${
-                            remarks ? remarks + '\n' : ''
-                          }${cannedText.text || ''}`.substring(0, 2000)
-                          setFieldValue(
-                            'currentAppointment.appointmentRemarks',
-                            newRemaks,
-                          )
-                        }}
-                      />
-                    </div>
-                  </GridItem>
-                  <GridItem xs md={12}>
-                    <Recurrence
-                      size='lg'
-                      disabled={this.disableRecurrence()}
-                      formValues={values}
-                      recurrenceDto={values.recurrenceDto}
-                      handleRecurrencePatternChange={
-                        this.onRecurrencePatternChange
-                      }
-                      checkedRecurrence={this.checkedRecurrence}
-                    />
-                  </GridItem>
-                  <GridItem xs md={12}>
-                    {this.showPreOrder() && (
-                      <PreOrder
-                        {...this.props}
-                        deletePreOrderItem={this.deletePreOrderItem}
-                        disabled={disableDataGrid}
-                      ></PreOrder>
-                    )}
-                  </GridItem>
                 </GridItem>
-
+                <GridItem xs md={12}>
+                  <div style={{ position: 'relative' }}>
+                    <span>Appointment Remarks</span>
+                    <Field
+                      name='currentAppointment.appointmentRemarks'
+                      render={args => (
+                        <OutlinedTextField
+                          {...args}
+                          disabled={disableDataGrid}
+                          rows='5'
+                          multiline
+                          maxLength={2000}
+                          label=''
+                          className={classes.apptRemarksMultiline}
+                        />
+                      )}
+                    />
+                    <CannedTextButton
+                      buttonType='text'
+                      disabled={disableDataGrid}
+                      cannedTextTypeFK={CANNED_TEXT_TYPE.APPOINTMENTREMARKS}
+                      style={{
+                        position: 'absolute',
+                        top: -5,
+                        right: -7,
+                      }}
+                      handleSelectCannedText={cannedText => {
+                        const remarks = currentAppointment.appointmentRemarks
+                        const newRemaks = `${
+                          remarks ? remarks + '\n' : ''
+                        }${cannedText.text || ''}`.substring(0, 2000)
+                        setFieldValue(
+                          'currentAppointment.appointmentRemarks',
+                          newRemaks,
+                        )
+                      }}
+                    />
+                  </div>
+                </GridItem>
+                <GridItem xs md={12}>
+                  <Recurrence
+                    size='lg'
+                    disabled={this.disableRecurrence()}
+                    formValues={values}
+                    recurrenceDto={values.recurrenceDto}
+                    handleRecurrencePatternChange={
+                      this.onRecurrencePatternChange
+                    }
+                    checkedRecurrence={this.checkedRecurrence}
+                  />
+                </GridItem>
+                <GridItem xs md={12}>
+                  {this.showPreOrder() && (
+                    <PreOrder
+                      {...this.props}
+                      deletePreOrderItem={this.deletePreOrderItem}
+                      disabled={disableDataGrid}
+                    ></PreOrder>
+                  )}
+                </GridItem>
                 <GridItem xs md={12} className={classes.footerGrid}>
                   <FormFooter
                     // isNew={slotInfo.type === 'add'}
@@ -1506,6 +1511,13 @@ class Form extends React.PureComponent {
                 <CardContainer
                   hideHeader
                   className={classes.appointmentHistory}
+                  style={{
+                    height:
+                      this.props.mainDivHeight -
+                      (this.state.bannerHeight || 0) -
+                      24,
+                    overflow: 'auto',
+                  }}
                 >
                   <h4 style={{ fontWeight: 500 }}>Appointment History</h4>
                   <AppointmentHistory
