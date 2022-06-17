@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { connect } from 'dva'
+import numeral from 'numeral'
 import moment from 'moment'
 import { currencySymbol } from '@/utils/config'
 import _ from 'lodash'
@@ -320,7 +321,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         labelField: 'name',
         valueField: 'value',
         sortingEnabled: false,
-        width: 180,
+        width: 130,
         sortingEnabled: false,
         options: () => preOrderItemCategory,
         onChange: handleCategoryChanged,
@@ -381,19 +382,12 @@ const PendingPreOrder: React.FC = (props: any) => {
         width: 120,
         sortingEnabled: false,
         render: row => {
+          const displayQty = `${numeral(row.quantity).format(
+            '0.0',
+          )} ${row.dispenseUOM || ''}`
           return (
-            <Tooltip
-              title={
-                <span>
-                  {row.id < 0 ? row.quantity : row.quantity.toFixed(1)}{' '}
-                  {row.dispenseUOM}
-                </span>
-              }
-            >
-              <span>
-                {row.id < 0 ? row.quantity : row.quantity.toFixed(1)}{' '}
-                {row.dispenseUOM}
-              </span>
+            <Tooltip title={displayQty}>
+              <span>{displayQty}</span>
             </Tooltip>
           )
         },

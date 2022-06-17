@@ -21,7 +21,7 @@ import {
 } from '@/components'
 import { Typography, Input } from 'antd'
 import { CHECKLIST_CATEGORY, SCRIBBLE_NOTE_TYPE } from '@/utils/constants'
-import { navigateDirtyCheck } from '@/utils/utils'
+import { getUniqueId, navigateDirtyCheck } from '@/utils/utils'
 import ScribbleNote from '@/pages/Shared/ScribbleNote/ScribbleNote'
 import { scribbleTypes } from '@/utils/codes'
 
@@ -55,19 +55,27 @@ export const Findings = ({
   })
   const [scribbleNotes, setScribbleNotes] = useState([])
   useEffect(() => {
+    const newRadiologyScribbleNote = radiologyScribbleNote.map(scribbleNote => {
+      return {
+        ...scribbleNote,
+        uid: getUniqueId(),
+      }
+    })
     const fields = [item]
     const payload = {
       entity: '',
-      selectedIndex: '',
+      selectedItemUid: '',
       ...fields.reduce(
         (_result, field) => ({
           ..._result,
-          [field.fieldName]: { [field.scribbleField]: radiologyScribbleNote },
+          [field.fieldName]: {
+            [field.scribbleField]: newRadiologyScribbleNote,
+          },
         }),
         {},
       ),
     }
-    setScribbleNotes(radiologyScribbleNote)
+    setScribbleNotes(newRadiologyScribbleNote)
     dispatch({
       type: 'scriblenotes/updateState',
       payload,
@@ -160,9 +168,12 @@ export const Findings = ({
 
     if (scriblenotes.editEnable) {
       const newArrayItems = [...scriblenotes[category][arrayName]]
-      newArrayItems[scriblenotes.selectedIndex].subject = subject
-      newArrayItems[scriblenotes.selectedIndex].scribbleNoteLayers = temp
-      newArrayItems[scriblenotes.selectedIndex].thumbnail = thumbnail
+      const updateItem = newArrayItems.find(
+        x => x.uid === scriblenotes.selectedItemUid,
+      )
+      updateItem.subject = subject
+      updateItem.scribbleNoteLayers = temp
+      updateItem.thumbnail = thumbnail
 
       dispatch({
         type: 'scriblenotes/updateState',
@@ -177,14 +188,12 @@ export const Findings = ({
       dispatch({
         type: 'scriblenotes/upsert',
         payload: {
-          id: newArrayItems[scriblenotes.selectedIndex].scribbleNoteFK,
-          scribbleNoteTypeFK:
-            newArrayItems[scriblenotes.selectedIndex].scribbleNoteTypeFK,
+          id: updateItem.scribbleNoteFK,
+          scribbleNoteTypeFK: updateItem.scribbleNoteTypeFK,
           scribbleNoteLayers: temp.map(t => {
             return {
               ...t,
-              scribbleNoteFK:
-                newArrayItems[scriblenotes.selectedIndex].scribbleNoteFK,
+              scribbleNoteFK: updateItem.scribbleNoteFK,
             }
           }),
           subject,
@@ -199,6 +208,7 @@ export const Findings = ({
       }, [])
     } else {
       const newData = {
+        uid: getUniqueId(),
         subject,
         thumbnail,
         origin,
@@ -253,15 +263,12 @@ export const Findings = ({
       {},
     )
     const tempArrayItems = [...scriblenotes[category][arrayName]]
-    const deleteItem = tempArrayItems[scriblenotes.selectedIndex]
+    const deleteItem = tempArrayItems.find(
+      x => x.uid === scriblenotes.selectedItemUid,
+    )
     const updatedCategoryScribbleArray = currentScribbleNoteData[
       category
-    ].filter((_, index) => index !== scriblenotes.selectedIndex)
-
-    dispatch({
-      type: 'scriblenotes/removeScribble',
-      payload: deleteItem.scribbleNoteFK,
-    })
+    ].filter(x => x.uid !== scriblenotes.selectedItemUid)
 
     dispatch({
       type: 'scriblenotes/updateState',

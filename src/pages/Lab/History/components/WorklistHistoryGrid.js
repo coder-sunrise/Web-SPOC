@@ -55,7 +55,6 @@ export const WorklistHistoryGrid = ({ labWorklistHistory }) => {
     list: labWorklistHistoryEntity = [],
     pagination = {},
   } = labWorklistHistory
-  console.log('labWorklistHistory value', labWorklistHistory)
   const [visits, setVisits] = useState([])
   const [collapsedKeys, setCollapsedKeys] = useState([])
   const cttestpanel = useCodeTable('cttestpanel')
@@ -232,7 +231,7 @@ export const WorklistHistoryGrid = ({ labWorklistHistory }) => {
         title: 'Collected Date',
         dataIndex: 'specimenCollectionDate',
         key: 'specimenCollectionDate',
-        width: 145,
+        width: 135,
         render: (text, record, index) =>
           record.specimenCollectionDate?.format(dateFormatLongWithTimeNoSec),
       },
@@ -240,7 +239,7 @@ export const WorklistHistoryGrid = ({ labWorklistHistory }) => {
         title: 'Received Date',
         dataIndex: 'dateReceived',
         key: 'dateReceived',
-        width: 145,
+        width: 135,
         render: (text, record, index) =>
           record.dateReceived?.format(dateFormatLongWithTimeNoSec),
       },

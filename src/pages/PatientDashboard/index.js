@@ -74,10 +74,6 @@ class PatientDashboard extends PureComponent {
 
   componentWillUnmount() {}
 
-  handleListItemClick = (e, i) => {
-    this.setState({ selectedIndex: i })
-  }
-
   startConsultation = () => {
     // this.props.dispatch({
     //   type: 'patientDashboard/openConsultationModal',
