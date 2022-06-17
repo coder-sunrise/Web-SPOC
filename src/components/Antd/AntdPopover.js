@@ -28,7 +28,6 @@ export default ({
 
   return (
     <Popover
-      getPopupContainer={node => node.parentNode || document.body}
       content={<div>{content}</div>}
       trigger='click'
       {...props}
