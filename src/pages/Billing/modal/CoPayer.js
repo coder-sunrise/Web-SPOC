@@ -305,7 +305,6 @@ class CoPayer extends Component {
   render() {
     const { classes, onClose, copayers = [], values } = this.props
     const { selectedRows, invoiceItems } = this.state
-
     return (
       <div className={classes.container}>
         <GridContainer style={{ height: 700, overflow: 'auto' }}>
@@ -378,7 +377,11 @@ class CoPayer extends Component {
           <GridItem md={12}>
             <EditableTableGrid
               size='sm'
-              rows={invoiceItems.map(item => ({
+              rows={_.orderBy(
+                invoiceItems,
+                ['isVisitPurposeItem', 'itemType', 'itemName'],
+                ['desc', 'asc', 'asc'],
+              ).map(item => ({
                 ...item,
                 disabled: !selectedRows.includes(item.id),
               }))}

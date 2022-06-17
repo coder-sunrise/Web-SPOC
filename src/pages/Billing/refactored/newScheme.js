@@ -156,6 +156,7 @@ const Scheme = ({
       align: 'right',
       type: 'currency',
       width: 150,
+      sortingEnabled: false,
       currency: true,
       isDisabled: row => _isConfirmed || !row.isClaimable, // latter is for drug mixture
     },
@@ -332,7 +333,11 @@ const Scheme = ({
                       ]
                 }
                 columnExtensions={columnExtensions}
-                rows={invoicePayerItem}
+                rows={_.orderBy(
+                  invoicePayerItem,
+                  ['isVisitPurposeItem', 'itemType', 'itemName'],
+                  ['desc', 'asc', 'asc'],
+                )}
                 schema={validationSchema}
               />
             ) : (
@@ -356,7 +361,11 @@ const Scheme = ({
                     width: 150,
                   },
                 ]}
-                rows={invoicePayerItem}
+                rows={_.orderBy(
+                  invoicePayerItem,
+                  ['isVisitPurposeItem', 'itemType', 'itemName'],
+                  ['desc', 'asc', 'asc'],
+                )}
               />
             )}
           </GridItem>

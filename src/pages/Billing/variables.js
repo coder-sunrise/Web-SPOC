@@ -25,25 +25,29 @@ export const ApplyClaimsColumnExtension = [
     columnName: 'itemType',
     width: 150,
     disabled: true,
+    sortingEnabled: false,
     render: row => {
       return (
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <span>{row.itemType}</span>
-          <Tooltip title='Visit Purpose Item' placement='right'>
-            <Tag style={{ marginRight: 0 }} color='blue'>
-              V.P.
-            </Tag>
-          </Tooltip>
+          {row.isVisitPurposeItem && (
+            <Tooltip title='Visit Purpose Item' placement='right'>
+              <Tag style={{ marginRight: 0 }} color='blue'>
+                V.P.
+              </Tag>
+            </Tooltip>
+          )}
         </div>
       )
     },
   },
-  { columnName: 'itemName', disabled: true },
+  { columnName: 'itemName', disabled: true, sortingEnabled: false },
   {
     columnName: 'coverage',
     align: 'right',
     disabled: true,
     width: 150,
+    sortingEnabled: false,
   },
   {
     columnName: 'payableBalance',
@@ -51,6 +55,7 @@ export const ApplyClaimsColumnExtension = [
     currency: true,
     disabled: true,
     width: 160,
+    sortingEnabled: false,
   },
 
   {
@@ -86,16 +91,20 @@ export const CoPayerColumns = [
 export const CoPayerColExtensions = [
   {
     columnName: 'itemType',
+    width: 150,
     disabled: true,
+    sortingEnabled: false,
     render: row => {
       return (
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <span>{row.itemType}</span>
-          <Tooltip title='Visit Purpose Item' placement='right'>
-            <Tag style={{ marginRight: 0 }} color='blue'>
-              V.P.
-            </Tag>
-          </Tooltip>
+          {row.isVisitPurposeItem && (
+            <Tooltip title='Visit Purpose Item' placement='right'>
+              <Tag style={{ marginRight: 0 }} color='blue'>
+                V.P.
+              </Tag>
+            </Tooltip>
+          )}
         </div>
       )
     },
@@ -103,18 +112,23 @@ export const CoPayerColExtensions = [
   {
     columnName: 'itemName',
     disabled: true,
+    sortingEnabled: false,
   },
   {
     columnName: 'payableBalance',
     type: 'number',
     currency: true,
     disabled: true,
+    width: 160,
+    sortingEnabled: false,
   },
   {
     columnName: 'claimAmountBeforeGST',
     type: 'number',
     currency: true,
     isDisabled: row => !row.isClaimable,
+    width: 160,
+    sortingEnabled: false,
   },
 ]
 
