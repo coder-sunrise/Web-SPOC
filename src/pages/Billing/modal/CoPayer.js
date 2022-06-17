@@ -204,7 +204,7 @@ class CoPayer extends Component {
         0,
       ),
     )
-    const totalGst = roundTo((totalClaimAmountBeforeGST * gstValue) / 100) 
+    const totalGst = roundTo((totalClaimAmountBeforeGST * gstValue) / 100)
     const returnValue = {
       invoicePayerItem,
       payerDistributedAmtBeforeGST: totalClaimAmountBeforeGST,
@@ -305,10 +305,9 @@ class CoPayer extends Component {
   render() {
     const { classes, onClose, copayers = [], values } = this.props
     const { selectedRows, invoiceItems } = this.state
-
     return (
       <div className={classes.container}>
-        <GridContainer>
+        <GridContainer style={{ height: 700, overflow: 'auto' }}>
           <GridItem md={4} className={classes.dropdown}>
             <FastField
               name='coPayer'
@@ -378,7 +377,11 @@ class CoPayer extends Component {
           <GridItem md={12}>
             <EditableTableGrid
               size='sm'
-              rows={invoiceItems.map(item => ({
+              rows={_.orderBy(
+                invoiceItems,
+                ['isVisitPurposeItem', 'itemType', 'itemName'],
+                ['desc', 'asc', 'asc'],
+              ).map(item => ({
                 ...item,
                 disabled: !selectedRows.includes(item.id),
               }))}

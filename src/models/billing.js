@@ -177,6 +177,7 @@ export default createFormViewModel({
           v: Date.now(),
           vid: billingState.visitID,
           pid: billingState.patientID,
+          backToDispense: true,
         }
 
         const destinationUrl = getAppendUrl(

@@ -3,6 +3,7 @@ import Info from '@material-ui/icons/Info'
 import { Tooltip } from '@/components'
 import { INVOICE_ITEM_TYPE } from '@/utils/constants'
 import { roundTo } from '@/utils/utils'
+import { Tag } from 'antd'
 
 export const SchemeInvoicePayerColumn = [
   { name: 'itemType', title: 'Category' },
@@ -24,13 +25,29 @@ export const ApplyClaimsColumnExtension = [
     columnName: 'itemType',
     width: 150,
     disabled: true,
+    sortingEnabled: false,
+    render: row => {
+      return (
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span>{row.itemType}</span>
+          {row.isVisitPurposeItem && (
+            <Tooltip title='Visit Purpose Item' placement='right'>
+              <Tag style={{ marginRight: 0 }} color='blue'>
+                V.P.
+              </Tag>
+            </Tooltip>
+          )}
+        </div>
+      )
+    },
   },
-  { columnName: 'itemName', disabled: true },
+  { columnName: 'itemName', disabled: true, sortingEnabled: false },
   {
     columnName: 'coverage',
     align: 'right',
     disabled: true,
     width: 150,
+    sortingEnabled: false,
   },
   {
     columnName: 'payableBalance',
@@ -38,6 +55,7 @@ export const ApplyClaimsColumnExtension = [
     currency: true,
     disabled: true,
     width: 160,
+    sortingEnabled: false,
   },
 
   {
@@ -68,33 +86,49 @@ export const CoPayerColumns = [
     name: 'claimAmountBeforeGST',
     title: 'Claim Amount',
   },
-  // {
-  //   hidden: true,
-  //   name: 'gstAmount',
-  //   title: 'GST Amount',
-  // },
 ]
 
 export const CoPayerColExtensions = [
   {
     columnName: 'itemType',
+    width: 150,
     disabled: true,
+    sortingEnabled: false,
+    render: row => {
+      return (
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span>{row.itemType}</span>
+          {row.isVisitPurposeItem && (
+            <Tooltip title='Visit Purpose Item' placement='right'>
+              <Tag style={{ marginRight: 0 }} color='blue'>
+                V.P.
+              </Tag>
+            </Tooltip>
+          )}
+        </div>
+      )
+    },
   },
   {
     columnName: 'itemName',
     disabled: true,
+    sortingEnabled: false,
   },
   {
     columnName: 'payableBalance',
     type: 'number',
     currency: true,
     disabled: true,
+    width: 160,
+    sortingEnabled: false,
   },
   {
     columnName: 'claimAmountBeforeGST',
     type: 'number',
     currency: true,
     isDisabled: row => !row.isClaimable,
+    width: 160,
+    sortingEnabled: false,
   },
 ]
 
