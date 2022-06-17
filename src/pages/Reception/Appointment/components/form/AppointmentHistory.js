@@ -211,7 +211,7 @@ class AppointmentHistory extends PureComponent {
       <LoadingWrapper loading={loadingAppt} text='loading...'>
         <div>
           <CardContainer hideHeader size='sm'>
-            <h4 style={{ marginTop: 20 }}>Current & Future Appointment</h4>
+            <h4>Current & Future Appointment</h4>
 
             <CommonTableGrid
               size='sm'
@@ -221,7 +221,7 @@ class AppointmentHistory extends PureComponent {
               FuncProps={{
                 pager: true,
                 pagerDefaultState: {
-                  pagesize: 100,
+                  pagesize: 10,
                 },
               }}
             />
@@ -243,7 +243,7 @@ class AppointmentHistory extends PureComponent {
               FuncProps={{
                 pager: true,
                 pagerDefaultState: {
-                  pagesize: 100,
+                  pagesize: 10,
                 },
               }}
             />

@@ -1,6 +1,6 @@
 import { defaultColorOpts } from '../../utils'
 
-const styles = (theme) => ({
+const styles = theme => ({
   loading: {
     position: 'absolute',
     top: 0,
@@ -15,7 +15,7 @@ const styles = (theme) => ({
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
   },
   formContent: {
-    padding: `${theme.spacing.unit}px 0px`,
+    padding: `4px 0px 0px`,
   },
   verticalSpacing: {
     margin: `${theme.spacing(1)}px 0px`,
@@ -98,11 +98,11 @@ const styles = (theme) => ({
     height: '100%',
     overflow: 'auto',
   },
-  apptRemarksMultiline:{
-    '& > Div > Div':{
+  apptRemarksMultiline: {
+    '& > Div > Div': {
       paddingTop: '5px !important',
       paddingBottom: '5px !important',
-    }
+    },
   },
 })
 

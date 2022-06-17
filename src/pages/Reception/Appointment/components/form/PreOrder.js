@@ -59,7 +59,7 @@ const PreOrder = ({ values, deletePreOrderItem, disabled }) => {
           { name: 'action', title: 'Action' },
         ]}
         columnExtensions={[
-          { columnName: 'preOrderItemType', sortingEnabled: false, width: 120 },
+          { columnName: 'preOrderItemType', sortingEnabled: false, width: 100 },
           {
             columnName: 'itemName',
             sortingEnabled: false,
