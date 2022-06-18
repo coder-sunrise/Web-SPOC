@@ -24,7 +24,7 @@ const AppointmentDate = ({
     x => x.id === values.appointmentStatusFk,
   )
   var patientCopayers = patientProfile?.patientScheme
-    ?.filter(x => !x.isExpired || x.isCopayerActive)
+    ?.filter(x => !x.isExpired && x.isSchemeActive && x.isCopayerActive)
     ?.map(x => x.copayerFK)
   let availableVisitOrderTemplate = []
   if (patientProfile) {
