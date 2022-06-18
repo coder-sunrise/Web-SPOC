@@ -356,9 +356,6 @@ class Main extends Component {
     const { dispatch, dispense, values, history } = this.props
     const { location } = history
     const { query } = location
-    if (query.backToDispense) {
-      return
-    }
     const { visitPurposeFK } = values
     const addOrderList = [VISIT_TYPE.OTC]
     const shouldShowAddOrderModal = addOrderList.includes(visitPurposeFK)
@@ -618,7 +615,13 @@ class Main extends Component {
       visitRegistration,
       history,
     } = this.props
-    if (!dispense.queryCodeTablesDone || this.state.hasShowOrderModal) {
+    const { location } = history
+    const { query } = location
+    if (
+      !dispense.queryCodeTablesDone ||
+      this.state.hasShowOrderModal ||
+      query.backToDispense
+    ) {
       return
     }
     const { entity = {} } = visitRegistration
@@ -638,8 +641,6 @@ class Main extends Component {
     const accessRights = Authorized.check('queue.dispense.editorder')
     const noClinicalObjectRecord = !values.clinicalObjectRecordFK
 
-    const { location } = history
-    const { query } = location
     if (
       accessRights &&
       accessRights.rights !== 'hidden' &&
