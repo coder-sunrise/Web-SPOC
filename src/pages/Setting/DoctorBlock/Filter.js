@@ -183,6 +183,14 @@ class Filter extends PureComponent {
               <Button
                 color='primary'
                 onClick={() => {
+                  this.props.dispatch({
+                    type: 'doctorBlock/getClinicOperationhour',
+                    payload: {
+                      apptDate: moment()
+                        .startOf('day')
+                        .formatUTC(),
+                    },
+                  })
                   this.props.toggleModal()
                   this.props.dispatch({
                     type: 'settingDoctorBlock/reset',

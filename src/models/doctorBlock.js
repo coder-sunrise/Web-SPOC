@@ -1,8 +1,10 @@
 import moment from 'moment'
 import { createListViewModel } from 'medisys-model'
 // common components
-import { notification } from '@/components'
+import { constructObj } from '@/pages/Reception/Appointment/utils'
+import { notification, timeFormat24Hour } from '@/components'
 import * as service from '@/services/doctorBlock'
+import cohServices from '@/pages/Setting/ClinicOperationHour/services'
 
 export default createListViewModel({
   namespace: 'doctorBlock',
@@ -62,7 +64,7 @@ export default createListViewModel({
             type: 'setEditType',
             payload: payload.mode,
           })
-          return true
+          return data
         }
         return false
       },
@@ -105,6 +107,14 @@ export default createListViewModel({
             isFromCopy: true,
           }
           yield put({
+            type: 'getClinicOperationhour',
+            payload: {
+              apptDate: moment(start)
+                .startOf('day')
+                .formatUTC(),
+            },
+          })
+          yield put({
             type: 'setDoctorBlockView',
             payload: copyBlock,
           })
@@ -115,6 +125,54 @@ export default createListViewModel({
           return true
         }
         return false
+      },
+      *getClinicOperationhour({ payload }, { call, select, put }) {
+        const { apptDate } = payload
+        const result = yield call(cohServices.queryList, {
+          lsteql_effectiveStartDate: apptDate,
+          lgteql_effectiveEndDate: apptDate,
+        })
+        if (result.status === '200') {
+          const clinicSettings = yield select(state => state.clinicSettings)
+          const {
+            clinicOperationStartTime = '07:00',
+            clinicOperationEndTime = '22:00',
+          } = clinicSettings.settings
+          let clinicOperationhour = {
+            clinicOperationStartTime,
+            clinicOperationEndTime,
+          }
+          const list = result.data.data
+          if (list.length) {
+            const currentDayOfWeek = moment(apptDate).weekday()
+            const value = constructObj({
+              value: list[0],
+              fromSuffix: 'FromOpHour',
+              toSuffix: 'ToOpHour',
+            })
+            const operationHour = value[currentDayOfWeek]
+            clinicOperationhour = {
+              startTime: operationHour.start || clinicOperationStartTime,
+              endTime: operationHour.end || clinicOperationEndTime,
+            }
+          }
+          yield put({
+            type: 'updateState',
+            payload: {
+              clinicOperationhour: {
+                startTime: moment(
+                  clinicOperationhour.startTime,
+                  timeFormat24Hour,
+                )
+                  .add(-30, 'minute')
+                  .format(timeFormat24Hour),
+                endTime: moment(clinicOperationhour.endTime, timeFormat24Hour)
+                  .add(30, 'minute')
+                  .format(timeFormat24Hour),
+              },
+            },
+          })
+        }
       },
     },
     reducers: {

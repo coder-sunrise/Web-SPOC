@@ -88,6 +88,7 @@ const Block = ({ label }) => (
       color: '#fff',
       minHeight: '34px',
       maxHeight: '34px',
+      fontSize: 14,
     }}
   >
     <span>{label}</span>

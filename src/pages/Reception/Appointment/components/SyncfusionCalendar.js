@@ -148,7 +148,7 @@ class SyncfusionCalendar extends React.PureComponent {
       eventAction,
     } = this.props
     return (
-      <div className='schedule-control-section' style={{ margin: '20px 10px' }}>
+      <div className='schedule-control-section' style={{ margin: '8px 8px' }}>
         <div className='col-lg-9 control-section'>
           <div className='control-wrapper'>
             <ScheduleComponent
@@ -165,6 +165,7 @@ class SyncfusionCalendar extends React.PureComponent {
               endHour={endHour}
               timeFormat='HH:mm'
               timeScale={timeScale}
+              allowResizing={view !== CALENDAR_VIEWS.MONTH}
               resourceHeaderTemplate={this.resourceHeaderTemplate}
               dateHeaderTemplate={dateHeaderTemplate}
               eventSettings={eventSettings}

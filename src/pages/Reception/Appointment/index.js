@@ -415,11 +415,23 @@ class Appointment extends React.PureComponent {
       end,
       resourceId,
     }
-    this.setState({
-      selectedSlot,
-      isDragging: false,
-      showAppointmentForm: true,
-    })
+    this.setState(
+      {
+        selectedSlot,
+        isDragging: false,
+        showAppointmentForm: true,
+      },
+      () => {
+        this.props.dispatch({
+          type: 'calendar/getClinicOperationhour',
+          payload: {
+            apptDate: moment(start)
+              .startOf('day')
+              .formatUTC(),
+          },
+        })
+      },
+    )
   }
 
   onDoubleClickEvent = doubleClickEvent => {
@@ -493,11 +505,23 @@ class Appointment extends React.PureComponent {
           })
           .then(response => {
             if (response) {
-              this.setState({
-                selectedDoctorEventFK: id,
-                showDoctorEventModal: true,
-                isDragging: false,
-              })
+              this.setState(
+                {
+                  selectedDoctorEventFK: id,
+                  showDoctorEventModal: true,
+                  isDragging: false,
+                },
+                () => {
+                  this.props.dispatch({
+                    type: 'doctorBlock/getClinicOperationhour',
+                    payload: {
+                      apptDate: moment(response.doctorBlocks[0].startDateTime)
+                        .startOf('day')
+                        .formatUTC(),
+                    },
+                  })
+                },
+              )
             }
           })
       }
@@ -536,12 +560,23 @@ class Appointment extends React.PureComponent {
             },
           })
           .then(response => {
-            if (response)
-              this.setState({
-                selectedAppointmentFK: selectedAppointmentID,
-                showAppointmentForm: true,
-                isDragging: false,
-              })
+            if (response) {
+              this.setState(
+                {
+                  selectedAppointmentFK: selectedAppointmentID,
+                  showAppointmentForm: true,
+                  isDragging: false,
+                },
+                () => {
+                  this.props.dispatch({
+                    type: 'calendar/getClinicOperationhour',
+                    payload: {
+                      apptDate: response.appointments[0].appointmentDate,
+                    },
+                  })
+                },
+              )
+            }
           })
       }
     }
@@ -711,10 +746,22 @@ class Appointment extends React.PureComponent {
 
   handleDoctorEventClick = () => {
     const { showDoctorEventModal } = this.state
-    this.setState({
-      showDoctorEventModal: !showDoctorEventModal,
-      updateEvent: undefined,
-    })
+    this.setState(
+      {
+        showDoctorEventModal: !showDoctorEventModal,
+        updateEvent: undefined,
+      },
+      () => {
+        this.props.dispatch({
+          type: 'doctorBlock/getClinicOperationhour',
+          payload: {
+            apptDate: moment()
+              .startOf('day')
+              .formatUTC(),
+          },
+        })
+      },
+    )
     this.props.dispatch({
       type: 'doctorBlock/updateState',
       payload: {
@@ -763,14 +810,41 @@ class Appointment extends React.PureComponent {
         mode: isEditedAsSingle ? 'single' : 'series',
       },
     }).then(response => {
-      if (response)
-        this.setState({
-          isDragging: false,
-          showSeriesConfirmation: false,
-          eventType: '',
-          showAppointmentForm: eventType === 'Appointment',
-          showDoctorEventModal: eventType === 'DoctorBlock',
-        })
+      if (response) {
+        this.setState(
+          {
+            isDragging: false,
+            showSeriesConfirmation: false,
+            eventType: '',
+            showAppointmentForm: eventType === 'Appointment',
+            showDoctorEventModal: eventType === 'DoctorBlock',
+          },
+          () => {
+            if (eventType === 'Appointment') {
+              dispatch({
+                type: 'calendar/getClinicOperationhour',
+                payload: {
+                  apptDate: response.appointments.find(
+                    x => x.id === selectedAppointmentFK,
+                  )?.appointmentDate,
+                },
+              })
+            } else {
+              dispatch({
+                type: 'doctorBlock/getClinicOperationhour',
+                payload: {
+                  apptDate: moment(
+                    response.find(x => x.id === selectedDoctorEventFK)
+                      ?.startDateTime,
+                  )
+                    .startOf('day')
+                    .formatUTC(),
+                },
+              })
+            }
+          },
+        )
+      }
     })
   }
 
@@ -929,18 +1003,30 @@ class Appointment extends React.PureComponent {
           })
           .then(response => {
             if (response) {
-              this.setState({
-                selectedDoctorEventFK: id,
-                showDoctorEventModal: true,
-                eventType: 'DoctorBlock',
-                updateEvent: {
-                  newResourceId: resourceId,
-                  newStartTime: startTime,
-                  newEndTime: endTime,
-                  view,
+              this.setState(
+                {
+                  selectedDoctorEventFK: id,
+                  showDoctorEventModal: true,
+                  eventType: 'DoctorBlock',
+                  updateEvent: {
+                    newResourceId: resourceId,
+                    newStartTime: startTime,
+                    newEndTime: endTime,
+                    view,
+                  },
+                  isDragging: false,
                 },
-                isDragging: false,
-              })
+                () => {
+                  this.props.dispatch({
+                    type: 'doctorBlock/getClinicOperationhour',
+                    payload: {
+                      apptDate: moment(startTime)
+                        .startOf('day')
+                        .formatUTC(),
+                    },
+                  })
+                },
+              )
             }
           })
       }
@@ -994,21 +1080,34 @@ class Appointment extends React.PureComponent {
             },
           })
           .then(response => {
-            if (response)
-              this.setState({
-                selectedAppointmentFK: selectedAppointmentID,
-                showAppointmentForm: true,
-                eventType: 'Appointment',
-                updateEvent: {
-                  updateApptResourceId: id,
-                  newResourceId: resourceId,
-                  newStartTime: startTime,
-                  newEndTime: endTime,
-                  view: view,
-                  isAffectAllResource,
+            if (response) {
+              this.setState(
+                {
+                  selectedAppointmentFK: selectedAppointmentID,
+                  showAppointmentForm: true,
+                  eventType: 'Appointment',
+                  updateEvent: {
+                    updateApptResourceId: id,
+                    newResourceId: resourceId,
+                    newStartTime: startTime,
+                    newEndTime: endTime,
+                    view: view,
+                    isAffectAllResource,
+                  },
+                  isDragging: false,
                 },
-                isDragging: false,
-              })
+                () => {
+                  this.props.dispatch({
+                    type: 'calendar/getClinicOperationhour',
+                    payload: {
+                      apptDate: moment(startTime)
+                        .startOf('day')
+                        .formatUTC(),
+                    },
+                  })
+                },
+              )
+            }
           })
       }
     }
@@ -1067,22 +1166,20 @@ class Appointment extends React.PureComponent {
           toggleSearchAppointmentModal={this.toggleSearchAppointmentModal}
         />
         <Authorized authority='appointment.appointmentdetails'>
-          <div style={{ marginTop: 16, height: '100%' }}>
-            <FuncCalendarView
-              resources={resources}
-              allResources={allResources}
-              filter={filter}
-              handleSelectSlot={this.onSelectSlot}
-              handleDoubleClick={this.onDoubleClickEvent}
-              handleMoveEvent={this.moveEvent}
-              handleEventMouseOver={this.onEventMouseOver}
-              handleOnDragStart={this.handleOnDragStart}
-              printDailyAppointmentReport={this.printDailyAppointmentReport}
-              onResourceDateChange={this.onResourceDateChange}
-              onUpdateEvent={this.onUpdateEvent}
-              {...this.props}
-            />
-          </div>
+          <FuncCalendarView
+            resources={resources}
+            allResources={allResources}
+            filter={filter}
+            handleSelectSlot={this.onSelectSlot}
+            handleDoubleClick={this.onDoubleClickEvent}
+            handleMoveEvent={this.moveEvent}
+            handleEventMouseOver={this.onEventMouseOver}
+            handleOnDragStart={this.handleOnDragStart}
+            printDailyAppointmentReport={this.printDailyAppointmentReport}
+            onResourceDateChange={this.onResourceDateChange}
+            onUpdateEvent={this.onUpdateEvent}
+            {...this.props}
+          />
         </Authorized>
 
         <CommonModal

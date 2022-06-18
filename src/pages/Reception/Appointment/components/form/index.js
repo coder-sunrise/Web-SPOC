@@ -95,6 +95,7 @@ const gridValidationSchema = Yup.object().shape({
     patientSearchResult: patientSearch.list,
     visitRegistration,
     ctcalendarresource: codetable.ctcalendarresource,
+    operationhour: calendar.clinicOperationhour,
     ctresource: codetable.ctresource,
     codetable: codetable,
     mainDivHeight: global.mainDivHeight,
@@ -1274,6 +1275,16 @@ class Form extends React.PureComponent {
         )
     )
   }
+
+  getClinicoperationhour = apptDate => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'calendar/getClinicOperationhour',
+      payload: {
+        apptDate,
+      },
+    })
+  }
   render() {
     const {
       classes,
@@ -1292,6 +1303,7 @@ class Form extends React.PureComponent {
       setFieldValue,
       handleCopyAppointmentClick,
       registerToVisit = () => {},
+      operationhour,
     } = this.props
 
     const {
@@ -1336,7 +1348,10 @@ class Form extends React.PureComponent {
         ? datagrid
             .filter(item => !item.isDeleted)
             .sort(sortDataGrid)
-            .map((item, index) => ({ ...item, sortOrder: index }))
+            .map((item, index) => ({
+              ...item,
+              sortOrder: index,
+            }))
         : [...datagrid]
 
     const show =
@@ -1415,13 +1430,14 @@ class Form extends React.PureComponent {
                   values={values}
                   onVisitPurposeSelected={this.onVisitPurposeSelected}
                   patientProfile={patientProfile}
+                  getClinicoperationhour={this.getClinicoperationhour}
                 />
                 <GridItem xs md={12} className={classes.verticalSpacing}>
                   <AppointmentDataGrid
                     validationSchema={gridValidationSchema}
                     disabled={disableDataGrid}
                     appointmentDate={currentAppointment.appointmentDate}
-                    data={_datagrid}
+                    data={_datagrid.map(item => ({ ...item, operationhour }))}
                     handleCommitChanges={this.onCommitChanges}
                     handleEditingRowsChange={this.onEditingRowsChange}
                     editingRows={editingRows}

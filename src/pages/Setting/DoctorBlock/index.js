@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import moment from 'moment'
 import $ from 'jquery'
 import * as Yup from 'yup'
 // material ui
@@ -57,8 +58,18 @@ class DoctorBlock extends PureComponent {
         type: 'doctorBlock/queryOne',
         payload: { id },
       })
-      .then(() => {
-        this.toggleModal()
+      .then(response => {
+        if (response) {
+          this.props.dispatch({
+            type: 'doctorBlock/getClinicOperationhour',
+            payload: {
+              apptDate: moment(response.doctorBlocks[0].startDateTime)
+                .startOf('day')
+                .formatUTC(),
+            },
+          })
+          this.toggleModal()
+        }
       })
   }
 

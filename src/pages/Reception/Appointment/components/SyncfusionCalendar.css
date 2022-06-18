@@ -48,3 +48,41 @@ hr {
 .e-contextmenu-container ul {
   padding: 0px !important;
 }
+
+.e-schedule .e-vertical-view .e-header-cells .e-header-day {
+  font-size: 14px;
+}
+
+.e-schedule .e-month-view .e-content-wrap {
+  font-size: 14px;
+}
+
+.e-schedule .e-month-view .e-current-date .e-date-header,
+.e-schedule .e-month-agenda-view .e-current-date .e-date-header {
+  padding-top: 2px;
+}
+
+.e-schedule .e-month-view .e-date-header-wrap {
+  font-size: 14px;
+}
+
+.e-schedule .e-vertical-view .e-time-cells-wrap table td,
+.e-schedule .e-vertical-view .e-work-cells {
+  font-size: 14px;
+}
+
+.e-calendar .e-content span.e-day,
+.e-bigger.e-small .e-calendar .e-content span.e-day {
+  font-size: 14px;
+}
+
+.e-calendar th,
+.e-bigger.e-small .e-calendar th {
+  font-size: 14px;
+  color: black;
+}
+
+.e-calendar .e-header .e-title,
+.e-bigger.e-small .e-calendar .e-header .e-title {
+  font-size: 15px;
+}

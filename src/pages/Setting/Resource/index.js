@@ -19,7 +19,7 @@ const styles = theme => ({
   global,
   mainDivHeight: global.mainDivHeight,
   calendarResource,
-  apptTimeIntervel: clinicSettings.settings.apptTimeIntervel,
+  clinicSettings: clinicSettings.settings,
 }))
 @withSettingBase({ modelName: 'settingResource' })
 class Resource extends PureComponent {
