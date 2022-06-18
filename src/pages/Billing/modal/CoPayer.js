@@ -307,7 +307,7 @@ class CoPayer extends Component {
     const { selectedRows, invoiceItems } = this.state
     return (
       <div className={classes.container}>
-        <GridContainer style={{ height: 700, overflow: 'auto' }}>
+        <GridContainer style={{ maxHeight: 700, overflow: 'auto' }}>
           <GridItem md={4} className={classes.dropdown}>
             <FastField
               name='coPayer'

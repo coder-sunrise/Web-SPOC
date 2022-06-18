@@ -52,9 +52,10 @@ const modalStyle = (theme) => {
       textShadow: 'none',
       fontWeight: '700',
       lineHeight: '1',
+      position:'absolute',      
       float: 'right',
-      right: '-8px',
-      top: 11,
+      right: '3px',
+      top: 20,
     },
     modalMinButton: {
       color: '#999999',
