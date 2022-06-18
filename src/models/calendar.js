@@ -27,6 +27,7 @@ import {
   mapOperationHour,
   mapBreakHour,
   isSavePayloadOk,
+  constructObj,
 } from '@/pages/Reception/Appointment/utils'
 import { getTimeObject, compare } from '@/utils/yup'
 
@@ -440,6 +441,10 @@ export default createListViewModel({
             isFromCopy: true,
           }
           yield put({
+            type: 'getClinicOperationhour',
+            payload: { apptDate: appointmentDate },
+          })
+          yield put({
             type: 'setViewAppointment',
             data: copyAppt,
           })
@@ -677,6 +682,54 @@ export default createListViewModel({
             },
           }),
         ])
+      },
+      *getClinicOperationhour({ payload }, { call, select, put }) {
+        const { apptDate } = payload
+        const result = yield call(cohServices.queryList, {
+          lsteql_effectiveStartDate: apptDate,
+          lgteql_effectiveEndDate: apptDate,
+        })
+        if (result.status === '200') {
+          const clinicSettings = yield select(state => state.clinicSettings)
+          const {
+            clinicOperationStartTime = '07:00',
+            clinicOperationEndTime = '22:00',
+          } = clinicSettings.settings
+          let clinicOperationhour = {
+            clinicOperationStartTime,
+            clinicOperationEndTime,
+          }
+          const list = result.data.data
+          if (list.length) {
+            const currentDayOfWeek = moment(apptDate).weekday()
+            const value = constructObj({
+              value: list[0],
+              fromSuffix: 'FromOpHour',
+              toSuffix: 'ToOpHour',
+            })
+            const operationHour = value[currentDayOfWeek]
+            clinicOperationhour = {
+              startTime: operationHour.start || clinicOperationStartTime,
+              endTime: operationHour.end || clinicOperationEndTime,
+            }
+          }
+          yield put({
+            type: 'updateState',
+            payload: {
+              clinicOperationhour: {
+                startTime: moment(
+                  clinicOperationhour.startTime,
+                  timeFormat24Hour,
+                )
+                  .add(-30, 'minute')
+                  .format(timeFormat24Hour),
+                endTime: moment(clinicOperationhour.endTime, timeFormat24Hour)
+                  .add(30, 'minute')
+                  .format(timeFormat24Hour),
+              },
+            },
+          })
+        }
       },
     },
     reducers: {

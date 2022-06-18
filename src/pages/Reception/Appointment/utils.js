@@ -36,16 +36,14 @@ export const InitialPopoverEvent = {
 }
 
 export const applyFilter = (data, filter) => {
-  let returnData = [
-    ...data,
-  ]
+  let returnData = [...data]
   const { doctors, appointmentType, searchQuery } = filter
-  const filterByDoctor = (aptData) => doctors.includes(aptData.doctor)
+  const filterByDoctor = aptData => doctors.includes(aptData.doctor)
 
-  const filterByAppointmentType = (aptData) =>
+  const filterByAppointmentType = aptData =>
     appointmentType.includes(aptData.appointmentType)
 
-  const filterBySearchQuery = (aptData) => {
+  const filterBySearchQuery = aptData => {
     const { patientName } = aptData
     if (patientName !== undefined)
       return patientName.toLowerCase().includes(searchQuery.toLowerCase())
@@ -70,7 +68,7 @@ export const applyFilter = (data, filter) => {
   return returnData
 }
 
-export const constructClinicBreakHoursData = (breakHoursList) => {
+export const constructClinicBreakHoursData = breakHoursList => {
   const result = breakHoursList.reduce((breakHoursMap, breakHour) => {
     return [
       ...breakHoursMap,
@@ -91,7 +89,7 @@ export const constructClinicBreakHoursData = (breakHoursList) => {
   return result
 }
 
-const getDay = (value) => {
+const getDay = value => {
   if (value.includes('mon')) return 1
   if (value.includes('tue')) return 2
   if (value.includes('wed')) return 3
@@ -102,7 +100,7 @@ const getDay = (value) => {
   return 0
 }
 
-const constructObj = ({ value, toSuffix = '', fromSuffix = '' }) => {
+export const constructObj = ({ value, toSuffix = '', fromSuffix = '' }) => {
   return {
     0: {
       end: value[`sun${toSuffix}`],
@@ -137,34 +135,13 @@ const constructObj = ({ value, toSuffix = '', fromSuffix = '' }) => {
 
 const appendResult = (result, value) => ({
   ...result,
-  0: [
-    ...result[0],
-    value[0],
-  ],
-  1: [
-    ...result[1],
-    value[1],
-  ],
-  2: [
-    ...result[2],
-    value[2],
-  ],
-  3: [
-    ...result[3],
-    value[3],
-  ],
-  4: [
-    ...result[4],
-    value[4],
-  ],
-  5: [
-    ...result[5],
-    value[5],
-  ],
-  6: [
-    ...result[6],
-    value[6],
-  ],
+  0: [...result[0], value[0]],
+  1: [...result[1], value[1]],
+  2: [...result[2], value[2]],
+  3: [...result[3], value[3]],
+  4: [...result[4], value[4]],
+  5: [...result[5], value[5]],
+  6: [...result[6], value[6]],
 })
 
 const initialObj = {
@@ -177,7 +154,7 @@ const initialObj = {
   6: [],
 }
 
-export const mapOperationHour = (operationHourList) => {
+export const mapOperationHour = operationHourList => {
   const result = operationHourList.reduce((_result, operationHour) => {
     const value = constructObj({
       value: operationHour,
@@ -189,7 +166,7 @@ export const mapOperationHour = (operationHourList) => {
   return result
 }
 
-export const mapBreakHour = (breakHourList) => {
+export const mapBreakHour = breakHourList => {
   const result = breakHourList.reduce((_result, breakHour) => {
     const value = constructObj({
       value: breakHour,
@@ -201,7 +178,6 @@ export const mapBreakHour = (breakHourList) => {
   return result
 }
 
-export const isSavePayloadOk = (payload) => {
-  console.log({ payload })
+export const isSavePayloadOk = payload => {
   return false
 }

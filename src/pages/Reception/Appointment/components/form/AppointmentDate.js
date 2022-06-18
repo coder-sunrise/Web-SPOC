@@ -19,6 +19,7 @@ const AppointmentDate = ({
   disabled,
   onVisitPurposeSelected,
   visitOrderTemplateOptions,
+  getClinicoperationhour,
 }) => {
   const status = APPOINTMENT_STATUSOPTIONS.find(
     x => x.id === values.appointmentStatusFk,
@@ -80,6 +81,7 @@ const AppointmentDate = ({
               disabled={disabled}
               allowClear={false}
               label='Appointment Date'
+              onChange={getClinicoperationhour}
             />
           )}
         />

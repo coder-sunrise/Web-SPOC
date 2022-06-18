@@ -86,13 +86,19 @@ export const AppointmentDataColExtensions = (apptTimeIntervel, disabled) => [
     render: e => {
       const { row, columnConfig, cellProps } = e
       const { control, error, validSchema } = columnConfig
-      const { apptDurationHour = 0, apptDurationMinute = 0 } = row
+      const {
+        apptDurationHour = 0,
+        apptDurationMinute = 0,
+        operationhour = {},
+      } = row
       return (
         <div style={{ position: 'relative', paddingRight: 15 }}>
           <SyncfusionTimePicker
             step={apptTimeIntervel}
             value={row.startTime}
             disabled={disabled}
+            min={operationhour.startTime}
+            max={operationhour.endTime}
             onChange={time => {
               if (!isTimeChange(row.startTime, time)) return
               const { commitChanges } = control

@@ -114,6 +114,7 @@ const initDailyRecurrence = {
   currentViewDoctorBlock: doctorBlock.currentViewDoctorBlock,
   doctorBlockMode: doctorBlock.mode,
   apptTimeIntervel: clinicSettings.settings.apptTimeIntervel,
+  operationhour: doctorBlock.clinicOperationhour,
 }))
 @withFormikExtend({
   displayName: 'DoctorBlockForm',
@@ -383,8 +384,23 @@ class DoctorEventForm extends React.PureComponent {
     this.closeSeriesUpdateConfirmation(handleSubmit)
   }
 
+  getClinicoperationhour = apptDate => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'doctorBlock/getClinicOperationhour',
+      payload: {
+        apptDate,
+      },
+    })
+  }
   render() {
-    const { classes, values, onClose, apptTimeIntervel = 30 } = this.props
+    const {
+      classes,
+      values,
+      onClose,
+      apptTimeIntervel = 30,
+      operationhour = {},
+    } = this.props
     const { showSeriesUpdateConfirmation } = this.state
     return (
       <div style={{ padding: 8 }}>
@@ -414,6 +430,7 @@ class DoctorEventForm extends React.PureComponent {
                     label='Date'
                     allowClear={false}
                     format={dateFormatLong}
+                    onChange={this.getClinicoperationhour}
                     disabled={
                       values.id !== undefined && values.isEnableRecurrence
                     }
@@ -423,13 +440,15 @@ class DoctorEventForm extends React.PureComponent {
             </GridItem>
 
             <GridItem xs md={4}>
-              <FastField
+              <Field
                 name='eventTime'
                 render={args => {
                   return (
                     <SyncfusionTimePicker
                       label='Time'
                       step={apptTimeIntervel}
+                      min={operationhour.startTime}
+                      max={operationhour.endTime}
                       {...args}
                     />
                   )

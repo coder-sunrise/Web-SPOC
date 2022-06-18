@@ -38,15 +38,7 @@ const resourceCapacitySchema = Yup.object().shape({
         return Yup.string().required('Time to should be more than time from.')
     },
   ),
-  startTimeRange: Yup.string().when('startTime', {
-    is: val => val < '07:00' || val > '22:00:00',
-    then: Yup.string().required('Value must be from 07:00 to 22:00'),
-  }),
   startTime: Yup.string().required(),
-  endTimeRange: Yup.string().when('endTime', {
-    is: val => val < '07:00' || val > '22:00:00',
-    then: Yup.string().required('Value must be from 07:00 to 22:00'),
-  }),
   endTime: Yup.string().required(),
   maxCapacity: Yup.number()
     .required()
@@ -238,13 +230,20 @@ class Detail extends PureComponent {
     if (color) setFieldValue('balanceTagColorHex', color.hex)
   }
   render() {
+    const { theme, footer, values, dispatch, clinicSettings = {} } = this.props
     const {
-      theme,
-      footer,
-      values,
-      dispatch,
       apptTimeIntervel = 30,
-    } = this.props
+      clinicOperationStartTime = '07:00',
+      clinicOperationEndTime = '22:00',
+    } = clinicSettings
+    const operationhour = {
+      startTime: moment(clinicOperationStartTime, timeFormat24Hour)
+        .add(-30, 'minute')
+        .format(timeFormat24Hour),
+      endTime: moment(clinicOperationEndTime, timeFormat24Hour)
+        .add(30, 'minute')
+        .format(timeFormat24Hour),
+    }
     return (
       <React.Fragment>
         <GridContainer
@@ -332,9 +331,9 @@ class Detail extends PureComponent {
                     style={{
                       marginTop: theme.spacing(1),
                     }}
-                    rows={
+                    rows={(
                       values.calendarResource?.ctCalendarResourceCapacity || []
-                    }
+                    ).map(item => ({ ...item, operationhour }))}
                     EditingProps={{
                       showCommandColumn: false,
                       showAddCommand: true,
@@ -356,17 +355,12 @@ class Detail extends PureComponent {
                         render: e => {
                           const { row, columnConfig, cellProps } = e
                           const { control, error, validSchema } = columnConfig
+                          const { operationhour = {} } = row
                           const startError = (row._errors || []).find(
                             se => se.path === 'startTime',
                           )
-                          const startRangeError = (row._errors || []).find(
-                            se => se.path === 'startTimeRange',
-                          )
                           const endError = (row._errors || []).find(
                             se => se.path === 'endTime',
-                          )
-                          const endRangeError = (row._errors || []).find(
-                            se => se.path === 'endTimeRange',
                           )
                           const moreThanError = (row._errors || []).find(
                             se => se.path === 'capacityTime',
@@ -384,8 +378,8 @@ class Detail extends PureComponent {
                                     step={apptTimeIntervel}
                                     value={row.startTime}
                                     style={{ margin: 0 }}
-                                    min='06:30'
-                                    max='22:30'
+                                    min={operationhour.startTime}
+                                    max={operationhour.endTime}
                                     onChange={e => {
                                       if (!this.isTimeChange(row.startTime, e))
                                         return
@@ -415,7 +409,7 @@ class Detail extends PureComponent {
                                       top: 8,
                                     }}
                                   >
-                                    {(startError || startRangeError) && (
+                                    {startError && (
                                       <Tooltip
                                         title={
                                           (startError || startRangeError)
@@ -448,8 +442,8 @@ class Detail extends PureComponent {
                                     step={apptTimeIntervel}
                                     style={{ margin: 0 }}
                                     value={row.endTime}
-                                    min='06:30'
-                                    max='22:30'
+                                    min={operationhour.startTime}
+                                    max={operationhour.endTime}
                                     onChange={e => {
                                       if (!this.isTimeChange(row.endTime, e))
                                         return
@@ -471,9 +465,7 @@ class Detail extends PureComponent {
                                       top: 8,
                                     }}
                                   >
-                                    {(endError ||
-                                      endRangeError ||
-                                      moreThanError) && (
+                                    {(endError || moreThanError) && (
                                       <Tooltip
                                         title={
                                           (

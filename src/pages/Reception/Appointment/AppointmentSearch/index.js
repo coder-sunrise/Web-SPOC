@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import { connect } from 'dva'
 import $ from 'jquery'
 import Authorized from '@/utils/Authorized'
@@ -15,6 +15,7 @@ const AppointmentSearch = ({
   ctcalendarresource = [],
   mainDivHeight = 700,
 }) => {
+  const [headerHeight, setHeaderHeight] = useState(0)
   const viewOtherApptAccessRight = Authorized.check(
     'appointment.viewotherappointment',
   )
@@ -29,12 +30,16 @@ const AppointmentSearch = ({
       !viewOtherApptAccessRight ||
       viewOtherApptAccessRight.rights !== 'enable'
     ) {
-        if (isActiveCalendarResource) {
-          defaultDoctor = [isActiveCalendarResource.id]
-        } else {
-          defaultDoctor = [-1]
-        }
+      if (isActiveCalendarResource) {
+        defaultDoctor = [isActiveCalendarResource.id]
+      } else {
+        defaultDoctor = [-1]
       }
+    }
+
+    if ($('.filterAppointmentSearchBar').height() !== headerHeight) {
+      setHeaderHeight($('.filterAppointmentSearchBar').height())
+    }
     return () => {
       dispatch({
         type: 'appointment/reset',
@@ -51,11 +56,11 @@ const AppointmentSearch = ({
     }
   }, [])
 
-  let height = window.innerHeight - 210 - ($('.filterBar').height() || 0)
+  let height = mainDivHeight - 160 - headerHeight
   if (height < 300) height = 300
   return (
     <Fragment>
-      <div className='filterBar'>
+      <div className='filterAppointmentSearchBar'>
         <FitlerBar
           dispatch={dispatch}
           handleAddAppointmentClick={handleAddAppointmentClick}

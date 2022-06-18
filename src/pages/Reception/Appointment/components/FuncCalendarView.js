@@ -557,7 +557,7 @@ const CalendarView = ({
               }">${balance}</span>`
             })
             .join(', ')
-          event.element.innerHTML = `<div style="position:relative;">${event.element.innerHTML}<div title="${tooltip}" style="position:absolute;right:4px;top:1px;color:black;">Max: ${maxSlot} Bal: ${balanceSlot}</div></div>`
+          event.element.innerHTML = `<div style="position:relative;">${event.element.innerHTML}<div title="${tooltip}" style="position:absolute;right:0px;top:0px;color:black;font-size:14px;">Max: ${maxSlot} Bal: ${balanceSlot}</div></div>`
         }
       }
     } else if (event.elementType === 'monthCells') {
@@ -609,7 +609,7 @@ const CalendarView = ({
         printDailyAppointmentReport={printDailyAppointmentReport}
         startHour='07:00 AM'
         endHour='22:00 PM'
-        height={740}
+        height={760}
         view={calendarView}
         eventSettings={{
           dataSource: filtered.filter(
