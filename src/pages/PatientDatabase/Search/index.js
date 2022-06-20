@@ -102,10 +102,10 @@ class PatientSearch extends PureComponent {
     let height = 0
     if (simple) {
       height =
-        mainDivHeight - 330 - ($('.filterPatientSearchBar').height() || 0)
+        mainDivHeight - 330 - ($('.filterPatientSearchBar').height() || 55)
     } else {
       height =
-        mainDivHeight - 120 - ($('.filterPatientSearchBar').height() || 0)
+        mainDivHeight - 120 - ($('.filterPatientSearchBar').height() || 55)
     }
     if (height < 300) height = 300
     const newChildren = (

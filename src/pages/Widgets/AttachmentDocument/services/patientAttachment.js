@@ -3,9 +3,9 @@ import * as service from '@/services/common'
 const url = '/api/PatientAttachment'
 
 export const queryList = params =>
-  service.queryList(url, {
-    ...params,
-    sorting: [{ columnName: 'sortOrder', direction: 'asc' }],
-  })
+         service.queryList(url, {
+           ...params,
+           sorting: [{ columnName: 'updateDate', direction: 'desc' }],
+         })
 export const upsert = params => service.upsert(url, params)
 export const remove = params => service.remove(url, params)

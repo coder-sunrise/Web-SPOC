@@ -169,10 +169,6 @@ const Filterbar = props => {
                   }
                   onClick={() => {
                     handleSubmit()
-                    setTimeout(() => {
-                      setFieldValue('search', '')
-                      setSearch('')
-                    }, 1000)
                   }}
                   size='sm'
                   submitKey='patientSearch/query'
