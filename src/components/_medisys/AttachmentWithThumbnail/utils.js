@@ -48,7 +48,7 @@ export const generateThumbnailAsync = async (
           let newHeight = size.height
 
           if (image.height * (size.width / image.width) > size.height) {
-            newWidth = (size.width * size.height) / image.height
+            newWidth = (image.width * size.height) / image.height
           } else {
             newHeight = image.height * (size.width / image.width)
           }

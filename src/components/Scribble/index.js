@@ -40,7 +40,10 @@ import keydown, { Keys } from 'react-keydown'
 import { Radio } from 'antd'
 import { connect } from 'dva'
 import Yup from '@/utils/yup'
-import { getThumbnail } from '@/components/_medisys/AttachmentWithThumbnail/utils'
+import {
+  getThumbnail,
+  generateThumbnailAsync,
+} from '@/components/_medisys/AttachmentWithThumbnail/utils'
 import {
   GridContainer,
   GridItem,
@@ -90,7 +93,7 @@ const styles = () => ({
   layout: {
     paddingLeft: 10,
     paddingRight: 10,
-    paddingTop: 20,
+    paddingTop: 10,
   },
   gridItem: {
     position: 'relative',
@@ -105,15 +108,16 @@ const styles = () => ({
     paddingTop: 5,
   },
   templateImage: {
-    maxHeight: 'calc(100vh - 270px)',
+    maxHeight: 'calc(100vh - 260px)',
     overflow: 'auto',
     alignItems: 'center',
+    padding: '5px 0px',
+    marginBottom: 10,
   },
   imageOption: {
     alignItems: 'center',
     textAlign: 'center',
     display: 'block',
-    margin: 5,
   },
   rightButton: {
     display: 'flex',
@@ -121,14 +125,11 @@ const styles = () => ({
     padding: 2,
   },
   sketchArea: {
-    paddingTop: 30,
+    paddingTop: 10,
     paddingRight: 0,
   },
-  imageTemplateArea: {
-    paddingTop: 10,
-  },
   templateItemActions: {
-    // height: 30,
+    width: 250,
     position: 'relative',
     '& > #templateItemActions': {
       display: 'none',
@@ -184,15 +185,41 @@ class ScribbleTemplateItem extends React.Component {
       classes,
       onEditingTemplate,
       isTemplateEditing,
+      onInsertImage,
     } = this.props
     return (
       <div style={{ paddingBottom: 5 }}>
-        <div>
-          <img
-            style={{ height: 140, border: '1px solid gray' }}
-            src={item.layerContent}
-          />
-        </div>
+        <Tooltip title='Double click to apply template'>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid #CCCCCC',
+              width: 253,
+              height: 140,
+              cursor: 'pointer',
+              backgroundColor: 'white',
+            }}
+            onDoubleClick={() => {
+              setTemplate(item.id)
+            }}
+          >
+            {item.layerContentThumbnail ? (
+              <img
+                src={item.layerContentThumbnail}
+                style={{
+                  maxHeight: 138,
+                  maxWidth: 250,
+                  disabled: true,
+                  pointerEvents: 'none',
+                }}
+              />
+            ) : (
+              <span>No Image</span>
+            )}
+          </div>
+        </Tooltip>
         <div className={classes.templateItemActions}>
           {isEdit ? (
             <TextField
@@ -275,7 +302,7 @@ class ScribbleTemplateItem extends React.Component {
                   disabled={isTemplateEditing}
                   {...this.buttonProps}
                   onClick={() => {
-                    setTemplate(item.layerContent, item.id, item.description)
+                    setTemplate(item.id)
                   }}
                 >
                   <CopyOutlined />
@@ -321,14 +348,14 @@ let temp = null
       origin: values.origin,
       temp,
     }
-    // console.log({ payload })
     props.addScribble(payload)
     props.toggleScribbleModal()
   },
   displayName: 'ScribbleNotePage',
 })
-@connect(({ scriblenotes }) => ({
+@connect(({ scriblenotes, global }) => ({
   scriblenotes,
+  mainDivHeight: global.mainDivHeight,
 }))
 class Scribble extends React.Component {
   constructor(props) {
@@ -350,8 +377,6 @@ class Scribble extends React.Component {
       canUndo: false,
       canRedo: false,
       canClear: false,
-      sketchHeight: 770,
-      sketchWidth: window.width,
       hideEnable: false,
       disableAddImage: false,
       indexCount: 1,
@@ -506,8 +531,20 @@ class Scribble extends React.Component {
       await setTimeout(() => {
         // wait for 1 milli second for img to set src successfully
       }, 100)
-      const thumbnailSize = { width: 275, height: 150 }
-      const thumbnail = getThumbnail(imgEle, thumbnailSize)
+
+      const size = { width: 275, height: 150 }
+      let newWidth = size.width
+      let newHeight = size.height
+
+      if (imgEle.height * (size.width / imgEle.width) > size.height) {
+        newWidth = (imgEle.width * size.height) / imgEle.height
+      } else {
+        newHeight = imgEle.height * (size.width / imgEle.width)
+      }
+      const thumbnail = getThumbnail(imgEle, {
+        width: newWidth,
+        height: newHeight,
+      })
       const thumbnailData = thumbnail.toDataURL(`image/jpeg`)
 
       return { origin: result, thumbnail: thumbnailData }
@@ -584,12 +621,6 @@ class Scribble extends React.Component {
         () => sketch.setBackgroundFromDataUrl(reader.result),
         false,
       )
-
-      // let newIndexCount = indexCount + 1
-
-      // this.setState({
-      //   indexCount: newIndexCount,
-      // })
       reader.readAsDataURL(accepted[0])
     }
   }
@@ -597,33 +628,37 @@ class Scribble extends React.Component {
   uploadTemplate = file => {
     let reader = new FileReader()
     reader.onloadend = () => {
-      const newItem = this.generateScribbleTemplateDto(
+      this.generateScribbleTemplateDto(
         file.name.substring(0, 50),
         reader.result,
       )
-      this.upsertTemplate(newItem)
     }
     reader.readAsDataURL(file)
   }
 
   generateScribbleTemplateDto = (name, base64) => {
-    const dto = {
-      code: getUniqueGUID(),
-      displayValue: name,
-      description: name,
-      layerContent: base64,
-      isUserMaintainable: true,
-      isDeleted: false,
-      sortOrder:
-        this.state.templateList.reduce(
-          (maxSortOrder, t) => Math.max(maxSortOrder, t.sortOrder || 0),
-          0,
-        ) + 1,
-      effectiveStartDate: moment().formatUTC(false),
-      effectiveEndDate: moment('2099-12-31').formatUTC(false),
-      scribbleNoteType: this.props.scribbleNoteType,
-    }
-    return dto
+    generateThumbnailAsync(base64, { width: 275, height: 150 }).then(
+      thumbnail => {
+        const dto = {
+          code: getUniqueGUID(),
+          displayValue: name,
+          description: name,
+          layerContent: base64,
+          layerContentThumbnail: thumbnail,
+          isUserMaintainable: true,
+          isDeleted: false,
+          sortOrder:
+            this.state.templateList.reduce(
+              (maxSortOrder, t) => Math.max(maxSortOrder, t.sortOrder || 0),
+              0,
+            ) + 1,
+          effectiveStartDate: moment().formatUTC(false),
+          effectiveEndDate: moment('2099-12-31').formatUTC(false),
+          scribbleNoteType: this.props.scribbleNoteType,
+        }
+        this.upsertTemplate(dto)
+      },
+    )
   }
 
   queryTemplateList = () => {
@@ -666,12 +701,20 @@ class Scribble extends React.Component {
 
   onFileChange = async event => {
     const { files } = event.target
-    if (files.length > 0) this.uploadTemplate(files[0])
+    if (files.length > 0) await this.uploadTemplate(files[0])
   }
 
-  _setTemplate = (layerContent, id, description) => {
-    this._sketch.setTemplate(layerContent, id, description)
-    this.props.setFieldValue('subject', description.substr(0, 50))
+  _setTemplate = id => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'scriblenotes/queryTemplate',
+      payload: { id },
+    }).then(r => {
+      if (r && r.status === '200') {
+        this._sketch.setTemplate(r.data.layerContent, id)
+        this.props.setFieldValue('subject', r.data.description.substr(0, 50))
+      }
+    })
   }
 
   toolDrawingHandleClickAway = () => {
@@ -742,7 +785,6 @@ class Scribble extends React.Component {
   onSaveClick = async () => {
     temp = this._sketch.getAllLayerData()
     const { origin, thumbnail } = await this._generateThumbnail()
-    // console.log({origin,thumbnail})
     await this.props.setFieldValue('thumbnail', thumbnail.split(',')[1])
     await this.props.setFieldValue('origin', origin.split(',')[1])
     this.props.handleSubmit()
@@ -751,12 +793,6 @@ class Scribble extends React.Component {
   onInsertClick = event => {
     const imageDataUrl = this._sketch.exportToImageDataUrl()
     const { dispatch, exportToClinicalNote } = this.props
-    // this.props.dispatch({
-    //   type: 'scriblenotes/updateState',
-    //   payload: {
-    //     selectedScribbleDataUrl: imageDataUrl,
-    //   },
-    // })
     if (exportToClinicalNote) {
       exportToClinicalNote(imageDataUrl)
     }
@@ -775,6 +811,7 @@ class Scribble extends React.Component {
       setFieldValue,
       dispatch,
       scriblenotes,
+      mainDivHeight = 700,
     } = this.props
     const { templateList, filterItem } = this.state
     const filteredTemplateList =
@@ -792,7 +829,7 @@ class Scribble extends React.Component {
     return (
       <div className={classes.layout}>
         <GridContainer>
-          <GridItem xs={12} md={12} gutter={0} className={classes.gridItem}>
+          <GridItem xs={12} md={12} className={classes.gridItem}>
             <div className={classes.scribbleSubject}>
               <FastField
                 name='subject'
@@ -832,6 +869,7 @@ class Scribble extends React.Component {
                 }}
                 value={this.state.tool}
                 outline='none'
+                style={{ position: 'relative', top: 6 }}
               >
                 <Tooltip title='Select'>
                   <ToggleButton
@@ -1363,7 +1401,15 @@ class Scribble extends React.Component {
               )}
             </div>
           </GridItem>
-          <GridItem xs={10} md={10}>
+          <GridItem
+            xs={12}
+            md={12}
+            container
+            style={{
+              position: 'relative',
+              paddingRight: !isReadonly ? 300 : 0,
+            }}
+          >
             <div className={classes.sketchArea}>
               <FastField name='drawing' render={args => ''} />
               <SketchField
@@ -1387,43 +1433,41 @@ class Scribble extends React.Component {
                 }
                 onChange={this._onSketchChange}
                 forceValue
-                height={this.state.sketchHeight}
-                width={this.state.sketchWidth}
+                height={mainDivHeight - 110}
+                width='calc(100vw - 320px)'
               />
             </div>
-          </GridItem>
-          {!isReadonly && (
-            <GridItem xs={2} md={2}>
-              <div className={classes.imageTemplateArea}>
-                <GridContainer>
-                  <GridItem xs={12} md={12}>
-                    <div style={{ position: 'relative' }}>
-                      <TextField
-                        label='Image Templates'
-                        maxLength={500}
-                        inputProps={{ maxLength: 500 }}
-                        style={{ paddingRight: 35 }}
-                        value={filterItem}
-                        onChange={e => {
-                          this.setState({ filterItem: e.target.value })
+            <div style={{ position: 'absolute', right: 0, width: 280 }}>
+              <GridContainer>
+                <GridItem xs={12} md={12}>
+                  <div style={{ position: 'relative' }}>
+                    <TextField
+                      label='Image Templates'
+                      maxLength={500}
+                      inputProps={{ maxLength: 500 }}
+                      style={{ paddingRight: 35 }}
+                      value={filterItem}
+                      onChange={e => {
+                        this.setState({ filterItem: e.target.value })
+                      }}
+                    />
+                    <Tooltip title='Upload image to save as image template'>
+                      <Button
+                        color='success'
+                        justIcon
+                        onClick={this.onUploadTemplateClick}
+                        style={{
+                          position: 'absolute',
+                          right: -10,
+                          bottom: 10,
                         }}
-                      />
-                      <Tooltip title='Upload image to save as image template'>
-                        <Button
-                          color='success'
-                          justIcon
-                          onClick={this.onUploadTemplateClick}
-                          style={{
-                            position: 'absolute',
-                            right: -10,
-                            bottom: 10,
-                          }}
-                        >
-                          <CloudUploadOutlined />
-                        </Button>
-                      </Tooltip>
-                    </div>
-                    <div className={classes.templateImage}>
+                      >
+                        <CloudUploadOutlined />
+                      </Button>
+                    </Tooltip>
+                  </div>
+                  <div className={classes.templateImage}>
+                    {sortedTemplateList.length > 0 && (
                       <List>
                         <div className={classes.imageOption}>
                           {sortedTemplateList.map(item => (
@@ -1439,45 +1483,45 @@ class Scribble extends React.Component {
                           ))}
                         </div>
                       </List>
-                    </div>
-                  </GridItem>
-                </GridContainer>
-                <GridContainer style={{ paddingTop: 10 }}>
-                  <GridItem xs={12} md={12}>
-                    <Dropzone
-                      onDrop={this._onBackgroundImageDrop}
-                      accept='image/*'
-                      multiple={false}
-                    >
-                      {({ getRootProps, getInputProps }) => (
-                        <section>
-                          <div {...getRootProps()} style={styles.dropArea}>
-                            <input {...getInputProps()} />
-                            <p className={classes.dropArea}>
-                              Drag and drop some files here, <br />
-                              or click to select files
-                            </p>
-                          </div>
-                        </section>
-                      )}
-                    </Dropzone>
-                  </GridItem>
-                  <GridItem xs={12} md={12}>
-                    <input
-                      style={{ display: 'none' }}
-                      type='file'
-                      accept='image/*'
-                      id='uploadTemplate'
-                      ref={this.inputEl}
-                      multiple={false}
-                      onChange={this.onFileChange}
-                      onClick={this.clearValue}
-                    />
-                  </GridItem>
-                </GridContainer>
-              </div>
-            </GridItem>
-          )}
+                    )}
+                  </div>
+                </GridItem>
+              </GridContainer>
+              <GridContainer>
+                <GridItem xs={12} md={12}>
+                  <Dropzone
+                    onDrop={this._onBackgroundImageDrop}
+                    accept='image/*'
+                    multiple={false}
+                  >
+                    {({ getRootProps, getInputProps }) => (
+                      <section>
+                        <div {...getRootProps()} style={styles.dropArea}>
+                          <input {...getInputProps()} />
+                          <p className={classes.dropArea}>
+                            Drag and drop some files here, <br />
+                            or click to select files
+                          </p>
+                        </div>
+                      </section>
+                    )}
+                  </Dropzone>
+                </GridItem>
+                <GridItem xs={12} md={12}>
+                  <input
+                    style={{ display: 'none' }}
+                    type='file'
+                    accept='image/*'
+                    id='uploadTemplate'
+                    ref={this.inputEl}
+                    multiple={false}
+                    onChange={this.onFileChange}
+                    onClick={this.clearValue}
+                  />
+                </GridItem>
+              </GridContainer>
+            </div>
+          </GridItem>
         </GridContainer>
       </div>
     )
