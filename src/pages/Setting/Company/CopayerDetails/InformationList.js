@@ -431,6 +431,7 @@ export const InformationList = props => {
               </Typography.Link>
               <Typography.Link>
                 <Popconfirm
+                  overlayStyle={{ width: 180 }}
                   title='Sure to delete?'
                   cancelText='No'
                   okText='Yes'
@@ -486,6 +487,7 @@ export const InformationList = props => {
             <Tooltip title='Cancel' placement='bottom'>
               <Typography.Link>
                 <Popconfirm
+                  overlayStyle={{ width: 180 }}
                   title='Sure to cancel?'
                   cancelText='No'
                   okText='Yes'

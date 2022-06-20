@@ -566,6 +566,7 @@ export const ContactPersonList = props => {
               {enableEditDetails && (
                 <Typography.Link>
                   <Popconfirm
+                    overlayStyle={{ width: 180 }}
                     title='Sure to delete?'
                     cancelText='No'
                     okText='Yes'
@@ -728,6 +729,7 @@ export const ContactPersonList = props => {
             <Tooltip title='Cancel' placement='bottom'>
               <Typography.Link>
                 <Popconfirm
+                  overlayStyle={{ width: 180 }}
                   title='Sure to cancel?'
                   cancelText='No'
                   okText='Yes'
