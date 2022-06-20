@@ -575,19 +575,27 @@ class Forms extends PureComponent {
                         title={item.name}
                         classes={classes}
                         onClick={() => {
-                          window.g_app._store.dispatch({
-                            type: 'forms/updateState',
-                            payload: {
-                              showModal: true,
-                              type: item.value,
-                              entity: undefined,
-                              formCategory: FORM_CATEGORY.CORFORM,
-                              formName: item.name,
-                              templateContent: item.templateContent,
-                              formTemplateFK: item.formTemplateFK,
-                            },
+                          dispatch({
+                            type: 'settingDocumentTemplate/queryOne',
+                            payload: { id: item.id },
+                          }).then(r => {
+                            if (!r) {
+                              return
+                            }
+                            window.g_app._store.dispatch({
+                              type: 'forms/updateState',
+                              payload: {
+                                showModal: true,
+                                type: item.value,
+                                entity: undefined,
+                                formCategory: FORM_CATEGORY.CORFORM,
+                                formName: item.name,
+                                templateContent: r.templateContent,
+                                formTemplateFK: item.formTemplateFK,
+                              },
+                            })
+                            this.toggleVisibleChange()
                           })
-                          this.toggleVisibleChange()
                         }}
                         {...item}
                       />
@@ -600,7 +608,7 @@ class Forms extends PureComponent {
             <Tooltip title='Add Form'>
               <Button color='primary' style={{ margin: theme.spacing(1) }}>
                 <Add />
-                Add New
+                Add New1
               </Button>
             </Tooltip>
           </Popover>

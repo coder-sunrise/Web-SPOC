@@ -25,7 +25,7 @@ import {
 import VoidWithPopover from './FormDetail/VoidWithPopover'
 import Authorized from '@/utils/Authorized'
 
-const styles = (theme) => ({
+const styles = theme => ({
   item: {
     display: 'flex',
     justifyContent: 'flex-start',
@@ -33,7 +33,9 @@ const styles = (theme) => ({
     cursor: 'pointer',
 
     '&:hover': {
-      background: color(primaryColor).lighten(0.9).hex(),
+      background: color(primaryColor)
+        .lighten(0.9)
+        .hex(),
     },
     '& > svg': {
       marginRight: theme.spacing(1),
@@ -89,7 +91,7 @@ class VisitFormGrid extends PureComponent {
       }
     })
 
-  setFilterFormTemplate = (val) => {
+  setFilterFormTemplate = val => {
     this.setState({ filterFormTemplate: val })
   }
 
@@ -155,7 +157,11 @@ class VisitFormGrid extends PureComponent {
   }
 
   printRow = row => {
-    DocumentEditor.print({ documentName: row.formName, document: row.formData.content, strWatermark:'VOIDED'})
+    DocumentEditor.print({
+      documentName: row.formName,
+      document: row.formData.content,
+      strWatermark: 'VOIDED',
+    })
   }
 
   VoidForm = ({ classes, dispatch, row, user }) => {
@@ -294,8 +300,9 @@ class VisitFormGrid extends PureComponent {
             {
               columnName: 'updateDate',
               render: r => {
-                const updateDate = moment(r.lastUpdatedDate || r.updateDate)
-                  .format('DD MMM YYYY HH:mm')
+                const updateDate = moment(
+                  r.lastUpdatedDate || r.updateDate,
+                ).format('DD MMM YYYY HH:mm')
                 return (
                   <Tooltip title={updateDate}>
                     <span>{updateDate}</span>
@@ -307,8 +314,15 @@ class VisitFormGrid extends PureComponent {
               columnName: 'statusFK',
               render: r => {
                 const status = formStatus.find(x => x.value === r.statusFK).name
-                const title = r.statusFK === 4 ? `${status}, Reason: ${r.voidReason}.` : status
-                return <Tooltip title={title}><span>{status}</span></Tooltip>
+                const title =
+                  r.statusFK === 4
+                    ? `${status}, Reason: ${r.voidReason}.`
+                    : status
+                return (
+                  <Tooltip title={title}>
+                    <span>{status}</span>
+                  </Tooltip>
+                )
               },
             },
             {
@@ -408,8 +422,13 @@ class VisitFormGrid extends PureComponent {
         />
         <AuthorizedContext>
           {r => {
-            if ((r && r.rights !== 'enable') || isHiddenModify || !isCanEditForms) return null
-            let unionFormTypes = formTemplates//formTypes.concat(formTemplates)
+            if (
+              (r && r.rights !== 'enable') ||
+              isHiddenModify ||
+              !isCanEditForms
+            )
+              return null
+            let unionFormTypes = formTemplates //formTypes.concat(formTemplates)
             unionFormTypes = this.state.filterFormTemplate
               ? unionFormTypes.filter(
                   x =>
@@ -423,7 +442,13 @@ class VisitFormGrid extends PureComponent {
               DOCUMENTCATEGORY_DOCUMENTTYPE.find(
                 y => y.documentCategoryFK === DOCUMENT_CATEGORY.FORM,
               )?.templateTypes || []
-            const orderedTemplates = _.orderBy(unionFormTypes,[a=>formDocumentTypes.findIndex(x=>x===a.documentTemplateTypeFK),b=>b.name])
+            const orderedTemplates = _.orderBy(unionFormTypes, [
+              a =>
+                formDocumentTypes.findIndex(
+                  x => x === a.documentTemplateTypeFK,
+                ),
+              b => b.name,
+            ])
             return (
               <Popover
                 icon={null}
@@ -447,19 +472,29 @@ class VisitFormGrid extends PureComponent {
                             title={item.name}
                             classes={classes}
                             onClick={() => {
-                              this.props.dispatch({
-                                type: 'formListing/updateState',
-                                payload: {
-                                  showModal: true,
-                                  type: item.value,
-                                  entity: undefined,
-                                  formCategory: this.props.formCategory,
-                                  formName: item.name,
-                                  templateContent: item.templateContent,
-                                  formTemplateFK: item.formTemplateFK,
-                                },
-                              })
-                              this.toggleVisibleChange()
+                              this.props
+                                .dispatch({
+                                  type: 'settingDocumentTemplate/queryOne',
+                                  payload: { id: item.formTemplateFK },
+                                })
+                                .then(r => {
+                                  if (!r) {
+                                    return
+                                  }
+                                  this.props.dispatch({
+                                    type: 'formListing/updateState',
+                                    payload: {
+                                      showModal: true,
+                                      type: item.value,
+                                      entity: undefined,
+                                      formCategory: this.props.formCategory,
+                                      formName: item.name,
+                                      templateContent: r.templateContent,
+                                      formTemplateFK: item.formTemplateFK,
+                                    },
+                                  })
+                                  this.toggleVisibleChange()
+                                })
                             }}
                             {...item}
                           />

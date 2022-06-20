@@ -8,16 +8,22 @@ import MouseOverPopover from './MouseOverPopover'
 
 class Grid extends PureComponent {
   editRow = row => {
-    const { dispatch, settingDocumentTemplate } = this.props
-
-    const { list } = settingDocumentTemplate
-
+    const { dispatch } = this.props
     dispatch({
-      type: 'settingDocumentTemplate/updateState',
-      payload: {
-        showModal: true,
-        entity: list.find(o => o.id === row.id),
-      },
+      type: 'settingDocumentTemplate/queryOne',
+      payload: { id: row.id },
+    }).then(r => {
+      if (!r) return
+      dispatch({
+        type: 'settingDocumentTemplate/updateState',
+        payload: {
+          showModal: true,
+          entity: {
+            ...r,
+            effectiveDates: [r.effectiveStartDate, r.effectiveEndDate],
+          },
+        },
+      })
     })
   }
 
