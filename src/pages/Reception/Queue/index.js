@@ -417,18 +417,8 @@ class Queue extends React.Component {
   }
 
   onEnterPressed = async searchQuery => {
-    const { dispatch } = this.props
-    const prefix = 'like_'
-    await dispatch({
-      type: 'patientSearch/query',
-      payload: {
-        apiCriteria: {
-          searchValue: searchQuery,
-        },
-      },
-    })
     const hasSearchQuery = !!searchQuery
-    this.showSearchResult(hasSearchQuery)
+    await this.showSearchResult(hasSearchQuery, searchQuery)
   }
 
   onContextMenu = (row, event) => {
@@ -753,7 +743,30 @@ class Queue extends React.Component {
     })
   }
 
-  showSearchResult = (hasSearchQuery = false) => {
+  showSearchResult = async (hasSearchQuery = false, searchQuery) => {
+    const { dispatch } = this.props
+    if (searchQuery) {
+      const prefix = 'like_'
+      await dispatch({
+        type: 'patientSearch/query',
+        payload: {
+          apiCriteria: {
+            searchValue: searchQuery,
+          },
+        },
+      })
+    } else {
+      this.props.dispatch({
+        type: 'patientSearch/updateState',
+        payload: {
+          list: [],
+          pagination: {
+            totalRecords: 0,
+            pagesize: 20,
+          },
+        },
+      })
+    }
     const { patientSearchResult = [] } = this.props
     const totalRecords = patientSearchResult.length
 
@@ -765,7 +778,10 @@ class Queue extends React.Component {
     if (totalRecords >= 1) {
       return this.togglePatientSearch()
     }
-    return this.toggleRegisterNewPatient()
+    if (totalRecords === 0 && searchQuery) {
+      return this.toggleRegisterNewPatient()
+    }
+    return this.togglePatientSearch()
   }
 
   onRefreshClick = () => {

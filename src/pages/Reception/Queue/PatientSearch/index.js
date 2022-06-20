@@ -13,15 +13,25 @@ import RegisterVisitBtn from './RegisterVisitBtn'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import Authorized from '@/utils/Authorized'
 import { primaryColor } from '@/assets/jss'
+import { first } from 'lodash'
 
 const styles = () => ({
   patientNameBtn: {
     paddingLeft: '0px !important',
+    paddingRight: '0px !important',
     fontSize: '1em !important',
     display: 'flex',
     justifyContent: 'flex-start',
     textAlign: 'left',
-    textOverflow: 'ellipsis',
+    width: '100%',
+    '& > span:first-child': {
+      display: 'inline-block',
+      width: '100%',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      verticalAlign: 'middle',
+      whiteSpace: 'nowrap',
+    },
   },
 })
 
