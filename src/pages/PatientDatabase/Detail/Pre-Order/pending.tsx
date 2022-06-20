@@ -518,11 +518,12 @@ const PendingPreOrder: React.FC = (props: any) => {
               deletePreOrderAccessRight.rights === 'enable' ? true : false,
             onCommitChanges: commitChanges,
             onAddedRowsChange: (rows: any) => {
+              console.log(clinicianProfile)
               return rows.map(o => {
                 return {
                   orderDate: moment(),
                   orderByUserFK: clinicianProfile?.userProfileFK,
-                  orderByUser: clinicianProfile?.userProfile.userName,
+                  orderByUser: clinicianProfile?.name,
                   preOrderItemStatus: 'New',
                   hasPaid: false,
                   amount: 0,
