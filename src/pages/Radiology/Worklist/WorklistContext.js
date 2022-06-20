@@ -56,7 +56,6 @@ export const WorklistContextProvider = props => {
     if (currentFilter) refreshWorklist()
 
     return () => {
-      console.log('WorklistContext -  cleanup')
       stopTimer()
     }
   }, [currentFilter])
