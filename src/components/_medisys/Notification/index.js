@@ -25,7 +25,7 @@ const styles = (theme) => ({
 const NotificationComponent = ({
   notifications = [],
   systemMessage = {},
-  unreadTotalRecords = 0,
+  appNotificationTotalUnreadCounts = [],
   dispatch,
   classes,
   theme,
@@ -51,6 +51,7 @@ const NotificationComponent = ({
     setShowNotification(!showNotification)
   }
 
+  const unreadTotalRecords = _.sumBy(appNotificationTotalUnreadCounts,'count')
   const overlay = (
     <div style={{ position: 'relative', width: 600 }}>
       <Tabs
@@ -61,8 +62,7 @@ const NotificationComponent = ({
         }}
         options={TYPES.map((o) => {
           const list = notifications.filter((m) => !o.id || m.type === o.id)
-          let unReadCounts =
-            o.id === 4 ? totalUnReadCount : list.filter((m) => !m.read).length
+          let unReadCounts = o.id === 4 ? totalUnReadCount : appNotificationTotalUnreadCounts.find(x => x.source === o.name)?.count
 
           return {
             ...o,
