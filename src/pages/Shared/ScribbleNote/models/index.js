@@ -31,6 +31,10 @@ export default createFormViewModel({
       },
     },
     effects: {
+      *queryTemplate({ payload }, { call, put }) {
+        const response = yield call(service.queryTemplate, payload)
+        return response
+      },
       *queryTemplateList({ payload }, { call, put }) {
         const response = yield call(service.queryTemplateList, payload)
         return response

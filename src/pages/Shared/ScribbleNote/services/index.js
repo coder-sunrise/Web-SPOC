@@ -12,7 +12,9 @@ const fns = {
   upsert: params => {
     return service.upsert(url, params)
   },
-
+  queryTemplate: params => {
+    return service.query(templateUrl, params)
+  },
   queryTemplateList: params => service.queryList(templateUrl, params),
   upsertTemplate: params => service.upsert(templateUrl, params),
 }

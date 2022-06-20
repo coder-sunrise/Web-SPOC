@@ -103,13 +103,18 @@ export default ({
             width: 253,
             height: 140,
             cursor: 'pointer',
+            backgroundColor: 'white',
           }}
           onClick={() => {
             viewScribbleNote(o)
           }}
         >
           {src ? (
-            <img src={src} alt={o.subject} width={250} />
+            <img
+              src={src}
+              alt={o.subject}
+              style={{ maxHeight: 138, maxWidth: 250 }}
+            />
           ) : (
             <span>No Image</span>
           )}

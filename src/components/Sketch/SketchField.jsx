@@ -1001,7 +1001,7 @@ class SketchField extends PureComponent {
   downloadImage = () => {
     let canvas = this._fc
     // let url = canvas.toDataURL('image/png')
-
+    canvas.backgroundColor = 'white'
     const result = canvas.toDataURL()
     let link = document.createElement('a')
     link.download = 'drawing.png'
