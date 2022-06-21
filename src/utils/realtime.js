@@ -88,12 +88,12 @@ const initStream = () => {
         header,
       } = getState()
       if (sender !== user.data.clinicianProfile.name) {
-        let { notifications = [], unreadTotalRecords = 0 } = header
+        let { notifications = [], appNotificationTotalUnreadCounts = [] } = header
         if (type == 'AppNotification') {
           const notification = list.find(x => x.toUserFK === user.data.id)
           if (notification) {
             notifications.unshift(notification)
-            unreadTotalRecords += 1
+            appNotificationTotalUnreadCounts.find(x=>x.source === notification.source).count += 1
             dispatch({
               type: 'appNotification/receiveMessage',
               payload: notification,
@@ -104,7 +104,7 @@ const initStream = () => {
           type: 'header/updateState',
           payload: {
             notifications,
-            unreadTotalRecords,
+            appNotificationTotalUnreadCounts,
           },
         })
         sessionStorage.setItem('notifications', JSON.stringify(notifications))

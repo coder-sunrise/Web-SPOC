@@ -1,12 +1,12 @@
 import React from 'react'
-import { CardContainer } from '@/components'
+import { CardContainer, Tooltip } from '@/components'
 import numeral from 'numeral'
 import { currencySymbol } from '@/utils/config'
 import moment from 'moment'
 import { Table } from 'antd'
 import tablestyles from '../PatientHistory/PatientHistoryStyle.less'
 
-export default ({ classes, current, fieldName = '' }) => {
+export default ({ classes, current, fieldName = '', isFullScreen = true }) => {
   const showCurrency = (value = 0) => {
     if (value >= 0)
       return (
@@ -24,49 +24,56 @@ export default ({ classes, current, fieldName = '' }) => {
     {
       dataIndex: 'visitDate',
       title: 'Date',
-      width: 105,
+      width: 90,
       render: (text, row) => (
         <span>{moment(row.visitDate).format('DD MMM YYYY')}</span>
       ),
     },
-    { dataIndex: 'description', title: 'Name', width: 250 },
-    { dataIndex: 'category', title: 'Category', width: 120 },
+    {
+      dataIndex: 'description',
+      title: 'Name',
+      width: isFullScreen ? 250 : 140,
+    },
+    { dataIndex: 'category', title: 'Category', width: 100 },
     {
       dataIndex: 'quantity',
       title: 'Qty.',
       align: 'right',
-      width: 80,
-      render: (text, row) => (
-        <div className={classes.numberstyle}>
-          {`${numeral(row.quantity || 0).format('0,0.0')}`}
-        </div>
-      ),
+      width: isFullScreen ? 80 : 60,
+      render: (text, row) => {
+        const qty = `${numeral(row.quantity || 0).format('0,0.0')}`
+        return (
+          <Tooltip title={qty}>
+            <div>{qty}</div>
+          </Tooltip>
+        )
+      },
     },
     {
       dataIndex: 'totalPrice',
-      title: 'Subtotal',
+      title: 'Sub Total',
       align: 'right',
-      width: 90,
+      width: isFullScreen ? 90 : 80,
       render: (text, row) => showCurrency(row.totalPrice),
     },
     {
       dataIndex: 'adjAmt',
       title: 'Adj.',
       align: 'right',
-      width: 80,
+      width: isFullScreen ? 80 : 70,
       render: (text, row) => showCurrency(row.adjAmt),
     },
     {
       dataIndex: 'totalAfterItemAdjustment',
       title: 'Total',
       align: 'right',
-      width: 90,
+      width: isFullScreen ? 90 : 80,
       render: (text, row) => showCurrency(row.totalAfterItemAdjustment),
     },
     { dataIndex: 'remarks', title: 'Remarks' },
   ]
   return (
-    <CardContainer hideHeader size='sm' style={{ margin: 0 }}>
+    <div style={{ padding: 8 }}>
       <Table
         size='small'
         bordered
@@ -78,6 +85,6 @@ export default ({ classes, current, fieldName = '' }) => {
         }}
         className={tablestyles.table}
       />
-    </CardContainer>
+    </div>
   )
 }
