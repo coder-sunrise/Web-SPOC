@@ -14,6 +14,7 @@ import {
   CodeSelect,
   ProgressButton,
 } from '@/components'
+import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
 
 @withFormikExtend({
   mapPropsToValues: ({ settingVisitOrderTemplate }) => ({
@@ -64,6 +65,14 @@ class Filter extends PureComponent {
                   {...args}
                   code='ctcopayer'
                   labelField='displayValue'
+                  additionalSearchField='code'
+                  renderDropdown={option => {
+                    return (
+                      <CopayerDropdownOption
+                        option={option}
+                      ></CopayerDropdownOption>
+                    )
+                  }}
                   maxTagCount={0}
                   label='Co-Payers'
                 />

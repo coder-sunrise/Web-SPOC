@@ -14,6 +14,7 @@ import {
 import { osBalanceStatus } from '@/utils/codes'
 import { COPAYER_TYPE } from '@/utils/constants'
 import ReportDateRangePicker from '../ReportDateRangePicker'
+import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
 
 const FilterBar = ({ handleSubmit, isSubmitting, values, setFieldValue }) => {
   return (
@@ -54,6 +55,14 @@ const FilterBar = ({ handleSubmit, isSubmitting, values, setFieldValue }) => {
                   code='ctcopayer'
                   labelField='displayValue'
                   mode='multiple'
+                  renderDropdown={option => {
+                    return (
+                      <CopayerDropdownOption
+                        option={option}
+                      ></CopayerDropdownOption>
+                    )
+                  }}
+                  additionalSearchField='code'
                   label='Co-Payer'
                   localFilter={item =>
                     [COPAYER_TYPE.CORPORATE, COPAYER_TYPE.INSURANCE].indexOf(

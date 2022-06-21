@@ -14,6 +14,7 @@ import {
 } from '@/components'
 import { DoctorProfileSelect } from '@/components/_medisys'
 import ReportDateRangePicker from '../ReportDateRangePicker'
+import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
 
 const FilterBar = ({ handleSubmit, isSubmitting }) => {
   return (
@@ -49,8 +50,17 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                   {...args}
                   // code='ctcopayer,ctsupplier'
                   code='ctcopayer'
+                  style={{ width: 300 }}
                   labelField='displayValue'
+                  renderDropdown={option => {
+                    return (
+                      <CopayerDropdownOption
+                        option={option}
+                      ></CopayerDropdownOption>
+                    )
+                  }}
                   mode='multiple'
+                  additionalSearchField='code'
                   label='Co-Payer'
                 />
               )}

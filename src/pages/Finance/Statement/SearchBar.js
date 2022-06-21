@@ -18,6 +18,7 @@ import {
 import { FilterBarDate } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
 import { COPAYER_TYPE } from '@/utils/constants'
+import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
 
 const styles = () => ({
   container: {
@@ -262,6 +263,14 @@ class SearchBar extends PureComponent {
                       label='Co-Payer'
                       code='ctCopayer'
                       labelField='displayValue'
+                      additionalSearchField='code'
+                      renderDropdown={option => {
+                        return (
+                          <CopayerDropdownOption
+                            option={option}
+                          ></CopayerDropdownOption>
+                        )
+                      }}
                       localFilter={item =>
                         [
                           COPAYER_TYPE.CORPORATE,

@@ -12,6 +12,7 @@ import { TextField, DatePicker, CodeSelect } from '@/components'
 import { useState, useRef } from 'react'
 import { ActionType } from '@ant-design/pro-table'
 import { Tooltip } from '@material-ui/core'
+import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
 const { queryList, upsert, query, remove } = patientService
 const api = {
   remove,
@@ -182,15 +183,11 @@ const defaultColumns = [
             mode='multiple'
             renderDropdown={option => {
               return (
-                <div>
-                  <span
-                    style={{ fontWeight: 'bold' }}
-                  >{`${option.displayValue}`}</span>
-                  {option.code ? ` (${option.code})` : ''}
-                </div>
+                <CopayerDropdownOption option={option}></CopayerDropdownOption>
               )
             }}
             code='ctCopayer'
+            additionalSearchField='code'
             labelField='displayValue'
           />
         </Tooltip>

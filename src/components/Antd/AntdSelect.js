@@ -304,18 +304,28 @@ class AntdSelect extends React.PureComponent {
   }
 
   handleFilter = (input, option) => {
-    // console.log(input, option, option.props.children, this.props.labelField)
-    const { handleFilter } = this.props
+    const { handleFilter, additionalSearchField } = this.props
     let match = false
 
     if (handleFilter && typeof handleFilter === 'function') {
       return handleFilter(input, option)
     }
     try {
-      if (Array.isArray(option.props.children)) { 
+      if (Array.isArray(option.props.children)) {
         match = false
       }
       match = option.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      if (
+        !match &&
+        additionalSearchField &&
+        option.data &&
+        option.data[additionalSearchField]
+      ) {
+        match =
+          option.data[additionalSearchField]
+            .toLowerCase()
+            .indexOf(input.toLowerCase()) >= 0
+      }
     } catch (error) {
       console.log({ error })
       match = false
@@ -484,17 +494,38 @@ class AntdSelect extends React.PureComponent {
         options,
         valueField,
         labelField,
+        additionalSearchField,
         max,
         localFilter = () => true,
       } = props
+      console.log(
+        _.filter(
+          options,
+          // (o) => o[labelField].toLowerCase().indexOf(search) >= 0,
+          o =>
+            (Object.byString(o, labelField)
+              .toLowerCase()
+              .indexOf(search) >= 0 ||
+              (additionalSearchField &&
+                Object.byString(o, additionalSearchField)
+                  .toLowerCase()
+                  .indexOf(search) >= 0)) &&
+            localFilter(o),
+        ),
+      )
       this.setState({
         data: _.filter(
           options,
           // (o) => o[labelField].toLowerCase().indexOf(search) >= 0,
           o =>
-            Object.byString(o, labelField)
+            (Object.byString(o, labelField)
               .toLowerCase()
-              .indexOf(search) >= 0 && localFilter(o),
+              .indexOf(search) >= 0 ||
+              (additionalSearchField &&
+                Object.byString(o, additionalSearchField)
+                  .toLowerCase()
+                  .indexOf(search) >= 0)) &&
+            localFilter(o),
         ).splice(0, max),
         fetching: false,
       })
@@ -751,7 +782,7 @@ class AntdSelect extends React.PureComponent {
       if (labelProps.shrink === undefined) {
         labelProps.shrink = false
       }
-    } 
+    }
     return (
       <CustomInput
         labelProps={labelProps}

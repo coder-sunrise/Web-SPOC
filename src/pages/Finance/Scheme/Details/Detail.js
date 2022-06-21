@@ -16,6 +16,7 @@ import {
 } from '@/components'
 import { SCHEME_TYPE, COPAYER_TYPE, SCHEME_CATEGORY } from '@/utils/constants'
 import Setting from './Setting'
+import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
 
 const styles = () => ({})
 
@@ -186,9 +187,17 @@ const Detail = ({ height, ...props }) => {
                   label={formatMessage({
                     id: 'finance.scheme.detail.coPayer',
                   })}
+                  additionalSearchField='code'
                   localFilter={item => item.coPayerTypeFK === copayerTypeFK}
                   labelField='displayValueWithCode'
                   max={50}
+                  renderDropdown={option => {
+                    return (
+                      <CopayerDropdownOption
+                        option={option}
+                      ></CopayerDropdownOption>
+                    )
+                  }}
                   {...args}
                 />
               )}
