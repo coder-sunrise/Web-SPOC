@@ -247,6 +247,24 @@ class CommonTableGrid extends PureComponent {
             </Tooltip>
           )
         }}
+        contentComponent={({ children }) => {
+          let {
+            props: {
+              column: { fullTitle },
+            },
+          } = children
+          if (fullTitle) {
+            return (
+              <TableHeaderRow.Content>
+                <Tooltip title={fullTitle} placement='top'>
+                  <div>{children}</div>
+                </Tooltip>
+              </TableHeaderRow.Content>
+            )
+          } else {
+            return children
+          }
+        }}
         sortLabelComponent={({ children, ...p }) => {
           return (
             <TableHeaderRow.SortLabel
