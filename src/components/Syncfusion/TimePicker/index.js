@@ -226,7 +226,7 @@ class TimePicker extends PureComponent {
                       ).toDate()
                     : undefined
                 }
-                format='hh:mm a'
+                format='HH:mm'
                 step={step}
                 focus={extendFunc(onFocus, this.handleFocus)}
                 blur={extendFunc(onBlur, this.handleBlur)}

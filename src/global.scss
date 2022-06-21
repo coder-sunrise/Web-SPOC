@@ -838,6 +838,9 @@ input[class*='MuiInputBase-input-'] {
 textarea[class*='MuiInputBase-input-'] {
   font-size: 14px !important;
 }
+div[class*='CardBody-cardBodySm-'] {
+  padding: 8px !important;
+}
 .MuiInputBase-input {
   font-size: 14px !important;
 }
@@ -1029,9 +1032,16 @@ body {
   background-color: #c8dafd !important;
 }
 
-.ant-tabs-tab-btn{
-  color:#000000;
+.ant-tabs-tab-btn {
+  color: #000000;
 }
-.ant-pro-table-column-setting-overlay .ant-popover-inner-content{
+.ant-pro-table-column-setting-overlay .ant-popover-inner-content {
   width: 280px;
+}
+
+.e-input-group input.e-input,
+.e-input-group.e-control-wrapper input.e-input,
+.e-input-group textarea.e-input,
+.e-input-group.e-control-wrapper textarea.e-input {
+  font-size: 14px !important;
 }
