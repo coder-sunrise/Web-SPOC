@@ -81,8 +81,9 @@ export default createBasicModel({
             },
           ],
         })
-        if (response.status != 200) return null
-        var notifications = (response.data.data || []).map(x => ({
+
+        if (!response) return null
+        var notifications = (response.data || []).map(x => ({
           ...x,
           type: Object.values(APPNOTIFICATION_SCHEMA).find(
             y => y.name === x.source,
@@ -92,7 +93,7 @@ export default createBasicModel({
         yield put({
           type: 'updateState',
           payload: {
-            pageSize: Math.min(response.data.pageSize,response.data.totalRecords),
+            pageSize: Math.min(response.pageSize,response.totalRecords),
             rows: notifications.map(x => x.id),
           },
         })
@@ -100,7 +101,7 @@ export default createBasicModel({
           type: 'header/updateState',
           payload: {
             notifications,
-            unreadTotalRecords: response.data.currentPage
+            appNotificationTotalUnreadCounts: response.appNotificationTotalUnreadCounts
           },
         })
         return response
@@ -112,7 +113,7 @@ export default createBasicModel({
 
         return {
           ...st,
-          notifications: data.data,
+          notifications: data,
         }
       },
       receiveMessage(st, { payload }) {

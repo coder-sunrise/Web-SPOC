@@ -100,7 +100,7 @@ class HeaderLinks extends React.Component {
   render() {
     const { rtlActive, user, clinicInfo, header, codetable } = this.props
     const { openAccount } = this.state
-    const { signalRConnected, notifications, unreadTotalRecords } = header
+    const { signalRConnected, notifications, appNotificationTotalUnreadCounts } = header
     const { ctroom = [] } = codetable
 
     const name =
@@ -130,7 +130,7 @@ class HeaderLinks extends React.Component {
               <Notification
                 dispatch={this.props.dispatch}
                 notifications={notifications}
-                unreadTotalRecords={unreadTotalRecords}
+                appNotificationTotalUnreadCounts={appNotificationTotalUnreadCounts}
               />
               {!signalRConnected && (
                 <Tooltip title='Real-time update signal is down. Please refresh manually.'>
