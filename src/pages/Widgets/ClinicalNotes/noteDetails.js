@@ -95,7 +95,7 @@ class NoteDetails extends Component {
         <div
           style={{
             position: 'absolute',
-            zIndex: 1,
+            zIndex: 1, // AntdPopover.Popover.getPopupContainer == "node => node.parentNode"?set the zIndex's value to 2:don't change
             left: 305,
             right: 0,
             top: 12,

@@ -143,6 +143,7 @@ const CannedTextButton = ({
   return (
     <div>
       <Popover
+        getPopupContainer={node => node.parentNode || document.body}
         icon={null}
         trigger='click'
         placement='bottom'
