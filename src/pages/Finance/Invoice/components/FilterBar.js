@@ -18,6 +18,7 @@ import {
 import { FilterBarDate } from '@/components/_medisys'
 import { getBizSession } from '@/services/queue'
 import { osBalanceStatus, sessionOptions } from '@/utils/codes'
+import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
 
 const getBizSessionId = async () => {
   const bizSessionPayload = {
@@ -156,9 +157,17 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
                   <CodeSelect
                     code='ctCopayer'
                     labelField='displayValue'
+                    additionalSearchField='code'
                     maxTagCount={0}
                     maxTagPlaceholder='Co-Payer'
                     label='Co-Payer'
+                    renderDropdown={option => {
+                      return (
+                        <CopayerDropdownOption
+                          option={option}
+                        ></CopayerDropdownOption>
+                      )
+                    }}
                     {...args}
                   />
                 )}

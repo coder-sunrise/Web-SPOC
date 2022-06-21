@@ -6,6 +6,7 @@ import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
 // common components
 import { Table } from '@devexpress/dx-react-grid-material-ui'
+import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
 import {
   Button,
   EditableTableGrid,
@@ -317,11 +318,19 @@ class CoPayer extends Component {
                     label='Co-Payer'
                     code='ctcopayer'
                     labelField='displayValue'
+                    additionalSearchField='code'
                     localFilter={item =>
                       [COPAYER_TYPE.CORPORATE, COPAYER_TYPE.INSURANCE].indexOf(
                         item.coPayerTypeFK,
                       ) >= 0 && !copayers.includes(item.id)
                     }
+                    renderDropdown={option => {
+                      return (
+                        <CopayerDropdownOption
+                          option={option}
+                        ></CopayerDropdownOption>
+                      )
+                    }}
                     {...args}
                   />
                 )

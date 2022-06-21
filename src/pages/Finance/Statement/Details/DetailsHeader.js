@@ -17,6 +17,7 @@ import {
   FastField,
 } from '@/components'
 import { COPAYER_TYPE } from '@/utils/constants'
+import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
 
 const styles = theme => ({
   root: {
@@ -84,7 +85,15 @@ class DetailsHeader extends PureComponent {
               render={args => (
                 <CodeSelect
                   code='ctcopayer'
+                  renderDropdown={option => {
+                    return (
+                      <CopayerDropdownOption
+                        option={option}
+                      ></CopayerDropdownOption>
+                    )
+                  }}
                   prefix='Co-Payer:'
+                  additionalSearchField='code'
                   rightAlign
                   text
                   labelField='displayValue'

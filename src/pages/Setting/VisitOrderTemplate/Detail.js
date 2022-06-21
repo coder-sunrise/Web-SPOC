@@ -14,6 +14,7 @@ import {
 import { InventoryItemList } from '@/components/_medisys'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
 import { CALENDAR_RESOURCE } from '@/utils/constants'
+import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
 
 import { DoctorLabel } from '@/components/_medisys'
 @connect(({ codetable }) => ({ codetable }))
@@ -116,9 +117,6 @@ class Detail extends PureComponent {
     this.props.dispatch({
       type: 'settingVisitOrderTemplate/reset',
     })
-  }
-  renderDropdown = option => {
-    return option.displayValue
   }
 
   handleCopayerChanges = copayers => {
@@ -250,10 +248,17 @@ class Detail extends PureComponent {
                     {...args}
                     code='ctcopayer'
                     labelField='displayValue'
+                    additionalSearchField='code'
+                    renderDropdown={option => {
+                      return (
+                        <CopayerDropdownOption
+                          option={option}
+                        ></CopayerDropdownOption>
+                      )
+                    }}
                     mode='multiple'
                     maxTagCount={0}
                     label='Co-Payers'
-                    renderDropdown={this.renderDropdown}
                     onChange={v => {
                       this.handleCopayerChanges(v)
                     }}

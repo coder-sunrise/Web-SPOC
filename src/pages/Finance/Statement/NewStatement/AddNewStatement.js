@@ -25,6 +25,7 @@ import {
   ProgressButton,
 } from '@/components'
 import { COPAYER_TYPE } from '@/utils/constants'
+import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
 
 const styles = () => ({
   root: { padding: '10px' },
@@ -377,6 +378,14 @@ class AddNewStatement extends PureComponent {
                         label='Co-Payer'
                         code='ctcopayer'
                         labelField='displayValue'
+                        renderDropdown={option => {
+                          return (
+                            <CopayerDropdownOption
+                              option={option}
+                            ></CopayerDropdownOption>
+                          )
+                        }}
+                        additionalSearchField='code'
                         localFilter={item =>
                           [
                             COPAYER_TYPE.CORPORATE,

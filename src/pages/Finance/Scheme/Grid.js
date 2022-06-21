@@ -14,6 +14,7 @@ const Grid = ({ history, height }) => {
       { name: 'name', title: 'Scheme Name' },
       { name: 'description', title: 'Description' },
       { name: 'schemeTypeName', title: 'Scheme Type' },
+      { name: 'coPayerCode', title: 'Co-Payer Code' },
       { name: 'coPayerName', title: 'Co-Payer Name' },
       { name: 'coPayerType', title: 'Co-Payer Type' },
       { name: 'isActive', title: 'Status' },
@@ -51,6 +52,12 @@ const Grid = ({ history, height }) => {
     {
       columnName: 'coPayerName',
       sortBy: 'CopayerFKNavigation.displayValue',
+      width: 300,
+    },
+    {
+      columnName: 'coPayerCode',
+      sortBy: 'CopayerFKNavigation.Code',
+      width: 130,
     },
     {
       columnName: 'isActive',

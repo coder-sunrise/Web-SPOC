@@ -17,6 +17,7 @@ import {
 } from '@/components'
 import { status } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
+import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
 
 const styles = theme => ({
   filterBar: {
@@ -76,6 +77,14 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                   })}
                   code='ctCopayer'
                   labelField='displayValue'
+                  additionalSearchField='code'
+                  renderDropdown={option => {
+                    return (
+                      <CopayerDropdownOption
+                        option={option}
+                      ></CopayerDropdownOption>
+                    )
+                  }}
                   {...args}
                 />
               )
