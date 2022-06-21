@@ -73,8 +73,8 @@ class Grid extends PureComponent {
               (selectedFolderFK === -99 ||
                 f.folderFKs.includes(selectedFolderFK)),
           ),
-          [data => (data.fileName || '').toLowerCase()],
-          ['asc'],
+          [data => (data.createDate || '').toLowerCase()],
+          ['desc'],
         ).map(a => {
           return { ...a, folderList: _.sortBy(folderList, 'sortOrder') }
         })}

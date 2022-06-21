@@ -102,8 +102,8 @@ class CardView extends Component {
               (f.folderFKs.includes(selectedFolderFK) ||
                 selectedFolderFK === -99),
           ),
-          [data => (data.fileName || '').toLowerCase()],
-          ['asc'],
+          [data => (data.createDate || '').toLowerCase()],
+          ['desc'],
         ).map(p => {
           return (
             <Card
