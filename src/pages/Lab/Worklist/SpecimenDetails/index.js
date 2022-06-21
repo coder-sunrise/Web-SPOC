@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, Fragment } from 'react'
 import {
   Space,
   Collapse,
@@ -91,6 +91,7 @@ export const SpecimenDetails = ({
   onConfirm,
   isDisposePatientEntity = true,
   isReadonly = false,
+  hideRawData = false,
 }) => {
   if (!open) return ''
   const dispatch = useDispatch()
@@ -398,7 +399,10 @@ export const SpecimenDetails = ({
                           <Tooltip title='Result History'>
                             <span
                               className='material-icons'
-                              style={{ color: 'gray', cursor: 'pointer' }}
+                              style={{
+                                color: 'gray',
+                                cursor: 'pointer',
+                              }}
                               onClick={event => {
                                 setRetestHistoryPara({
                                   open: true,
@@ -410,11 +414,14 @@ export const SpecimenDetails = ({
                             </span>
                           </Tooltip>
                         )}
-
-                        <Checkbox
-                          onChange={e => setShowRawData(e.target.checked)}
-                        />
-                        <span>Display Raw Data</span>
+                        {!hideRawData && (
+                          <Fragment>
+                            <Checkbox
+                              onChange={e => setShowRawData(e.target.checked)}
+                            />
+                            <span>Display Raw Data</span>
+                          </Fragment>
+                        )}
                       </Space>
                       <div style={{ flexGrow: 1, textAlign: 'right' }}>
                         {Authorized.check('lab.starttest')?.rights ===
