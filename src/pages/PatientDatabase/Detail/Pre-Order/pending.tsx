@@ -153,7 +153,11 @@ const PendingPreOrder: React.FC = (props: any) => {
               c.serviceCenterCategoryFK !==
                 SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER &&
               c.serviceCenterCategoryFK !==
-                SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
+                SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER &&
+              c.serviceCenterCategoryFK !==
+                SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE &&
+              c.serviceCenterCategoryFK !==
+                SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE,
           )
           .reduce(itemWrapper, [])
         setServices(retSerResponse)
@@ -161,7 +165,9 @@ const PendingPreOrder: React.FC = (props: any) => {
           .filter(
             c =>
               c.serviceCenterCategoryFK ===
-              SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER,
+                SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER ||
+              c.serviceCenterCategoryFK ===
+                SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE,
           )
           .reduce(itemWrapper, [])
         setLabs(retLabResponse)
@@ -169,7 +175,9 @@ const PendingPreOrder: React.FC = (props: any) => {
           .filter(
             c =>
               c.serviceCenterCategoryFK ===
-              SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
+                SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER ||
+              c.serviceCenterCategoryFK ===
+                SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE,
           )
           .reduce(itemWrapper, [])
         setRadiology(retRadiologyResponse)
@@ -181,7 +189,11 @@ const PendingPreOrder: React.FC = (props: any) => {
                 c.serviceCenterCategoryFK !==
                   SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER &&
                 c.serviceCenterCategoryFK !==
-                  SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
+                  SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER &&
+                c.serviceCenterCategoryFK !==
+                  SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE &&
+                c.serviceCenterCategoryFK !==
+                  SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE,
             )
             .reduce(itemWrapper, [])
           setServices(retSerResponse)
@@ -189,7 +201,9 @@ const PendingPreOrder: React.FC = (props: any) => {
             .filter(
               c =>
                 c.serviceCenterCategoryFK ===
-                SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER,
+                  SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER ||
+                c.serviceCenterCategoryFK ===
+                  SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE,
             )
             .reduce(itemWrapper, [])
           setLabs(retLabResponse)
@@ -197,7 +211,9 @@ const PendingPreOrder: React.FC = (props: any) => {
             .filter(
               c =>
                 c.serviceCenterCategoryFK ===
-                SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
+                  SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER ||
+                c.serviceCenterCategoryFK ===
+                  SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE,
             )
             .reduce(itemWrapper, [])
           setRadiology(retRadiologyResponse)
@@ -322,7 +338,6 @@ const PendingPreOrder: React.FC = (props: any) => {
         valueField: 'value',
         sortingEnabled: false,
         width: 130,
-        sortingEnabled: false,
         options: () => preOrderItemCategory,
         onChange: handleCategoryChanged,
         isDisabled: row => !isEditable(row),
@@ -518,7 +533,6 @@ const PendingPreOrder: React.FC = (props: any) => {
               deletePreOrderAccessRight.rights === 'enable' ? true : false,
             onCommitChanges: commitChanges,
             onAddedRowsChange: (rows: any) => {
-              console.log(clinicianProfile)
               return rows.map(o => {
                 return {
                   orderDate: moment(),

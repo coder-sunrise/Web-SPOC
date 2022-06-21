@@ -442,6 +442,7 @@ export const WorklistHistoryGrid = ({ labWorklistHistory }) => {
         onConfirm={() => {
           closeSpecimenDetails()
         }}
+        isReadonly
       />
       <LabResultReportPreview
         {...labResultReportPreviewPara}
