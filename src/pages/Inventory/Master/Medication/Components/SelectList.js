@@ -62,9 +62,23 @@ const SelectList = props => {
     if (onChange) onChange(newListItems)
   }
   return (
-    <div>
-      <SectionHeader style={{ marginBottom: 0 }}>{header}</SectionHeader>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 10 }}>
+    <div style={{ position: 'relative', top: isShowFreeText ? -9 : 0 }}>
+      <SectionHeader
+        style={{
+          marginBottom: 0,
+          position: 'relative',
+          top: isShowFreeText ? 10 : 0,
+        }}
+      >
+        {header}
+      </SectionHeader>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          marginBottom: isShowFreeText ? 3 : 10,
+        }}
+      >
         <MultiLangCodeSelect
           code={codeset}
           language={isMultiLanguage ? language : ''}
