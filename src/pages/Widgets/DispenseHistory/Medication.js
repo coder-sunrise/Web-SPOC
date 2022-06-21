@@ -9,7 +9,13 @@ import tablestyles from '../PatientHistory/PatientHistoryStyle.less'
 import { Tooltip } from '@/components'
 import { FileCopySharp } from '@material-ui/icons'
 
-export default ({ classes, current, fieldName = '', clinicSettings }) => {
+export default ({
+  classes,
+  current,
+  fieldName = '',
+  clinicSettings,
+  isFullScreen = true,
+}) => {
   const drugMixtureIndicator = (row, right) => {
     if (!row.isDrugMixture) return null
 
@@ -36,7 +42,7 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
     {
       dataIndex: 'visitDate',
       title: 'Date',
-      width: 105,
+      width: 90,
       render: (text, row) => (
         <span>{moment(row.visitDate).format('DD MMM YYYY')}</span>
       ),
@@ -44,7 +50,7 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
     {
       dataIndex: 'name',
       title: 'Name',
-      width: 250,
+      width: isFullScreen ? 250 : 120,
       render: (text, row) => {
         let paddingRight = 0
         if (row.isPreOrder && row.isExclusive) {
@@ -118,7 +124,7 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
     {
       dataIndex: 'instruction',
       title: 'Instructions',
-      width: 200,
+      width: isFullScreen ? 200 : 110,
       render: text => (
         <Tooltip title={text}>
           <div>{text}</div>
@@ -129,25 +135,20 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
       dataIndex: 'dispensedQuanity',
       title: 'Qty.',
       align: 'right',
-      width: 80,
-      render: (text, row) => (
-        <Tooltip
-          title={
-            <div className={classes.numberstyle}>
-              {`${numeral(row.dispensedQuanity || 0).format('0,0.00')}`}
-            </div>
-          }
-        >
-          <div className={classes.numberstyle}>
-            {`${numeral(row.dispensedQuanity || 0).format('0,0.00')}`}
-          </div>
-        </Tooltip>
-      ),
+      width: isFullScreen ? 80 : 60,
+      render: (text, row) => {
+        const qty = `${numeral(row.dispensedQuanity || 0).format('0,0.0')}`
+        return (
+          <Tooltip title={qty}>
+            <div>{qty}</div>
+          </Tooltip>
+        )
+      },
     },
     {
       dataIndex: 'dispenseUOM',
       title: 'UOM',
-      width: 90,
+      width: isFullScreen ? 100 : 80,
       render: text => (
         <Tooltip title={text}>
           <div>{text}</div>
@@ -156,23 +157,23 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
     },
     {
       dataIndex: 'totalPrice',
-      title: 'Subtotal',
+      title: 'Sub Total',
       align: 'right',
-      width: 90,
+      width: isFullScreen ? 90 : 75,
       render: (text, row) => showCurrency(row.totalPrice),
     },
     {
       dataIndex: 'adjAmt',
       title: 'Adj.',
       align: 'right',
-      width: 80,
+      width: isFullScreen ? 80 : 70,
       render: (text, row) => showCurrency(row.adjAmt),
     },
     {
       dataIndex: 'totalAfterItemAdjustment',
       title: 'Total',
       align: 'right',
-      width: 90,
+      width: isFullScreen ? 90 : 75,
       render: (text, row) =>
         showCurrency(
           (row.isPreOrder && !row.isChargeToday) || row.hasPaid
@@ -196,7 +197,7 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
                 minHeight: 20,
               }}
             >
-              <Tooltip title={row.remarks || ' '}>
+              <Tooltip title={row.remarks}>
                 <span className='oneline_textblock'> {row.remarks || ' '}</span>
               </Tooltip>
             </div>
@@ -234,7 +235,7 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
   const showDrugLabelRemark = labelPrinterSize === '8.0cmx4.5cm_V2'
 
   return (
-    <CardContainer hideHeader size='sm' style={{ margin: 0 }}>
+    <div style={{ padding: 8 }}>
       <Table
         size='small'
         bordered
@@ -246,6 +247,6 @@ export default ({ classes, current, fieldName = '', clinicSettings }) => {
         }}
         className={tablestyles.table}
       />
-    </CardContainer>
+    </div>
   )
 }
