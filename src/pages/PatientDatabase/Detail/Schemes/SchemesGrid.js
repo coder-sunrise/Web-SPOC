@@ -402,6 +402,22 @@ class SchemesGrid extends PureComponent {
         columnName: 'coPaymentSchemeFK',
         sortingEnabled: false,
         type: 'codeSelect',
+        renderDropdown: option => {
+          return (
+            <div
+              style={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {option.code ? `${option.code} - ` : ''}
+              <span style={{ fontWeight: option.code ? 'bold' : 'normal' }}>
+                {`${option.name}`}
+              </span>
+            </div>
+          )
+        },
         options: row => {
           const { codetable } = this.props
           const { copaymentscheme = [] } = codetable
