@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 // import NumberFormat from 'react-number-format'
+import { IGNORED_REPORT_SETTING_REPORT_IDS } from '@/utils/constants'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -153,7 +154,10 @@ const errorMessage = v => {
   displayName: 'printoutSettingInfo',
 })
 class printoutSetting extends PureComponent {
-  state = { selected: !!this.props.values.reportFK, prevSelectedIndex: 0 }
+  state = {
+    selected: !!this.props.values.reportFK,
+    prevSelectedIndex: 0,
+  }
 
   componentDidMount = () => {
     this.props.dispatch({
@@ -274,6 +278,9 @@ class printoutSetting extends PureComponent {
                     {...args}
                     onChange={e => this.checkFormIsDirty(e)}
                     orderBy={[['name'], ['asc']]}
+                    localFilter={item =>
+                      IGNORED_REPORT_SETTING_REPORT_IDS.indexOf(item.id) === -1
+                    }
                   />
                 )}
               />

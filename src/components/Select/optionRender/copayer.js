@@ -1,5 +1,5 @@
 const CopayerDropdownOption = props => {
-  const { option } = props
+  const { option, labelField = 'displayValue' } = props
   return (
     <div
       style={{
@@ -10,7 +10,7 @@ const CopayerDropdownOption = props => {
     >
       {option.code ? `${option.code} - ` : ''}
       <span style={{ fontWeight: option.code ? 'bold' : 'normal' }}>
-        {`${option.displayValue}`}
+        {`${option[labelField]}`}
       </span>
     </div>
   )

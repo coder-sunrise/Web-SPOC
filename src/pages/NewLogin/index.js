@@ -162,10 +162,17 @@ const submitKey = 'login/getToken'
           })
 
           reloadAuthorized()
-          await versionCheck()
+          try {
+            await versionCheck()
+          } catch {
+            console.log('Printing tool auto upgrade did not trigger.')
+          }
           history.push(loginDestination)
 
-          dispatch({ type: 'appNotification/loadNotifications', payload:{ isRead: false} })
+          dispatch({
+            type: 'appNotification/loadNotifications',
+            payload: { isRead: false },
+          })
         }
       })
       .catch(error => {
@@ -209,11 +216,6 @@ class NewLogin extends React.Component {
     const showClinicCode =
       history.location.pathname.toLowerCase() === '/user/login/clinic' ||
       process.env.client_env !== 'production'
-
-    console.log(
-      'process.env.default_cliniccode',
-      process.env.default_cliniccode,
-    )
 
     return (
       <React.Fragment>

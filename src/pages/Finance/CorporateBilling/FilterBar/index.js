@@ -5,6 +5,7 @@ import Search from '@material-ui/icons/Search'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 import { compose } from 'redux'
+import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
 import {
   GridContainer,
   GridItem,
@@ -46,8 +47,16 @@ const FilterBar = ({
                 <CodeSelect
                   options={ctCoPayer}
                   label='Co-Payer'
-                  labelField='displayValue'
                   labelField='name'
+                  additionalSearchField='code'
+                  renderDropdown={option => {
+                    return (
+                      <CopayerDropdownOption
+                        option={option}
+                        labelField='name'
+                      ></CopayerDropdownOption>
+                    )
+                  }}
                   {...args}
                 />
               )
@@ -97,7 +106,7 @@ export default compose(
   withStyles(styles, { withTheme: true }),
   withFormik({
     mapPropsToValues: () => ({
-      isActive:true,
+      isActive: true,
       copayerFK: 'All Co-Payer',
     }),
     handleSubmit: (values, { props }) => {
