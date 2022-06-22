@@ -76,7 +76,7 @@ const inventoryAdjustmentSchema = Yup.object().shape({
     } = values
     const { dispatch, onConfirm } = props
     const list = inventoryAdjustmentItems
-    const newInventoryAdjustmentItem = list.map((o, index) => {
+    const newInventoryAdjustmentItem = list.filter(o=> !(o.isDeleted && !o.id)).map((o, index) => {
       if (o.isDeleted) {
         return {
           ...o,
