@@ -633,6 +633,7 @@ class PatientDetail extends PureComponent {
           disableSave: false,
         },
       })
+      return
     }
     return this.beforeHandleSubmit()
   }

@@ -144,21 +144,23 @@ const schemaDemographic = {
   }),
 }
 
-const pecValidationSchema = Yup.object().shape({
-  // remark: Yup.string().required(),
-  name: Yup.string().required(),
-})
 const schemaEmergencyContact = {
   patientEmergencyContact: Yup.array()
     .compact(v => v.isDeleted)
-    .of(pecValidationSchema),
-  patientFamilyMember: Yup.array()
-    .compact(v => v.isDeleted)
     .of(
       Yup.object().shape({
-        relationshipFK: Yup.number().required(),
+        name: Yup.string().required(),
       }),
     ),
+  patientFamilyGroup: Yup.object().shape({
+    patientFamilyMember: Yup.array()
+      .compact(v => v.isDeleted)
+      .of(
+        Yup.object().shape({
+          relationshipFK: Yup.number().required(),
+        }),
+      ),
+  }),
 }
 
 const schemaAllergies = {
