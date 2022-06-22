@@ -19,7 +19,7 @@ import PatientStickyNotesBtn from '@/components/_medisys/PatientInfoSideBanner/P
 import SelectPreOrder from '@/pages/Reception/Appointment/components/form/SelectPreOrder'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import { MoreButton, LoadingWrapper } from '@/components/_medisys'
-import PrintLabLabelButton from '@/components/_medisys/PatientInfoSideBanner/PatientLabelBtn'
+import PatientLabelBtn from '@/components/_medisys/PatientInfoSideBanner/PatientLabelBtn'
 import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 import {
   GridContainer,
@@ -1164,12 +1164,12 @@ class Banner extends PureComponent {
             className={classes.part}
             style={{ top: 3, position: 'relative' }}
           >
-            <PrintLabLabelButton
+            <PatientLabelBtn
               patientId={info.id}
               codetable={codetable}
               iconOnly={true}
               entity={entity}
-              clinicSettings={clinicSettings?.settings}
+              clinicSettings={clinicSettings}
             />
           </span>
         )}
