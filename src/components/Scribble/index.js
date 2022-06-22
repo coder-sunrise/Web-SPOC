@@ -1383,6 +1383,7 @@ class Scribble extends React.Component {
                     onClick={navigateDirtyCheck({
                       displayName: 'ScribbleNotePage',
                       onProceed: toggleScribbleModal,
+                      showSecondConfirmButton: false,
                       openConfirmContent: 'Discard the changes?',
                     })}
                   >
