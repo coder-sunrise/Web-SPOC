@@ -402,6 +402,7 @@ class SchemesGrid extends PureComponent {
         columnName: 'coPaymentSchemeFK',
         sortingEnabled: false,
         type: 'codeSelect',
+        additionalSearchField: 'code',
         renderDropdown: option => {
           return (
             <div
