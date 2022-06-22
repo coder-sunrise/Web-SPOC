@@ -643,23 +643,31 @@ class PastMedication extends PureComponent {
               dt.isDefaultTemplate === true && dt.documentTemplateTypeFK === 3,
           )
           if (defaultTemplate) {
-            newCORVaccinationCert = [
-              {
-                type: '3',
-                certificateDate: moment(),
-                issuedByUserFK: clinicianProfile.userProfileFK,
-                subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
-                  ''}, ${Math.floor(
-                  moment.duration(moment().diff(dob)).asYears(),
-                )}`,
-                content: ReplaceCertificateTeplate(
-                  defaultTemplate.templateContent,
-                  newVaccination,
-                ),
-                sequence: nextSequence,
-              },
-            ]
-            nextSequence += 1
+            dispatch({
+              type: 'settingDocumentTemplate/queryOne',
+              payload: { id: defaultTemplate.id },
+            }).then(r => {
+              if (!r) {
+                return
+              }
+              newCORVaccinationCert = [
+                {
+                  type: '3',
+                  certificateDate: moment(),
+                  issuedByUserFK: clinicianProfile.userProfileFK,
+                  subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
+                    ''}, ${Math.floor(
+                    moment.duration(moment().diff(dob)).asYears(),
+                  )}`,
+                  content: ReplaceCertificateTeplate(
+                    r.templateContent,
+                    newVaccination,
+                  ),
+                  sequence: nextSequence,
+                },
+              ]
+              nextSequence += 1
+            })
           } else {
             showNoTemplate = true
           }

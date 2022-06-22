@@ -170,23 +170,31 @@ let i = 0
             const { sequence } = _.maxBy(allDocs, 'sequence')
             nextSequence = sequence + 1
           }
-          newCORVaccinationCert = [
-            ...corVaccinationCert,
-            {
-              type: '3',
-              certificateDate: moment(),
-              issuedByUserFK: clinicianProfile.userProfileFK,
-              subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
-                ''}, ${Math.floor(
-                moment.duration(moment().diff(dob)).asYears(),
-              )}`,
-              content: ReplaceCertificateTeplate(
-                defaultTemplate.templateContent,
-                { ...values, subject: currentType.getSubject(values) },
-              ),
-              sequence: nextSequence,
-            },
-          ]
+          dispatch({
+            type: 'settingDocumentTemplate/queryOne',
+            payload: { id: defaultTemplate.id },
+          }).then(r => {
+            if (!r) {
+              return
+            }
+            newCORVaccinationCert = [
+              ...corVaccinationCert,
+              {
+                type: '3',
+                certificateDate: moment(),
+                issuedByUserFK: clinicianProfile.userProfileFK,
+                subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
+                  ''}, ${Math.floor(
+                  moment.duration(moment().diff(dob)).asYears(),
+                )}`,
+                content: ReplaceCertificateTeplate(r.templateContent, {
+                  ...values,
+                  subject: currentType.getSubject(values),
+                }),
+                sequence: nextSequence,
+              },
+            ]
+          })
         }
       }
     }

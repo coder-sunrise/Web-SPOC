@@ -27,7 +27,7 @@ import VaccinationCertificate from './VaccinationCertificate'
 
 const loadFromCodesConfig = {
   mapPrescriptions: (rows, codetable, patient, isExtPrescription = false) => {
-    return rows.map((o) => {
+    return rows.map(o => {
       const {
         instruction,
         corPrescriptionItemPrecaution: precaution = [],
@@ -37,16 +37,16 @@ const loadFromCodesConfig = {
       } = o
       const qtyFormatStr = numeral(quantity).format(qtyFormat)
       const { ctmedicationprecaution = [] } = codetable
-      const subjectHtml = `<li> - ${o.subject} ${isExtPrescription
-        ? ' (Ext.)'
-        : ''}</li>`
+      const subjectHtml = `<li> - ${o.subject} ${
+        isExtPrescription ? ' (Ext.)' : ''
+      }</li>`
       const instHtml = instruction !== '' ? `<li>${instruction}</li>` : ''
       const remarksHtml = remarks !== '' ? `<li>${remarks}</li>` : ''
       const qtyHtml = `<li>Quantity: ${qtyFormatStr} ${dispenseUOMDisplayValue}</li>`
       const precautionHtml = precaution
-        .map((i) => {
+        .map(i => {
           const codetablePrecaution = ctmedicationprecaution.find(
-            (c) => c.id === i.medicationPrecautionFK,
+            c => c.id === i.medicationPrecautionFK,
           )
           if (codetablePrecaution && codetablePrecaution.translationLink) {
             const {
@@ -54,8 +54,8 @@ const loadFromCodesConfig = {
             } = codetablePrecaution
 
             const transHtml = translationMasters
-              .filter((t) => patient.translationLinkFK === t.languageFK)
-              .map((m) => {
+              .filter(t => patient.translationLinkFK === t.languageFK)
+              .map(m => {
                 return `<li>${m.displayValue}</li>`
               })
               .join('')
@@ -74,7 +74,7 @@ const loadFromCodesConfig = {
   },
   InsertMedication: (rows, codetable, patient, isExtPrescription = false) => {
     const pRows = rows.filter(
-      (o) =>
+      o =>
         !o.isDeleted &&
         o.type === '1' &&
         (o.isExternalPrescription || false) === isExtPrescription,
@@ -87,9 +87,9 @@ const loadFromCodesConfig = {
         isExtPrescription,
       )
       return `<ul>
-              <li><strong>${isExtPrescription
-                ? 'External Prescription'
-                : 'Medication'}</strong></li>
+              <li><strong>${
+                isExtPrescription ? 'External Prescription' : 'Medication'
+              }</strong></li>
                ${rowHTMLs.join('')}
             </ul>`
     }
@@ -98,7 +98,8 @@ const loadFromCodesConfig = {
   InsertVaccination: (rows, isGenerateCertificate) => {
     const vRows = (isGenerateCertificate
       ? rows
-      : rows.filter((o) => !o.isDeleted && o.type === '2')).map((v) => {
+      : rows.filter(o => !o.isDeleted && o.type === '2')
+    ).map(v => {
       const {
         subject = '',
         usageMethodDisplayValue: usage = '',
@@ -132,7 +133,7 @@ const loadFromCodesConfig = {
     isExtPrescription = false,
   ) => {
     const pRows = rows.filter(
-      (o) =>
+      o =>
         !o.isDeleted &&
         o.type === '5' &&
         (o.isExternalPrescription || false) === isExtPrescription,
@@ -151,10 +152,10 @@ const loadFromCodesConfig = {
     return ''
   },
 
-  InsertConsumable: (rows) => {
-    const pRows = rows.filter((o) => !o.isDeleted && o.type === '4')
+  InsertConsumable: rows => {
+    const pRows = rows.filter(o => !o.isDeleted && o.type === '4')
     if (pRows && pRows.length > 0) {
-      const rowHTMLs = pRows.map((o) => {
+      const rowHTMLs = pRows.map(o => {
         const {
           consumableName = '',
           unitOfMeasurement = '',
@@ -180,9 +181,7 @@ const loadFromCodesConfig = {
 
   InsertPatientInfo: (codetable, patient) => {
     let result
-    let patientGender = codetable.ctgender.find(
-      (x) => x.id === patient.genderFK,
-    )
+    let patientGender = codetable.ctgender.find(x => x.id === patient.genderFK)
     let patientAllergy
     for (let index = 0; index < patient.patientAllergy.length; index++) {
       if (patient.patientAllergy[index].type === 'Allergy')
@@ -214,11 +213,11 @@ const loadFromCodesConfig = {
     {
       value: 'corDiagnosis',
       name: 'Diagnosis',
-      getter: (v) => {
+      getter: v => {
         const { corDiagnosis = [] } = v
         return corDiagnosis
-          .filter((o) => !!o.diagnosisDescription)
-          .map((o) => `<p>- ${o.diagnosisDescription}</p>`)
+          .filter(o => !!o.diagnosisDescription)
+          .map(o => `<p>- ${o.diagnosisDescription}</p>`)
           .join('')
       },
     },
@@ -232,8 +231,8 @@ const loadFromCodesConfig = {
         const { rows = [] } = orders
 
         let service = rows
-          .filter((o) => !o.isDeleted && o.type === '3')
-          .map((s) => `<p>- ${s.subject}</p>`)
+          .filter(o => !o.isDeleted && o.type === '3')
+          .map(s => `<p>- ${s.subject}</p>`)
           .join('')
 
         const ordersHTML = [
@@ -259,7 +258,7 @@ const loadFromCodesConfig = {
         let insertRows = rows
         let isGenerateCertificate = false
         if (entity.vaccinationUFK) {
-          insertRows = rows.filter((vc) => vc.uid === entity.vaccinationUFK)
+          insertRows = rows.filter(vc => vc.uid === entity.vaccinationUFK)
           isGenerateCertificate = true
         }
         const ordersHTML = [
@@ -328,7 +327,7 @@ const templateReg = /<a.*?data-value="(.*?)".*?<\/a>/gm
   }),
 )
 class AddConsultationDocument extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     const { dispatch } = props
 
@@ -353,8 +352,10 @@ class AddConsultationDocument extends PureComponent {
   }
 
   getNextSequence = () => {
-    const { consultationDocument: { rows, type } } = this.props
-    const allDocs = rows.filter((s) => !s.isDeleted)
+    const {
+      consultationDocument: { rows, type },
+    } = this.props
+    const allDocs = rows.filter(s => !s.isDeleted)
     let nextSequence = 1
     if (allDocs && allDocs.length > 0) {
       const { sequence } = _.maxBy(allDocs, 'sequence')
@@ -364,29 +365,44 @@ class AddConsultationDocument extends PureComponent {
   }
 
   getLoader = (editor, setFieldValue, currentType) => {
-    const { classes, consultation, codetable, patient, values } = this.props
+    const {
+      classes,
+      consultation,
+      codetable,
+      patient,
+      dispatch,
+      values,
+    } = this.props
     const { documenttemplate = [] } = codetable
     const documentType = parseInt(currentType.value, 10) || -1
     return (
       <div className={classes.editorBtn}>
         <ButtonSelect
           options={documenttemplate.filter(
-            (template) => template.documentTemplateTypeFK === documentType,
+            template => template.documentTemplateTypeFK === documentType,
           )}
           textField='displayValue'
           onChange={(val, option) => {
             if (!val) return
-            let msg = htmlDecodeByRegExp(option.templateContent)
-            const match = msg.match(templateReg) || []
-            match.forEach((s) => {
-              const value = s.match(/data-value="(.*?)"/)[1]
-              const m = tagList.find((o) => o.value === value)
-              if (m && m.getter) msg = msg.replace(s, m.getter())
+            dispatch({
+              type: 'settingDocumentTemplate/queryOne',
+              payload: { id: option.id },
+            }).then(r => {
+              if (!r) {
+                return
+              }
+              let msg = htmlDecodeByRegExp(r.templateContent)
+              const match = msg.match(templateReg) || []
+              match.forEach(s => {
+                const value = s.match(/data-value="(.*?)"/)[1]
+                const m = tagList.find(o => o.value === value)
+                if (m && m.getter) msg = msg.replace(s, m.getter())
+              })
+              setFieldValue('content', msg)
+              setTimeout(() => {
+                editor.focus()
+              }, 1)
             })
-            setFieldValue('content', msg)
-            setTimeout(() => {
-              editor.focus()
-            }, 1)
           }}
         >
           Load Template
@@ -421,7 +437,7 @@ class AddConsultationDocument extends PureComponent {
     )
   }
 
-  render () {
+  render() {
     const { props } = this
     const {
       theme,
@@ -438,7 +454,7 @@ class AddConsultationDocument extends PureComponent {
     const cfg = {
       ...props,
       loadFromCodes,
-      currentType: types.find((o) => o.value === type),
+      currentType: types.find(o => o.value === type),
       templateLoader: this.getLoader,
       getNextSequence: this.getNextSequence,
     }
@@ -454,7 +470,7 @@ class AddConsultationDocument extends PureComponent {
                 allowClear={false}
                 value={type}
                 disabled={entity.id || entity.uid}
-                onChange={(v) => {
+                onChange={v => {
                   dispatch({
                     type: 'consultationDocument/updateState',
                     payload: {
@@ -476,9 +492,9 @@ class AddConsultationDocument extends PureComponent {
     )
   }
 }
-export default withStyles(styles, { withTheme: true })((props) => (
+export default withStyles(styles, { withTheme: true })(props => (
   <SizeContainer size='sm'>
-    {(extraProps) => {
+    {extraProps => {
       return <AddConsultationDocument {...props} {...extraProps} />
     }}
   </SizeContainer>
