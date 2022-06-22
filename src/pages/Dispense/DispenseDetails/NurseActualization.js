@@ -97,7 +97,11 @@ const historyColumnExtensions = [
   {
     columnName: 'orderDate',
     width: 135,
-    render: r => localDateTime(r.orderDate),
+    render: r => (
+      <Tooltip title={localDateTime(r.orderDate)}>
+        <span>{localDateTime(r.orderDate)}</span>
+      </Tooltip>
+    ),
   },
   { columnName: 'instructions', width: 130 },
   { columnName: 'accessionNo', width: 125 },
@@ -106,14 +110,22 @@ const historyColumnExtensions = [
   {
     columnName: 'actualizeDate',
     width: 135,
-    render: r => localDateTime(r.actualizeDate),
+    render: r => (
+      <Tooltip title={localDateTime(r.actualizeDate)}>
+        <span>{localDateTime(r.actualizeDate)}</span>
+      </Tooltip>
+    ),
   },
   { columnName: 'actualizeRemarks' },
   { columnName: 'cancelByUser', width: 130 },
   {
     columnName: 'cancelDate',
     width: 135,
-    render: r => localDateTime(r.cancelDate),
+    render: r => (
+      <Tooltip title={localDateTime(r.cancelDate)}>
+        <span>{localDateTime(r.cancelDate)}</span>
+      </Tooltip>
+    ),
   },
   { columnName: 'cancelReasons' },
 ]
@@ -135,13 +147,17 @@ class NurseActualization extends React.PureComponent {
     }).then(r => {
       if (r && r.data) {
         const isActualized = status == NURSE_WORKITEM_STATUS.ACTUALIZED
-        const statusGroup = _.groupBy(r.data.nurseActualize, x=>x.nurseWorkitemStatusFK == NURSE_WORKITEM_STATUS.ACTUALIZED)
+        const statusGroup = _.groupBy(
+          r.data.nurseActualize,
+          x => x.nurseWorkitemStatusFK == NURSE_WORKITEM_STATUS.ACTUALIZED,
+        )
         let currentStatus = status
         let nurseActualize = statusGroup[isActualized] || []
-        if(nurseActualize.length == 0 && r.data.nurseActualize.length > 0)
-        {
+        if (nurseActualize.length == 0 && r.data.nurseActualize.length > 0) {
           nurseActualize = statusGroup[!isActualized]
-          currentStatus = isActualized ? NURSE_WORKITEM_STATUS.NEW : NURSE_WORKITEM_STATUS.ACTUALIZED
+          currentStatus = isActualized
+            ? NURSE_WORKITEM_STATUS.NEW
+            : NURSE_WORKITEM_STATUS.ACTUALIZED
         }
         this.setState({
           status: currentStatus,
