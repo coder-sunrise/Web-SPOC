@@ -1,5 +1,5 @@
 import React from 'react'
-import Edit from '@material-ui/icons/Edit'
+import ListItem from '@material-ui/icons/List'
 import { CommonTableGrid, Button } from '@/components'
 
 const DOGrid = ({
@@ -34,7 +34,7 @@ const DOGrid = ({
           columnName: 'action',
           sortingEnabled: false,
           align: 'center',
-          render: (row) => {
+          render: row => {
             return (
               <Button
                 size='sm'
@@ -45,7 +45,7 @@ const DOGrid = ({
                 justIcon
                 color='primary'
               >
-                <Edit />
+                <ListItem />
               </Button>
             )
           },

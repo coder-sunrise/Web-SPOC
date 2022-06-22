@@ -15,6 +15,7 @@ import {
 import { podoOrderType, getInventoryItemV2 } from '@/utils/codes'
 import { INVENTORY_TYPE } from '@/utils/constants'
 import AuthorizedContext from '@/components/Context/Authorized'
+import CommonTableGrid from '@/components/CommonTableGrid'
 
 // let commitCount = 2201 // uniqueNumber
 
@@ -646,6 +647,7 @@ class DODetails extends PureComponent {
                           id: 'inventory.pr.detail.dod.remarks',
                         })}
                         multiline
+                        disabled={values.id}
                         rowsMax={2}
                         rows={2}
                         maxLength={2000}
@@ -670,25 +672,39 @@ class DODetails extends PureComponent {
           {errors.rows && (
             <p className={classes.errorMsgStyle}>{errors.rows}</p>
           )}
-          <EditableTableGrid
-            getRowId={r => r.uid}
-            rows={rows}
-            schema={receivingDetailsSchema}
-            FuncProps={{
-              // edit: isEditable,
-              pager: false,
-            }}
-            EditingProps={{
-              showAddCommand: true,
-              onCommitChanges: this.onCommitChanges,
-            }}
-            {...tableParas}
-          />
+          {values.id && (
+            <CommonTableGrid
+              getRowId={r => r.uid}
+              rows={rows}
+              schema={receivingDetailsSchema}
+              FuncProps={{
+                // edit: isEditable,
+                pager: false,
+              }}
+              {...tableParas}
+            />
+          )}
+          {!values.id && (
+            <EditableTableGrid
+              getRowId={r => r.uid}
+              rows={rows}
+              schema={receivingDetailsSchema}
+              FuncProps={{
+                // edit: isEditable,
+                pager: false,
+              }}
+              EditingProps={{
+                showAddCommand: values.id ? false : true,
+                onCommitChanges: this.onCommitChanges,
+              }}
+              {...tableParas}
+            />
+          )}
         </div>
         {footer &&
           footer({
             align: 'center',
-            onConfirm: props.handleSubmit,
+            onConfirm: values.id ? undefined : props.handleSubmit,
             confirmBtnText: 'Save',
           })}
       </div>
