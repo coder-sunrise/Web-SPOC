@@ -577,7 +577,7 @@ class Forms extends PureComponent {
                         onClick={() => {
                           dispatch({
                             type: 'settingDocumentTemplate/queryOne',
-                            payload: { id: item.id },
+                            payload: { id: item.formTemplateFK },
                           }).then(r => {
                             if (!r) {
                               return

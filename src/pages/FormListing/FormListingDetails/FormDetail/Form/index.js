@@ -39,7 +39,12 @@ import Authorized from '@/utils/Authorized'
       const fillData = {
         patientName,
         doctorName,
-        patientGender: patientGender === 'F' ? 'Female' : patientGender === 'M' ? 'Male' : 'Unknown' ,
+        patientGender:
+          patientGender === 'F'
+            ? 'Female'
+            : patientGender === 'M'
+            ? 'Male'
+            : 'Unknown',
         patientDOB: moment(patientDOB).format('DD MMM YYYY'),
         patientAge: `${patientAge}`,
         patientRefNo,
@@ -67,7 +72,7 @@ import Authorized from '@/utils/Authorized'
   displayName: 'Form',
 })
 class Form extends PureComponent {
-  onSubmitButtonClicked = async (action,skipConfirm) => {
+  onSubmitButtonClicked = async (action, skipConfirm) => {
     const {
       dispatch,
       onConfirm,
@@ -86,16 +91,19 @@ class Form extends PureComponent {
       this.props.handleSubmit()
     } else {
       if (action === 'finalize') {
-        if (!(values.formData.signatureCounter > 0)){
-          notification.warning({ message: `At least one signature is required.` })
+        if (!(values.formData.signatureCounter > 0)) {
+          notification.warning({
+            message: `At least one signature is required.`,
+          })
           return
         }
-        if(!skipConfirm) {
+        if (!skipConfirm) {
           this.props.dispatch({
             type: 'global/updateAppState',
             payload: {
               openConfirm: true,
-              openConfirmContent: 'Signed form is not editable after Finalized. Confirm to proceed ?',
+              openConfirmContent:
+                'Signed form is not editable after Finalized. Confirm to proceed ?',
               openConfirmText: 'Confirm',
               onConfirmSave: () => this.onSubmitButtonClicked('finalize', true),
             },
@@ -203,7 +211,7 @@ class Form extends PureComponent {
 
     const isHiddenModify = modifyAR && modifyAR.rights !== 'enable'
     const isHiddenFinalize = finalizeAR && finalizeAR.rights !== 'enable'
-    
+
     return (
       <div>
         <CommonForm {...this.props} />
@@ -220,19 +228,20 @@ class Form extends PureComponent {
           </Button>
           {formCategory === FORM_CATEGORY.VISITFORM && !isHiddenModify && (
             // <Authorized authority='queue.consultation.form.modify'>
-              <ProgressButton
-                color='primary'
-                icon={null}
-                onClick={() => {
-                  this.onSubmitButtonClicked('save')
-                }}
-              >
-                Save
-              </ProgressButton>
+            <ProgressButton
+              color='primary'
+              icon={null}
+              onClick={() => {
+                this.onSubmitButtonClicked('save')
+              }}
+            >
+              Save
+            </ProgressButton>
             // </Authorized>
           )}
-          {/*formCategory === FORM_CATEGORY.CORFORM && */!isHiddenFinalize && statusFK === 1 && (
-            // <Authorized authority='queue.consultation.form.finalize'>
+          {/*formCategory === FORM_CATEGORY.CORFORM && */ !isHiddenFinalize &&
+            statusFK === 1 && (
+              // <Authorized authority='queue.consultation.form.finalize'>
               <ProgressButton
                 color='success'
                 icon={null}
@@ -242,8 +251,8 @@ class Form extends PureComponent {
               >
                 Finalize
               </ProgressButton>
-            // </Authorized>
-          )}
+              // </Authorized>
+            )}
 
           {/* {formCategory === FORM_CATEGORY.CORFORM &&
             (statusFK === 1 || statusFK === 2) && (

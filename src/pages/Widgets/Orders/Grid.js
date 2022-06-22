@@ -573,23 +573,31 @@ export default ({
         dt => dt.isDefaultTemplate === true && dt.documentTemplateTypeFK === 3,
       )
       if (defaultTemplate) {
-        newCORVaccinationCert = [
-          {
-            type: '3',
-            certificateDate: moment().date(),
-            issuedByUserFK: user.data.clinicianProfile.userProfile.id,
-            subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
-              ''}, ${Math.floor(
-              moment.duration(moment().diff(dob)).asYears(),
-            )}`,
-            content: ReplaceCertificateTeplate(
-              defaultTemplate.templateContent,
-              newVaccination,
-            ),
-            sequence: vaccCertSequence,
-          },
-        ]
-        isGenerateVaccCert = true
+        dispatch({
+          type: 'settingDocumentTemplate/queryOne',
+          payload: { id: defaultTemplate.id },
+        }).then(r => {
+          if (!r) {
+            return
+          }
+          newCORVaccinationCert = [
+            {
+              type: '3',
+              certificateDate: moment().date(),
+              issuedByUserFK: user.data.clinicianProfile.userProfile.id,
+              subject: `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
+                ''}, ${Math.floor(
+                moment.duration(moment().diff(dob)).asYears(),
+              )}`,
+              content: ReplaceCertificateTeplate(
+                r.templateContent,
+                newVaccination,
+              ),
+              sequence: vaccCertSequence,
+            },
+          ]
+          isGenerateVaccCert = true
+        })
       }
     }
     const newVaccine = {
