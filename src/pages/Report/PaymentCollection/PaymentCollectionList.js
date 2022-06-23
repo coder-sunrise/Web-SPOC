@@ -4,7 +4,7 @@ import { ReportDataGrid } from '@/components/_medisys'
 import { GridItem, dateFormatLongWithTimeNoSec12h } from '@/components'
 
 class PaymentCollectionList extends PureComponent {
-  render () {
+  render() {
     let paymentCollectionData = []
     const { reportDatas } = this.props
     if (!reportDatas) return null
@@ -160,28 +160,34 @@ class PaymentCollectionList extends PureComponent {
       return (
         <GridItem md={12}>
           {cashData && cashData.length > 0 && (
-            <ReportDataGrid
-              data={cashData}
-              columns={CashDetailsCols}
-              columnExtensions={CashColsExtension}
-              FuncProps={CashFuncProps}
-            />
+            <div style={{ margin: '8px 0px' }}>
+              <ReportDataGrid
+                data={cashData}
+                columns={CashDetailsCols}
+                columnExtensions={CashColsExtension}
+                FuncProps={CashFuncProps}
+              />
+            </div>
           )}
           {giroData && giroData.length > 0 && (
-            <ReportDataGrid
-              data={giroData}
-              columns={GIRODetailsCols}
-              columnExtensions={PaymentCollectionDetailsExtensions}
-              FuncProps={FuncProps}
-            />
+            <div style={{ margin: '8px 0px' }}>
+              <ReportDataGrid
+                data={giroData}
+                columns={GIRODetailsCols}
+                columnExtensions={PaymentCollectionDetailsExtensions}
+                FuncProps={FuncProps}
+              />
+            </div>
           )}
           {otherData && otherData.length > 0 && (
-            <ReportDataGrid
-              data={otherData}
-              columns={OtherPaymentModeDetailsCols}
-              columnExtensions={PaymentCollectionDetailsExtensions}
-              FuncProps={FuncProps}
-            />
+            <div style={{ margin: '8px 0px' }}>
+              <ReportDataGrid
+                data={otherData}
+                columns={OtherPaymentModeDetailsCols}
+                columnExtensions={PaymentCollectionDetailsExtensions}
+                FuncProps={FuncProps}
+              />
+            </div>
           )}
         </GridItem>
       )

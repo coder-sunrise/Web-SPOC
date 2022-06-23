@@ -16,7 +16,7 @@ const ReportDataGrid = ({
   if (height) tableProps = { ...TableProps, height }
 
   if (height === undefined && !noHeight) {
-    tableProps = { ...TableProps, height: '65vh' }
+    tableProps = { ...TableProps }
   }
   if (noHeight || (data.length <= 15 && height === undefined))
     tableProps = { ...TableProps }
