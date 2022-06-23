@@ -6,7 +6,7 @@ import Delete from '@material-ui/icons/Delete'
 // common components
 import {
   dateFormatLong,
-  timeFormat,
+  timeFormat24Hour,
   Button,
   CommonTableGrid,
   Tooltip,
@@ -33,9 +33,7 @@ export default ({ dataSource, onEditClick, onDeleteClick, height }) => {
   const GroupCellContent = ({ row }) => {
     let label = 'Doctor'
     if (!dataSource) return ''
-    const data = dataSource.find(
-      (item) => item.doctorBlockGroupFK === row.value,
-    )
+    const data = dataSource.find(item => item.doctorBlockGroupFK === row.value)
     if (data) {
       const { title = '', name } = data.doctor.clinicianProfile
       label = `${title} ${name}`
@@ -45,88 +43,67 @@ export default ({ dataSource, onEditClick, onDeleteClick, height }) => {
     )
   }
 
-  const [
-    expandedGroups,
-    setExpandedGroups,
-  ] = useState([])
+  const [expandedGroups, setExpandedGroups] = useState([])
 
-  const handleExpandedGroupsChange = (e) => {
+  const handleExpandedGroupsChange = e => {
     setExpandedGroups(e)
   }
 
-  useEffect(
-    () => {
-      if (dataSource) {
-        const groups = dataSource.reduce(
-          (distinct, data) =>
-            distinct.includes(data.doctorBlockGroupFK.toString())
-              ? [
-                  ...distinct,
-                ]
-              : [
-                  ...distinct,
-                  data.doctorBlockGroupFK.toString(),
-                ],
-          [],
-        )
+  useEffect(() => {
+    if (dataSource) {
+      const groups = dataSource.reduce(
+        (distinct, data) =>
+          distinct.includes(data.doctorBlockGroupFK.toString())
+            ? [...distinct]
+            : [...distinct, data.doctorBlockGroupFK.toString()],
+        [],
+      )
 
-        setExpandedGroups(groups)
-      }
-    },
-    [
-      dataSource,
-    ],
-  )
+      setExpandedGroups(groups)
+    }
+  }, [dataSource])
 
-  const editDoctorBlock = (event) => onEditClick(event.currentTarget.id)
+  const editDoctorBlock = event => onEditClick(event.currentTarget.id)
 
-  const deleteDoctorBlock = (event) => onDeleteClick(event.currentTarget.id)
+  const deleteDoctorBlock = event => onDeleteClick(event.currentTarget.id)
 
-  const handleDoubleClick = (row) => onEditClick(row.id)
+  const handleDoubleClick = row => onEditClick(row.id)
 
   const columnExtensions = [
     {
       columnName: 'doctorName',
       sortBy: 'doctor.clinicianProfile.name',
-      render: (row) => <DoctorLabel doctor={row.doctor} />,
+      render: row => <DoctorLabel doctor={row.doctor} />,
     },
     {
       columnName: 'startDate',
       sortingEnabled: false,
-      observeFields: [
-        'startDateTime',
-      ],
-      render: (row) => moment(row.startDateTime).format(dateFormatLong),
+      observeFields: ['startDateTime'],
+      render: row => moment(row.startDateTime).format(dateFormatLong),
     },
     {
       columnName: 'endDate',
       sortingEnabled: false,
-      observeFields: [
-        'endDateTime',
-      ],
-      render: (row) => moment(row.endDateTime).format(dateFormatLong),
+      observeFields: ['endDateTime'],
+      render: row => moment(row.endDateTime).format(dateFormatLong),
     },
     {
       columnName: 'startTime',
       sortingEnabled: false,
-      observeFields: [
-        'startDateTime',
-      ],
-      render: (row) => moment(row.startDateTime).format(timeFormat),
+      observeFields: ['startDateTime'],
+      render: row => moment(row.startDateTime).format(timeFormat24Hour),
     },
     {
       columnName: 'endTime',
       sortingEnabled: false,
-      observeFields: [
-        'endDateTime',
-      ],
-      render: (row) => moment(row.endDateTime).format(timeFormat),
+      observeFields: ['endDateTime'],
+      render: row => moment(row.endDateTime).format(timeFormat24Hour),
     },
     {
       align: 'center',
       columnName: 'action',
       // width: 240,
-      render: (row) => (
+      render: row => (
         <React.Fragment>
           <Tooltip title='Edit Doctor Block'>
             <Button
@@ -173,12 +150,8 @@ export default ({ dataSource, onEditClick, onDeleteClick, height }) => {
         ...TableParams.FuncProps,
         groupingConfig: {
           state: {
-            grouping: [
-              { columnName: 'doctorBlockGroupFK' },
-            ],
-            expandedGroups: [
-              ...expandedGroups,
-            ],
+            grouping: [{ columnName: 'doctorBlockGroupFK' }],
+            expandedGroups: [...expandedGroups],
             onExpandedGroupsChange: handleExpandedGroupsChange,
           },
           row: {

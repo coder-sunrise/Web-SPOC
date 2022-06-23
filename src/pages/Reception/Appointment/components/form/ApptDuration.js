@@ -56,88 +56,94 @@ const ApptDuration = ({ row, columnConfig, cellProps }) => {
   const [focused, setFocused] = useState(false)
 
   return (
-    <div>
-      <Select
-        inputProps={{
-          onMouseUp: e => {
-            if (!focused) {
-              setFocused(true)
-              if (typeof e.target.click === 'function') e.target.click()
-            }
-          },
-        }}
-        value={row.apptDurationHour}
-        options={hourOptions}
-        {...restProps}
-        error={
-          row.apptDurationHour !== undefined ? '' : 'This is a required field'
-        }
-        onChange={e => {
-          const { commitChanges } = control
-          row.apptDurationHour = e
-          setEndTime(row)
-          validSchema(row)
+    <div style={{ position: 'relative', paddingRight: 75 }}>
+      <div>
+        <Select
+          inputProps={{
+            onMouseUp: e => {
+              if (!focused) {
+                setFocused(true)
+                if (typeof e.target.click === 'function') e.target.click()
+              }
+            },
+          }}
+          value={row.apptDurationHour}
+          options={hourOptions}
+          {...restProps}
+          error={
+            row.apptDurationHour !== undefined ? '' : 'This is a required field'
+          }
+          onChange={e => {
+            const { commitChanges } = control
+            row.apptDurationHour = e
+            setEndTime(row)
+            validSchema(row)
 
-          commitChanges({
-            changed: {
-              [row.id]: {
-                endTime: row.endTime,
+            commitChanges({
+              changed: {
+                [row.id]: {
+                  endTime: row.endTime,
+                },
               },
+            })
+          }}
+          onBlur={() => {
+            debounceBlur(true)
+          }}
+          onFocus={() => {
+            debounceBlur(false)
+          }}
+          dropdownMatchSelectWidth={false}
+          dropdownStyle={{
+            width: 60,
+          }}
+          style={{ width: 50 }}
+        />
+      </div>
+      <div style={{ position: 'absolute', right: 0, top: 0 }}>
+        <Select
+          inputProps={{
+            onMouseUp: e => {
+              if (!focused) {
+                setFocused(true)
+                if (typeof e.target.click === 'function') e.target.click()
+              }
             },
-          })
-        }}
-        onBlur={() => {
-          debounceBlur(true)
-        }}
-        onFocus={() => {
-          debounceBlur(false)
-        }}
-        dropdownMatchSelectWidth={false}
-        dropdownStyle={{
-          width: 60,
-        }}
-        style={{ display: 'inline-block', width: 50, marginRight: 10 }}
-      />
-      <Select
-        inputProps={{
-          onMouseUp: e => {
-            if (!focused) {
-              setFocused(true)
-              if (typeof e.target.click === 'function') e.target.click()
-            }
-          },
-        }}
-        value={row.apptDurationMinute}
-        options={minuteOptions}
-        {...restProps}
-        error={
-          row.apptDurationMinute !== undefined ? '' : 'This is a required field'
-        }
-        onChange={e => {
-          const { commitChanges } = control
-          row.apptDurationMinute = e
-          setEndTime(row)
-          validSchema(row)
-          commitChanges({
-            changed: {
-              [row.id]: {
-                endTime: row.endTime,
+          }}
+          value={row.apptDurationMinute}
+          options={minuteOptions}
+          {...restProps}
+          error={
+            row.apptDurationMinute !== undefined
+              ? ''
+              : 'This is a required field'
+          }
+          onChange={e => {
+            const { commitChanges } = control
+            row.apptDurationMinute = e
+            setEndTime(row)
+            validSchema(row)
+            commitChanges({
+              changed: {
+                [row.id]: {
+                  endTime: row.endTime,
+                },
               },
-            },
-          })
-        }}
-        onBlur={() => {
-          debounceBlur(true)
-        }}
-        onFocus={() => {
-          debounceBlur(false)
-        }}
-        dropdownMatchSelectWidth={false}
-        dropdownStyle={{
-          width: 90,
-        }}
-        style={{ display: 'inline-block', width: 75 }}
-      />
+            })
+          }}
+          onBlur={() => {
+            debounceBlur(true)
+          }}
+          onFocus={() => {
+            debounceBlur(false)
+          }}
+          dropdownMatchSelectWidth={false}
+          dropdownStyle={{
+            width: 90,
+          }}
+          style={{ width: 75 }}
+        />
+      </div>
     </div>
   )
 }

@@ -50,7 +50,7 @@ export const AppointmentDataColumn = [
 export const AppointmentDataColExtensions = (apptTimeIntervel, disabled) => [
   {
     columnName: 'calendarResourceFK',
-    width: 150,
+    width: 170,
     type: 'codeSelect',
     code: 'ctcalendarresource',
     valueField: 'id',
@@ -76,13 +76,13 @@ export const AppointmentDataColExtensions = (apptTimeIntervel, disabled) => [
   {
     columnName: 'endTime',
     isReactComponent: true,
-    width: 135,
+    width: 150,
     render: ApptDuration,
   },
   {
     columnName: 'startTime',
     isReactComponent: true,
-    width: 130,
+    width: 110,
     render: e => {
       const { row, columnConfig, cellProps } = e
       const { control, error, validSchema } = columnConfig
@@ -222,7 +222,9 @@ export const commonExt = (appointmentTypes, handleCopyAppointmentClick) => {
       columnName: 'startTime',
       type: 'time',
       sortingEnabled: false,
-      width: 80,
+      width: 55,
+      render: row =>
+        `${moment(row.startTime, timeFormat24Hour).format(timeFormat24Hour)}`,
     },
     {
       columnName: 'calendarResourceFK',

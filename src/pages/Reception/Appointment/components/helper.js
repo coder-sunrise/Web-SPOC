@@ -1,13 +1,10 @@
 import moment from 'moment'
 // common component
-import { timeFormat, timeFormat24Hour } from '@/components'
+import { timeFormat24Hour } from '@/components'
 // utils
 import { COUNTRY_CODE_NUMBER, NUMBER_TYPE } from '@/utils/constants'
 
-export const getTimeString = (value) => {
-  if (moment(value, timeFormat).isValid()) {
-    return moment(value, timeFormat).format(timeFormat)
-  }
+export const getTimeString = value => {
   if (moment(value, timeFormat24Hour).isValid()) {
     return moment(value, timeFormat24Hour).format(timeFormat24Hour)
   }
@@ -22,7 +19,7 @@ export const constructTitle = (
   if (patientProfile) {
     const { contactNumbers = [] } = patientProfile
     const mobile = contactNumbers.find(
-      (contact) => contact.numberTypeFK === NUMBER_TYPE.MOBILE,
+      contact => contact.numberTypeFK === NUMBER_TYPE.MOBILE,
     )
     const countryCode = mobile ? COUNTRY_CODE_NUMBER[mobile.countryCodeFK] : ''
     const number = mobile ? mobile.number : ''
@@ -31,8 +28,8 @@ export const constructTitle = (
   return `${patientName} (${patientContactNo})`
 }
 
-export const parseDateToDay = (date) => date.format('dddd')
-export const parseDateToFullDate = (date) => date.format('DD MMM YYYY')
+export const parseDateToDay = date => date.format('dddd')
+export const parseDateToFullDate = date => date.format('DD MMM YYYY')
 export const parseDurationToString = (durationInMoment = moment.duration()) => {
   if (!moment.isDuration(durationInMoment)) return ''
 
@@ -52,7 +49,7 @@ export const parseDurationToString = (durationInMoment = moment.duration()) => {
   return `${hourLabel} ${minuteLabel}`
 }
 
-export const getDuration = (appointment) => {
+export const getDuration = appointment => {
   const momentStartTime = moment(appointment.startTime, 'HH:mm')
   const momentEndTime = moment(appointment.endTime, 'HH:mm')
   const momentDuration = moment.duration(momentEndTime.diff(momentStartTime))
@@ -60,7 +57,7 @@ export const getDuration = (appointment) => {
 }
 
 export const getTimeRange = (apptResources = [], appointment) => {
-  let firstAppt = apptResources.find((item) => item.isPrimaryClinician)
+  let firstAppt = apptResources.find(item => item.isPrimaryClinician)
   if (!firstAppt) firstAppt = appointment
   if (firstAppt) {
     const momentDuration = getDuration(firstAppt)
