@@ -264,7 +264,7 @@ class FamilyMemberGrid extends PureComponent {
         </h5>
         <FastEditableTableGrid
           rows={values.patientFamilyGroup.patientFamilyMember}
-          schema={schema.patientFamilyMember._subType}
+          schema={schema.patientFamilyGroup.fields.patientFamilyMember._subType}
           FuncProps={{
             pagerConfig: {
               containerExtraComponent: !this.props.disabled && (
