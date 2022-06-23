@@ -7,7 +7,7 @@ import { withStyles } from '@material-ui/core'
 import ErrorOutline from '@material-ui/icons/ErrorOutline'
 import Cached from '@material-ui/icons/Cached'
 // common components
-import { Popper, Tooltip } from '@/components'
+import { Popper, Tooltip, timeFormat24Hour } from '@/components'
 // assets
 import LocalOfferIcon from '@material-ui/icons/LocalOffer'
 import { CALENDAR_VIEWS } from '@/utils/constants'
@@ -152,9 +152,9 @@ class Event extends React.PureComponent {
             <div>
               <div className={monthViewClass}>
                 <span className={classes.title}>
-                  {`${moment(start).format('h:mm A')} - ${moment(end).format(
-                    'h:mm A',
-                  )}`}
+                  {`${moment(start).format(timeFormat24Hour)} - ${moment(
+                    end,
+                  ).format(timeFormat24Hour)}`}
                 </span>
               </div>
               <div className={monthViewClass}>
@@ -180,9 +180,9 @@ class Event extends React.PureComponent {
             <div>
               <div className={otherViewClass}>
                 <span className={classes.title}>
-                  {`${moment(start).format('h:mm A')} - ${moment(end).format(
-                    'h:mm A',
-                  )}`}
+                  {`${moment(start).format(timeFormat24Hour)} - ${moment(
+                    end,
+                  ).format(timeFormat24Hour)}`}
                 </span>
               </div>
               <div className={otherViewClass}>

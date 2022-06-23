@@ -5,7 +5,7 @@ import {
   CANCELLATION_REASON_TYPE,
   mapApptStatus,
 } from '@/utils/constants'
-import { CodeSelect, Tooltip } from '@/components'
+import { CodeSelect, Tooltip, timeFormat24Hour } from '@/components'
 import moment from 'moment'
 import { AppointmentTypeLabel } from '@/components/_medisys'
 
@@ -48,7 +48,9 @@ export const commonExt = appointmentTypes => {
       columnName: 'startTime',
       type: 'time',
       sortingEnabled: false,
-      width: 80,
+      width: 55,
+      render: row =>
+        `${moment(row.startTime, timeFormat24Hour).format(timeFormat24Hour)}`,
     },
     {
       columnName: 'calendarResourceFK',

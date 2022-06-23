@@ -5,6 +5,7 @@ import moment from 'moment'
 import { withStyles } from '@material-ui/core'
 import AccessTime from '@material-ui/icons/AccessTime'
 import ErrorOutline from '@material-ui/icons/ErrorOutline'
+import * as Helper from './helper'
 // common component
 import {
   CardBody,
@@ -13,7 +14,6 @@ import {
   TextField,
   CodeSelect,
   Danger,
-  timeFormat,
   timeFormat24Hour,
 } from '@/components'
 import { CALENDAR_VIEWS } from '@/utils/constants'
@@ -37,17 +37,7 @@ const styles = () => ({
   },
 })
 
-const getTimeString = value => {
-  if (moment(value, timeFormat).isValid()) {
-    return moment(value, timeFormat).format(timeFormat)
-  }
-  if (moment(value, timeFormat24Hour).isValid()) {
-    return moment(value, timeFormat24Hour).format(timeFormat24Hour)
-  }
-  return 'N/A'
-}
-
-const getDoctorBlockTimeString = value => moment(value).format(timeFormat)
+const getDoctorBlockTimeString = value => moment(value).format(timeFormat24Hour)
 
 const DoctorEventContent = ({ popoverEvent, classes }) => {
   const startTime = getDoctorBlockTimeString(popoverEvent.startDateTime)
@@ -100,8 +90,8 @@ class DoctorBlockPopover extends React.Component {
       <Fragment>
         <AccessTime className={classnames(classes.icon)} />
         <span>
-          {getTimeString(popoverEvent.startTime)} -&nbsp;
-          {getTimeString(popoverEvent.endTime)}
+          {Helper.getTimeString(popoverEvent.startTime)} -&nbsp;
+          {Helper.getTimeString(popoverEvent.endTime)}
         </span>
       </Fragment>
     )
