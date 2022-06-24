@@ -849,7 +849,6 @@ export default ({
         },
       })
     } else if (row.type === ORDER_TYPES.SERVICE) {
-      console.log(row)
       dispatch({
         type: 'orders/updateState',
         payload: {
