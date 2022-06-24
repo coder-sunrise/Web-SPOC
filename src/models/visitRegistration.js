@@ -50,12 +50,18 @@ export default createFormViewModel({
                 type: 'patient/query',
                 payload: { id: query.pid },
               })
+          dispatch({
+            type: 'updateState',
+            payload: {
+              fromAppt: query.apptid ? true : false,
+              visitOrderTemplateFK: query.visitOrderTemplateFK,
+            },
+          })
           if (query.apptid) {
             dispatch({
               type: 'updateState',
-              payload: { appointmentFK: query.apptid },
+              payload: { appointmentFK: query.apptid, visitMode: 'edit' },
             })
-
             dispatch({
               type: 'calendar/getAppointmentDetails',
               payload: {
@@ -65,7 +71,9 @@ export default createFormViewModel({
             }).then(r => {
               dispatch({
                 type: 'updateState',
-                payload: { appointment: { ...r } },
+                payload: {
+                  appointment: { ...r },
+                },
               })
             })
           }

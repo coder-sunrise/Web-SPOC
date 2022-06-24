@@ -362,11 +362,11 @@ class Appointment extends React.PureComponent {
     })
 
     if (clearPatient) {
-      dispatch({
-        type: 'patient/updateState',
-        payload: { entity: null },
-      })
-    }
+                        dispatch({
+                          type: 'patient/updateState',
+                          payload: { entity: null },
+                        })
+                      }
     history.push(getRemovedUrl(['md', 'pid', 'apptid']))
   }
 

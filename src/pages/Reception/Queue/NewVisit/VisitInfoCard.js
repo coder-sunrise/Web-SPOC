@@ -167,14 +167,27 @@ const VisitInfoCard = ({
     return activeItemTotal
   }
 
-  const validateTotalCharges = value => {
+  const validateTotalCharges = async value => {
     const { values, dispatch } = restProps
     let totalTempCharge = 0
-    if ((values.visitOrderTemplateFK || 0) > 0 && currentVisitTemplate) {
-      totalTempCharge = getVisitOrderTemplateTotal(
-        visitType,
-        currentVisitTemplate,
-      )
+    if ((values.visitOrderTemplateFK || 0) > 0) {
+      if (currentVisitTemplate) {
+        totalTempCharge = getVisitOrderTemplateTotal(
+          visitType,
+          currentVisitTemplate,
+        )
+      } else {
+        await dispatch({
+          type: 'settingVisitOrderTemplate/queryOne',
+          payload: {
+            id: values.visitOrderTemplateFK,
+          },
+        }).then(template => {
+          if (template) {
+            totalTempCharge = getVisitOrderTemplateTotal(visitType, template)
+          }
+        })
+      }
     }
     if ((value || 0) > totalTempCharge) {
       return `Cannot more than default charges(${totalTempCharge}).`
