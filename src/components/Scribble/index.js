@@ -68,6 +68,7 @@ import {
 } from '@/utils/utils'
 import { Add } from '@material-ui/icons'
 import moment from 'moment'
+import './index.css'
 
 const styles = () => ({
   container: {
@@ -189,7 +190,7 @@ class ScribbleTemplateItem extends React.Component {
       onInsertImage,
     } = this.props
     return (
-      <div style={{ paddingBottom: 5 }}>
+      <div style={{ paddingBottom: 5 }} class='noselectable'>
         <Tooltip title='Double click to apply template'>
           <div
             style={{
