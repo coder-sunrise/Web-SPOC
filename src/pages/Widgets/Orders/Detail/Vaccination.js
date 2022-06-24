@@ -577,9 +577,11 @@ class Vaccination extends PureComponent {
   onAdjustmentConditionChange = v => {
     const { values } = this.props
     const { isMinus, adjValue, isExactAmount } = values
-    if (!isNumber(adjValue)) return
+    if (!isNumber(adjValue)) {
+      this.props.setFieldValue('adjValue', 0)
+    }
 
-    let value = adjValue
+    let value = adjValue || 0
     if (!isExactAmount && adjValue > 100) {
       value = 100
       this.props.setFieldValue('adjValue', 100)
@@ -1318,7 +1320,7 @@ class Vaccination extends PureComponent {
                 render={args => {
                   return (
                     <NumberInput
-                      label='Total After Adj'
+                      label='Total After Adj.'
                       currency
                       disabled
                       {...args}

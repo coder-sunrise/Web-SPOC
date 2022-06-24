@@ -17,7 +17,7 @@ import {
   Snackbar,
 } from '@/components'
 
-const styles = (theme) => ({
+const styles = theme => ({
   mainInput: {
     width: 'calc(100% - 120px)',
     display: 'inline-block',
@@ -134,25 +134,25 @@ class Adjustment extends PureComponent {
     const result = calculateAmount(
       rows,
       editAdj
-        ? adjustments.map((o) => {
-          if (
-            (editAdj.uid && editAdj.uid === o.uid) ||
-            (!editAdj.uid && editAdj.index === o.index)
-          )
-            return {
-              ...o,
+        ? adjustments.map(o => {
+            if (
+              (editAdj.uid && editAdj.uid === o.uid) ||
+              (!editAdj.uid && editAdj.index === o.index)
+            )
+              return {
+                ...o,
+                adjType: isExactAmount ? 'ExactAmount' : 'Percentage',
+                adjValue: value,
+              }
+            return o
+          })
+        : [
+            ...adjustments,
+            {
               adjType: isExactAmount ? 'ExactAmount' : 'Percentage',
               adjValue: value,
-            }
-          return o
-        })
-        : [
-          ...adjustments,
-          {
-            adjType: isExactAmount ? 'ExactAmount' : 'Percentage',
-            adjValue: value,
-          },
-        ],
+            },
+          ],
       config,
     )
 
@@ -176,12 +176,14 @@ class Adjustment extends PureComponent {
     })
   }
 
-  onConditionChange = (v) => {
+  onConditionChange = v => {
     // console.log(this.props, 'onConditionChange')
     const { values, setFieldValue } = this.props
     const { isExactAmount, isMinus, adjustment } = values
-    if (!isNumber(adjustment)) return
-    let value = adjustment
+    if (!isNumber(adjustment)) {
+      this.props.setFieldValue('adjValue', 0)
+    }
+    let value = adjustment || 0
 
     if (!isMinus) {
       value = Math.abs(adjustment)
@@ -193,7 +195,7 @@ class Adjustment extends PureComponent {
     this.getFinalAmount({ value })
   }
 
-  render () {
+  render() {
     const {
       theme,
       footer,
@@ -216,15 +218,14 @@ class Adjustment extends PureComponent {
     return (
       <div>
         <div style={{ margin: theme.spacing(1) }}>
-          {errors &&
-            errors.finalAmount && (
-              <Snackbar variant='warning' message={errors.finalAmount} />
-            )}
+          {errors && errors.finalAmount && (
+            <Snackbar variant='warning' message={errors.finalAmount} />
+          )}
           <GridContainer>
             <GridItem xs={12}>
               <FastField
                 name='isMinus'
-                render={(args) => {
+                render={args => {
                   return (
                     <Switch
                       style={{
@@ -247,7 +248,7 @@ class Adjustment extends PureComponent {
               />
               <Field
                 name='adjustment'
-                render={(args) => {
+                render={args => {
                   args.min = 0
                   if (values.isExactAmount) {
                     return (
@@ -290,7 +291,7 @@ class Adjustment extends PureComponent {
               />
               <FastField
                 name='isExactAmount'
-                render={(args) => {
+                render={args => {
                   return (
                     <Switch
                       style={{
@@ -326,7 +327,7 @@ class Adjustment extends PureComponent {
               <GridItem xs={12}>
                 <FastField
                   name='adjRemark'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <TextField
                         label='Remarks'
@@ -343,7 +344,7 @@ class Adjustment extends PureComponent {
               <GridItem xs={12}>
                 <FastField
                   name='finalAmount'
-                  render={(args) => {
+                  render={args => {
                     return (
                       <NumberInput
                         style={{ marginTop: theme.spacing(2) }}
