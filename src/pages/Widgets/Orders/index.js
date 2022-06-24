@@ -60,7 +60,7 @@ const styles = theme => ({
     borderRadius: 0,
     '& .ant-switch-handle': {
       width: 20,
-      height: 16,
+      height: 18,
       '&::before': {
         borderRadius: 3,
         right: 2,

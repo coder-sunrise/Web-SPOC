@@ -68,12 +68,15 @@ const styles = theme => ({
   },
   switchContainer: {
     lineHeight: '1em',
-    height: '100%',
+    borderRadius: 3,
+    height: 24,
+    margin: 0,
     color: 'currentColor',
-    borderRadius: 0,
+    overflow: 'visible',
+    top: -2,
     '& .ant-switch-handle': {
       width: 20,
-      height: 16,
+      height: 20,
       '&::before': {
         borderRadius: 3,
         right: 2,
