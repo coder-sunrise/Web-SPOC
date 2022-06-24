@@ -22,7 +22,7 @@ const styles = () => ({
 })
 
 @connect(({ visitRegistration }) => ({
-  visitRegistration
+  visitRegistration,
 }))
 class VisitListing extends ReportBase {
   constructor(props) {
@@ -34,7 +34,7 @@ class VisitListing extends ReportBase {
     }
   }
 
-  formatReportParams = (params) => {
+  formatReportParams = params => {
     return {
       ...params,
       groupByVisitPurpose: params.groupBy === 'VisitPurpose',
@@ -45,7 +45,7 @@ class VisitListing extends ReportBase {
   componentDidMount = async () => {
     const { dispatch } = this.props
     const response = await dispatch({
-      type: 'visitRegistration/getVisitOrderTemplateList',
+      type: 'visitRegistration/getVisitOrderTemplateListForDropdown',
       payload: {
         pagesize: 9999,
       },
@@ -53,8 +53,8 @@ class VisitListing extends ReportBase {
     if (response) {
       const { data } = response
       const templateOptions = data
-        .filter((template) => template.isActive)
-        .map((template) => {
+        .filter(template => template.isActive)
+        .map(template => {
           return {
             ...template,
             value: template.id,
@@ -72,7 +72,10 @@ class VisitListing extends ReportBase {
   }
 
   renderFilterBar = (handleSubmit, isSubmitting) => {
-    const { visitRegistration: { visitOrderTemplateOptions = [] }, classes } = this.props
+    const {
+      visitRegistration: { visitOrderTemplateOptions = [] },
+      classes,
+    } = this.props
     return (
       <FilterBar
         handleSubmit={handleSubmit}
@@ -83,15 +86,19 @@ class VisitListing extends ReportBase {
     )
   }
 
-  renderContent = (reportDatas) => {
+  renderContent = reportDatas => {
     return <VisitList reportDatas={reportDatas} />
   }
 }
 
 const VisitListingWithFormik = withFormik({
   mapPropsToValues: () => ({
-    dateFrom: moment(new Date()).startOf('month').toDate(),
-    dateTo: moment(new Date()).endOf('month').toDate(),
+    dateFrom: moment(new Date())
+      .startOf('month')
+      .toDate(),
+    dateTo: moment(new Date())
+      .endOf('month')
+      .toDate(),
     groupBy: 'None',
   }),
 })(VisitListing)

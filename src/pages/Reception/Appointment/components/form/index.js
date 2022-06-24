@@ -130,7 +130,7 @@ class Form extends React.PureComponent {
   componentDidMount = async () => {
     const { values, dispatch, setFieldValue } = this.props
     const response = await dispatch({
-      type: 'visitRegistration/getVisitOrderTemplateList',
+      type: 'visitRegistration/getVisitOrderTemplateListForDropdown',
       payload: {
         pagesize: 9999,
       },

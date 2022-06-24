@@ -119,6 +119,7 @@ const getHeight = propsHeight => {
 class NewVisit extends PureComponent {
   state = {
     hasActiveSession: false,
+    currentVisitOrderTemplate: undefined,
   }
 
   constructor(props) {
@@ -129,7 +130,7 @@ class NewVisit extends PureComponent {
   componentDidMount = async () => {
     const { dispatch, patientInfo } = this.props
     const response = await dispatch({
-      type: 'visitRegistration/getVisitOrderTemplateList',
+      type: 'visitRegistration/getVisitOrderTemplateListForDropdown',
       payload: {
         pagesize: 9999,
       },
@@ -237,6 +238,25 @@ class NewVisit extends PureComponent {
         return [...attachments, { ...item }]
       }, [])
     setFieldValue('visitAttachment', updated)
+  }
+  getVisitOrderTemplateDetails = id => {
+    if (!id) {
+      this.setState({ currentVisitOrderTemplate: undefined })
+      return
+    }
+    if (this.state.currentVisitOrderTemplate?.id === id) return
+    this.props
+      .dispatch({
+        type: 'settingVisitOrderTemplate/queryOne',
+        payload: {
+          id: id,
+        },
+      })
+      .then(template => {
+        if (template) {
+          this.setState({ currentVisitOrderTemplate: template })
+        }
+      })
   }
 
   validatePatient = () => {
@@ -645,6 +665,12 @@ class NewVisit extends PureComponent {
                           )}
                           isReadOnly={isReadOnly}
                           handleUpdateAttachments={this.updateAttachments}
+                          getVisitOrderTemplateDetails={
+                            this.getVisitOrderTemplateDetails
+                          }
+                          currentVisitTemplate={
+                            this.state.currentVisitOrderTemplate
+                          }
                           attachments={values.visitAttachment}
                           visitType={values.visitPurposeFK}
                           dispatch={dispatch}

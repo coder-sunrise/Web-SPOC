@@ -222,6 +222,24 @@ export default createFormViewModel({
           return false
         }
       },
+      *getVisitOrderTemplateListForDropdown({ payload }, { call, put }) {
+        try {
+          const response = yield call(
+            service.queryVisitOrderTemplateForDropdown,
+            payload,
+          )
+          const { data } = response
+          return data
+        } catch (error) {
+          yield put({
+            type: 'updateErrorState',
+            payload: {
+              patientInfo: 'Failed to retrieve visit purposes',
+            },
+          })
+          return false
+        }
+      },
       *getBizSession({ payload }, { call, put }) {
         const response = yield call(service.getBizSession, payload)
         const { data } = response
