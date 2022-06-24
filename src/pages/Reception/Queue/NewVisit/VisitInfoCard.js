@@ -115,6 +115,7 @@ const VisitInfoCard = ({
   copaymentScheme,
   patientInfo,
   clinicSettings,
+  currentVisitTemplate,
   queueLog,
   visitMode,
   ctvisitpurpose,
@@ -123,6 +124,17 @@ const VisitInfoCard = ({
   const [visitGroupMessage, setVisitGroupMessage] = useState()
   const [visitGroupPopup, setVisitGroupPopup] = useState(false)
 
+  useEffect(() => {
+    if (currentVisitTemplate) {
+      let activeItemTotal = getVisitOrderTemplateTotal(
+        visitType,
+        currentVisitTemplate,
+      )
+      setFieldValue(FormField['visit.VisitOrderTemplateTotal'], activeItemTotal)
+    } else {
+      setFieldValue(FormField['visit.VisitOrderTemplateTotal'], undefined)
+    }
+  }, [currentVisitTemplate, visitType])
   // console.log(fromMedicalCheckupReporting)
   const disableConsReady = Authorized.check('queue.modifyconsultationready')
 
@@ -156,13 +168,13 @@ const VisitInfoCard = ({
   }
 
   const validateTotalCharges = value => {
-    const { values } = restProps
+    const { values, dispatch } = restProps
     let totalTempCharge = 0
-    if ((values.visitOrderTemplateFK || 0) > 0) {
-      const template = visitOrderTemplateOptions.find(
-        i => i.id === values.visitOrderTemplateFK,
+    if ((values.visitOrderTemplateFK || 0) > 0 && currentVisitTemplate) {
+      totalTempCharge = getVisitOrderTemplateTotal(
+        visitType,
+        currentVisitTemplate,
       )
-      totalTempCharge = getVisitOrderTemplateTotal(visitType, template)
     }
     if ((value || 0) > totalTempCharge) {
       return `Cannot more than default charges(${totalTempCharge}).`
@@ -178,31 +190,24 @@ const VisitInfoCard = ({
   }
 
   const handleVisitOrderTemplateChange = (vType, opts) => {
+    const { dispatch, getVisitOrderTemplateDetails } = restProps
     if (opts) {
-      let activeItemTotal = getVisitOrderTemplateTotal(vType, opts)
-
-      setFieldValue(FormField['visit.VisitOrderTemplateTotal'], activeItemTotal)
+      getVisitOrderTemplateDetails(opts.id)
     } else {
-      setTimeout(() => {
-        setFieldValue(FormField['visit.VisitOrderTemplateTotal'], undefined)
-      }, 1)
+      getVisitOrderTemplateDetails(undefined)
     }
   }
 
   const handleVisitTypeChange = (v, op) => {
-    const { values } = restProps
-    const template = visitOrderTemplateOptions.find(
-      i => i.id === values.visitOrderTemplateFK,
-    )
+    const { values, dispatch, getVisitOrderTemplateDetails } = restProps
     setFieldValue(FormField['visit.visitType'], v)
     if (v !== 1) {
       setFieldValue(FormField['visit.consReady'], false)
     }
     updateMedicalCheckup(v, values.isForInvoiceReplacement)
     setFieldValue('visitBasicExaminations[0].visitPurposeFK', v)
-
-    if (template) {
-      handleVisitOrderTemplateChange(v, template)
+    if (currentVisitTemplate) {
+      handleVisitOrderTemplateChange(v, currentVisitTemplate)
     }
   }
 
@@ -255,13 +260,13 @@ const VisitInfoCard = ({
     setVisitGroupPopup(false)
   }
 
-  const { values } = restProps
+  const { values, dispatch } = restProps
   let totalTempCharge = 0
-  if ((values.visitOrderTemplateFK || 0) > 0) {
-    const template = visitOrderTemplateOptions.find(
-      i => i.id === values.visitOrderTemplateFK,
+  if ((values.visitOrderTemplateFK || 0) > 0 && currentVisitTemplate) {
+    totalTempCharge = getVisitOrderTemplateTotal(
+      visitType,
+      currentVisitTemplate,
     )
-    totalTempCharge = getVisitOrderTemplateTotal(visitType, template)
   }
   let showNotApplyAdjustment =
     totalTempCharge !== (values.visitOrderTemplateTotal || 0)

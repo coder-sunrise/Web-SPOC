@@ -4,6 +4,7 @@ import * as service from '@/services/common'
 const patientApiUrl = '/api/patient'
 const queueApiUrl = '/api/queue'
 const visitOrderTemplateUrl = '/api/visitOrderTemplate'
+const visitOrderTemplateUrlForDropdown = '/api/visitOrderTemplate/simple'
 const bizSessionAPIURL = '/api/bizsession'
 
 // export async function fetchPatientInfoByPatientID (patientID) {
@@ -14,12 +15,12 @@ const bizSessionAPIURL = '/api/bizsession'
 //   return response
 // }
 
-export const query = (payload) => {
+export const query = payload => {
   if (payload.id === 0) return false
   return service.query(queueApiUrl, payload)
 }
 
-export async function registerVisit (visitInfo) {
+export async function registerVisit(visitInfo) {
   const options = {
     method: 'POST',
     data: JSON.stringify(visitInfo),
@@ -29,7 +30,7 @@ export async function registerVisit (visitInfo) {
   return response
 }
 
-export const saveVisit = async (visitInfo) => {
+export const saveVisit = async visitInfo => {
   const { id } = visitInfo
   const options = {
     method: 'PUT',
@@ -40,8 +41,11 @@ export const saveVisit = async (visitInfo) => {
   return response
 }
 
-export const queryVisitOrderTemplate = (params) =>
+export const queryVisitOrderTemplate = params =>
   service.queryList(visitOrderTemplateUrl, params)
+
+export const queryVisitOrderTemplateForDropdown = params =>
+  service.queryList(visitOrderTemplateUrlForDropdown, params)
 
 export const queryReferralList = async () => {
   const response = await axiosRequest(`/api/ReferralSource`)
@@ -53,7 +57,7 @@ export const queryReferralPersonList = async () => {
   return response
 }
 
-export const upsert = (payload) => service.upsert(queueApiUrl, payload)
+export const upsert = payload => service.upsert(queueApiUrl, payload)
 
-export const getBizSession = (params) =>
+export const getBizSession = params =>
   service.queryList(bizSessionAPIURL, params)

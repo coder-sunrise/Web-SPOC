@@ -147,7 +147,7 @@ const defaultColumns = [
       return (
         <TextField
           debounceDuration={100}
-          style={{ width: 350 }}
+          style={{ width: 380 }}
           label={formatMessage({
             id: 'reception.queue.patientSearchPlaceholder',
           })}
