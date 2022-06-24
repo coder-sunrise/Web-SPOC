@@ -187,6 +187,7 @@ class Queue extends React.Component {
     pdid = undefined,
     pdroomid = undefined,
     visitMode = undefined,
+    visitOrderTemplateFK = undefined,
   }) => {
     const parameter = {
       md: 'visreg',
@@ -197,6 +198,8 @@ class Queue extends React.Component {
     if (pdid) parameter.pdid = pdid
     if (pdroomid) parameter.pdroomid = pdroomid
     if (visitMode) parameter.visitMode = visitMode
+    if (visitOrderTemplateFK)
+      parameter.visitOrderTemplateFK = visitOrderTemplateFK
 
     // console.log(parameter)
     this.togglePatientSearch(false)
@@ -208,12 +211,14 @@ class Queue extends React.Component {
     appointmentID = undefined,
     primaryClinicianFK = undefined,
     primaryClinicianRoomFK = undefined,
+    visitOrderTemplateFK = undefined,
   }) => {
     this.showVisitRegistration({
       patientID,
       appointmentID,
       pdid: primaryClinicianFK,
       pdroomid: primaryClinicianRoomFK,
+      visitOrderTemplateFK: visitOrderTemplateFK,
       visitMode: 'edit',
     })
   }
@@ -707,11 +712,13 @@ class Queue extends React.Component {
         const doctorProfile = clinicianprofile.find(
           item => item.id === row.clinicianProfileFk,
         )
+        console.log(row)
         this.handleActualizeAppointment({
           patientID: row.patientProfileFk,
           appointmentID: row.id,
           primaryClinicianFK: doctorProfile ? doctorProfile.id : undefined,
           primaryClinicianRoomFK: row.roomFk,
+          visitOrderTemplateFK: row.visitOrderTemplateFK,
         })
         break
       }

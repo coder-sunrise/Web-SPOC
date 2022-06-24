@@ -1011,6 +1011,7 @@ class Form extends React.PureComponent {
       md: 'visreg',
       pid: values.patientProfileFK,
       apptid: values.currentAppointment.id,
+      visitOrderTemplateFK: values.currentAppointment.visitOrderTemplateFK,
       pdid: primaryDoctorResource?.calendarResource?.clinicianProfileDto?.id, // primary clinician id
     }
 

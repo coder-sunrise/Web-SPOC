@@ -128,7 +128,7 @@ class NewVisit extends PureComponent {
   }
 
   componentDidMount = async () => {
-    const { dispatch, patientInfo } = this.props
+    const { dispatch, patientInfo, values, visitRegistration } = this.props
     const response = await dispatch({
       type: 'visitRegistration/getVisitOrderTemplateListForDropdown',
       payload: {
@@ -164,8 +164,27 @@ class NewVisit extends PureComponent {
       },
     })
     const { data = [] } = bizSession
-    this.setState({ hasActiveSession: data.length > 0 })
+    this.setState({
+      hasActiveSession: data.length > 0,
+    })
     await this.getCodeTables()
+    setTimeout(() => {
+      if (
+        visitRegistration.visitOrderTemplateFK &&
+        visitRegistration.fromAppt
+      ) {
+        dispatch({
+          type: 'settingVisitOrderTemplate/queryOne',
+          payload: {
+            id: visitRegistration.visitOrderTemplateFK,
+          },
+        }).then(template => {
+          if (template) {
+            this.setState({ currentVisitOrderTemplate: template })
+          }
+        })
+      }
+    }, 200)
   }
 
   getCodeTables = async () => {

@@ -162,7 +162,6 @@ export const formikMapPropsToValues = ({
     let consReady
     let currentVisitOrderTemplateFK
     let defaultVisitPreOrderItem = []
-    let totalTempCharge
     let medicalCheckupWorkitem
     if (clinicInfo) {
       // doctorProfile = doctorProfiles.find(
@@ -246,15 +245,7 @@ export const formikMapPropsToValues = ({
       if (appointment && appointment.appointments.length) {
         currentVisitOrderTemplateFK =
           appointment.appointments[0].visitOrderTemplateFK
-        const visitOrderTemplate = (
-          visitRegistration.visitOrderTemplateOptions || []
-        ).find(vi => vi.id === currentVisitOrderTemplateFK)
-        if (visitOrderTemplate) {
-          totalTempCharge = getVisitOrderTemplateTotal(
-            currentVisitOrderTemplateFK,
-            visitOrderTemplate,
-          )
-        }
+
         defaultVisitPreOrderItem = appointment.appointments[0].appointmentPreOrderItem.map(
           po => {
             const {
@@ -354,7 +345,7 @@ export const formikMapPropsToValues = ({
         ? defaultVisitPreOrderItem
         : visitEntries.visitPreOrderItem,
       visitOrderTemplateTotal: !visitEntries.id
-        ? totalTempCharge
+        ? undefined
         : visitEntries.visitOrderTemplateTotal,
       visitEyeRefractionForm: {
         ...visitEyeRefractionForm,
