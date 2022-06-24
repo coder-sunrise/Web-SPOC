@@ -319,7 +319,13 @@ class ConsultationDocument extends PureComponent {
                 : 'enable',
           }}
         >
-          <Tooltip title='Add Consultation Document'>
+          <Tooltip
+            title={
+              <span style={{ fontSize: '1.4em' }}>
+                Add Consultation Document
+              </span>
+            }
+          >
             <ProgressButton
               color='primary'
               icon={<Add />}
