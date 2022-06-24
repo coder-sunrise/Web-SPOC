@@ -538,10 +538,10 @@ const CalendarView = ({
             .map(c => {
               const startTime = moment(
                 new Date(`${moment().format('DD MMM YYYY')} ${c.startTime}`),
-              ).format('hh:mm A')
+              ).format(timeFormat24Hour)
               const endTime = moment(
                 new Date(`${moment().format('DD MMM YYYY')} ${c.endTime}`),
-              ).format('hh:mm A')
+              ).format(timeFormat24Hour)
               return `${startTime} - ${endTime} Maximum slot: ${
                 c.maxCapacity
               } Balance slot: ${c.maxCapacity -

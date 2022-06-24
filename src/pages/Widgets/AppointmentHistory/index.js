@@ -117,9 +117,11 @@ class AppointmentHistory extends PureComponent {
 
   reBuildApptDatas(data) {
     return data.map(o => {
-      const firstAppointment = o.appointment_Resources.find(
-        item => item.sortOrder === 0,
-      )
+      const firstAppointment = _.orderBy(
+        o.appointment_Resources,
+        ['sortOrder'],
+        ['asc'],
+      )[0]
       let startTime = ''
       let calendarResourceFK = 0
       let { appointmentDate } = o
