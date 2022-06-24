@@ -4,6 +4,7 @@ import {
   CodeSelect,
   Tooltip,
   Button,
+  timeFormat,
   SyncfusionTimePicker,
 } from '@/components'
 import Warning from '@material-ui/icons/Error'
@@ -220,11 +221,11 @@ export const commonExt = (appointmentTypes, handleCopyAppointmentClick) => {
     },
     {
       columnName: 'startTime',
-      type: 'time',
       sortingEnabled: false,
       width: 55,
-      render: row =>
-        `${moment(row.startTime, timeFormat24Hour).format(timeFormat24Hour)}`,
+      render: row => {
+        return `${moment(row.startTime, timeFormat).format(timeFormat24Hour)}`
+      },
     },
     {
       columnName: 'calendarResourceFK',
