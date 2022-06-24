@@ -31,10 +31,15 @@ import ConsReadySwitch from './ConsReadySwitch'
 const styles = theme => ({
   switchContainer: {
     color: 'currentColor',
-    borderRadius: 0,
+    borderRadius: 3,
+    height: 24,
+    margin: 0,
+    overflow: 'visible',
+    top: -2,
+    padding: 0,
     '& .ant-switch-handle': {
       width: 20,
-      height: 16,
+      height: 20,
       '&::before': {
         borderRadius: 3,
         right: 2,
@@ -303,7 +308,6 @@ class Grid extends React.Component {
                       <ConsReadySwitch
                         className={classes.switchContainer}
                         row={row}
-                        {...this.props}
                         disabled={
                           showConsReady && showConsReady.rights !== 'enable'
                         }

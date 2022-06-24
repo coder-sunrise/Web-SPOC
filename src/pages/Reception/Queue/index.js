@@ -422,14 +422,16 @@ class Queue extends React.Component {
   }
 
   onContextMenu = (row, event) => {
-    event.preventDefault()
-    this.setState({
-      rightClickedRow: row,
-      anchorEl: {
-        x: event.pageX,
-        y: event.pageY,
-      },
-    })
+    if (event) {
+      event.preventDefault()
+      this.setState({
+        rightClickedRow: row,
+        anchorEl: {
+          x: event.pageX,
+          y: event.pageY,
+        },
+      })
+    }
   }
 
   onHideContextMenu = e => {

@@ -17,12 +17,12 @@ const STYLES = () => {
   return {
     switchContainer: {
       lineHeight: '1em',
-      height: '100%',
+      // height: '100%',
       color: 'currentColor',
       borderRadius: 3,
       '& .ant-switch-handle': {
         width: 20,
-        height: 16,
+        height: 18,
         '&::before': {
           borderRadius: 3,
           right: 2,
