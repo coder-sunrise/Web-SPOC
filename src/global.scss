@@ -1042,3 +1042,7 @@ body {
 .e-input-group.e-control-wrapper textarea.e-input {
   font-size: 14px !important;
 }
+
+[role='tooltip'] {
+  z-index: 2030 !important;
+}
