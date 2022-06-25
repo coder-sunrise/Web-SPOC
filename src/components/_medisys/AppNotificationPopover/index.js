@@ -88,7 +88,7 @@ const AppNotificationPopover = ({
   const queryNotifications = () => {
     dispatch({
       type: 'appNotification/queryNotifications',
-      payload: { source, sourceRecordId },
+      payload: { doctorUserFK: doctor.userFK, source, sourceRecordId },
     }).then(r => {
       if (r.status == 200) {
         setNotifications(r.data)

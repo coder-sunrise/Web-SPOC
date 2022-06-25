@@ -10,11 +10,13 @@ import {
   GridItem,
   Checkbox,
 } from '@/components'
-
-import { APPOINTMENT_STATUSOPTIONS } from '@/utils/constants'
+import { Table } from '@devexpress/dx-react-grid-material-ui'
+import { APPOINTMENT_STATUSOPTIONS, INVALID_APPOINTMENT_STATUS } from '@/utils/constants'
 import { queryList as queryAppointments } from '@/services/calendar'
 import Authorized from '@/utils/Authorized'
 import { previousApptTableParams } from './variables'
+import { grayColors } from '@/assets/jss'
+import { getUniqueId } from '@/utils/utils'
 
 const styles = theme => ({
   gridRow: {
@@ -25,6 +27,16 @@ const styles = theme => ({
     flexDirection: 'column',
     alignItems: 'stretch',
     height: 'calc(100vh - 80px)',
+  },
+  subRow: {
+    '& > td:first-child': {
+      paddingLeft: theme.spacing(1),
+    },
+  },
+  disabledRow: {
+    '& > td': {
+      color: grayColors[3],
+    },
   },
 })
 
@@ -114,47 +126,137 @@ class AppointmentHistory extends PureComponent {
       await this.getAppts(patient.id)
     }
   }
+  
+  reBuildApptDatas = data => {
+    let formattedList = []
+    for (let i = 0; i < data.length; i++) {
+      const { appointment_Resources, ...restValues } = data[i]
+      const currentPatientAppts = appointment_Resources.map((appt, idx) => {
+        const {
+          startTime,
+          appointmentTypeFK,
+          calendarResourceFK,
+        } = appt
+        const apptStatusId = parseInt(restValues.appointmentStatusFk, 10)
+        const apptStatus = APPOINTMENT_STATUSOPTIONS.find(m => m.id === apptStatusId)
+        const commonValues = {
+          ...restValues,
+          uid: getUniqueId(),
+          // id: appt.id,
+          appointmentTypeFK,
+          appointmentDate: `${moment(restValues.appointmentDate).format(
+              'YYYY-MM-DD',
+            )} ${moment(appt.startTime, 'HH:mm:ss').format('HH:mm:ss')}`,
+          startTime: moment(startTime, 'HH:mm:ss').format('hh:mm A'),
+          calendarResourceFK,
+          appointmentStatus: apptStatus ? apptStatus.name || '' : '',
+          appointmentStatusFk: apptStatusId,
+          appointmentRemarks: restValues.appointmentRemarks || '',
+        }
 
-  reBuildApptDatas(data) {
-    return data.map(o => {
-      const firstAppointment = _.orderBy(
-        o.appointment_Resources,
-        ['sortOrder'],
-        ['asc'],
-      )[0]
-      let startTime = ''
-      let calendarResourceFK = 0
-      let { appointmentDate } = o
-
-      if (firstAppointment) {
-        startTime = moment(firstAppointment.startTime, 'HH:mm:ss').format(
-          'hh:mm A',
-        )
-        calendarResourceFK = firstAppointment.calendarResourceFK
-        appointmentDate = `${moment(o.appointmentDate).format(
-          'YYYY-MM-DD',
-        )} ${moment(firstAppointment.startTime, 'HH:mm:ss').format('HH:mm:ss')}`
-      }
-      const apptStatusId = parseInt(o.appointmentStatusFk, 10)
-      const apptStatus = APPOINTMENT_STATUSOPTIONS.find(
-        m => m.id === apptStatusId,
-      )
-
-      const newRow = {
-        ...o,
-        appointmentDate,
-        startTime,
-        calendarResourceFK,
-        appointmentStatus: apptStatus ? apptStatus.name || '' : '',
-        appointmentStatusFk: apptStatusId,
-        appointmentRemarks: o.appointmentRemarks || '',
-      }
-      return newRow
-    })
+        if (idx === 0) {
+          return {
+            ...commonValues,
+            countNumber: 1,
+            rowspan: appointment_Resources.length,
+          }
+        }
+        return {
+          ...commonValues,
+          countNumber: 0,
+          rowspan: 0,
+        }
+      })
+  
+      formattedList = [...formattedList, ...currentPatientAppts]
+    }
+    return formattedList
   }
 
   toggleShowRecheduledByClinic = e => {
     this.getAppts(this.props.patient.id, e.target.value)
+  }
+
+  appointmentRow = p => {
+    const { classes, handleDoubleClick } = this.props
+    const { row, children, tableRow } = p
+    let newchildren = []
+    const middleColumns = children.slice(1, 4)
+
+    if (row.countNumber === 1) {
+      newchildren.push(
+        children
+          .filter((value, index) => index < 1)
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.rowspan,
+            },
+          })),
+      )
+
+      newchildren.push(middleColumns)
+
+      newchildren.push(
+        children
+          .filter((value, index) => index > 3)
+          .map(item => ({
+            ...item,
+            props: {
+              ...item.props,
+              rowSpan: row.rowspan,
+            },
+          })),
+      )
+    } else {
+      newchildren.push(middleColumns)
+    }
+
+    const selectedData = {
+      ...tableRow.row,
+      doctor: null,
+    }
+
+    const isDisabledRow = () => {
+      return (
+        INVALID_APPOINTMENT_STATUS.indexOf(selectedData.appointmentStatusFk) >
+        -1
+      )
+    }
+
+    const doubleClick = () => {
+      // const accessRight = Authorized.check('appointment.appointmentdetails')
+
+      // if (!accessRight || (accessRight && accessRight.rights !== 'enable'))
+      //   return
+
+      if (isDisabledRow()) return
+
+      handleDoubleClick(selectedData)
+    }
+
+    const disabledRowClass = isDisabledRow() ? ` ${classes.disabledRow}` : null
+    if (row.countNumber === 1) {
+      return (
+        <Table.Row
+          {...p}
+          onDoubleClick={doubleClick}
+          className={disabledRowClass}
+        >
+          {newchildren}
+        </Table.Row>
+      )
+    }
+    return (
+      <Table.Row
+        {...p}
+        className={classes.subRow + disabledRowClass}
+        onDoubleClick={doubleClick}
+      >
+        {newchildren}
+      </Table.Row>
+    )
   }
 
   render() {
@@ -177,6 +279,7 @@ class AppointmentHistory extends PureComponent {
             <CommonTableGrid
               size='sm'
               TableProps={{
+                rowComponent: this.appointmentRow,
                 height,
               }}
               rows={previousAppt}
