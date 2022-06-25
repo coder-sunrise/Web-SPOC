@@ -46,14 +46,6 @@ const ReportingDoctorTag = ({
   const [newNotification, setNewNotification] = useState(undefined)
   const dispatch = useDispatch()
   const user = useSelector(st => st.user)
-  const queryNotifications = () => {
-    if (!isShowMessage) return
-    dispatch({ type: 'appNotification/queryNotifications' }).then(response => {
-      if (response && response.status === '200') {
-        setNewNotification(response.data)
-      }
-    })
-  }
   let reportingDoctorColor = '#354497'
   if (
     medicalCheckupDoctor.status === REPORTINGDOCTOR_STATUS.COMMENTVERIFYING ||
