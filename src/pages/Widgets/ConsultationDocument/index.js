@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 
 import withStyles from '@material-ui/core/styles/withStyles'
-import { Tooltip } from '@material-ui/core'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import Add from '@material-ui/icons/Add'
@@ -17,6 +16,7 @@ import {
   Popconfirm,
   notification,
   ProgressButton,
+  Tooltip,
   AuthorizedContext,
   withFormikExtend,
 } from '@/components'
