@@ -108,14 +108,37 @@ class Grid extends React.Component {
 
     const { clinicianProfile } = user.data
     if (filter === StatusIndicator.APPOINTMENT) {
+      let result = calendarEvents
       if (selfOnly) {
-        return calendarEvents.filter(item =>
+        result = result.filter(item =>
           clinicianProfile
             ? item.clinicianProfileFk === clinicianProfile.id
             : true,
         )
       }
-      return calendarEvents
+      if (doctor.length > 0) {
+        result = result.filter(
+          item => doctor.indexOf(item.doctorProfileFK) > -1,
+        )
+      }
+      if (searchQuery) {
+        result = result.filter(
+          item =>
+            (item.patientName || '')
+              .toLowerCase()
+              .indexOf(searchQuery.toLowerCase()) >= 0 ||
+            (item.patientReferenceNo || '')
+              .toLowerCase()
+              .indexOf(searchQuery.toLowerCase()) >= 0 ||
+            (item.patientAccountNo || '')
+              .toLowerCase()
+              .indexOf(searchQuery.toLowerCase()) >= 0 ||
+            (item.patientContactNo || '')
+              .toLowerCase()
+              .indexOf(searchQuery.toLowerCase()) >= 0,
+        )
+      }
+      return result
     }
 
     if (filter === StatusIndicator.E_QUEUE) return eQueueEvents

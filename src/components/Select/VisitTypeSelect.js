@@ -25,7 +25,7 @@ class VisitTypeSelect extends React.Component {
         )
         var newVisitType = getMappedVisitType(result, visitTypeSetting).filter(
           vt => vt.isEnabled === 'true',
-        ) 
+        )
         this.setState({
           ctVisitpurpose: newVisitType,
         })
