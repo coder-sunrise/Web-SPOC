@@ -182,6 +182,7 @@ class ScribbleTemplateItem extends React.Component {
       setTemplate,
       upsertTemplate,
       classes,
+      item: { concurrencyToken },
       onEditingTemplate,
       isTemplateEditing,
     } = this.props
@@ -242,7 +243,11 @@ class ScribbleTemplateItem extends React.Component {
                       })
                       return
                     }
-                    const savedItem = { ...item, description }
+                    const savedItem = {
+                      ...item,
+                      description,
+                      concurrencyToken,
+                    }
                     this.setState({
                       isEdit: false,
                       item: savedItem,
@@ -286,7 +291,11 @@ class ScribbleTemplateItem extends React.Component {
                   disabled={isTemplateEditing}
                   {...this.buttonProps}
                   onClick={() => {
-                    const deledItem = { ...item, isDeleted: true }
+                    const deledItem = {
+                      ...item,
+                      isDeleted: true,
+                      concurrencyToken,
+                    }
                     this.setState({ item: deledItem })
                     upsertTemplate(deledItem)
                   }}
