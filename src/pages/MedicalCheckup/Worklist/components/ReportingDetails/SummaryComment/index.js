@@ -13,6 +13,7 @@ import {
   dateFormatLong,
   Tooltip,
   Popconfirm,
+  notification,
   DragableTableGrid,
   SizeContainer,
 } from '@/components'
@@ -407,7 +408,14 @@ const SummaryComment = props => {
         status,
       },
     }).then(r => {
-      refreshMedicalCheckup()
+      if (r === 204) {
+        notification.success({
+          message: (status = 'Verified'
+            ? 'Reporting comment completed.'
+            : 'Reporting comment reverted to doctor.'),
+        })
+        refreshMedicalCheckup()
+      }
     })
   }
   const getNonVerifyCount = () => {
