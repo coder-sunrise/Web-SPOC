@@ -1029,9 +1029,12 @@ body {
   background-color: #c8dafd !important;
 }
 
-.ant-tabs-tab-btn{
-  color:#000000;
+.ant-tabs-tab-btn {
+  color: #000000;
 }
-.ant-pro-table-column-setting-overlay .ant-popover-inner-content{
+.ant-pro-table-column-setting-overlay .ant-popover-inner-content {
   width: 280px;
+}
+[role='tooltip'] {
+  z-index: 2030 !important;
 }
