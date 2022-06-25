@@ -1052,6 +1052,16 @@ class Form extends React.PureComponent {
         source => source.id === resource.calendarResourceFK && source.isActive,
       )
       if (!calendarResource) return
+      console.log(datagrid)
+      if (
+        datagrid.find(
+          res =>
+            res.calendarResourceFK === calendarResource.id && !res.isDeleted,
+        )
+      ) {
+        // Skip the active resources
+        return
+      }
       const newResource = {
         templateFK: template.id,
         appointmentTypeFK: primaryResrouce?.appointmentTypeFK,
