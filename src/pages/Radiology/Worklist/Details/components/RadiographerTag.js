@@ -126,7 +126,7 @@ export const RadiographerTag = ({
         <Select
           showSearch
           ref={inputRef}
-          style={{ width: 150 }}
+          style={{ width: 250 }}
           size={'small'}
           onChange={handleInputConfirm}
           onBlur={e => handleInputCancel(e)}

@@ -60,7 +60,7 @@ export default compose(
       return {}
     },
     validationSchema: Yup.object().shape({
-      verifyRemarks: Yup.string().required(),
+      // verifyRemarks: Yup.string().required(),
     }),
     handleSubmit: (values, { props }) => {
       const { onVerificationSave } = props

@@ -320,6 +320,7 @@ class SchemesGrid extends PureComponent {
         getInitialValue: row => {
           return [row.validFrom, row.validTo]
         },
+        width: 250,
         sortingEnabled: false,
         isDisabled: row => {
           return this.isPHPC(row)
@@ -329,6 +330,7 @@ class SchemesGrid extends PureComponent {
         columnName: 'schemeTypeFK',
         type: 'codeSelect',
         code: 'ctSchemeType',
+        width: 250,
         sortingEnabled: false,
         localFilter: opt => {
           return isMedisaveEnable ? opt : !this.isMedisave(opt)
@@ -502,6 +504,7 @@ class SchemesGrid extends PureComponent {
       {
         columnName: 'accountNumber',
         sortingEnabled: false,
+        width: 250,
         isDisabled: row => {
           return !this.isCorporate(row)
         },

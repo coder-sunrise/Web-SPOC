@@ -151,8 +151,16 @@ const getVisitDoctorUserId = props => {
       ...(orders.entity || orders.defaultService),
     }
     if (orders.entity) {
-      if (v.adjValue <= 0) {
-        v.adjValue = Math.abs(v.adjValue || 0)
+      if (
+        (v.serviceItems?.length > 0
+          ? v.serviceItems[0].adjAmount
+          : v.adjAmount) <= 0
+      ) {
+        v.adjValue = Math.abs(
+          (v.serviceItems?.length > 0
+            ? v.serviceItems[0].adjValue
+            : v.adjValue) || 0,
+        )
         v.isMinus = true
       } else {
         v.isMinus = false
@@ -160,8 +168,12 @@ const getVisitDoctorUserId = props => {
       v.isExactAmount = v.adjType !== 'Percentage'
       if ((v.serviceItems || []).length) {
         v.serviceItems[0].isMinus = v.isMinus
-        v.serviceItems[0].isExactAmount = v.isExactAmount
-        v.serviceItems[0].adjValue = v.adjValue
+        v.serviceItems[0].isExactAmount =
+          v.serviceItems?.length > 0
+            ? v.serviceItems[0].isExactAmount
+            : v.isExactAmount
+        v.serviceItems[0].adjValue =
+          v.serviceItems?.length > 0 ? v.serviceItems[0].adjValue : v.adjValue
       }
     }
     return {
@@ -402,9 +414,11 @@ class Service extends PureComponent {
 
   onAdjustmentConditionChange = editService => {
     const { isMinus, adjValue, isExactAmount } = editService
-    if (!isNumber(adjValue)) return
+    if (!isNumber(adjValue)) {
+      this.props.setFieldValue('adjValue', 0)
+    }
 
-    let value = adjValue
+    let value = adjValue || 0
     if (!isExactAmount && adjValue > 100) {
       value = 100
       editService.adjValue = 100
@@ -1212,6 +1226,7 @@ class Service extends PureComponent {
                           unCheckedChildren='+'
                           label=''
                           onChange={value => {
+                            console.log(value)
                             editService.isMinus = value
                             this.onAdjustmentConditionChange(editService)
                             setFieldValue('serviceItems', [...serviceItems])
@@ -1248,6 +1263,7 @@ class Service extends PureComponent {
                           noSuffix
                           label='Adjustment'
                           onChange={e => {
+                            console.log(e.target.value)
                             editService.adjValue = e.target.value
                             this.onAdjustmentConditionChange(editService)
                             setFieldValue('serviceItems', [...serviceItems])
@@ -1448,7 +1464,7 @@ class Service extends PureComponent {
                 render={args => {
                   return (
                     <NumberInput
-                      label='Total After Adj'
+                      label='Total After Adj.'
                       style={{
                         marginLeft: theme.spacing(7),
                         paddingRight: theme.spacing(6),

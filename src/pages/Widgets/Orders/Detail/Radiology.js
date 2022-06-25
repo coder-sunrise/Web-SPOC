@@ -397,9 +397,10 @@ class Radiology extends PureComponent {
 
   onAdjustmentConditionChange = editService => {
     const { isMinus, adjValue, isExactAmount } = editService
-    if (!isNumber(adjValue)) return
-
-    let value = adjValue
+    if (!isNumber(adjValue)) {
+      this.props.setFieldValue('adjValue', 0)
+    }
+    let value = adjValue || 0
     if (!isExactAmount && adjValue > 100) {
       value = 100
       editService.adjValue = 100
@@ -1437,7 +1438,7 @@ class Radiology extends PureComponent {
                 render={args => {
                   return (
                     <NumberInput
-                      label='Total After Adj'
+                      label='Total After Adj.'
                       style={{
                         marginLeft: theme.spacing(7),
                         paddingRight: theme.spacing(6),

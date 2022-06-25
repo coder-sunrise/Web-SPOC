@@ -50,6 +50,7 @@ const Filterbar = props => {
   const onSwitchClick = () => dispatch({ type: 'queueLog/toggleSelfOnly' })
   const clinicRoleFK = user.clinicianProfile.userProfile.role?.clinicRoleFK
   const servePatientRight = Authorized.check('queue.servepatient')
+  // const { currentFilter } = queueLog
   return (
     <div className='div-reception-header'>
       <Row wrap={false}>
@@ -63,7 +64,12 @@ const Filterbar = props => {
                     label='Visit Type'
                     {...args}
                     mode='multiple'
-                    style={{ width: 180, marginRight: 10, marginLeft: 10 }}
+                    // disabled={currentFilter === 'Appointment'}
+                    style={{
+                      width: 180,
+                      marginRight: 10,
+                      marginLeft: 10,
+                    }}
                     maxTagPlaceholder='Visit Types'
                     allowClear={true}
                     onChange={(v, op = {}) => {
@@ -97,7 +103,10 @@ const Filterbar = props => {
                   <DoctorProfileSelect
                     mode='multiple'
                     {...args}
-                    style={{ width: 160, marginRight: 10 }}
+                    style={{
+                      width: 160,
+                      marginRight: 10,
+                    }}
                     allValue={-99}
                     allValueOption={{
                       id: -99,

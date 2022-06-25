@@ -499,7 +499,7 @@ class Treatment extends PureComponent {
                   <NumberInput
                     disabled
                     currency
-                    label='Total After Adj'
+                    label='Total After Adj.'
                     {...args}
                   />
                 )}

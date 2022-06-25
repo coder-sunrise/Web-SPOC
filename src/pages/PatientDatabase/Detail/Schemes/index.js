@@ -202,6 +202,7 @@ class Schemes extends PureComponent {
       tempSchemeTypeFK = schemeTypeFK
     }
 
+    const { isEnableCHAS } = this.props.clinicSettings
     return (
       <div>
         <div>
@@ -216,21 +217,23 @@ class Schemes extends PureComponent {
                 : ''}
             </GridItem>
             <GridItem md={2}>
-              <Button
-                color='primary'
-                size='sm'
-                style={{ float: 'right' }}
-                onClick={() =>
-                  this.refreshChasBalance(
-                    tempPatientCoPaymentSchemeFK,
-                    tempSchemeTypeFK,
-                    isSaveToDb,
-                  )
-                }
-                disabled={disableSave}
-              >
-                Get CHAS
-              </Button>
+              {isEnableCHAS && (
+                <Button
+                  color='primary'
+                  size='sm'
+                  style={{ float: 'right' }}
+                  onClick={() =>
+                    this.refreshChasBalance(
+                      tempPatientCoPaymentSchemeFK,
+                      tempSchemeTypeFK,
+                      isSaveToDb,
+                    )
+                  }
+                  disabled={disableSave}
+                >
+                  Get CHAS
+                </Button>
+              )}
             </GridItem>
           </GridContainer>
         </div>

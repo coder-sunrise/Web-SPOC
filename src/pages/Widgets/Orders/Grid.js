@@ -2003,69 +2003,65 @@ export default ({
                 return ''
               return (
                 <div>
-                  <Tooltip title={editMessage}>
-                    <Button
-                      size='small'
-                      onClick={() => {
-                        editRow(row)
-                      }}
-                      type='primary'
-                      style={{ marginRight: 5 }}
-                      disabled={
-                        row.isEditingEntity ||
-                        (!row.isActive &&
-                          row.type !== '5' &&
-                          !row.isDrugMixture) ||
-                        row.isPreOrderActualize ||
-                        !editEnable ||
-                        getOrderAccessRight(
-                          editAccessRight,
-                          row.isEnableEditOrder,
-                        ).rights !== 'enable'
-                      }
-                      icon={<EditFilled />}
-                    ></Button>
-                  </Tooltip>
-                  <Tooltip title={deleteMessage}>
-                    <Button
-                      size='small'
-                      type='danger'
-                      disabled={
-                        row.isEditingEntity ||
-                        row.isPreOrderActualize ||
-                        !deleteEnable ||
-                        getOrderAccessRight(
-                          editAccessRight,
-                          row.isEnableEditOrder,
-                        ).rights !== 'enable'
-                      }
-                      onClick={() => {
+                  <Button
+                    size='small'
+                    onClick={() => {
+                      editRow(row)
+                    }}
+                    type='primary'
+                    style={{ marginRight: 5 }}
+                    disabled={
+                      row.isEditingEntity ||
+                      (!row.isActive &&
+                        row.type !== '5' &&
+                        !row.isDrugMixture) ||
+                      row.isPreOrderActualize ||
+                      !editEnable ||
+                      getOrderAccessRight(
+                        editAccessRight,
+                        row.isEnableEditOrder,
+                      ).rights !== 'enable'
+                    }
+                    icon={<EditFilled />}
+                  ></Button>
+                  <Button
+                    size='small'
+                    type='danger'
+                    disabled={
+                      row.isEditingEntity ||
+                      row.isPreOrderActualize ||
+                      !deleteEnable ||
+                      getOrderAccessRight(
+                        editAccessRight,
+                        row.isEnableEditOrder,
+                      ).rights !== 'enable'
+                    }
+                    onClick={() => {
+                      dispatch({
+                        type: 'orders/deleteRow',
+                        payload: {
+                          uid: row.uid,
+                        },
+                      })
+
+                      if (row.isPackage === true) {
                         dispatch({
-                          type: 'orders/deleteRow',
+                          type: 'orders/deletePackageItem',
                           payload: {
-                            uid: row.uid,
+                            packageGlobalId: row.packageGlobalId,
                           },
                         })
+                      }
 
-                        if (row.isPackage === true) {
-                          dispatch({
-                            type: 'orders/deletePackageItem',
-                            payload: {
-                              packageGlobalId: row.packageGlobalId,
-                            },
-                          })
-                        }
-
-                        dispatch({
-                          type: 'orders/updateState',
-                          payload: {
-                            entity: undefined,
-                          },
-                        })
-                      }}
-                      icon={<DeleteFilled />}
-                    ></Button>
-                  </Tooltip>
+                      dispatch({
+                        type: 'orders/updateState',
+                        payload: {
+                          entity: undefined,
+                        },
+                      })
+                    }}
+                    icon={<DeleteFilled />}
+                  ></Button>
                 </div>
               )
             },
