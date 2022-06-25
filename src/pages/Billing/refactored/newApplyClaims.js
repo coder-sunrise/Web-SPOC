@@ -179,7 +179,6 @@ const ApplyClaims = ({
     const invoicePayerWithUpdatedPayer = _list.map((payer, index) =>
       updatedIndex === index ? updatedPayer : payer,
     )
-    console.log(invoicePayerWithUpdatedPayer, 'ax')
     const newInvoicePayer = updateInvoicePayerPayableBalance(
       updatedInvoiceItems,
       invoicePayerWithUpdatedPayer,

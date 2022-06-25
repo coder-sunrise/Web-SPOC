@@ -410,9 +410,10 @@ const SummaryComment = props => {
     }).then(r => {
       if (r === 204) {
         notification.success({
-          message: (status = 'Verified'
-            ? 'Reporting comment completed.'
-            : 'Reporting comment reverted to doctor.'),
+          message:
+            status === 'New'
+              ? 'Reporting comment reverted to doctor.'
+              : 'Comment Verified.',
         })
         refreshMedicalCheckup()
       }

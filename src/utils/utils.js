@@ -1006,16 +1006,20 @@ const calculateGSTAdj = ({
     activeOrderRows.map(i => i[gstAmtField]).reduce(sumReducer, 0),
   )
   const diff = roundTo(gst - totalItemizedGST)
-
   // include the diff of GST value only to the last items
-  activeOrderRows.forEach((r, index) => {
-    if (index === activeOrderRows.length - 1) {
-      r[gstAmtField] += diff
-      if (!isGSTInclusive) {
-        r.totalAfterGST += diff
+  activeOrderRows
+    .filter(x => x.totalBeforeGST > 0)
+    .forEach((r, index) => {
+      if (
+        index ===
+        activeOrderRows.filter(x => x.totalBeforeGST > 0).length - 1
+      ) {
+        r[gstAmtField] += diff
+        if (!isGSTInclusive) {
+          r.totalAfterGST += diff
+        }
       }
-    }
-  })
+    })
 
   return {
     gst,
@@ -1047,9 +1051,29 @@ const calculateAmount = (
       r[gstField] = r[adjustedField]
       r[gstAmtField] = 0
     })
+  // pre-order
   const activeOrderRows = allOrderRows.filter(
-    o => !o.isDeleted && (!o.isPreOrder || o.isChargeToday) && !o.hasPaid,
+    o =>
+      !o.isDeleted &&
+      (!o.isPreOrder || o.isChargeToday) &&
+      !o.hasPaid &&
+      o.totalAfterItemAdjustment > 0,
   )
+  // zero amount
+  allOrderRows
+    .filter(
+      o =>
+        !o.isDeleted &&
+        (!o.isPreOrder || o.isChargeToday) &&
+        !o.hasPaid &&
+        o.totalAfterItemAdjustment === 0,
+    )
+    .forEach(r => {
+      r[adjustedField] = r[totalField]
+      r[gstField] = r[adjustedField]
+      r[gstAmtField] = 0
+    })
+
   const activeAdjustments = adjustments.filter(o => !o.isDeleted)
 
   const total = roundTo(
@@ -1206,7 +1230,6 @@ const calculateAmount = (
     },
   }
 
-  // eslint-disable-next-line consistent-return
   return r
 }
 
