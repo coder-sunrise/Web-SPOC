@@ -838,6 +838,9 @@ input[class*='MuiInputBase-input-'] {
 textarea[class*='MuiInputBase-input-'] {
   font-size: 14px !important;
 }
+div[class*='CardBody-cardBodySm-'] {
+  padding: 8px !important;
+}
 .MuiInputBase-input {
   font-size: 14px !important;
 }
@@ -931,9 +934,6 @@ textarea[class*='MuiInputBase-input-'] {
 .radiologyDescription .ant-descriptions-item-label {
   font-weight: 500;
   text-align: right;
-}
-.ant-switch-handle {
-  height: 80% !important;
 }
 .custom_pro {
   color: #000000;
@@ -1035,6 +1035,14 @@ body {
 .ant-pro-table-column-setting-overlay .ant-popover-inner-content {
   width: 280px;
 }
+
+.e-input-group input.e-input,
+.e-input-group.e-control-wrapper input.e-input,
+.e-input-group textarea.e-input,
+.e-input-group.e-control-wrapper textarea.e-input {
+  font-size: 14px !important;
+}
+
 [role='tooltip'] {
   z-index: 2030 !important;
 }
