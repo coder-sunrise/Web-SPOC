@@ -472,7 +472,6 @@ const ApplyClaims = ({
       ),
       temp,
     )
-    console.log(finalPayable)
     updateInvoiceItems(newInvoiceItemsCopy)
 
     const _values = {
