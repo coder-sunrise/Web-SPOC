@@ -136,7 +136,7 @@ const HistoryPreOrder: React.FC<IHistoryPreOrderProps> = (props: any) => {
         render: row => {
           return (
             <Tooltip title={row.remarks}>
-              <div>{row.remarks}</div>
+              <div style={{ whiteSpace: 'pre-wrap' }}>{row.remarks}</div>
             </Tooltip>
           )
         },
