@@ -208,6 +208,7 @@ const VisitInfoCard = ({
       getVisitOrderTemplateDetails(opts.id)
     } else {
       getVisitOrderTemplateDetails(undefined)
+      setFieldValue(FormField['visit.VisitOrderTemplateTotal'], undefined)
     }
   }
 
