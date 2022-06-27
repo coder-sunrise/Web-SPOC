@@ -439,9 +439,10 @@ class PatientDetail extends PureComponent {
 
   getAddressCompareVal = contactAddress => {
     return contactAddress
-      .filter(x => x.isPrimary && !x.isDeleted)
       .map(x => {
         const {
+          isDeleted,
+          isPrimary,
           isMailing,
           postcode = '',
           blockNo = '',
@@ -451,6 +452,8 @@ class PatientDetail extends PureComponent {
           countryFK = '',
         } = x
         return {
+          isDeleted,
+          isPrimary,
           isMailing,
           address: `${postcode}${blockNo}${unitNo}${buildingName}${street}${countryFK}`.replaceAll(
             ' ',
@@ -458,12 +461,11 @@ class PatientDetail extends PureComponent {
           ),
         }
       })
-      .filter(x => x.address !== '')
   }
 
   getSchemeCompareVal = patientScheme => {
     return patientScheme
-      .filter(x => x.schemeTypeFK === SCHEME_TYPE.CORPORATE && !x.isDeleted)
+      .filter(x => x.schemeTypeFK === SCHEME_TYPE.CORPORATE)
       .map(x => {
         const { coPaymentSchemeFK, accountNumber, validFrom, validTo } = x
         return { coPaymentSchemeFK, accountNumber, validFrom, validTo }
@@ -471,10 +473,23 @@ class PatientDetail extends PureComponent {
   }
 
   checkFamilyMembersInfoDiff = (initialValues, values) => {
+    //filterout self, current is not group primary need join to list
     let familyMembers =
       values.patientFamilyGroup?.patientFamilyMember.filter(
-        x => !x.isDeleted,
+        x => !x.isDeleted && x.familyMemberFK != values.id,
       ) || []
+    if (
+      values.patientFamilyGroup &&
+      values.patientFamilyGroup.primaryPatientFK != values.id
+    ) {
+      const { contactAddress, patientScheme } = values.patientFamilyGroup
+      familyMembers.push({
+        contactAddress,
+        patientScheme,
+        familyMemberFK: values.patientFamilyGroup.primaryPatientFK,
+        isNew: !values.patientFamilyGroup.id,
+      })
+    }
     let anyAddressDiff = false,
       anySchemeDiff = false
     if (familyMembers.length > 0) {
