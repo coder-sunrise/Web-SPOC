@@ -1,6 +1,7 @@
 import moment from 'moment'
 import { commonDataReaderTransform } from '@/utils/utils'
 import { dateFormatLong } from '@/components'
+import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 
 export const getMedicalCheckupReportPayload = data => {
   const {
@@ -15,6 +16,62 @@ export const getMedicalCheckupReportPayload = data => {
     reportContext = [],
     reportingDoctor = [],
   } = data
+
+  let newIndividualComment = []
+  individualComment.forEach(item => {
+    const {
+      groupFK,
+      groupJapaneseName,
+      groupEnglishName,
+      groupDescription,
+      groupSortOrder,
+      code,
+      japaneseName = '',
+      englishName = '',
+      japaneseComment = '',
+      englishComment = '',
+      sortOrder,
+    } = item
+    const jpnComments = japaneseComment.split('\n')
+    const enComments = englishComment.split('\n')
+    jpnComments.forEach((jpnComment, index) => {
+      if (hasValue(jpnComment) && jpnComment.trim().length) {
+        newIndividualComment.push({
+          groupFK,
+          groupJapaneseName,
+          groupEnglishName,
+          groupDescription,
+          groupSortOrder,
+          code,
+          japaneseName,
+          englishName,
+          sortOrder,
+          language: 'JP',
+          comment: jpnComment,
+          itemSortOrder: index,
+        })
+      }
+    })
+    enComments.forEach((enComment, index) => {
+      if (hasValue(enComment) && enComment.trim().length) {
+        newIndividualComment.push({
+          groupFK,
+          groupJapaneseName,
+          groupEnglishName,
+          groupDescription,
+          groupSortOrder,
+          code,
+          japaneseName,
+          englishName,
+          sortOrder,
+          language: 'EN',
+          comment: enComment,
+          itemSortOrder: index,
+        })
+      }
+    })
+  })
+
   const printData = {
     PatientInfo: patientInfo.map(p => ({
       ...p,
@@ -35,7 +92,7 @@ export const getMedicalCheckupReportPayload = data => {
     VisualAcuity: visualAcuity,
     IntraocularPressure: intraocularPressure,
     Audiometry: audiometry,
-    IndividualComment: individualComment,
+    IndividualComment: newIndividualComment,
     SummaryComment: summaryComment,
     LabTestPanel: labTestPanel,
     ReportingDoctor: reportingDoctor.map(x => ({
