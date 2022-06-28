@@ -5,6 +5,7 @@ import { Tag, Input, Tooltip, Select, Divider, Typography } from 'antd'
 import { SaveFilled, PlusOutlined } from '@ant-design/icons'
 import { CLINICAL_ROLE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
+import _ from 'lodash'
 
 export const RadiographerTag = ({
   onChange,
@@ -31,7 +32,9 @@ export const RadiographerTag = ({
     }).then(o => {
       if (o) {
         const result = o.filter(
-          c => c.userProfile.role.clinicRoleFK === CLINICAL_ROLE.RADIOGRAPHER,
+          c =>
+            c.userProfile.role.clinicRoleFK === CLINICAL_ROLE.RADIOGRAPHER ||
+            c.userProfile.role.clinicRoleFK === CLINICAL_ROLE.DOCTOR,
         )
         setRadiographers(result)
       }
@@ -43,11 +46,23 @@ export const RadiographerTag = ({
   }, [value])
 
   useEffect(() => {
-    const tmpAssignableRadiographers = radiographers
+    let tmpAssignableRadiographers = radiographers
       .filter(
         r => assignedRadiographers.findIndex(ar => ar.id === r.id) === -1, //filter out assigned radiographers in selection
       )
-      .map(r => ({ label: r.name, value: r.id }))
+      .map(r => ({
+        label: r.name,
+        value: r.id,
+        sortorder:
+          r.userProfile.role.clinicRoleFK === CLINICAL_ROLE.RADIOGRAPHER
+            ? 0
+            : 1,
+      }))
+    tmpAssignableRadiographers = _.orderBy(
+      tmpAssignableRadiographers,
+      ['sortorder', (o => o.label || '').toLowerCase()],
+      ['asc', 'asc'],
+    )
     setAssignableRadiographers(tmpAssignableRadiographers)
   }, [radiographers, assignedRadiographers])
 

@@ -55,10 +55,16 @@ const FilterBar = ({
                     noDefaultValue
                     mode='multiple'
                     temp={false}
+                    orderBy={[
+                      ['clinicRoleFK', o => (o.name || '').toLowerCase()],
+                      ['desc', 'asc'],
+                    ]}
+                    customOrder
                     maxTagPlaceholder='Radiology Technologists'
                     {...args}
                     localFilter={item =>
-                      item.userProfile.role.clinicRoleFK === 3
+                      item.userProfile.role.clinicRoleFK === 3 ||
+                      item.userProfile.role.clinicRoleFK === 1
                     }
                   />
                 </Tooltip>

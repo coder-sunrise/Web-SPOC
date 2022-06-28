@@ -147,8 +147,10 @@ export const WorklistFilter = () => {
           label={formatMessage({ id: 'radiology.search.urgentOnly' })}
         />
       </Form.Item>
-      {clinicianProfile.userProfile?.role?.clinicRoleFK ===
-        CLINICAL_ROLE.RADIOGRAPHER && (
+      {(clinicianProfile.userProfile?.role?.clinicRoleFK ===
+        CLINICAL_ROLE.RADIOGRAPHER ||
+        clinicianProfile.userProfile?.role?.clinicRoleFK ===
+          CLINICAL_ROLE.DOCTOR) && (
         <Form.Item name='isMyPatientOnly' style={{ alignSelf: 'flex-end' }}>
           <Checkbox
             style={{ width: 95 }}
