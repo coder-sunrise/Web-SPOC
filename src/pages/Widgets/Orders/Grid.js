@@ -2024,44 +2024,46 @@ export default ({
                     }
                     icon={<EditFilled />}
                   ></Button>
-                  <Button
-                    size='small'
-                    type='danger'
-                    disabled={
-                      row.isEditingEntity ||
-                      row.isPreOrderActualize ||
-                      !deleteEnable ||
-                      getOrderAccessRight(
-                        editAccessRight,
-                        row.isEnableEditOrder,
-                      ).rights !== 'enable'
-                    }
-                    onClick={() => {
-                      dispatch({
-                        type: 'orders/deleteRow',
-                        payload: {
-                          uid: row.uid,
-                        },
-                      })
-
-                      if (row.isPackage === true) {
+                  <Tooltip title={deleteMessage}>
+                    <Button
+                      size='small'
+                      type='danger'
+                      disabled={
+                        row.isEditingEntity ||
+                        row.isPreOrderActualize ||
+                        !deleteEnable ||
+                        getOrderAccessRight(
+                          editAccessRight,
+                          row.isEnableEditOrder,
+                        ).rights !== 'enable'
+                      }
+                      onClick={() => {
                         dispatch({
-                          type: 'orders/deletePackageItem',
+                          type: 'orders/deleteRow',
                           payload: {
-                            packageGlobalId: row.packageGlobalId,
+                            uid: row.uid,
                           },
                         })
-                      }
 
-                      dispatch({
-                        type: 'orders/updateState',
-                        payload: {
-                          entity: undefined,
-                        },
-                      })
-                    }}
-                    icon={<DeleteFilled />}
-                  ></Button>
+                        if (row.isPackage === true) {
+                          dispatch({
+                            type: 'orders/deletePackageItem',
+                            payload: {
+                              packageGlobalId: row.packageGlobalId,
+                            },
+                          })
+                        }
+
+                        dispatch({
+                          type: 'orders/updateState',
+                          payload: {
+                            entity: undefined,
+                          },
+                        })
+                      }}
+                      icon={<DeleteFilled />}
+                    ></Button>
+                  </Tooltip>
                 </div>
               )
             },
