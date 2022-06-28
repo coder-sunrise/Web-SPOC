@@ -1375,7 +1375,7 @@ class Medication extends PureComponent {
   onAdjustmentConditionChange = v => {
     const { values } = this.props
     const { isMinus, adjValue, isExactAmount } = values
-    if (!isNumber(adjValue)) { 
+    if (!isNumber(adjValue)) {
       this.props.setFieldValue('adjValue', 0)
     }
 
@@ -1904,7 +1904,7 @@ class Medication extends PureComponent {
     const showDrugLabelRemark = labelPrinterSize === '8.0cmx4.5cm_V2'
     const showPrescriptionSet =
       ENABLE_PRESCRIPTION_SET_CLINIC_ROLE.indexOf(
-        user.data.clinicianProfile.userProfile.role.clinicRoleFK,
+        user.data.clinicianProfile.userProfile.role.clinicRoleBitValue,
       ) >= 0
 
     const { nurseWorkitem = {} } = workitem
@@ -2014,7 +2014,10 @@ class Medication extends PureComponent {
             )}
             <GridItem
               xs={6}
-              style={{ marginTop: theme.spacing(2), textAlign: 'right' }}
+              style={{
+                marginTop: theme.spacing(2),
+                textAlign: 'right',
+              }}
             >
               <div style={{ display: 'inline-block' }}>
                 <div style={{ display: 'inline-block' }}>
@@ -2184,8 +2187,14 @@ class Medication extends PureComponent {
                                         allowClear={false}
                                         simple
                                         options={[
-                                          { value: 'AND', name: 'And' },
-                                          { value: 'THEN', name: 'Then' },
+                                          {
+                                            value: 'AND',
+                                            name: 'And',
+                                          },
+                                          {
+                                            value: 'THEN',
+                                            name: 'Then',
+                                          },
                                         ]}
                                         disabled={isStartedMedication}
                                         {...args}
@@ -2723,7 +2732,10 @@ class Medication extends PureComponent {
             <GridItem xs={3} className={classes.editor}>
               <div style={{ position: 'relative' }}>
                 <div
-                  style={{ marginTop: theme.spacing(2), position: 'absolute' }}
+                  style={{
+                    marginTop: theme.spacing(2),
+                    position: 'absolute',
+                  }}
                 >
                   <Field
                     name='isMinus'
