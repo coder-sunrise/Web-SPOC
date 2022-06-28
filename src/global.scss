@@ -1042,3 +1042,12 @@ body {
 .e-input-group.e-control-wrapper textarea.e-input {
   font-size: 14px !important;
 }
+
+.ant-popconfirm .ant-popover-inner-content {
+  display: flex;
+  flex-direction: column;
+}
+.ant-popconfirm .ant-popover-buttons {
+  display: inline-flex;
+  justify-content: end;
+}

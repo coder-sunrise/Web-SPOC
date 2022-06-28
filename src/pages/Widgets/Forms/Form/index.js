@@ -71,15 +71,6 @@ class Form extends PureComponent {
     if (!_.isEmpty(isFormValid)) {
       this.props.handleSubmit()
     } else {
-      // if (
-      //   (action === 'submit' || action === 'finalize') &&
-      //   !values.formData.signature.some(x => x.value)
-      // ) {
-      //   notification.warning({
-      //     message: `Signature is required.`,
-      //   })
-      //   return
-      // }
       const nextSequence = getNextSequence()
       let payload = {
         sequence: nextSequence,
@@ -165,6 +156,10 @@ class Form extends PureComponent {
                 color='success'
                 icon={null}
                 onClick={() => {
+                  if(!(values.formData.signatureCounter > 0)) {
+                    notification.warning({message:'At least one signature is required.'})
+                    return
+                  }
                   this.props.dispatch({
                     type: 'global/updateAppState',
                     payload: {
