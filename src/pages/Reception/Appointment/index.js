@@ -131,7 +131,7 @@ class Appointment extends React.PureComponent {
         code: 'clinicianprofile',
         force: true,
         filter: {
-          isActive: undefined,
+          // isActive: undefined,
         },
       },
     })
