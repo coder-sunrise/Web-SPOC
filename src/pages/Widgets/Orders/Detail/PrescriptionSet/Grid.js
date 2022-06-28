@@ -160,7 +160,7 @@ class Grid extends PureComponent {
                 style={{
                   left: 5,
                   position: 'absolute',
-                  top: 10,
+                  top: 7,
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
@@ -177,7 +177,7 @@ class Grid extends PureComponent {
               </div>
 
               {selectType === 'All' && (
-                <div style={{ left: 410, position: 'absolute', top: 8 }}>
+                <div style={{ left: 410, position: 'absolute', top: 5 }}>
                   {o.type === 'General' ? (
                     <Tag
                       className={classes.tagStyle}
@@ -208,7 +208,7 @@ class Grid extends PureComponent {
                 <div
                   style={{
                     position: 'absolute',
-                    top: 10,
+                    top: 7,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
@@ -233,7 +233,7 @@ class Grid extends PureComponent {
                   </Tooltip>
                 </div>
               )}
-              <div style={{ position: 'absolute', top: 8, right: 75 }}>
+              <div style={{ position: 'absolute', top: 5, right: 75 }}>
                 {!isSelect ? (
                   <span
                     className={classes.addIcon}
@@ -267,7 +267,7 @@ class Grid extends PureComponent {
                 )}
               </div>
               <Button
-                style={{ position: 'absolute', top: 8, right: 35 }}
+                style={{ position: 'absolute', top: 5, right: 35 }}
                 disabled={!editEnable}
                 justIcon
                 color='primary'
@@ -282,7 +282,7 @@ class Grid extends PureComponent {
 
               {false && (
                 <Button
-                  style={{ position: 'absolute', top: 8, right: 0 }}
+                  style={{ position: 'absolute', top: 5, right: 0 }}
                   disabled={!editEnable}
                   justIcon
                   color='danger'
@@ -295,7 +295,7 @@ class Grid extends PureComponent {
                   <Delete />
                 </Button>
               )}
-              <div style={{ position: 'absolute', top: 8, right: 0 }}>
+              <div style={{ position: 'absolute', top: 5, right: 0 }}>
                 <DeleteWithPopover
                   index={o.id}
                   title='Delete Prescription Set'
