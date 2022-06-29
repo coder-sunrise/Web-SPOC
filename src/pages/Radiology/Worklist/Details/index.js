@@ -159,7 +159,7 @@ const RadiologyDetails = () => {
     setShowReport(!showReport)
   }
 
-  const queryRadiologyDetails = () =>{
+  const queryRadiologyDetails = () => {
     dispatch({
       type: 'radiologyDetails/query',
       payload: { id: detailsId },
@@ -172,8 +172,7 @@ const RadiologyDetails = () => {
   const saveAndPrint = () => {
     if (details?.entity?.statusFK != 4 && details?.entity?.statusFK != 5) {
       handleSave(undefined, false, queryRadiologyDetails)
-    }
-    else {
+    } else {
       queryRadiologyDetails()
     }
   }
@@ -304,7 +303,11 @@ const RadiologyDetails = () => {
         maxWidth='lg'
       >
         <GridContainer
-          style={{ height: !isReadOnly ? 750 : undefined, overflowY: 'scroll' }}
+          style={{
+            height: !isReadOnly ? 750 : undefined,
+            overflowY: 'scroll',
+            alignContent: 'flex-start',
+          }}
         >
           {!isReadOnly && (
             <GridItem md={12}>
