@@ -176,8 +176,35 @@ class Detail extends PureComponent {
       ...deletedResources,
     ])
   }
+  // generateCopayersArray() {
+  //   const {
+  //     values: { selectedCopayers },
+  //     codetable: { ctcopayer },
+  //   } = this.props
+  //   let options = [...ctcopayer] ?? []
+  //   options.map(
+  //     e => (e.ischecked = selectedCopayers.includes(e.id) ? 'true' : 'false'),
+  //   )
+  //   return options
+  // }
+
+  copayersCompare(arr, a, b) {
+    if (arr.includes(a) && !arr.includes(b)) {
+      return -1
+    } else if (!arr.includes(a) && arr.includes(b)) {
+      return 1
+    } else {
+      return 0
+    }
+  }
   render() {
-    const { theme, footer, values, handleSubmit } = this.props
+    const {
+      theme,
+      footer,
+      values,
+      handleSubmit,
+      codetable: { ctcopayer },
+    } = this.props
     return (
       <Fragment>
         <div
@@ -261,6 +288,18 @@ class Detail extends PureComponent {
                     label='Co-Payers'
                     onChange={v => {
                       this.handleCopayerChanges(v)
+                    }}
+                    // options={this.generateCopayersArray()}
+                    // orderBy={[['ischecked'], ['desc']]}
+                    filterSort={(optionA, optionB) => {
+                      if (optionA?.value > 0 && optionB?.value > 0) {
+                        return this.copayersCompare(
+                          values.selectedCopayers,
+                          optionA.value,
+                          optionB.value,
+                        )
+                      }
+                      return 0
                     }}
                   />
                 )}
