@@ -16,7 +16,8 @@ import {
   CANNED_TEXT_TYPE,
   SCRIBBLE_NOTE_TYPE,
 } from '@/utils/constants'
-import { CannedTextButton, RadiographerTag, Findings } from './index'
+import { CannedTextButton, Findings } from './index'
+import RadiographerTag from './RadiographerTag'
 import { scribbleTypes } from '@/utils/codes'
 import ScribbleNote from '@/pages/Shared/ScribbleNote/ScribbleNote'
 
@@ -179,7 +180,9 @@ export const ExaminationDetails = ({
           <GridContainer style={{ rowGap: 10 }}>
             <GridItem md={2}>
               <RightAlignGridItem md={12}>
-                Radiology Technologist :
+                <span style={{ position: 'relative', top: 3 }}>
+                  Radiology Technologist :
+                </span>
               </RightAlignGridItem>
             </GridItem>
 
@@ -201,7 +204,10 @@ export const ExaminationDetails = ({
                   )}
                 </div>
               ) : (
-                assignedRadiographers.map(r => r.name).join(', ')
+                <span style={{ position: 'relative', top: 3 }}>
+                  {' '}
+                  {assignedRadiographers.map(r => r.name).join(', ')}
+                </span>
               )}
             </GridItem>
 
