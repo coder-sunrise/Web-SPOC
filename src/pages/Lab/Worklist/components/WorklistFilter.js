@@ -217,26 +217,14 @@ export const WorklistFilter = () => {
               alignItems: 'center',
             }}
           >
-            <div>
-              <p
-                style={{
-                  fontWeight: 400,
-                  fontSize: '0.8rem',
-                  minWidth: 80,
-                }}
-              >
-                Last Refresh:
-              </p>
-              <p style={{ color: '#1890f8', fontSize: '0.9rem' }}>
-                {refreshDate.format('HH:mm')}
-              </p>
-            </div>
+            <span>Last Refresh:</span>
+            <span style={{ color: '#1890f8', fontWeight: 500, marginLeft: 10 }}>
+              {refreshDate.format('HH:mm')}
+            </span>
             <Button
               color='primary'
               justIcon
-              style={{
-                height: 26,
-              }}
+              style={{ marginLeft: 10 }}
               onClick={() => handleSearch()}
             >
               <Refresh />

@@ -84,7 +84,7 @@ export const WorklistFilter = () => {
           mode='multiple'
           maxTagCount={0}
           maxTagPlaceholder='Visit Types'
-          style={{ width: 170 }}
+          style={{ width: 165 }}
           localFilter={item => {
             return item.id !== VISIT_TYPE.OTC
           }}
@@ -166,6 +166,7 @@ export const WorklistFilter = () => {
           onClick={() => {
             handleSearch()
           }}
+          style={{ position: 'relative', top: -5 }}
         >
           {formatMessage({ id: 'form.search' })}
         </ProgressButton>

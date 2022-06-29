@@ -73,6 +73,7 @@ const RadiologyWorklist = props => {
     <ProCard
       style={{
         height: '100%',
+        padding: '5px 10px',
       }}
       gutter={[16, 16]}
       load

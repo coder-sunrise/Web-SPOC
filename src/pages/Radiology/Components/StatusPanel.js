@@ -13,43 +13,40 @@ export const StatusPanel = () => {
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'end' }}>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
       <div>
-        <div style={{ display: 'flex', alignItems: 'end' }}>
-          <span style={{ fontWeight: 400, fontSize: '0.8rem' }}>
-            Now Serving:
-          </span>
-        </div>
-        <Tooltip title={nowServing || '-'}>
-          <p
-            style={{
-              color: '#1890f8',
-              textOverflow: 'ellipsis',
-              overflow: 'hidden',
-              whiteSpace: 'nowrap',
-              width: 200,
-              fontSize: '0.9rem',
-            }}
-          >
-            {nowServing || '-'}
-          </p>
-        </Tooltip>
+        <span>
+          Now Serving:
+          <Tooltip title={nowServing || '-'}>
+            <span
+              style={{
+                color: '#1890f8',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                display: 'inline-block',
+                left: 6,
+                position: 'relative',
+                fontWeight: 500,
+                top: 5,
+                width: 140,
+              }}
+            >
+              {nowServing || '-'}
+            </span>
+          </Tooltip>
+        </span>
       </div>
-
-      <div style={{ display: 'flex', alignItems: 'end', marginLeft: 10 }}>
-        <div>
-          <p style={{ fontWeight: 400, fontSize: '0.8rem', minWidth: 80 }}>
-            Last Refresh:
-          </p>
-          <p style={{ color: '#1890f8', fontSize: '0.9rem' }}>
-            {refreshDate.format('HH:mm')}
-          </p>
-        </div>
+      <div>
+        <span style={{ minWidth: 80 }}>Last Refresh:</span>
+        <span style={{ color: '#1890f8', fontWeight: 500, marginLeft: 6 }}>
+          {refreshDate.format('HH:mm')}
+        </span>
         <Button
           color='primary'
           justIcon
           style={{
-            height: 26,
+            marginLeft: 5,
           }}
           onClick={() => refreshWorklist()}
         >
