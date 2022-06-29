@@ -224,6 +224,7 @@ export default createListViewModel({
                   ...updated,
                   {
                     ...appt,
+                    isUpdatedInSeries: true,
                     rescheduleReason,
                     rescheduledByFK,
                     appointmentStatusFk: newAppointmentStatusFK,
@@ -250,6 +251,7 @@ export default createListViewModel({
                 ...updated,
                 {
                   ...appt,
+                  isUpdatedInSeries: true,
                   rescheduleReason,
                   rescheduledByFK,
                   appointmentStatusFk: newAppointmentStatusFK,
