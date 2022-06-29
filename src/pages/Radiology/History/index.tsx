@@ -79,6 +79,22 @@ const saveColumnsSetting = (dispatch, columnsSetting) => {
 }
 
 const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
+  const radiographer = (codetable.clinicianprofile || []).filter(
+    x =>
+      x.clinicRoleFK === CLINICAL_ROLE.RADIOGRAPHER ||
+      x.clinicRoleFK === CLINICAL_ROLE.DOCTOR,
+  )
+  const radiographerOptions = _.orderBy(
+    radiographer.map(x => {
+      return {
+        value: x.userProfile.id,
+        name: x.name,
+        clinicRoleFK: x.clinicRoleFK,
+      }
+    }),
+    ['clinicRoleFK', o => (o.name || '').toLowerCase()],
+    ['desc', 'asc'],
+  )
   return [
     {
       key: 'accessionNo',
@@ -503,12 +519,6 @@ const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
       dataIndex: 'searchRadiographer',
       initialValue: [-99],
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-        const radiographer = (codetable.clinicianprofile || []).filter(
-          x => x.userProfile.role.clinicRoleFK === CLINICAL_ROLE.RADIOGRAPHER,
-        )
-        const radiographerOptions = radiographer.map(x => {
-          return { value: x.userProfile.id, name: x.name }
-        })
         return (
           <Select
             label='Radiology Technologist'
