@@ -62,10 +62,11 @@ export const APPOINTMENT_CANCELLEDBY = {
 }
 
 export const PATIENT_LAB = {
-  PATIENT_PROFILE: 1,
-  CONSULTATION: 2,
-  LAB_TRACKING: 3,
-}
+         PATIENT_PROFILE: 1,
+         CONSULTATION: 2,
+         LAB_TRACKING: 3,
+         MEDICAL_CHECKUP: 4,
+       }
 
 export const CANCELLATION_REASON_TYPE = {
   NOSHOW: 1,

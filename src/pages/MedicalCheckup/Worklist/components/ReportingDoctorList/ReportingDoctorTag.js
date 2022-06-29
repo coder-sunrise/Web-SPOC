@@ -84,7 +84,6 @@ const ReportingDoctorTag = ({
 
   const isRevertCommentEnable = () => {
     if (!isEditEnable) return false
-    console.log(medicalCheckupDoctor)
     const revertCommentAccessRight = Authorized.check(
       'medicalcheckupworklist.revertcommenttodoctor',
     ) || {

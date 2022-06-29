@@ -598,11 +598,13 @@ export default compose(
       loading,
       medicalCheckupReportingDetails,
       user,
+      labTrackingDetails,
       clinicSettings,
     }) => ({
       patient: patient.entity || {},
       loading,
       medicalCheckupReportingDetails,
+      labTrackingDetails,
       user,
       clinicSettings,
     }),

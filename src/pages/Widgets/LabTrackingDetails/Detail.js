@@ -3,6 +3,7 @@ import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import { connect } from 'dva'
 import Yup from '@/utils/yup'
+import Authorized from '@/utils/Authorized'
 import {
   withFormikExtend,
   FastField,
@@ -20,7 +21,7 @@ import * as WidgetConfig from './config'
 import { deleteFileByFileID } from '@/services/file'
 import { LAB_TRACKING_STATUS, PATIENT_LAB } from '@/utils/constants'
 
-const styles = (theme) => ({
+const styles = theme => ({
   root: {},
   hide: {
     display: 'none',
@@ -77,7 +78,7 @@ const styles = (theme) => ({
   mapPropsToValues: ({ labTrackingDetails }) => {
     // Construct Attachment
     let labTrackingResults = []
-    labTrackingDetails.entity.labTrackingResults.map((labTrackingResult) => {
+    labTrackingDetails.entity.labTrackingResults.map(labTrackingResult => {
       labTrackingResults.push({
         ...labTrackingResult,
         attachmentType: 'labTrackingResults',
@@ -96,14 +97,14 @@ const styles = (theme) => ({
     let { oldRemarks, remarks } = values
     const { dispatch, onConfirm, codetable } = props
 
-    const saveData = (labTrackingStatusFK) => {
+    const saveData = labTrackingStatusFK => {
       if (values) {
         let sortOrder =
           0 && values.labTrackingResults.length
             ? values.labTrackingResults.length
             : 0
 
-        let item = values.labTrackingResults.map((x) => {
+        let item = values.labTrackingResults.map(x => {
           sortOrder += 1
           if (x.fileIndexFK) {
             return {
@@ -121,7 +122,7 @@ const styles = (theme) => ({
         restValues.labTrackingResults = item
         if (labTrackingStatusFK) {
           let status = codetable.ltlabtrackingstatus.find(
-            (o) => o.id === labTrackingStatusFK,
+            o => o.id === labTrackingStatusFK,
           )
           if (status) {
             restValues.labTrackingStatusFK = status.id
@@ -135,7 +136,7 @@ const styles = (theme) => ({
         payload: {
           ...restValues,
         },
-      }).then((r) => {
+      }).then(r => {
         if (r) {
           resetForm()
           if (onConfirm) onConfirm()
@@ -183,22 +184,22 @@ const styles = (theme) => ({
   displayName: 'labTrackingDetails',
 })
 class Detail extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.myRef = React.createRef()
     this.widgets = WidgetConfig.widgets(props, this.setShowMessage)
-    this.state = { showMessage: false }
+    this.state = { showMessage: false, readOnly: false }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { values, resultType } = this.props
     if (values && values.labTrackingResults) {
       const { labTrackingResults } = values
 
       const notConfirmedFiles = labTrackingResults.filter(
-        (att) => att.fileIndexFK === undefined,
+        att => att.fileIndexFK === undefined,
       )
-      notConfirmedFiles.forEach((item) => {
+      notConfirmedFiles.forEach(item => {
         !item.isDeleted && deleteFileByFileID(item.id)
       })
     }
@@ -206,11 +207,16 @@ class Detail extends PureComponent {
       this.toggleAccordion(values.labTrackingStatusFK)
     }
 
+    const accessRight = Authorized.check('reception/labtracking') || {
+      rights: 'hidden',
+    }
+    this.setState({ readOnly: accessRight.rights !== 'enable' })
+
     this.toggleAccordionByResultType(resultType)
   }
 
-  setShowMessage = (v) => {
-    this.setState((preState) => {
+  setShowMessage = v => {
+    this.setState(preState => {
       return {
         ...preState,
         showMessage: v,
@@ -218,9 +224,9 @@ class Detail extends PureComponent {
     })
   }
 
-  renderDropdown = (option) => <DoctorLabel doctor={option} />
+  renderDropdown = option => <DoctorLabel doctor={option} />
 
-  getTitle = (row) => {
+  getTitle = row => {
     const { name = '' } = row
 
     return (
@@ -237,17 +243,14 @@ class Detail extends PureComponent {
   }
 
   updateAttachments = ({ added, deleted }) => {
-    const { values: { labTrackingResults = [] }, setFieldValue } = this.props
+    const {
+      values: { labTrackingResults = [] },
+      setFieldValue,
+    } = this.props
 
-    let updated = [
-      ...labTrackingResults,
-    ]
+    let updated = [...labTrackingResults]
 
-    if (added)
-      updated = [
-        ...updated,
-        ...added,
-      ]
+    if (added) updated = [...updated, ...added]
 
     if (deleted)
       updated = updated.reduce((attachments, item) => {
@@ -255,15 +258,9 @@ class Detail extends PureComponent {
           (item.fileIndexFK !== undefined && item.fileIndexFK === deleted) ||
           (item.fileIndexFK === undefined && item.id === deleted)
         )
-          return [
-            ...attachments,
-            { ...item, isDeleted: true },
-          ]
+          return [...attachments, { ...item, isDeleted: true }]
 
-        return [
-          ...attachments,
-          { ...item },
-        ]
+        return [...attachments, { ...item }]
       }, [])
 
     setFieldValue('labTrackingResults', updated)
@@ -281,7 +278,7 @@ class Detail extends PureComponent {
     }
   }
 
-  toggleAccordion = (e) => {
+  toggleAccordion = e => {
     const { activedKeys } = this.myRef.current.state
     let newActivedKeys = activedKeys || []
     switch (e) {
@@ -302,10 +299,14 @@ class Detail extends PureComponent {
     this.setState({ activedKeys: [] })
   }
 
-  toggleAccordionByResultType = (resultType) => {
+  toggleAccordionByResultType = resultType => {
     const { activedKeys } = this.myRef.current.state
     let newActivedKeys = activedKeys || []
 
+    if (resultType === PATIENT_LAB.MEDICAL_CHECKUP) {
+      newActivedKeys.push(0)
+      newActivedKeys.push(1)
+    }
     if (resultType === PATIENT_LAB.LAB_TRACKING) {
       if (newActivedKeys.indexOf(0) === -1) {
         newActivedKeys.push(0)
@@ -315,7 +316,7 @@ class Detail extends PureComponent {
     }
   }
 
-  getContent = (data) => {
+  getContent = data => {
     const Widget = data.component
     const { values } = this.props
 
@@ -328,16 +329,19 @@ class Detail extends PureComponent {
     )
   }
 
-  render () {
+  render() {
     const { props } = this
     const { theme, footer, values, codetable, setFieldValue } = props
     const { doctorprofile } = codetable
     const { doctorProfileFK } = values
 
     let doctorNameLabel = ''
-    let selectDoctor = doctorprofile.find((d) => d.id === doctorProfileFK)
+    let selectDoctor = doctorprofile.find(d => d.id === doctorProfileFK)
     if (selectDoctor) {
-      const { doctorMCRNo, clinicianProfile: { name } } = selectDoctor
+      const {
+        doctorMCRNo,
+        clinicianProfile: { name },
+      } = selectDoctor
       doctorNameLabel = `${name} (${doctorMCRNo})`
     }
     return (
@@ -347,7 +351,7 @@ class Detail extends PureComponent {
             <GridItem md={4}>
               <FastField
                 name='patientAccountNo'
-                render={(args) => (
+                render={args => (
                   <TextField label='Patient Acc No.' {...args} disabled />
                 )}
               />
@@ -355,7 +359,7 @@ class Detail extends PureComponent {
             <GridItem md={4}>
               <FastField
                 name='patientName'
-                render={(args) => (
+                render={args => (
                   <TextField label='Patient Name' {...args} disabled />
                 )}
               />
@@ -366,7 +370,7 @@ class Detail extends PureComponent {
             <GridItem md={4}>
               <FastField
                 name='visitDate'
-                render={(args) => {
+                render={args => {
                   return (
                     <DatePicker
                       label='Visit Date'
@@ -382,7 +386,7 @@ class Detail extends PureComponent {
             <GridItem md={4}>
               <FastField
                 name='serviceName'
-                render={(args) => (
+                render={args => (
                   <TextField label='Service Name' {...args} disabled />
                 )}
               />
@@ -390,7 +394,7 @@ class Detail extends PureComponent {
             <GridItem md={4}>
               <FastField
                 name='labTrackingStatusFK'
-                render={(args) => (
+                render={args => (
                   <CodeSelect
                     label='Status'
                     {...args}
@@ -418,7 +422,7 @@ class Detail extends PureComponent {
               ref={this.myRef}
               onChange={this.changeToggle}
               mode='multiple'
-              collapses={this.widgets.map((o) => {
+              collapses={this.widgets.map(o => {
                 return {
                   title: this.getTitle(o),
                   hideExpendIcon: false,
@@ -440,7 +444,7 @@ class Detail extends PureComponent {
             onConfirm: props.handleSubmit,
             confirmBtnText: 'Save',
             confirmProps: {
-              disabled: false,
+              disabled: this.state.readOnly,
             },
           })}
       </CardContainer>

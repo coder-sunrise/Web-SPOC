@@ -12,17 +12,15 @@ import {
 import { AttachmentWithThumbnail } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
 
-export default ({
-  classes,
-  current,
-  fieldName = '',
-  updateAttachments,
-  isReadOnly = false,
-  attachment,
-}) => {
+export default ({ updateAttachments, isReadOnly = false, attachment }) => {
   const deleteExternalTrackingAttachmentRight = Authorized.check(
     'reception.viewexternaltracking.deleteattachment',
   ) || { rights: 'hidden' }
+  const labtrackingEditableRight = Authorized.check(
+    'reception/labtracking',
+  ) || {
+    rights: 'hidden',
+  }
   return (
     <CardContainer hideHeader size='sm' style={{ margin: 0, width: '100%' }}>
       <Field
@@ -42,7 +40,7 @@ export default ({
         attachmentType='labTrackingResults'
         handleUpdateAttachments={updateAttachments}
         attachments={attachment}
-        isReadOnly={isReadOnly}
+        isReadOnly={isReadOnly || labtrackingEditableRight.rights !== 'enable'}
         hiddenDelete={deleteExternalTrackingAttachmentRight.rights !== 'enable'}
         hideRemarks
         fieldName='labTrackingResults'
