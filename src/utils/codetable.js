@@ -73,7 +73,7 @@ const tenantCodesMap = new Map([
     'clinicianprofile',
     {
       ...defaultParams,
-      sorting: [],
+      sorting: [{ columnName: 'name', direction: 'asc' }],
     },
   ],
   [
