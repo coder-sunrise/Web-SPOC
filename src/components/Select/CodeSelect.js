@@ -9,6 +9,9 @@ class CodeSelect extends React.PureComponent {
   constructor(props) {
     super(props)
     // console.log({ props })
+    this.state = {
+      isCheckedShowOnTopFlage: false,
+    }
     if (
       this.props.maxTagCount === undefined &&
       this.props.mode &&
@@ -21,6 +24,7 @@ class CodeSelect extends React.PureComponent {
           ? 1
           : 0
       this.state = {
+        ...this.state,
         maxTagCount:
           this.props.maxTagCount !== undefined
             ? this.props.maxTagCount
@@ -97,20 +101,19 @@ class CodeSelect extends React.PureComponent {
           ],
           [orderBy[1]],
         )
-      : isCheckedShowOnTop
-      ? _.orderBy(
-          filteredOptions,
-          [
-            option =>
-              (
-                this.props.form?.values[this.props.field.name] ??
-                this.props.value ??
-                []
-              ).indexOf(option[this.props.valueField || 'id']),
-          ],
-          ['desc'],
-        )
       : filteredOptions
+    if (this.state.isCheckedShowOnTopFlage && isCheckedShowOnTop) {
+      let checkedArray =
+        this.props.form?.values[this.props.field.name] ?? this.props.value ?? []
+      filteredOptions.sort(
+        (a, b) =>
+          checkedArray.includes(a[this.props.valueField || 'id']) &&
+          !checkedArray.includes(b[this.props.valueField || 'id'])
+            ? -1
+            : 0,
+        0,
+      )
+    }
     const formattedFilteredOptions = formatCodes
       ? formatCodes(filteredOptions)
       : filteredOptions
@@ -139,12 +142,24 @@ class CodeSelect extends React.PureComponent {
             this.props.mode === 'multiple'
           ) {
             this.setState({
+              ...this.state,
+              isCheckedShowOnTopFlage: false,
               maxTagCount: values && values.length === 1 ? 1 : 0,
             })
           }
           if (this.props.onChange) {
+            this.setState({
+              ...this.state,
+              isCheckedShowOnTopFlage: false,
+            })
             this.props.onChange(values, opts)
           }
+        }}
+        onDropdownVisibleChange={() => {
+          this.setState({
+            ...this.state,
+            isCheckedShowOnTopFlage: true,
+          })
         }}
       />
     )
