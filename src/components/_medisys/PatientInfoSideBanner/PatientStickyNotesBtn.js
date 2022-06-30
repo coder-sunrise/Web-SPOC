@@ -588,7 +588,7 @@ class PatientStickyNotesBtn extends Component {
             }}
           >
             {(isFlaggedOnlyShow
-              ? stickyNotes.filter(x => x.isFlagged || !x.id)
+              ? stickyNotes.filter(x => x.id == editedNote?.id || x.isFlagged || !x.id )
               : stickyNotes
             ).map((item, index) =>
               this.renderStickyNotesItem(item, index, stickyNotesEditable),
