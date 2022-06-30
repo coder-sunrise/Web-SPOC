@@ -132,6 +132,7 @@ class Appointment extends React.PureComponent {
         force: true,
         filter: {
           isActive: undefined,
+          current: 1,
         },
       },
     })

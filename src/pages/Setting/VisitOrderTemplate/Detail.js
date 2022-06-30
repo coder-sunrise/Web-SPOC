@@ -176,8 +176,14 @@ class Detail extends PureComponent {
       ...deletedResources,
     ])
   }
+
   render() {
-    const { theme, footer, values, handleSubmit } = this.props
+    const {
+      theme,
+      footer,
+      values,
+      handleSubmit,
+    } = this.props
     return (
       <Fragment>
         <div
@@ -262,6 +268,7 @@ class Detail extends PureComponent {
                     onChange={v => {
                       this.handleCopayerChanges(v)
                     }}
+                    isCheckedShowOnTop
                   />
                 )}
               />
