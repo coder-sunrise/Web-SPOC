@@ -183,7 +183,6 @@ class Detail extends PureComponent {
       footer,
       values,
       handleSubmit,
-      codetable: { ctcopayer },
     } = this.props
     return (
       <Fragment>
