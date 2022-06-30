@@ -69,6 +69,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                   labelField='displayValue'
                   mode='multiple'
                   label='Co-Payer'
+                  isCheckedForward
                 />
               )}
             />

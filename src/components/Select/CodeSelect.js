@@ -67,8 +67,14 @@ class CodeSelect extends React.PureComponent {
   }
 
   render() {
-    const { codetable, code, localFilter, formatCodes, orderBy } = this.props
-
+    const {
+      codetable,
+      code,
+      localFilter,
+      formatCodes,
+      orderBy,
+      isCheckedForward,
+    } = this.props
     const options = this.props.options
       ? //if options set explicitly, to use the options that have been set.
         //This is only for legacy purpose and options should not be set for codeselect, and use Select component instead.
@@ -80,10 +86,30 @@ class CodeSelect extends React.PureComponent {
     filteredOptions = orderBy
       ? _.orderBy(
           filteredOptions,
-          [option => (_.get(option, orderBy[0]) || '').toLowerCase()],
-          [orderBy[1]],
+          [
+            option =>
+              (_.get(option, orderBy[0]) || '').toString().toLowerCase(),
+
+            option =>
+              isCheckedForward &&
+              (this.props.form?.values[this.props.field.name] ?? []).indexOf(
+                option.id,
+              ),
+          ],
+          [orderBy[1], isCheckedForward && 'desc'],
         )
-      : filteredOptions
+      : (isCheckedForward &&
+          _.orderBy(
+            filteredOptions,
+            [
+              option =>
+                (this.props.form?.values[this.props.field.name] ?? []).indexOf(
+                  option.id,
+                ),
+            ],
+            ['desc'],
+          )) ||
+        filteredOptions
     const formattedFilteredOptions = formatCodes
       ? formatCodes(filteredOptions)
       : filteredOptions
@@ -93,7 +119,10 @@ class CodeSelect extends React.PureComponent {
       this.props.mode &&
       this.props.mode === 'multiple'
     ) {
-      selectProps = { ...this.props, maxTagCount: this.state.maxTagCount }
+      selectProps = {
+        ...this.props,
+        maxTagCount: this.state.maxTagCount,
+      }
     }
     return (
       <Select

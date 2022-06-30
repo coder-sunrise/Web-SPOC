@@ -102,6 +102,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                   additionalSearchField='code'
                   mode='multiple'
                   label='Co-Payer'
+                  isCheckedForward
                 />
               )}
             />
