@@ -12,6 +12,7 @@ import { CommonModal } from '@/components'
 import RadiologyDetails from './Details'
 import { Worklist, WorklistFilter, StatusPanel } from '../Components'
 import WorklistContext, { WorklistContextProvider } from './WorklistContext'
+import { withStyles } from '@material-ui/core'
 
 const columnsTemplate = [
   {
@@ -48,6 +49,14 @@ const columnsTemplate = [
   },
 ]
 
+const styles = () => ({
+  customProCard: {
+    '& > .ant-pro-card-header': {
+      padding: '4px 8px',
+    },
+  },
+})
+
 const RadiologyWorklist = props => {
   const dispatch = useDispatch()
   const [columns, setColumns] = useState([])
@@ -71,13 +80,20 @@ const RadiologyWorklist = props => {
 
   return (
     <ProCard
+      className={props.classes.customProCard}
       style={{
         height: '100%',
       }}
       gutter={[16, 16]}
       load
       title={
-        <div style={{ display: 'flex', alignItems: 'end', paddingBottom: 8 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'end',
+            paddingBottom: 8,
+          }}
+        >
           <WorklistFilter />
         </div>
       }
@@ -95,4 +111,6 @@ const RadiologyWorklistWithProvider = props => (
   </WorklistContextProvider>
 )
 
-export default RadiologyWorklistWithProvider
+export default withStyles(styles, { name: 'RadiologyWorklistWithProvider' })(
+  RadiologyWorklistWithProvider,
+)

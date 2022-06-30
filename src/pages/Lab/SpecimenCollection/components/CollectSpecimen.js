@@ -248,7 +248,7 @@ const CollectSpecimen = ({
                 />
               </Form.Item>
               <Checkbox
-                defaultChecked={true}
+                // defaultChecked={true}
                 onChange={e => {
                   form.setFieldsValue({
                     dateReceived: e.target.checked ? moment() : undefined,

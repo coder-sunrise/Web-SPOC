@@ -1011,13 +1011,16 @@ class Form extends React.PureComponent {
       md: 'visreg',
       pid: values.patientProfileFK,
       apptid: values.currentAppointment.id,
-      visitOrderTemplateFK: values.currentAppointment.visitOrderTemplateFK,
       pdid: primaryDoctorResource?.calendarResource?.clinicianProfileDto?.id, // primary clinician id
     }
 
     if (firstResource?.roomFk) {
       // pdroomid: primaryDoctorResource.roomFk || null, // primary clinician resource room fk
       parameters.pdroomid = firstResource.roomFk
+    }
+    if (values.currentAppointment.visitOrderTemplateFK) {
+      parameters.visitOrderTemplateFK =
+        values.currentAppointment.visitOrderTemplateFK
     }
 
     return getAppendUrl(parameters)

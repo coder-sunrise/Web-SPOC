@@ -986,10 +986,13 @@ const DispenseDetails = ({
           </div>
           {orderCreateTime && (
             <span style={{ color: '#999999' }}>
-              Order created by
-              <span style={{ fontWeight: 500 }}>
-                {` ${orderCreateBy} `}
-                at {orderCreateTime.format('DD MMM yyyy HH:mm')}
+              Visit Doctor:
+              <span style={{ fontWeight: 500 }}>{` ${orderCreateBy}. `}</span>
+              <span style={{ color: '#999999' }}>
+                Order created at:
+                <span style={{ fontWeight: 500 }}>
+                  {` ${orderCreateTime.format('DD MMM yyyy HH:mm')}`}.
+                </span>
               </span>{' '}
             </span>
           )}

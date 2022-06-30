@@ -67,7 +67,14 @@ class CodeSelect extends React.PureComponent {
   }
 
   render() {
-    const { codetable, code, localFilter, formatCodes, orderBy } = this.props
+    const {
+      codetable,
+      code,
+      localFilter,
+      formatCodes,
+      orderBy,
+      customOrder,
+    } = this.props
 
     const options = this.props.options
       ? //if options set explicitly, to use the options that have been set.
@@ -77,10 +84,16 @@ class CodeSelect extends React.PureComponent {
       ? codetable[code.toLowerCase()] || []
       : []
     let filteredOptions = localFilter ? options.filter(localFilter) : options
-    filteredOptions = orderBy
+
+    filteredOptions = customOrder
+      ? _.orderBy(filteredOptions, [...orderBy[0]], [...orderBy[1]])
+      : orderBy
       ? _.orderBy(
           filteredOptions,
-          [option => (_.get(option, orderBy[0]) || '').toLowerCase()],
+          [
+            option =>
+              (_.get(option, orderBy[0]) || '').toString().toLowerCase(),
+          ],
           [orderBy[1]],
         )
       : filteredOptions
@@ -93,7 +106,10 @@ class CodeSelect extends React.PureComponent {
       this.props.mode &&
       this.props.mode === 'multiple'
     ) {
-      selectProps = { ...this.props, maxTagCount: this.state.maxTagCount }
+      selectProps = {
+        ...this.props,
+        maxTagCount: this.state.maxTagCount,
+      }
     }
     return (
       <Select

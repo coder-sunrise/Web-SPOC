@@ -394,7 +394,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         columnName: 'quantity',
         type: 'number',
         precision: 1,
-        width: 120,
+        width: 100,
         sortingEnabled: false,
         render: row => {
           const displayQty = `${numeral(row.quantity).format(
@@ -437,13 +437,14 @@ const PendingPreOrder: React.FC = (props: any) => {
       },
       {
         columnName: 'remarks',
+        width: 250,
         maxLength: 100,
         sortingEnabled: false,
-        isDisabled: row => !isEditable(row),
+        isDisabled: row => false,
         render: row => {
           return (
             <Tooltip title={row.remarks}>
-              <div>{row.remarks}</div>
+              <div style={{ whiteSpace: 'pre-wrap' }}>{row.remarks}</div>
             </Tooltip>
           )
         },

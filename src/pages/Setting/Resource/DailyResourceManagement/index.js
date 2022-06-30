@@ -18,6 +18,7 @@ import {
   NumberInput,
   EditableTableGrid,
   Tooltip,
+  timeFormat24Hour,
 } from '@/components'
 import Filter from './Filter'
 
@@ -206,9 +207,9 @@ class DailyResourceManagement extends PureComponent {
                   const endTime = new Date(
                     `${moment().format('YYYY MM DD')} ${row.endTime}`,
                   )
-                  return `${moment(startTime).format('hh:mm A')} - ${moment(
-                    endTime,
-                  ).format('hh:mm A')}`
+                  return `${moment(startTime).format(
+                    timeFormat24Hour,
+                  )} - ${moment(endTime).format(timeFormat24Hour)}`
                 },
                 sortingEnabled: false,
                 disabled: true,

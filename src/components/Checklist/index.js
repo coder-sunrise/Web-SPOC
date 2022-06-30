@@ -3,7 +3,7 @@ import { compose } from 'redux'
 import classnames from 'classnames'
 import withStyles from '@material-ui/core/styles/withStyles'
 import CustomInput from 'mui-pro-components/CustomInput'
-import { Checkbox, FormControlLabel, Tooltip } from '@material-ui/core'
+import { Checkbox, FormControlLabel } from '@material-ui/core'
 import regularFormsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/regularFormsStyle'
 import { control } from '@/components/Decorator'
 import Authorized from '@/utils/Authorized'
@@ -13,6 +13,7 @@ import {
   GridItem,
   Button,
   CommonModal,
+  Tooltip,
   Popover,
   RichEditor,
 } from '@/components'

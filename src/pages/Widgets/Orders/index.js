@@ -5,6 +5,7 @@ import { withStyles, Divider, Paper, IconButton } from '@material-ui/core'
 import { getUniqueId } from '@/utils/utils'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
+import './index.css'
 import {
   Button,
   CommonHeader,
@@ -146,7 +147,7 @@ class Orders extends PureComponent {
     const { props } = this
     const { className, footer, isEnableEditOrder = true, ...restProps } = props
     return (
-      <div className={className}>
+      <div className={className} id='ordersContainer'>
         {isEnableEditOrder && <Detail {...restProps} />}
         {/* <Divider light /> */}
 

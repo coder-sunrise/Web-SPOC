@@ -331,7 +331,10 @@ const ReportingDetails = props => {
         status: REPORTINGDOCTOR_STATUS.COMMENTVERIFYING,
       },
     }).then(r => {
-      if (r) onClose()
+      if (r) {
+        notification.success({ message: 'Reporting comment completed.' })
+        onClose()
+      }
     })
   }
 
@@ -595,11 +598,13 @@ export default compose(
       loading,
       medicalCheckupReportingDetails,
       user,
+      labTrackingDetails,
       clinicSettings,
     }) => ({
       patient: patient.entity || {},
       loading,
       medicalCheckupReportingDetails,
+      labTrackingDetails,
       user,
       clinicSettings,
     }),

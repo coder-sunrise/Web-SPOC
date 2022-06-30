@@ -40,11 +40,14 @@ class RadiologyStatisticReport extends ReportBase {
     }).then(result => {
       if (result) {
         this.setState({
-          ctTag: result
-            .filter(t => t.category === 'Patient')
-            .map(x => {
-              return { id: x.id, name: x.displayValue }
-            }),
+          ctTag: _.orderBy(
+            result
+              .filter(t => t.category === 'Patient')
+              .map(x => {
+                return { id: x.id, name: x.displayValue }
+              }),
+            ['name'],
+          ),
         })
       }
     })

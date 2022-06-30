@@ -132,7 +132,8 @@ const VisitInfoCard = ({
       )
       setFieldValue(FormField['visit.VisitOrderTemplateTotal'], activeItemTotal)
     } else {
-      setFieldValue(FormField['visit.VisitOrderTemplateTotal'], undefined)
+      if (!restProps.values.visitOrderTemplateFK)
+        setFieldValue(FormField['visit.VisitOrderTemplateTotal'], undefined)
     }
   }, [currentVisitTemplate, visitType])
   // console.log(fromMedicalCheckupReporting)
@@ -208,6 +209,7 @@ const VisitInfoCard = ({
       getVisitOrderTemplateDetails(opts.id)
     } else {
       getVisitOrderTemplateDetails(undefined)
+      setFieldValue(FormField['visit.VisitOrderTemplateTotal'], undefined)
     }
   }
 

@@ -109,6 +109,8 @@ export default createFormViewModel({
             'apptid',
             'pdid',
             'pdroomid',
+            'visitMode',
+            'visitOrderTemplateFK',
           ]),
         )
         yield put({
