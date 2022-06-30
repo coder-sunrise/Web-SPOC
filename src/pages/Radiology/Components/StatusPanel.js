@@ -13,7 +13,7 @@ export const StatusPanel = () => {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <div style={{ display: 'flex', width: 225, flexDirection: 'column' }}>
       <div>
         <span>
           Now Serving:
