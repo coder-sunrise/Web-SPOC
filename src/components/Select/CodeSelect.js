@@ -99,7 +99,7 @@ class CodeSelect extends React.PureComponent {
           [orderBy[1], isCheckedForward && 'desc'],
         )
       : (isCheckedForward &&
-          _.orderBy(
+          _.orderBy( 
             filteredOptions,
             [
               option =>
