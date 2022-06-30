@@ -74,6 +74,7 @@ class CodeSelect extends React.PureComponent {
       formatCodes,
       orderBy,
       customOrder,
+      isCheckedForward,
     } = this.props
 
     const options = this.props.options
@@ -95,6 +96,17 @@ class CodeSelect extends React.PureComponent {
               (_.get(option, orderBy[0]) || '').toString().toLowerCase(),
           ],
           [orderBy[1]],
+        )
+      : isCheckedForward
+      ? _.orderBy(
+          filteredOptions,
+          [
+            option =>
+              (this.props.form?.values[this.props.field.name] ?? []).indexOf(
+                option.id,
+              ),
+          ],
+          ['desc'],
         )
       : filteredOptions
     const formattedFilteredOptions = formatCodes
