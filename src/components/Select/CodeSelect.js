@@ -73,8 +73,9 @@ class CodeSelect extends React.PureComponent {
       localFilter,
       formatCodes,
       orderBy,
-      isCheckedForward,
+      customOrder,
     } = this.props
+
     const options = this.props.options
       ? //if options set explicitly, to use the options that have been set.
         //This is only for legacy purpose and options should not be set for codeselect, and use Select component instead.
@@ -83,33 +84,19 @@ class CodeSelect extends React.PureComponent {
       ? codetable[code.toLowerCase()] || []
       : []
     let filteredOptions = localFilter ? options.filter(localFilter) : options
-    filteredOptions = orderBy
+
+    filteredOptions = customOrder
+      ? _.orderBy(filteredOptions, [...orderBy[0]], [...orderBy[1]])
+      : orderBy
       ? _.orderBy(
           filteredOptions,
           [
             option =>
               (_.get(option, orderBy[0]) || '').toString().toLowerCase(),
-
-            option =>
-              isCheckedForward &&
-              (this.props.form?.values[this.props.field.name] ?? []).indexOf(
-                option.id,
-              ),
           ],
-          [orderBy[1], isCheckedForward && 'desc'],
+          [orderBy[1]],
         )
-      : (isCheckedForward &&
-          _.orderBy( 
-            filteredOptions,
-            [
-              option =>
-                (this.props.form?.values[this.props.field.name] ?? []).indexOf(
-                  option.id,
-                ),
-            ],
-            ['desc'],
-          )) ||
-        filteredOptions
+      : filteredOptions
     const formattedFilteredOptions = formatCodes
       ? formatCodes(filteredOptions)
       : filteredOptions
