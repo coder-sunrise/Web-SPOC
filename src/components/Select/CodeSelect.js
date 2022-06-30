@@ -74,7 +74,6 @@ class CodeSelect extends React.PureComponent {
       formatCodes,
       orderBy,
       customOrder,
-      isCheckedForward,
     } = this.props
 
     const options = this.props.options

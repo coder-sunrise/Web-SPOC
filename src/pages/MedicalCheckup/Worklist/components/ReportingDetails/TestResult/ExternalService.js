@@ -4,10 +4,13 @@ import {
   Tooltip,
   GridContainer,
   GridItem,
+  notification,
   dateFormatLongWithTimeNoSec,
   CommonModal,
 } from '@/components'
+import { PATIENT_LAB } from '@/utils/constants'
 import moment from 'moment'
+import Authorized from '@/utils/Authorized'
 import { Table, Button } from 'antd'
 import { useDispatch } from 'dva'
 import { Link } from 'umi'
@@ -16,10 +19,11 @@ import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
 import printJS from 'print-js'
 import ImagePreviewer from '@/pages/Widgets/AttachmentDocument/FolderContainer/ImagePreviewer'
 import customtyles from '../../Style.less'
+import Detail from '@/pages/Widgets/LabTrackingDetails/Detail'
 import { Attachment } from '@/components/_medisys'
 
 const ExternalService = props => {
-  const { height, medicalCheckupReportingDetails } = props
+  const { height, medicalCheckupReportingDetails, labTrackingDetails } = props
   const [showImagePreview, setShowImagePreview] = useState(false)
   const [selectedFile, setSelectedFile] = useState({})
   const [dataSource, setDataSource] = useState([])
@@ -43,6 +47,15 @@ const ExternalService = props => {
     })
   }
 
+  const toggleModal = () => {
+    dispatch({
+      type: 'labTrackingDetails/updateState',
+      payload: {
+        showModal: false,
+      },
+    })
+  }
+
   const onPreview = file => {
     const fileExtension = (file.fileExtension || '').toUpperCase()
     if (fileExtension === 'PDF') {
@@ -61,69 +74,114 @@ const ExternalService = props => {
     }
   }
   return (
-    <div>
-      <Table
-        size='small'
-        bordered
-        pagination={false}
-        dataSource={dataSource}
-        columns={[
-          {
-            dataIndex: 'serviceName',
-            title: <div style={{ padding: 4 }}>Service</div>,
-            render: (text, row) => <div style={{ padding: 4 }}>{text}</div>,
-          },
-          {
-            dataIndex: 'serviceCenterName',
-            title: <div style={{ padding: 4 }}>Service Center</div>,
-            render: (text, row) => <div style={{ padding: 4 }}>{text}</div>,
-            width: 180,
-          },
-          {
-            dataIndex: 'result',
-            title: <div style={{ padding: 4 }}>Attachment</div>,
-            width: 250,
-            render: (text, row) => (
-              <div style={{ padding: 4 }}>
-                {row.labTrackingResults && (
-                  <Attachment
-                    label='Attachment'
-                    attachments={row.labTrackingResults}
-                    isReadOnly={true}
-                    hideRemarks
-                    listOnly={true}
-                    simple
-                    hiddenDelete
-                    fieldName='labTrackingResults'
-                  />
-                )}
-              </div>
-            ),
-          },
-          {
-            dataIndex: 'updateDate',
-            title: <div style={{ padding: 4 }}>Last Updated Date</div>,
-            width: 150,
-            render: (text, row) => (
-              <div style={{ padding: 4 }}>
-                {moment(row.updateDate).format(dateFormatLongWithTimeNoSec)}
-              </div>
-            ),
-          },
-          {
-            dataIndex: 'status',
-            title: <div style={{ padding: 4 }}>Status</div>,
-            width: 80,
-            render: (text, row) => <div style={{ padding: 4 }}>{text}</div>,
-          },
-        ]}
-        scroll={{ y: height - 80 }}
-        rowClassName={(record, index) => {
-          return index % 2 === 0 ? customtyles.once : customtyles.two
-        }}
-        className={customtyles.table}
-      ></Table>
-    </div>
+    <React.Fragment>
+      <div>
+        <Table
+          size='small'
+          bordered
+          pagination={false}
+          dataSource={dataSource}
+          onRow={r => {
+            return {
+              onDoubleClick: () => {
+                console.log(r.id)
+                dispatch({
+                  type: 'labTrackingDetails/queryOne',
+                  payload: {
+                    id: r.id,
+                  },
+                }).then(entity => {
+                  if (entity) {
+                    dispatch({
+                      type: 'labTrackingDetails/updateState',
+                      payload: {
+                        showModal: true,
+                        entity: entity,
+                      },
+                    })
+                  } else {
+                    notification.error({
+                      message: 'Get external tracking details failed.',
+                    })
+                  }
+                })
+              },
+            }
+          }}
+          columns={[
+            {
+              dataIndex: 'serviceName',
+              title: <div style={{ padding: 4 }}>Service</div>,
+              render: (text, row) => <div style={{ padding: 4 }}>{text}</div>,
+            },
+            {
+              dataIndex: 'serviceCenterName',
+              title: <div style={{ padding: 4 }}>Service Center</div>,
+              render: (text, row) => <div style={{ padding: 4 }}>{text}</div>,
+              width: 180,
+            },
+            {
+              dataIndex: 'result',
+              title: <div style={{ padding: 4 }}>Attachment</div>,
+              width: 250,
+              render: (text, row) => (
+                <div style={{ padding: 4 }}>
+                  {row.labTrackingResults && (
+                    <Attachment
+                      label='Attachment'
+                      attachments={row.labTrackingResults}
+                      isReadOnly={true}
+                      hideRemarks
+                      listOnly={true}
+                      simple
+                      hiddenDelete
+                      fieldName='labTrackingResults'
+                    />
+                  )}
+                </div>
+              ),
+            },
+            {
+              dataIndex: 'updateDate',
+              title: <div style={{ padding: 4 }}>Last Updated Date</div>,
+              width: 150,
+              render: (text, row) => (
+                <div style={{ padding: 4 }}>
+                  {moment(row.updateDate).format(dateFormatLongWithTimeNoSec)}
+                </div>
+              ),
+            },
+            {
+              dataIndex: 'status',
+              title: <div style={{ padding: 4 }}>Status</div>,
+              width: 80,
+              render: (text, row) => <div style={{ padding: 4 }}>{text}</div>,
+            },
+          ]}
+          scroll={{ y: height - 80 }}
+          rowClassName={(record, index) => {
+            return index % 2 === 0 ? customtyles.once : customtyles.two
+          }}
+          className={customtyles.table}
+        ></Table>
+      </div>
+
+      <CommonModal
+        open={labTrackingDetails.showModal}
+        observe='LabResultsDetail'
+        title='View External Tracking / Results'
+        maxWidth='md'
+        bodyNoPadding
+        onClose={toggleModal}
+        onConfirm={toggleModal}
+      >
+        <Detail
+          mode='integrated'
+          resultType={PATIENT_LAB.MEDICAL_CHECKUP}
+          labTrackingDetails={labTrackingDetails}
+        />
+      </CommonModal>
+    </React.Fragment>
   )
 }
 export default ExternalService

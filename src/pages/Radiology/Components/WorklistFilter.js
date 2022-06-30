@@ -84,7 +84,7 @@ export const WorklistFilter = () => {
           mode='multiple'
           maxTagCount={0}
           maxTagPlaceholder='Visit Types'
-          style={{ width: 170 }}
+          style={{ width: 165 }}
           localFilter={item => {
             return item.id !== VISIT_TYPE.OTC
           }}
@@ -147,8 +147,10 @@ export const WorklistFilter = () => {
           label={formatMessage({ id: 'radiology.search.urgentOnly' })}
         />
       </Form.Item>
-      {clinicianProfile.userProfile?.role?.clinicRoleFK ===
-        CLINICAL_ROLE.RADIOGRAPHER && (
+      {(clinicianProfile.userProfile?.role?.clinicRoleFK ===
+        CLINICAL_ROLE.RADIOGRAPHER ||
+        clinicianProfile.userProfile?.role?.clinicRoleFK ===
+          CLINICAL_ROLE.DOCTOR) && (
         <Form.Item name='isMyPatientOnly' style={{ alignSelf: 'flex-end' }}>
           <Checkbox
             style={{ width: 95 }}
@@ -164,6 +166,7 @@ export const WorklistFilter = () => {
           onClick={() => {
             handleSearch()
           }}
+          style={{ position: 'relative', top: -5 }}
         >
           {formatMessage({ id: 'form.search' })}
         </ProgressButton>

@@ -62,10 +62,11 @@ export const APPOINTMENT_CANCELLEDBY = {
 }
 
 export const PATIENT_LAB = {
-  PATIENT_PROFILE: 1,
-  CONSULTATION: 2,
-  LAB_TRACKING: 3,
-}
+         PATIENT_PROFILE: 1,
+         CONSULTATION: 2,
+         LAB_TRACKING: 3,
+         MEDICAL_CHECKUP: 4,
+       }
 
 export const CANCELLATION_REASON_TYPE = {
   NOSHOW: 1,
@@ -867,7 +868,7 @@ export const PATIENT_ALLERGY_TYPE = {
   NONALLERGY: 'NonAllergy',
 }
 
-export const ENABLE_PRESCRIPTION_SET_CLINIC_ROLE = [1]
+export const ENABLE_PRESCRIPTION_SET_CLINIC_ROLE = [1, 8]
 
 export const mapApptStatus = statusFK => {
   let status = ''

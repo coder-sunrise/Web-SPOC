@@ -291,7 +291,7 @@ const defaultColumns = (codetable, setDetailsId) => {
       hideInTable: true,
       title: '',
       dataIndex: 'searchOrderBy',
-      // initialValue:[-99],
+      initialValue:[-99],
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
         const visitDoctorOptions = (codetable.doctorprofile || []).map(x => {
           return {
