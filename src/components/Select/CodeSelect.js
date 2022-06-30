@@ -75,7 +75,6 @@ class CodeSelect extends React.PureComponent {
       orderBy,
       customOrder,
     } = this.props
-
     const options = this.props.options
       ? //if options set explicitly, to use the options that have been set.
         //This is only for legacy purpose and options should not be set for codeselect, and use Select component instead.
