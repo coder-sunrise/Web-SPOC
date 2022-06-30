@@ -102,9 +102,11 @@ class CodeSelect extends React.PureComponent {
           filteredOptions,
           [
             option =>
-              (this.props.form?.values[this.props.field.name] ?? []).indexOf(
-                option.id,
-              ),
+              (
+                this.props.form?.values[this.props.field.name] ??
+                this.props.value ??
+                []
+              ).indexOf(option[this.props.valueField || 'id']),
           ],
           ['desc'],
         )
