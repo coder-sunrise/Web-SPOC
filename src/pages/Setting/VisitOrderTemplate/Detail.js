@@ -268,7 +268,7 @@ class Detail extends PureComponent {
                     onChange={v => {
                       this.handleCopayerChanges(v)
                     }}
-                    isCheckedForward
+                    isCheckedShowOnTop
                   />
                 )}
               />

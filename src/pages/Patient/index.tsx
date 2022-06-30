@@ -189,7 +189,7 @@ const defaultColumns = [
             code='ctCopayer'
             additionalSearchField='code'
             labelField='displayValue'
-            isCheckedForward
+            isCheckedShowOnTop
           />
         </Tooltip>
       )
