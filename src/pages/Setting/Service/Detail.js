@@ -236,6 +236,7 @@ class Detail extends PureComponent {
       { name: 'serviceCenterFK', title: 'Service Center' },
       { name: 'costPrice', title: 'Cost' },
       { name: 'unitPrice', title: 'Selling Price/Unit' },
+      { name: 'isTrackResults', title: 'Track Results' },
       { name: 'isDefault', title: 'Default' },
     ],
     columnExtensions: [
@@ -255,11 +256,19 @@ class Detail extends PureComponent {
           }
         },
       },
-      { columnName: 'costPrice', type: 'number', currency: true },
-      { columnName: 'unitPrice', type: 'number', currency: true },
+      { columnName: 'costPrice', type: 'number', currency: true, width: 110 },
+      { columnName: 'unitPrice', type: 'number', currency: true, width: 160 },
+      {
+        columnName: 'isTrackResults',
+        type: 'checkbox',
+        checkedValue: true,
+        width: 135,
+        uncheckedValue: false,
+      },
       {
         columnName: 'isDefault',
         type: 'radio',
+        width: 80,
         checkedValue: true,
         uncheckedValue: false,
         onChange: ({ row, checked }) => {
@@ -954,7 +963,7 @@ class Detail extends PureComponent {
                     )}
                   <GridItem xs={12}>
                     <GridContainer>
-                      <GridItem xs={4}>
+                      <GridItem xs={3}>
                         <Field
                           name='isAutoOrder'
                           render={args => {
@@ -969,15 +978,15 @@ class Detail extends PureComponent {
                           }}
                         />
                       </GridItem>
-                      <GridItem xs={4}>
+                      {/* <GridItem xs={4}>
                         <Field
                           name='isTrackResults'
                           render={args => {
                             return <Switch label='Track Results' {...args} />
                           }}
                         />{' '}
-                      </GridItem>
-                      <GridItem xs={4}>
+                      </GridItem> */}
+                      <GridItem xs={3}>
                         <Field
                           name='isDisplayValueChangable'
                           render={args => {
@@ -988,7 +997,7 @@ class Detail extends PureComponent {
                         />
                       </GridItem>
                       {!hiddenFields.includes('isNurseActualizable') && (
-                        <GridItem xs={4}>
+                        <GridItem xs={3}>
                           <Field
                             name='isNurseActualizable'
                             render={args => {
@@ -999,7 +1008,7 @@ class Detail extends PureComponent {
                           />
                         </GridItem>
                       )}
-                      <GridItem xs={4}>
+                      <GridItem xs={3}>
                         <Field
                           name='isAutoDisplayInOrderCart'
                           render={args => {

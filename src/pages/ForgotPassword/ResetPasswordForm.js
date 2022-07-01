@@ -127,6 +127,7 @@ export default withFormik({
   }),
   mapPropsToValues: ({ payload }) => ({
     ...payload,
+    clinicCode: process.env.default_cliniccode,
   }),
   handleSubmit: (values, { props }) => {
     const { onResetClick } = props
