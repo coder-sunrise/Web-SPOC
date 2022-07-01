@@ -124,99 +124,107 @@ export const WorklistFilter = () => {
 
   return (
     <Card bordered={false}>
-      <Form form={form} layout='inline' initialValues={{}}>
-        <div style={{ display: 'flex', width: '100%' }}>
-          <Form.Item name='searchValue'>
-            <TextField
-              label={formatMessage({ id: 'lab.search.general' })}
-              style={{ width: 350 }}
-            />
-          </Form.Item>
-          <Form.Item name='visitDoctor' initialValue={[-99]}>
-            <Tooltip
-              placement='right'
-              title='Select "All" will retrieve active and inactive doctors'
-            >
-              <Select
-                label={formatMessage({ id: 'lab.search.visitDoctor' })}
-                options={doctorprofile.map(item => ({
-                  value: item.id,
-                  name: item.clinicianProfile.name,
-                }))}
-                style={{ width: 180 }}
-                mode='multiple'
-                maxTagCount={0}
-                maxTagPlaceholder='Visit Doctor'
-              />
-            </Tooltip>
-          </Form.Item>
-          <Form.Item name='priority' initialValue={[]}>
-            <Select
-              label={formatMessage({ id: 'lab.search.priority' })}
-              options={PRIORITY_OPTIONS}
-              style={{ width: 170 }}
-              mode='multiple'
-              maxTagCount={0}
-              maxTagPlaceholder='Priority'
-            />
-          </Form.Item>
-          <Form.Item name='visitType' initialValue={[-99]}>
-            <VisitTypeSelect
-              label={formatMessage({ id: 'lab.search.visittype' })}
-              mode='multiple'
-              maxTagCount={0}
-              maxTagPlaceholder='Visit Types'
-              style={{ width: 170 }}
-              localFilter={item => {
-                return item.id !== VISIT_TYPE.OTC
-              }}
-              allowClear={true}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name='dateFrom'
-            initialValue={moment(moment().toDate()).formatUTC()}
-          >
-            <DatePicker
-              style={{ width: 100 }}
-              label={formatMessage({ id: 'lab.search.dateFrom' })}
-            />
-          </Form.Item>
-          <Form.Item
-            name='dateTo'
-            initialValue={moment()
-              .endOf('day')
-              .formatUTC(false)}
-          >
-            <DatePicker
-              bordered={true}
-              label={formatMessage({ id: 'lab.search.dateTo' })}
-              style={{ width: 100 }}
-            />
-          </Form.Item>
-
-          <Form.Item style={{ alignSelf: 'center' }}>
-            <ProgressButton
-              variant='contained'
-              color='primary'
-              icon={<Search />}
-              size='small'
-              onClick={() => {
-                handleSearch()
+      <div
+        style={{ display: 'flex', flexDirection: 'row', justifyContent: 'end' }}
+      >
+        <div style={{ flex: 'auto' }}>
+          <Form form={form} layout='inline' initialValues={{}}>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                flexDirection: 'row',
+                width: '100%',
               }}
             >
-              {formatMessage({ id: 'form.search' })}
-            </ProgressButton>
-          </Form.Item>
-          <div
-            style={{
-              display: 'inline-flex',
-              flexGrow: 1,
-              justifyContent: 'end',
-              alignItems: 'center',
-            }}
-          >
+              <Form.Item name='searchValue'>
+                <TextField
+                  label={formatMessage({ id: 'lab.search.general' })}
+                  style={{ width: 350 }}
+                />
+              </Form.Item>
+              <Form.Item name='visitDoctor' initialValue={[-99]}>
+                <Tooltip
+                  placement='right'
+                  title='Select "All" will retrieve active and inactive doctors'
+                >
+                  <Select
+                    label={formatMessage({ id: 'lab.search.visitDoctor' })}
+                    options={doctorprofile.map(item => ({
+                      value: item.id,
+                      name: item.clinicianProfile.name,
+                    }))}
+                    style={{ width: 180 }}
+                    mode='multiple'
+                    maxTagCount={0}
+                    maxTagPlaceholder='Visit Doctor'
+                  />
+                </Tooltip>
+              </Form.Item>
+              <Form.Item name='priority' initialValue={[]}>
+                <Select
+                  label={formatMessage({ id: 'lab.search.priority' })}
+                  options={PRIORITY_OPTIONS}
+                  style={{ width: 170 }}
+                  mode='multiple'
+                  maxTagCount={0}
+                  maxTagPlaceholder='Priority'
+                />
+              </Form.Item>
+              <Form.Item name='visitType' initialValue={[-99]}>
+                <VisitTypeSelect
+                  label={formatMessage({ id: 'lab.search.visittype' })}
+                  mode='multiple'
+                  maxTagCount={0}
+                  maxTagPlaceholder='Visit Types'
+                  style={{ width: 170 }}
+                  localFilter={item => {
+                    return item.id !== VISIT_TYPE.OTC
+                  }}
+                  allowClear={true}
+                />
+              </Form.Item>
+
+              <Form.Item
+                name='dateFrom'
+                initialValue={moment(moment().toDate()).formatUTC()}
+              >
+                <DatePicker
+                  style={{ width: 100 }}
+                  label={formatMessage({ id: 'lab.search.dateFrom' })}
+                />
+              </Form.Item>
+              <Form.Item
+                name='dateTo'
+                initialValue={moment()
+                  .endOf('day')
+                  .formatUTC(false)}
+              >
+                <DatePicker
+                  bordered={true}
+                  label={formatMessage({ id: 'lab.search.dateTo' })}
+                  style={{ width: 100 }}
+                />
+              </Form.Item>
+
+              <Form.Item style={{ alignSelf: 'center' }}>
+                <ProgressButton
+                  variant='contained'
+                  color='primary'
+                  icon={<Search />}
+                  size='small'
+                  onClick={() => {
+                    handleSearch()
+                  }}
+                >
+                  {formatMessage({ id: 'form.search' })}
+                </ProgressButton>
+              </Form.Item>
+            </div>
+          </Form>
+        </div>
+        <div>
+          <div style={{ position: 'relative', width: 180, top: 20 }}>
             <span>Last Refresh:</span>
             <span style={{ color: '#1890f8', fontWeight: 500, marginLeft: 10 }}>
               {refreshDate.format('HH:mm')}
@@ -231,7 +239,7 @@ export const WorklistFilter = () => {
             </Button>
           </div>
         </div>
-      </Form>
+      </div>
     </Card>
   )
 }

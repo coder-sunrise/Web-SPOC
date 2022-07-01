@@ -118,96 +118,100 @@ export const WorklistFilter = () => {
   const clinicRoleFK = clinicianProfile.userProfile?.role?.clinicRoleFK
   return (
     <Card bordered={false}>
-      <Form form={form} layout='inline' initialValues={{}}>
-        <div style={{ display: 'flex', width: '100%' }}>
-          <Form.Item name='searchValue'>
-            <TextField
-              label='Patient Name, Acc. No., Patient Ref. No.'
-              style={{ width: 350 }}
-            />
-          </Form.Item>
-          <Form.Item name='visitDoctor' initialValue={[-99]}>
-            <Tooltip
-              placement='right'
-              title='Select "All" will retrieve active and inactive doctors'
-            >
-              <Select
-                label='Visit Doctor'
-                options={doctorprofile.map(item => ({
-                  value: item.id,
-                  name: item.clinicianProfile.name,
-                }))}
-                style={{ width: 180 }}
-                mode='multiple'
-                maxTagCount={0}
-                maxTagPlaceholder='Visit Doctor'
-              />
-            </Tooltip>
-          </Form.Item>
+      <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <div style={{ flex: 'auto' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+            }}
+          >
+            <Form form={form} layout='inline' initialValues={{}}>
+              <Form.Item name='searchValue'>
+                <TextField
+                  label='Patient Name, Acc. No., Patient Ref. No.'
+                  style={{ width: 350 }}
+                />
+              </Form.Item>
+              <Form.Item name='visitDoctor' initialValue={[-99]}>
+                <Tooltip
+                  placement='right'
+                  title='Select "All" will retrieve active and inactive doctors'
+                >
+                  <Select
+                    label='Visit Doctor'
+                    options={doctorprofile.map(item => ({
+                      value: item.id,
+                      name: item.clinicianProfile.name,
+                    }))}
+                    style={{ width: 180 }}
+                    mode='multiple'
+                    maxTagCount={0}
+                    maxTagPlaceholder='Visit Doctor'
+                  />
+                </Tooltip>
+              </Form.Item>
 
-          <Form.Item name='dateFrom'>
-            <DatePicker style={{ width: 140 }} label='Visit Date From' />
-          </Form.Item>
-          <Form.Item name='dateTo'>
-            <DatePicker
-              bordered={true}
-              label='Visit Date To'
-              style={{ width: 140, marginRight: 20 }}
-            />
-          </Form.Item>
+              <Form.Item name='dateFrom'>
+                <DatePicker style={{ width: 140 }} label='Visit Date From' />
+              </Form.Item>
+              <Form.Item name='dateTo'>
+                <DatePicker
+                  bordered={true}
+                  label='Visit Date To'
+                  style={{ width: 140, marginRight: 20 }}
+                />
+              </Form.Item>
 
-          <Form.Item name='isOnlyUrgent' initialValue={false}>
-            <Checkbox simple label='Urgent' style={{ marginTop: 25 }} />
-          </Form.Item>
+              <Form.Item name='isOnlyUrgent' initialValue={false}>
+                <Checkbox simple label='Urgent' style={{ marginTop: 25 }} />
+              </Form.Item>
 
-          {clinicRoleFK === 1 && (
-            <Form.Item name='isMyPatient' initialValue={true}>
-              <Checkbox
-                simple
-                label='My Patient'
-                style={{ marginTop: 25 }}
-                defaultChecked={true}
-              />
-            </Form.Item>
-          )}
+              {clinicRoleFK === 1 && (
+                <Form.Item name='isMyPatient' initialValue={true}>
+                  <Checkbox
+                    simple
+                    label='My Patient'
+                    style={{ marginTop: 25 }}
+                    defaultChecked={true}
+                  />
+                </Form.Item>
+              )}
 
-          <Form.Item style={{ alignSelf: 'center' }}>
-            <ProgressButton
-              variant='contained'
-              color='primary'
-              icon={<Search />}
-              size='small'
-              onClick={() => {
-                handleSearch()
-              }}
-            >
-              {formatMessage({ id: 'form.search' })}
-            </ProgressButton>
-          </Form.Item>
-          <div style={{ position: 'absolute', top: 12, right: 40 }}>
-            <p style={{ fontWeight: 400, fontSize: '0.8rem' }}>Last Refresh:</p>
-            <span>
-              <p style={{ color: '#1890f8', marginTop: 4, fontSize: '0.9rem' }}>
-                {refreshDate.format('HH:mm')}
-              </p>
-              <Button
-                color='primary'
-                justIcon
-                style={{
-                  position: 'absolute',
-                  top: 20,
-                  left: 80,
-                  width: 26,
-                  height: 26,
-                }}
-                onClick={handleSearch}
-              >
-                <Refresh />
-              </Button>
-            </span>
+              <Form.Item style={{ alignSelf: 'center' }}>
+                <ProgressButton
+                  variant='contained'
+                  color='primary'
+                  icon={<Search />}
+                  size='small'
+                  onClick={() => {
+                    handleSearch()
+                  }}
+                >
+                  {formatMessage({ id: 'form.search' })}
+                </ProgressButton>
+              </Form.Item>
+            </Form>
           </div>
         </div>
-      </Form>
+        <div>
+          <div style={{ width: 180, position: 'relative', top: 20 }}>
+            <span>Last Refresh:</span>
+            <span style={{ color: '#1890f8', fontWeight: 500, marginLeft: 10 }}>
+              {refreshDate.format('HH:mm')}
+            </span>
+            <Button
+              color='primary'
+              justIcon
+              style={{ marginLeft: 10 }}
+              onClick={handleSearch}
+            >
+              <Refresh />
+            </Button>
+          </div>
+        </div>
+      </div>
     </Card>
   )
 }
