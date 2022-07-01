@@ -8,10 +8,6 @@ import _ from 'lodash'
 class CodeSelect extends React.PureComponent {
   constructor(props) {
     super(props)
-    // console.log({ props })
-    this.state = {
-      isCheckedShowOnTopFlage: false,
-    }
     if (
       this.props.maxTagCount === undefined &&
       this.props.mode &&
@@ -24,7 +20,6 @@ class CodeSelect extends React.PureComponent {
           ? 1
           : 0
       this.state = {
-        ...this.state,
         maxTagCount:
           this.props.maxTagCount !== undefined
             ? this.props.maxTagCount
@@ -89,29 +84,42 @@ class CodeSelect extends React.PureComponent {
       ? codetable[code.toLowerCase()] || []
       : []
     let filteredOptions = localFilter ? options.filter(localFilter) : options
+    let checkedArray =
+      this.props.form?.values[this.props.field.name] ?? this.props.value ?? []
 
-    filteredOptions = customOrder
-      ? _.orderBy(filteredOptions, [...orderBy[0]], [...orderBy[1]])
-      : orderBy
-      ? _.orderBy(
-          filteredOptions,
-          [
-            option =>
-              (_.get(option, orderBy[0]) || '').toString().toLowerCase(),
-          ],
-          [orderBy[1]],
-        )
-      : filteredOptions
-    if (this.state.isCheckedShowOnTopFlage && isCheckedShowOnTop) {
-      let checkedArray =
-        this.props.form?.values[this.props.field.name] ?? this.props.value ?? []
-      filteredOptions.sort(
-        (a, b) =>
-          checkedArray.includes(a[this.props.valueField || 'id']) &&
-          !checkedArray.includes(b[this.props.valueField || 'id'])
-            ? -1
-            : 0,
-        0,
+    if (customOrder) {
+      filteredOptions = _.orderBy(
+        filteredOptions,
+        [
+          isCheckedShowOnTop
+            ? option =>
+                checkedArray.includes(option[this.props.valueField || 'id'])
+            : null,
+          ...orderBy[0],
+        ],
+        [isCheckedShowOnTop ? 'desc' : null, ...orderBy[1]],
+      )
+    } else if (orderBy) {
+      filteredOptions = _.orderBy(
+        filteredOptions,
+        [
+          isCheckedShowOnTop
+            ? option =>
+                checkedArray.includes(option[this.props.valueField || 'id'])
+            : null,
+
+          option => (_.get(option, orderBy[0]) || '').toString().toLowerCase(),
+        ],
+        [isCheckedShowOnTop ? 'desc' : null, orderBy[1]],
+      )
+    } else if (isCheckedShowOnTop) {
+      filteredOptions = _.orderBy(
+        filteredOptions,
+        [
+          option =>
+            checkedArray.includes(option[this.props.valueField || 'id']),
+        ],
+        ['desc'],
       )
     }
     const formattedFilteredOptions = formatCodes
