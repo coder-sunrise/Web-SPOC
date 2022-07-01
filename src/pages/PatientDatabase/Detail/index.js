@@ -530,7 +530,8 @@ class PatientDetail extends PureComponent {
 
   beforeHandleSubmit = () => {
     const { handleSubmit, dispatch, values, dirty, initialValues } = this.props
-    if (dirty) {
+    //only primaryMember can can update family member info
+    if (dirty && values.patientFamilyGroup?.primaryPatientFK == values.id) {
       const [familyMembers, address, scheme] = this.checkFamilyMembersInfoDiff(
         initialValues,
         values,

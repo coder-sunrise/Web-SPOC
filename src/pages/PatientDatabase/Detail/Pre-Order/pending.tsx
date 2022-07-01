@@ -440,7 +440,7 @@ const PendingPreOrder: React.FC = (props: any) => {
         width: 250,
         maxLength: 100,
         sortingEnabled: false,
-        isDisabled: row => false,
+        isDisabled: row => (row.preOrderItemStatus === 'New' ? false : true),
         render: row => {
           return (
             <Tooltip title={row.remarks}>

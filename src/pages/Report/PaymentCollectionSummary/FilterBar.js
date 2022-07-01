@@ -65,6 +65,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, setFieldValue, values }) => {
                     ]}
                     maxTagCount={maxcompanyIDSCount}
                     maxTagPlaceholder='Co-Payers'
+                    isCheckedShowOnTop
                   />
                 )}
               />
