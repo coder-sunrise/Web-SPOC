@@ -26,7 +26,7 @@ const exportPDF = container => {
   let count = container.documentEditor.pageCount
   let loadedPage = 0
   for (let i = 1; i <= count; i++) {
-    // setTimeout(() => 
+    // setTimeout(() =>
     {
       let format = 'image/jpeg'
       // Getting pages as image
@@ -66,10 +66,12 @@ const exportPDF = container => {
 }
 
 class CommonForm extends PureComponent {
-
   switchMode = () => {
     let isSigningMode = !this.state.isSigningMode
-    this.DEContainer.documentEditor.editor.enforceProtection('', isSigningMode ? 'ReadOnly' : 'FormFieldsOnly')
+    this.DEContainer.documentEditor.editor.enforceProtection(
+      '',
+      isSigningMode ? 'ReadOnly' : 'FormFieldsOnly',
+    )
     this.setState({ isSigningMode })
   }
 
@@ -77,22 +79,32 @@ class CommonForm extends PureComponent {
     this.setState({ showSignature: true })
   }
 
-  notificationWarning = _.debounce(message => notification.warning(message),500)
+  notificationWarning = _.debounce(
+    message => notification.warning(message),
+    500,
+  )
 
   selectionChange = e => {
     const isImageSelected = e.source.documentEditor.selection.isImageSelected
     const isSelectionInEditRegion = e.source.documentEditor.selection.isSelectionInEditRegion()
     let isSignatured = false
-    if(isSelectionInEditRegion) {
+    if (isSelectionInEditRegion) {
       const { start, end, documentHelper } = e.source.documentEditor.selection
       documentHelper.editableDiv.contentEditable = false
       documentHelper.editableDiv.contenteditable = false
 
-      if(start.currentWidget.children.some(x=> x instanceof ImageElementBox))
+      if (start.currentWidget.children.some(x => x instanceof ImageElementBox))
         isSignatured = true
     }
-    if (this.mouseClicked && this.props.values.statusFK !== 2 && !isSelectionInEditRegion && this.state.signatureCounter > 0)
-      this.notificationWarning({ message: 'Please remove signatures to update form content.'})
+    if (
+      this.mouseClicked &&
+      this.props.values.statusFK !== 2 &&
+      !isSelectionInEditRegion &&
+      this.state.signatureCounter > 0
+    )
+      this.notificationWarning({
+        message: 'Please remove signatures to update form content.',
+      })
     this.setState({ isSelectionInEditRegion, isImageSelected, isSignatured })
     this.mouseClicked = false
   }
@@ -100,7 +112,9 @@ class CommonForm extends PureComponent {
   deleteSignature = () => {
     if (this.state.isImageSelected) {
       this.DEContainer.documentEditor.selection.isImageSelected = false
-      this.DEContainer.documentEditor.editor.deleteEditElement(this.DEContainer.documentEditor.selection)
+      this.DEContainer.documentEditor.editor.deleteEditElement(
+        this.DEContainer.documentEditor.selection,
+      )
       this.setState({ isImageSelected: false })
       this.updateSignatureCounter(-1)
     }
@@ -127,12 +141,14 @@ class CommonForm extends PureComponent {
   }
 
   closeSignature = force => {
-    if (!force && this.signatureDirty) 
+    if (!force && this.signatureDirty)
       this.props.dispatch({
         type: 'global/updateAppState',
         payload: {
           openConfirm: true,
-          openConfirmContent: formatMessage({id: 'app.general.leave-without-save'}),
+          openConfirmContent: formatMessage({
+            id: 'app.general.leave-without-save',
+          }),
           onConfirmSave: () => this.setState({ showSignature: false }),
         },
       })
@@ -141,7 +157,8 @@ class CommonForm extends PureComponent {
 
   showHideHighligth(isShow) {
     const selection = this.DEContainer.documentEditor.editor.selection
-    const formFieldSettings = this.DEContainer.documentEditorSettings.formFieldSettings
+    const formFieldSettings = this.DEContainer.documentEditorSettings
+      .formFieldSettings
     formFieldSettings.applyShading = isShow
     selection.isHighlightEditRegion = isShow
   }
@@ -149,7 +166,7 @@ class CommonForm extends PureComponent {
   download = () => {
     this.showHideHighligth(false)
     // this.DEContainer.documentEditor.save(this.props.values.formName, 'Docx')
-    exportPDF(this.DEContainer);
+    exportPDF(this.DEContainer)
     this.showHideHighligth(true)
   }
 
@@ -160,13 +177,17 @@ class CommonForm extends PureComponent {
   }
 
   contentChange = () => {
-    this.props.setFieldValue('formData.content',this.DEContainer.documentEditor.serialize())
+    this.props.setFieldValue(
+      'formData.content',
+      this.DEContainer.documentEditor.serialize(),
+    )
   }
 
   fillFormFields = () => {
     const fillData = this.props.values.fillData
     if (fillData) {
       const formFieldData = this.DEContainer.documentEditor.exportFormData()
+      let newFormFieldData = []
       Object.entries(fillData).forEach(p => {
         formFieldData.forEach(f => {
           if (
@@ -174,12 +195,12 @@ class CommonForm extends PureComponent {
               .toLowerCase()
               .trim()
               .startsWith(p[0].toLowerCase())
-          )
-            f.value = p[1]
-          f.defaultValue = p[1]
+          ) {
+            newFormFieldData.push({ ...f, value: p[1] })
+          }
         })
       })
-      this.DEContainer.documentEditor.importFormData(formFieldData)
+      this.DEContainer.documentEditor.importFormData(newFormFieldData)
     }
   }
 
@@ -190,14 +211,20 @@ class CommonForm extends PureComponent {
   documentChange = () => {
     if (!this.DEContainer) return
     this.fillFormFields()
-    const { statusFK, formData:{ signatureCounter = 0 } } = this.props.values
+    const {
+      statusFK,
+      formData: { signatureCounter = 0 },
+    } = this.props.values
     const isSigningMode = statusFK === 2 || signatureCounter > 0
-    this.DEContainer.documentEditor.editor.enforceProtection('',isSigningMode ? 'ReadOnly' : 'FormFieldsOnly')
+    this.DEContainer.documentEditor.editor.enforceProtection(
+      '',
+      isSigningMode ? 'ReadOnly' : 'FormFieldsOnly',
+    )
     this.DEContainer.documentEditor.showRestrictEditingPane(false)
     this.DEContainer.showHidePropertiesPane(false)
     const deElement = this.DEContainer.documentEditor.getDocumentEditorElement()
-    deElement.addEventListener('click',this.documentClick.bind(this))
-    this.setState({isSigningMode,signatureCounter})
+    deElement.addEventListener('click', this.documentClick.bind(this))
+    this.setState({ isSigningMode, signatureCounter })
   }
 
   state = {}
@@ -212,7 +239,11 @@ class CommonForm extends PureComponent {
       signatureCounter,
     } = this.state
     const {
-      values: { statusFK, formName, formData:{ content } },
+      values: {
+        statusFK,
+        formName,
+        formData: { content },
+      },
       height,
     } = this.props
     const disableEdit = statusFK === 2 //Finalize
@@ -227,7 +258,12 @@ class CommonForm extends PureComponent {
             {isSigningMode ? 'Switch to Edit Mode' : 'Switch to Signing Mode'}
           </Button>
           <Button
-            disabled={disableEdit || !isSigningMode || !isSelectionInEditRegion || isSignatured}
+            disabled={
+              disableEdit ||
+              !isSigningMode ||
+              !isSelectionInEditRegion ||
+              isSignatured
+            }
             size='sm'
             color='primary'
             icon
@@ -255,17 +291,25 @@ class CommonForm extends PureComponent {
           documentName={formName}
           document={content}
           ref={r => (this.DEContainer = r?.container)}
+          initialized={()=>{
+            const {values: { statusFK }} = this.props
+            this.documentChange()
+            this.DEContainer.contentChange = this.contentChange
+            this.DEContainer.documentChange = this.documentChange
+            this.DEContainer.selectionChange = _.debounce(this.selectionChange,100) 
+            this.DEContainer.disableEdit = statusFK === 2
+          }}
           zoomTarget='FitPageWidth'
           height={'78vh'}
           showPropertiesPane={false}
           enableToolbar={false}
           restrictEditing={disableEdit}
           // userColor={'#FFFF00'}
-          contentChange={this.contentChange}
-          documentChange={this.documentChange}
-          selectionChange={this.selectionChange}
+          // contentChange={this.contentChange}
+          // documentChange={this.documentChange}
+          // selectionChange={this.selectionChange}
           documentEditorSettings={{
-            printDevicePixelRatio:3,
+            printDevicePixelRatio: 3,
             // searchHighlightColor: '#FFE97F',
             // formFieldSettings: {
             //   shadingColor: '#cfcfcf',
@@ -283,7 +327,10 @@ class CommonForm extends PureComponent {
           onClose={this.closeSignature}
         >
           {showSignature && (
-            <Signature onChange={this.signatureChange} updateSignature={this.updateSignature} />
+            <Signature
+              onChange={this.signatureChange}
+              updateSignature={this.updateSignature}
+            />
           )}
         </CommonModal>
       </div>

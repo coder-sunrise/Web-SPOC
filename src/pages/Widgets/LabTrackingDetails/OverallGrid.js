@@ -24,6 +24,7 @@ class OverallGrid extends PureComponent {
       { name: 'estimateReceiveDate', title: 'Est. Receive Date' },
       { name: 'receivedDate', title: 'Received Date' },
       { name: 'labTrackingStatusDisplayValue', title: 'Status' },
+      { name: 'sentBy', title: 'Sent By' },
       { name: 'remarks', title: 'Remarks' },
       { name: 'action', title: 'Action' },
     ],
@@ -48,7 +49,8 @@ class OverallGrid extends PureComponent {
           'ServiceCenterServiceFKNavigation.ServiceCenterFKNavigation.DisplayValue',
       },
       { columnName: 'supplierName', width: 150 },
-      { columnName: 'labTrackingStatusDisplayValue', width: 80 },
+      { columnName: 'labTrackingStatusDisplayValue', width: 110 },
+      { columnName: 'sentBy', width: 100 },
       { columnName: 'remarks', width: 200 },
       {
         columnName: 'doctorProfileFKNavigation.ClinicianProfile.Name',

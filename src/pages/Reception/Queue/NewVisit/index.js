@@ -79,10 +79,7 @@ const styles = theme => ({
 
 const getHeight = propsHeight => {
   if (propsHeight < 0) return '100%'
-
-  const modalMargin = 64
-  const footerAndHeaderHeight = 95
-  return propsHeight - footerAndHeaderHeight - modalMargin
+  return propsHeight - 64
 }
 
 @connect(
@@ -652,9 +649,9 @@ class NewVisit extends PureComponent {
               md={12}
               style={{
                 height: !fromMedicalCheckupReporting
-                  ? height - (this.state.bannerHeight || 0) - 60
-                  : height - 60,
-                overflow: 'auto',
+                  ? height - (this.state.bannerHeight || 0) - 10
+                  : height - 10,
+                overflow: 'scroll',
               }}
             >
               <ErrorWrapper errorState={errorState} errorKey='visitInfo'>

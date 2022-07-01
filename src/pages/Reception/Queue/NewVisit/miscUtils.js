@@ -170,19 +170,20 @@ export const formikMapPropsToValues = ({
       doctorProfileFK = clinicInfo.primaryRegisteredDoctorFK
     }
 
+    const { visitInfo, roomFK, appointment, maxQueueNo } = visitRegistration
     if (queueLog) {
       const { list } = queueLog
-      const largestQNo = list.reduce(
-        (largest, { queueNo }) =>
-          parseFloat(queueNo) > largest ? parseFloat(queueNo) : largest,
-        0,
-      )
+      const largestQNo = maxQueueNo
+        ? parseFloat(maxQueueNo)
+        : list.reduce(
+            (largest, { queueNo }) =>
+              parseFloat(queueNo) > largest ? parseFloat(queueNo) : largest,
+            0,
+          )
       qNo = parseFloat(largestQNo + 1).toFixed(
         clinicSettings.settings.isQueueNoDecimal ? 1 : 0,
       )
     }
-
-    const { visitInfo, roomFK, appointment } = visitRegistration
 
     if (Object.keys(visitInfo).length > 0) {
       qNo = visitInfo.queueNo

@@ -257,8 +257,7 @@ class GlobalModalContainer extends PureComponent {
           overrideLoading
           onClose={this.closeVisitRegistration}
           onConfirm={this.closeVisitRegistration}
-          maxWidth='lg'
-          fullHeight
+          fullScreen
           observe='VisitRegistration'
         >
           <VisitRegistration history={this.props.history} />

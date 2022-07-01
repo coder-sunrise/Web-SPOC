@@ -15,6 +15,7 @@ import WorklistContext, {
 } from '@/pages/Radiology/Worklist/WorklistContext'
 import PharmacyDetails from './Details'
 import { WorklistFilter } from '../Components'
+import { withStyles } from '@material-ui/core'
 const columnsTemplate = [
   {
     backgroundColor: '#009933',
@@ -38,7 +39,15 @@ const columnsTemplate = [
   },
 ]
 
-const PharmacyWorklist = () => {
+const styles = () => ({
+  customProCard: {
+    '& > .ant-pro-card-header': {
+      padding: '4px 8px',
+    },
+  },
+})
+
+const PharmacyWorklist = props => {
   const dispatch = useDispatch()
   const [columns, setColumns] = useState([])
   const entity = useSelector(s => s.pharmacyWorklist)
@@ -150,12 +159,58 @@ const PharmacyWorklist = () => {
         style={{
           height: '100%',
         }}
+        className={props.classes.customProCard}
         gutter={[16, 16]}
         title={
           <WorklistFilter
             valueChange={debouncedAction}
             filterValue={filterValue}
           />
+        }
+        extra={
+          <div style={{ display: 'flex', width: 265, flexDirection: 'column' }}>
+            <div>
+              <span>
+                Now Serving:
+                <Tooltip title={nowServing || '-'}>
+                  <span
+                    style={{
+                      color: '#1890f8',
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden',
+                      whiteSpace: 'nowrap',
+                      display: 'inline-block',
+                      left: 6,
+                      position: 'relative',
+                      fontWeight: 500,
+                      top: 5,
+                      width: 180,
+                    }}
+                  >
+                    {nowServing || '-'}
+                  </span>
+                </Tooltip>
+              </span>
+            </div>
+            <div>
+              <span style={{ minWidth: 80 }}>Last Refresh:</span>
+              <span
+                style={{ color: '#1890f8', fontWeight: 500, marginLeft: 6 }}
+              >
+                {refreshDate.format('HH:mm')}
+              </span>
+              <Button
+                color='primary'
+                justIcon
+                style={{
+                  marginLeft: 5,
+                }}
+                onClick={refreshClick}
+              >
+                <Refresh />
+              </Button>
+            </div>
+          </div>
         }
       >
         <Worklist columns={columns} />
@@ -165,54 +220,6 @@ const PharmacyWorklist = () => {
           stopRefreshTimer={stopRefreshTimer}
         />
       </ProCard>
-
-      <div>
-        <div
-          style={{
-            position: 'absolute',
-            top: 25,
-            right: 150,
-            width: 200,
-          }}
-        >
-          <p style={{ fontWeight: 400, fontSize: '0.8rem' }}>Now Serving:</p>
-          <Tooltip title={nowServing || '-'}>
-            <p
-              style={{
-                color: '#1890f8',
-                textOverflow: 'ellipsis',
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
-                marginTop: 4,
-              }}
-            >
-              {nowServing || '-'}
-            </p>
-          </Tooltip>
-        </div>
-        <div style={{ position: 'absolute', top: 25, right: 50 }}>
-          <p style={{ fontWeight: 400, fontSize: '0.8rem' }}>Last Refresh:</p>
-          <span>
-            <p style={{ color: '#1890f8', marginTop: 4, fontSize: '0.9rem' }}>
-              {refreshDate.format('HH:mm')}
-            </p>
-            <Button
-              color='primary'
-              justIcon
-              style={{
-                position: 'absolute',
-                top: 20,
-                left: 80,
-                width: 26,
-                height: 26,
-              }}
-              onClick={refreshClick}
-            >
-              <Refresh />
-            </Button>
-          </span>
-        </div>
-      </div>
     </div>
   )
 }
@@ -222,4 +229,8 @@ const PharmacyWorklistWithProvider = props => (
     <PharmacyWorklist {...props}></PharmacyWorklist>
   </WorklistContextProvider>
 )
-export default PharmacyWorklistWithProvider
+
+export default withStyles(styles, { name: 'PharmacyWorklistWithProvider' })(
+  PharmacyWorklistWithProvider,
+)
+
