@@ -38,7 +38,6 @@ const RadiographerTag = ({
       payload: {
         code: 'clinicianprofile',
         force: true,
-        isActive: true,
       },
     }).then(o => {
       if (o) {
