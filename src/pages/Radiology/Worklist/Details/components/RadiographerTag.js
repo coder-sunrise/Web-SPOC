@@ -38,13 +38,15 @@ const RadiographerTag = ({
       payload: {
         code: 'clinicianprofile',
         force: true,
+        isActive: true,
       },
     }).then(o => {
       if (o) {
         const result = o.filter(
           c =>
-            c.userProfile.role.clinicRoleFK === CLINICAL_ROLE.RADIOGRAPHER ||
-            c.userProfile.role.clinicRoleFK === CLINICAL_ROLE.DOCTOR,
+            (c.userProfile.role.clinicRoleFK === CLINICAL_ROLE.RADIOGRAPHER ||
+              c.userProfile.role.clinicRoleFK === CLINICAL_ROLE.DOCTOR) &&
+            c.isActive,
         )
         setRadiographers(result)
       }
