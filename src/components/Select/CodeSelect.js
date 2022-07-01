@@ -150,24 +150,12 @@ class CodeSelect extends React.PureComponent {
             this.props.mode === 'multiple'
           ) {
             this.setState({
-              ...this.state,
-              isCheckedShowOnTopFlage: false,
               maxTagCount: values && values.length === 1 ? 1 : 0,
             })
           }
           if (this.props.onChange) {
-            this.setState({
-              ...this.state,
-              isCheckedShowOnTopFlage: false,
-            })
             this.props.onChange(values, opts)
           }
-        }}
-        onDropdownVisibleChange={() => {
-          this.setState({
-            ...this.state,
-            isCheckedShowOnTopFlage: true,
-          })
         }}
       />
     )
