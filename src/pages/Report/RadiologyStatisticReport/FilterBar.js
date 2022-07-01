@@ -63,8 +63,10 @@ const FilterBar = ({
                     maxTagPlaceholder='Radiology Technologists'
                     {...args}
                     localFilter={item =>
-                      item.userProfile.role.clinicRoleFK === 3 ||
-                      item.userProfile.role.clinicRoleFK === 1
+                      (item.userProfile.role.clinicRoleFK === 3 ||
+                        item.userProfile.role.clinicRoleFK === 1) &&
+                      item.isActive &&
+                      item.userProfile.isActive
                     }
                   />
                 </Tooltip>

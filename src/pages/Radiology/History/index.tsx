@@ -81,8 +81,10 @@ const saveColumnsSetting = (dispatch, columnsSetting) => {
 const defaultColumns = (codetable, setDetailsId, visitPurpose) => {
   const radiographer = (codetable.clinicianprofile || []).filter(
     x =>
-      x.clinicRoleFK === CLINICAL_ROLE.RADIOGRAPHER ||
-      x.clinicRoleFK === CLINICAL_ROLE.DOCTOR,
+      (x.clinicRoleFK === CLINICAL_ROLE.RADIOGRAPHER ||
+        x.clinicRoleFK === CLINICAL_ROLE.DOCTOR) &&
+      x.isActive &&
+      x.userProfile.isActive,
   )
   const radiographerOptions = _.orderBy(
     radiographer.map(x => {
