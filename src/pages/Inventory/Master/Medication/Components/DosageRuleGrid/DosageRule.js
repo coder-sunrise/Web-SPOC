@@ -103,7 +103,7 @@ const DosageRuleTable = ({
 
       const sortedInitialData =
         rule !== DOSAGE_RULE.default
-          ? _.sortBy(initialData, s => getRangeMinMax(s).max)
+          ? _.sortBy(initialData, s => getRangeMinMax(s)?.max)
           : initialData
 
       setData(
