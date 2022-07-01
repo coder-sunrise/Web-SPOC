@@ -416,6 +416,9 @@ class PatientDetail extends PureComponent {
   }
 
   registerVisit = e => {
+    this.props.dispatch({
+      type: 'visitRegistration/closeModal',
+    })
     navigateDirtyCheck({
       onProceed: () => {
         this.props
@@ -438,29 +441,28 @@ class PatientDetail extends PureComponent {
     this.setState({ showReplacementModal: false })
 
   getAddressCompareVal = contactAddress => {
-    return contactAddress
-      .map(x => {
-        const {
-          isDeleted,
-          isPrimary,
-          isMailing,
-          postcode = '',
-          blockNo = '',
-          unitNo = '',
-          buildingName = '',
-          street = '',
-          countryFK = '',
-        } = x
-        return {
-          isDeleted,
-          isPrimary,
-          isMailing,
-          address: `${postcode}${blockNo}${unitNo}${buildingName}${street}${countryFK}`.replaceAll(
-            ' ',
-            '',
-          ),
-        }
-      })
+    return contactAddress.map(x => {
+      const {
+        isDeleted,
+        isPrimary,
+        isMailing,
+        postcode = '',
+        blockNo = '',
+        unitNo = '',
+        buildingName = '',
+        street = '',
+        countryFK = '',
+      } = x
+      return {
+        isDeleted,
+        isPrimary,
+        isMailing,
+        address: `${postcode}${blockNo}${unitNo}${buildingName}${street}${countryFK}`.replaceAll(
+          ' ',
+          '',
+        ),
+      }
+    })
   }
 
   getSchemeCompareVal = patientScheme => {
