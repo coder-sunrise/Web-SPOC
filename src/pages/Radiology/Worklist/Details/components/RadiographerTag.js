@@ -45,7 +45,8 @@ const RadiographerTag = ({
           c =>
             (c.userProfile.role.clinicRoleFK === CLINICAL_ROLE.RADIOGRAPHER ||
               c.userProfile.role.clinicRoleFK === CLINICAL_ROLE.DOCTOR) &&
-            c.isActive,
+            c.isActive &&
+            c.userProfile.isActive,
         )
         setRadiographers(result)
       }
