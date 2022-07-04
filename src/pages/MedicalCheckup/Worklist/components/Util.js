@@ -94,7 +94,10 @@ export const getMedicalCheckupReportPayload = data => {
     Audiometry: audiometry,
     IndividualComment: newIndividualComment,
     SummaryComment: summaryComment,
-    LabTestPanel: labTestPanel,
+    LabTestPanel: labTestPanel.map(item => ({
+      ...item,
+      japaneseName: item.japaneseName || '',
+    })),
     ReportingDoctor: reportingDoctor.map(x => ({
       ...x,
       japaneseName: x.japaneseName || '',
