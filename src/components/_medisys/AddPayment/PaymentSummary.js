@@ -28,8 +28,8 @@ const PaymentSummary = ({
   )
   return (
     <React.Fragment>
-      <GridItem md={6} className={classes.paymentSummary} />
-      <GridItem md={6} container className={classes.paymentSummary}>
+      <GridItem md={8} className={classes.paymentSummary} />
+      <GridItem md={4} container className={classes.paymentSummary}>
         <GridItem md={6}>Total Payment: </GridItem>
         <GridItem md={6}>
           <NumberInput text currency value={totalAmtPaid} />
@@ -47,7 +47,7 @@ const PaymentSummary = ({
         <GridItem md={3}>
           <Field
             name='cashReceived'
-            render={(args) => (
+            render={args => (
               <NumberInput
                 onChange={handleCashReceivedChange}
                 min={shouldDisableCashReceived ? 0 : minCashReceived}
