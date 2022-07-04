@@ -189,11 +189,9 @@ class AppointmentHistory extends PureComponent {
         const commonValues = {
           ...restValues,
           uid: getUniqueId(),
-          // id: appt.id,
+          apptResourceFK: appt.id,
           appointmentTypeFK,
-          appointmentDate: `${moment(restValues.appointmentDate).format(
-              'YYYY-MM-DD',
-            )} ${moment(appt.startTime, 'HH:mm:ss').format('HH:mm:ss')}`,
+          appointmentDate: `${moment(restValues.appointmentDate).format('YYYY-MM-DD')}`,
           startTime: moment(startTime, 'HH:mm:ss').format('hh:mm A'),
           calendarResourceFK,
           appointmentStatus: apptStatus ? apptStatus.name || '' : '',
@@ -321,6 +319,7 @@ class AppointmentHistory extends PureComponent {
             <CommonTableGrid
               size='sm'
               rows={futureAppt}
+              getRowId={(r)=> `${r.id}_${r.apptResourceFK}`}
               onRowDoubleClick={handleRowDoubleClick}
               {...futureApptTableParams(appointmentTypes)}
               TableProps={{
@@ -344,6 +343,7 @@ class AppointmentHistory extends PureComponent {
             <CommonTableGrid
               size='sm'
               rows={previousAppt}
+              getRowId={(r)=> `${r.id}_${r.apptResourceFK}`}
               {...previousApptTableParams(
                 appointmentTypes,
                 handleCopyAppointmentClick,

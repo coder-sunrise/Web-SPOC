@@ -57,6 +57,7 @@ export const commonExt = appointmentTypes => {
       code: 'ctcalendarresource',
       valueField: 'id',
       labelField: 'name',
+      sortingEnabled: false,
     },
     {
       columnName: 'cancellationReason',
