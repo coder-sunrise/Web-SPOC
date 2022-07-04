@@ -39,9 +39,9 @@ export function getAuthority(str) {
   // return localStorage.getItem('antd-pro-authority') || ['admin', 'user'];
   // g_app
   try {
-    return JSON.parse(localStorage.getItem('user')).accessRights || []
+    return JSON.parse(sessionStorage.getItem('user')).accessRights || []
   } catch (error) {
-    return []
+    return JSON.parse(localStorage.getItem('user')).accessRights ?? []
   }
 
   if (!window.g_app || !window.g_app._store) return []
