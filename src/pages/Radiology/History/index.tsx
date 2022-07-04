@@ -603,6 +603,7 @@ const RadiologyWorklistHistoryIndex = ({
         filter: {
           isActive: true,
         },
+        force: true,
       },
     })
     dispatch({
