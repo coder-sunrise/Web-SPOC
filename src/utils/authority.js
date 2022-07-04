@@ -35,13 +35,13 @@ const accessRightsMapping = {
   'patient.view': 'SEMRWebApp:PatientDatabase',
 }
 // use localStorage to store the authority info, which might be sent from server in actual project.
-export function getAuthority (str) {
+export function getAuthority(str) {
   // return localStorage.getItem('antd-pro-authority') || ['admin', 'user'];
   // g_app
   try {
     return JSON.parse(sessionStorage.getItem('user')).accessRights || []
   } catch (error) {
-    return []
+    return JSON.parse(localStorage.getItem('user')).accessRights ?? []
   }
 
   if (!window.g_app || !window.g_app._store) return []
@@ -65,12 +65,10 @@ export function getAuthority (str) {
   if (!result) return []
   // console.log(result, authority)
   if (typeof authority === 'string') {
-    result = [
-      authority,
-    ]
+    result = [authority]
   }
   const r = result
-    .map((o) => roleAccessRightsMapping[o] || [])
+    .map(o => roleAccessRightsMapping[o] || [])
     .reduce((a, b) => {
       return a.concat(b)
     })
@@ -78,13 +76,8 @@ export function getAuthority (str) {
   return r
 }
 
-export function setAuthority (authority) {
-  const proAuthority =
-    typeof authority === 'string'
-      ? [
-          authority,
-        ]
-      : authority
+export function setAuthority(authority) {
+  const proAuthority = typeof authority === 'string' ? [authority] : authority
   return localStorage.setItem(
     'antd-pro-authority',
     JSON.stringify(proAuthority),
