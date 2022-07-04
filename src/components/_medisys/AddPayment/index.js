@@ -36,6 +36,7 @@ import styles from './styles'
 import { ValidationSchema, getLargestID } from './variables'
 import { rounding } from './utils'
 import _ from 'lodash'
+import { Tag } from 'antd'
 
 @connect(({ clinicSettings, patient, codetable }) => ({
   clinicSettings: clinicSettings.settings || clinicSettings.default,
@@ -655,6 +656,15 @@ class AddPayment extends Component {
     const { selectedRows = [], invoicePayerItem = [] } = values
     const { bizSessionList, paymentModes } = this.state
     const payerHeaderProps = this.getPayerHeaderProps()
+    const sortedInvoicePayerItem = _.orderBy(
+      invoicePayerItem,
+      [
+        'isVisitPurposeItem',
+        x => (x.itemType || '').toLowerCase(),
+        x => (x.itemName || '').toLowerCase(),
+      ],
+      ['desc', 'asc', 'asc'],
+    )
     return (
       <div>
         <PayerHeader {...payerHeaderProps} />
@@ -668,7 +678,7 @@ class AddPayment extends Component {
                   </div>
                   <EditableTableGrid
                     size='sm'
-                    rows={invoicePayerItem}
+                    rows={sortedInvoicePayerItem}
                     forceRender
                     columns={[
                       {
@@ -703,9 +713,26 @@ class AddPayment extends Component {
                               (row.itemType || '').toUpperCase(),
                           )
                           return (
-                            <Tooltip title={row.itemType}>
-                              <span>{itemType?.displayValue}</span>
-                            </Tooltip>
+                            <div
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                              }}
+                            >
+                              <Tooltip title={row.itemType}>
+                                <span>{itemType?.displayValue}</span>
+                              </Tooltip>
+                              {row.isVisitPurposeItem && (
+                                <Tooltip
+                                  title='Visit Purpose Item'
+                                  placement='right'
+                                >
+                                  <Tag style={{ marginRight: 0 }} color='blue'>
+                                    V.P.
+                                  </Tag>
+                                </Tooltip>
+                              )}
+                            </div>
                           )
                         },
                       },

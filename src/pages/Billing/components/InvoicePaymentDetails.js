@@ -6,6 +6,9 @@ import { orderItemTypes } from '@/utils/codes'
 import { GridContainer, GridItem, Tooltip } from '@/components'
 import AmountSummary from '@/pages/Widgets/PatientHistory/AmountSummary'
 import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
+
+import { Tag } from 'antd'
+
 const showMoney = (v = 0) => {
   if (v < 0)
     return (
@@ -26,6 +29,22 @@ const drugMixtureIndicator = (row, right) => {
 }
 const InvoicePaymentDetails = ({ invoice = {}, classes }) => {
   const { invoiceNo, invoiceItems = [], invoiceAdjustments = [] } = invoice
+  let data = invoiceItems.map(item => ({
+    ...item,
+    outstanding:
+      (item.isPreOrder && !item.isChargeToday) || item.hasPaid
+        ? 0
+        : roundTo(item.totalAfterGst - item.totalClaim - item.paidAmount, 2),
+  }))
+  data = _.orderBy(
+    data,
+    [
+      'isVisitPurposeItem',
+      x => (x.itemType || '').toLowerCase(),
+      x => (x.itemName || '').toLowerCase(),
+    ],
+    ['desc', 'asc', 'asc'],
+  )
   return (
     <GridContainer hideHeader>
       <GridItem md={12}>
@@ -36,21 +55,12 @@ const InvoicePaymentDetails = ({ invoice = {}, classes }) => {
           size='small'
           bordered
           pagination={false}
-          dataSource={invoiceItems.map(item => ({
-            ...item,
-            outstanding:
-              (item.isPreOrder && !item.isChargeToday) || item.hasPaid
-                ? 0
-                : roundTo(
-                    item.totalAfterGst - item.totalClaim - item.paidAmount,
-                    2,
-                  ),
-          }))}
+          dataSource={data}
           columns={[
             {
               dataIndex: 'itemType',
               title: 'Category ',
-              width: 105,
+              width: 160,
               render: (_, row) => {
                 let paddingRight = 0
                 if (row.isPreOrder) {
@@ -67,21 +77,14 @@ const InvoicePaymentDetails = ({ invoice = {}, classes }) => {
                   <div style={{ position: 'relative' }}>
                     <div
                       style={{
-                        wordWrap: 'break-word',
-                        whiteSpace: 'pre-wrap',
-                        paddingRight: paddingRight,
+                        display: 'flex',
+                        justifyContent: 'space-between',
                       }}
                     >
                       <Tooltip title={row.itemType}>
                         <span>{itemType?.displayValue}</span>
                       </Tooltip>
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '-1px',
-                          right: '-6px',
-                        }}
-                      >
+                      <div>
                         <div
                           style={{
                             display: 'inline-block',
@@ -102,6 +105,13 @@ const InvoicePaymentDetails = ({ invoice = {}, classes }) => {
                             >
                               Pre
                             </div>
+                          </Tooltip>
+                        )}
+                        {row.isVisitPurposeItem && (
+                          <Tooltip title='Visit Purpose Item' placement='right'>
+                            <Tag style={{ marginRight: 0 }} color='blue'>
+                              V.P.
+                            </Tag>
                           </Tooltip>
                         )}
                       </div>
