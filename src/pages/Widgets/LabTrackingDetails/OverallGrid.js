@@ -24,8 +24,8 @@ class OverallGrid extends PureComponent {
       { name: 'estimateReceiveDate', title: 'Est. Receive Date' },
       { name: 'receivedDate', title: 'Received Date' },
       { name: 'sentBy', title: 'Sent By' },
-      { name: 'labTrackingStatusDisplayValue', title: 'Status' },
       { name: 'remarks', title: 'Remarks' },
+      { name: 'labTrackingStatusDisplayValue', title: 'Status' },
       { name: 'action', title: 'Action' },
     ],
     columnExtensions: [
@@ -37,7 +37,22 @@ class OverallGrid extends PureComponent {
           'VisitFKNavigation.PatientProfileFkNavigation.PatientReferenceNo',
       },
       { columnName: 'patientAccountNo', width: 100 },
-      { columnName: 'patientName', width: 180 },
+      {
+        columnName: 'patientName',
+        width: 180,
+        render: r => {
+          return (
+            <Tooltip title={r.patientName}>
+              <span
+                className='text-auto-hide'
+                style={{ position: 'relative', top: 2 }}
+              >
+                {r.patientName}
+              </span>
+            </Tooltip>
+          )
+        },
+      },
       { columnName: 'estimateReceiveDate', type: 'date', width: 130 },
       { columnName: 'orderedDate', type: 'date', width: 100 },
       { columnName: 'receivedDate', type: 'date', width: 105 },
@@ -115,6 +130,13 @@ class OverallGrid extends PureComponent {
         },
       },
     ],
+    leftColumns: [
+      'visitDate',
+      'patientAccountNo',
+      'referreceNo',
+      'patientName',
+    ],
+    rightColumns: ['labTrackingStatusDisplayValue', 'action'],
   }
 
   editRow = (row, e) => {
