@@ -408,7 +408,8 @@ class EditOrder extends Component {
       )
       if (div.attr('aria-expanded') === 'false') div.click()
     }
-
+    const visitRemarks = this.props.visitRegistration?.entity?.visit
+      ?.visitRemarks
     return (
       <div className={classes.content} style={{ backgroundColor: 'white' }}>
         <GridContainer>
@@ -420,6 +421,23 @@ class EditOrder extends Component {
                 className={classes.orderPanel}
                 status=''
                 from='EditOrder'
+              />
+            </GridItem>
+            <GridItem xs={12}>
+              <FastField
+                name='visitRemarks'
+                render={args => {
+                  return (
+                    <TextField
+                      multiline
+                      rowsMax='5'
+                      disabled
+                      label='Visit Remarks'
+                      value={visitRemarks}
+                      {...args}
+                    />
+                  )
+                }}
               />
             </GridItem>
             <GridItem xs={12} md={6}>
