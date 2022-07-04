@@ -36,7 +36,6 @@ const TestCategoryPanel = ({
         ?.sortOrder,
     }))
     .sort((a, b) => (a.sortOrder < b.sortOrder ? -1 : 1))
-
   return (
     <GridContainer>
       {sortedWorkitems.length > 0 &&
@@ -52,7 +51,8 @@ const TestCategoryPanel = ({
               checked={labWorkitems.find(
                 cur =>
                   cur.id === item.id &&
-                  cur.statusFK === LAB_WORKITEM_STATUS.SPECIMENCOLLECTED,
+                  (cur.statusFK === LAB_WORKITEM_STATUS.SPECIMENCOLLECTED ||
+                    cur.statusFK === LAB_WORKITEM_STATUS.SPECIMENRECEIVED),
               )}
               onChange={e =>
                 e.target.checked ? onAddWorkitem(item) : onRemoveWorkitem(item)
@@ -153,8 +153,6 @@ const TestCategoryCollapse = ({
           categoryWorkitems.length
 
         console.group('Start Group')
-        console.log('categoryWorkitems', categoryWorkitems)
-        console.log('value', value)
         console.groupEnd()
 
         return (
