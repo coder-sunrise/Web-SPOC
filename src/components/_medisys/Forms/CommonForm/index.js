@@ -66,6 +66,23 @@ const exportPDF = container => {
 }
 
 class CommonForm extends PureComponent {
+  componentDidMount() {
+    const {
+      values: { formTemplateFK },
+    } = this.props
+    // setTimeout(() => {
+    this.props
+      .dispatch({
+        type: 'settingDocumentTemplate/queryOne',
+        payload: { id: formTemplateFK },
+      })
+      .then(r => {
+        this.DEContainer.documentEditor.open(r.templateContent)
+        this.documentChange()
+      })
+    // })
+  }
+
   switchMode = () => {
     let isSigningMode = !this.state.isSigningMode
     this.DEContainer.documentEditor.editor.enforceProtection(
