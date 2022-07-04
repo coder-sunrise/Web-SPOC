@@ -385,35 +385,29 @@ const WorklistGrid = ({
         search: false,
         width: 200,
         render: (_dom, entity) => {
-          if (entity.reportPriority === 'Urgent') {
-            return (
-              <Tooltip title={entity.urgentReportRemarks}>
-                <div style={{ position: 'relative', paddingLeft: 15 }}>
-                  <Icon
-                    type='thunder'
-                    style={{
-                      fontSize: 15,
-                      color: 'red',
-                      alignSelf: 'center',
-                      position: 'absolute',
-                      left: 0,
-                      top: 2,
-                    }}
-                  />
-                  <div
-                    style={{
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {entity.urgentReportRemarks}
-                  </div>
-                </div>
-              </Tooltip>
-            )
-          }
-          return 'Normal'
+          const remarks = `${entity.reportPriority}${
+            entity.urgentReportRemarks ? `, ${entity.urgentReportRemarks}` : ''
+          }`
+          return (
+            <Tooltip title={remarks}>
+              <div
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {entity.reportPriority === 'Urgent' ? (
+                  <span style={{ color: 'red' }}>{entity.reportPriority}</span>
+                ) : (
+                  <span>{entity.reportPriority}</span>
+                )}
+                {entity.urgentReportRemarks
+                  ? `, ${entity.urgentReportRemarks}`
+                  : ''}
+              </div>
+            </Tooltip>
+          )
         },
       },
       {
