@@ -64,8 +64,7 @@ class PaymentCard extends Component {
         hideHeader
         className={classes.paymentTypeContainer}
         style={{
-          height: `${noPayment ? 50 : maxHeight}px`,
-          maxHeight: maxHeight,
+          height: `${noPayment ? 50 : 260}px`,
         }}
       >
         {!noPayment ? (

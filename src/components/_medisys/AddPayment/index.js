@@ -819,7 +819,7 @@ class AddPayment extends Component {
                       onCommitChanges: this.handleCommitChanges,
                     }}
                     TableProps={{
-                      height: invoicePayerItem.length > 4 ? 200 : undefined,
+                      height: invoicePayerItem.length > 8 ? 340 : undefined,
                     }}
                     schema={Yup.object().shape({
                       totalPaidAmount: Yup.number()
@@ -865,7 +865,7 @@ class AddPayment extends Component {
                 maxHeight={this.getModeMaxHeight()}
               />
             </GridItem>
-            <GridItem md={9} className={classes.noPaddingLeft}>
+            <GridItem md={6} className={classes.noPaddingLeft}>
               <PaymentCard
                 paymentList={values.paymentList}
                 handleDeletePayment={this.onDeleteClick}
@@ -875,15 +875,17 @@ class AddPayment extends Component {
                 maxHeight={this.getModeMaxHeight()}
               />
             </GridItem>
+            <GridItem md={3} className={classes.noPaddingLeft}>
+              <PaymentSummary
+                clinicSettings={clinicSettings}
+                handleCashReceivedChange={this.handleCashReceivedChange}
+                minCashReceived={this.state.cashPaymentAmount}
+                {...values}
+              />
+            </GridItem>
           </GridContainer>
 
           <GridContainer alignItems='flex-end'>
-            <PaymentSummary
-              clinicSettings={clinicSettings}
-              handleCashReceivedChange={this.handleCashReceivedChange}
-              minCashReceived={this.state.cashPaymentAmount}
-              {...values}
-            />
             <GridItem md={12} className={classes.addPaymentActionButtons}>
               <Button color='danger' onClick={onClose}>
                 Cancel
