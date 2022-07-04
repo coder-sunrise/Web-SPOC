@@ -36,7 +36,6 @@ const TestCategoryPanel = ({
         ?.sortOrder,
     }))
     .sort((a, b) => (a.sortOrder < b.sortOrder ? -1 : 1))
-  console.log(labWorkitems)
   return (
     <GridContainer>
       {sortedWorkitems.length > 0 &&
@@ -154,8 +153,6 @@ const TestCategoryCollapse = ({
           categoryWorkitems.length
 
         console.group('Start Group')
-        console.log('categoryWorkitems', categoryWorkitems)
-        console.log('value', value)
         console.groupEnd()
 
         return (
