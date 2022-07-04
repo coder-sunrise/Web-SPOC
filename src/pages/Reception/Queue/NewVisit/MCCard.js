@@ -193,37 +193,26 @@ const MCCard = ({
                   },
                 ]}
                 disabled={!mcWorkItemInProgress || visitMode === 'view'}
-                onChange={e => {
-                  if (e.target.value !== 'Urgent') {
-                    setFieldValue(
-                      'medicalCheckupWorkitem[0].urgentReportRemarks',
-                      undefined,
-                    )
-                  }
-                }}
                 {...args}
               />
             )}
           />
         </div>
         <div style={{ marginLeft: 10, width: 500 }}>
-          {(values.medicalCheckupWorkitem || [{}])[0].reportPriority ===
-            'Urgent' && (
-            <Field
-              name='medicalCheckupWorkitem[0].urgentReportRemarks'
-              render={args => (
-                <TextField
-                  {...args}
-                  multiline
-                  rowsMax={3}
-                  maxLength={2000}
-                  authority='none'
-                  disabled={!mcWorkItemInProgress || visitMode === 'view'}
-                  label='Urgent Report Remarks'
-                />
-              )}
-            />
-          )}
+          <Field
+            name='medicalCheckupWorkitem[0].urgentReportRemarks'
+            render={args => (
+              <TextField
+                {...args}
+                multiline
+                rowsMax={3}
+                maxLength={2000}
+                authority='none'
+                disabled={!mcWorkItemInProgress || visitMode === 'view'}
+                label='Report Remarks'
+              />
+            )}
+          />
         </div>
       </GridItem>
       <GridItem xs md={12}>
