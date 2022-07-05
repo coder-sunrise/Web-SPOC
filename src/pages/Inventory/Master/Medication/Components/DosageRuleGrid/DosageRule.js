@@ -77,6 +77,7 @@ const DosageRuleTable = ({
   dispenseUomFK,
   prescribeUomFK,
   onChange,
+  editenable,
 }) => {
   const [form] = Form.useForm()
   const [data, setData] = useState([])
@@ -644,19 +645,26 @@ const DosageRuleTable = ({
             title='Edit'
           >
             <Typography.Link
-              disabled={editingKey !== ''}
+              disabled={!editenable || editingKey !== ''}
               onClick={() => edit(record)}
             >
               <Edit />
             </Typography.Link>
-            <Typography.Link disabled={editingKey !== ''} title='Delete'>
+            <Typography.Link
+              disabled={!editenable || editingKey !== ''}
+              title='Delete'
+            >
               <Popconfirm
                 title='Sure to delete?'
                 cancelText='No'
                 okText='Yes'
                 onConfirm={() => deleteData(record.key)}
               >
-                <Delete style={{ color: '#f5222d' }} />
+                <Delete
+                  style={{
+                    color: '#f5222d',
+                  }}
+                />
               </Popconfirm>
             </Typography.Link>
           </div>
@@ -697,7 +705,7 @@ const DosageRuleTable = ({
         }
         pagination={false}
       />
-      {(rule !== DOSAGE_RULE.default || data.length === 0) && (
+      {editenable && (rule !== DOSAGE_RULE.default || data.length === 0) && (
         <Button
           disabled={editingKey !== ''}
           onClick={() => {

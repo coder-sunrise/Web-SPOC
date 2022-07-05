@@ -4,7 +4,6 @@ import { connect } from 'dva'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Edit from '@material-ui/icons/Edit'
 import { Button, CommonTableGrid, Tooltip, notification } from '@/components'
-import Authorized from '@/utils/Authorized'
 
 @connect(({ global }) => ({
   mainDivHeight: global.mainDivHeight,
@@ -25,10 +24,7 @@ class Grid extends React.Component {
     const showDetail = row => () =>
       history.push(`/inventory/master/edit${namespace}?uid=${row.id}`)
     const handleDoubleClick = row => {
-      const accessRight = Authorized.check(
-        'inventorymaster.inventoryitemdetails',
-      )
-      if (disabled || accessRight.rights !== 'enable') {
+      if (disabled) {
         notification.error({
           message: 'Current user is not authorized to access',
         })
@@ -47,19 +43,17 @@ class Grid extends React.Component {
                 namespace.slice(1)}`}
               placement='bottom'
             >
-              <Authorized authority='inventorymaster.inventoryitemdetails'>
-                <Fragment>
-                  <Button
-                    size='sm'
-                    onClick={showDetail(row)}
-                    justIcon
-                    color='primary'
-                    style={{ marginRight: 5 }}
-                  >
-                    <Edit />
-                  </Button>
-                </Fragment>
-              </Authorized>
+              <Fragment>
+                <Button
+                  size='sm'
+                  onClick={showDetail(row)}
+                  justIcon
+                  color='primary'
+                  style={{ marginRight: 5 }}
+                >
+                  <Edit />
+                </Button>
+              </Fragment>
             </Tooltip>
           </Table.Cell>
         )

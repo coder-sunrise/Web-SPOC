@@ -115,7 +115,7 @@ const Detail = ({ height, ...props }) => {
         </GridItem>
         <GridItem xs={6} md={6} direction='column'>
           <GridItem xs={9}>
-            <FastField
+            <Field
               name='schemeTypeFK'
               render={args => {
                 return (

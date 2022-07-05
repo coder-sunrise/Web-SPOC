@@ -10,6 +10,7 @@ import {
   Popconfirm,
 } from '@/components'
 import { DOSAGE_RULE } from '@/utils/constants'
+import { ableToViewByAuthority } from '@/utils/utils'
 import DetailsContext from '../../Details/DetailsContext'
 import SectionHeader from '../SectionHeader'
 import DosageRuleTable from './DosageRule'
@@ -21,6 +22,7 @@ const AutoCalculateDosage = ({
   codetable,
   ...restProps
 }) => {
+  const editenable = ableToViewByAuthority('inventorymaster.medication')
   const [ruleType, setRuleType] = useState(DOSAGE_RULE.default)
   const [conversionEnabled, setConversionEnabled] = useState(false)
   const { isEditingDosageRule } = useContext(DetailsContext)
@@ -43,7 +45,7 @@ const AutoCalculateDosage = ({
   const handleRuleTypeClick = e => {
     const clickedItem = e.currentTarget.dataset.ruletype
 
-    if (isEditingDosageRule || clickedItem === ruleType) {
+    if (!editenable || isEditingDosageRule || clickedItem === ruleType) {
       e.stopPropagation()
       e.preventDefault()
       return
@@ -207,7 +209,7 @@ const AutoCalculateDosage = ({
             <Popconfirm
               title='Confirm to remove all instructions by changing setting?'
               onConfirm={handleRuleTypeChange}
-              disabled={isEditingDosageRule}
+              disabled={!editenable || isEditingDosageRule}
             >
               <span
                 data-ruletype={DOSAGE_RULE.default}
@@ -217,7 +219,7 @@ const AutoCalculateDosage = ({
                   value={DOSAGE_RULE.default}
                   checked={ruleType === DOSAGE_RULE.default}
                   data-ruletype={DOSAGE_RULE.default}
-                  disabled={isEditingDosageRule}
+                  disabled={!editenable || isEditingDosageRule}
                 >
                   Default
                 </Radio>
@@ -229,7 +231,7 @@ const AutoCalculateDosage = ({
                 <Radio
                   value={DOSAGE_RULE.age}
                   checked={ruleType === DOSAGE_RULE.age}
-                  disabled={isEditingDosageRule}
+                  disabled={!editenable || isEditingDosageRule}
                 >
                   By Age
                 </Radio>
@@ -241,7 +243,7 @@ const AutoCalculateDosage = ({
                 <Radio
                   value={DOSAGE_RULE.weight}
                   checked={ruleType === DOSAGE_RULE.weight}
-                  disabled={isEditingDosageRule}
+                  disabled={!editenable || isEditingDosageRule}
                 >
                   By Weight
                 </Radio>
@@ -256,6 +258,7 @@ const AutoCalculateDosage = ({
           render={args => (
             <DosageRuleTable
               rule={ruleType}
+              editenable={editenable}
               medicationUsageFK={values.medicationUsageFK}
               dispenseUomFK={values.dispensingUOMFK}
               prescribeUomFK={values.prescribingUOMFK}
