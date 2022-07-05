@@ -477,7 +477,8 @@ class CommonTableGrid extends PureComponent {
             zIndex: 1,
             overflow: 'visible',
             backgroundColor: 'inherit',
-            borderLeft: '1px solid rgba(0, 0, 0, 0.12)',
+            borderLeft: '1px solid rgb(224, 224, 224)',
+            backgroundClip: 'border-box'
           },
           dividerRight: {
             borderRightWidth: 0,
@@ -495,7 +496,7 @@ class CommonTableGrid extends PureComponent {
           table: {
             // tableLayout: 'auto',
 
-            borderCollapse: 'collapse',
+            // borderCollapse: 'collapse',
           },
           stickyTable: {
             ' & > thead > tr': {
