@@ -472,29 +472,19 @@ class VisitFormGrid extends PureComponent {
                             title={item.name}
                             classes={classes}
                             onClick={() => {
-                              this.props
-                                .dispatch({
-                                  type: 'settingDocumentTemplate/queryOne',
-                                  payload: { id: item.formTemplateFK },
-                                })
-                                .then(r => {
-                                  if (!r) {
-                                    return
-                                  }
-                                  this.props.dispatch({
-                                    type: 'formListing/updateState',
-                                    payload: {
-                                      showModal: true,
-                                      type: item.value,
-                                      entity: undefined,
-                                      formCategory: this.props.formCategory,
-                                      formName: item.name,
-                                      templateContent: r.templateContent,
-                                      formTemplateFK: item.formTemplateFK,
-                                    },
-                                  })
-                                  this.toggleVisibleChange()
-                                })
+                              this.props.dispatch({
+                                type: 'formListing/updateState',
+                                payload: {
+                                  showModal: true,
+                                  type: item.value,
+                                  entity: undefined,
+                                  formCategory: this.props.formCategory,
+                                  formName: item.name,
+                                  templateContent: null,
+                                  formTemplateFK: item.formTemplateFK,
+                                },
+                              })
+                              this.toggleVisibleChange()
                             }}
                             {...item}
                           />

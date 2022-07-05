@@ -576,26 +576,18 @@ class Forms extends PureComponent {
                         classes={classes}
                         onClick={() => {
                           dispatch({
-                            type: 'settingDocumentTemplate/queryOne',
-                            payload: { id: item.formTemplateFK },
-                          }).then(r => {
-                            if (!r) {
-                              return
-                            }
-                            window.g_app._store.dispatch({
-                              type: 'forms/updateState',
-                              payload: {
-                                showModal: true,
-                                type: item.value,
-                                entity: undefined,
-                                formCategory: FORM_CATEGORY.CORFORM,
-                                formName: item.name,
-                                templateContent: r.templateContent,
-                                formTemplateFK: item.formTemplateFK,
-                              },
-                            })
-                            this.toggleVisibleChange()
+                            type: 'forms/updateState',
+                            payload: {
+                              showModal: true,
+                              type: item.value,
+                              entity: undefined,
+                              formCategory: FORM_CATEGORY.CORFORM,
+                              formName: item.name,
+                              templateContent: null,
+                              formTemplateFK: item.formTemplateFK,
+                            },
                           })
+                          this.toggleVisibleChange()
                         }}
                         {...item}
                       />
