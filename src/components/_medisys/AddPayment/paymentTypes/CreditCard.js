@@ -14,9 +14,8 @@ import {
 import PaymentBase from './PaymentBase'
 import styles from '../styles'
 import { CREDIT_CARD_TYPE } from '@/utils/constants'
-import { 
-  CreditCardNumberInput,
-} from '@/components/_medisys'
+import { CreditCardNumberInput } from '@/components/_medisys'
+import './CreditCard.css'
 
 const CreditCard = ({
   payment,
@@ -29,29 +28,29 @@ const CreditCard = ({
     <PaymentBase payment={payment} handleDeletePayment={handleDeletePayment}>
       <GridContainer>
         <GridItem md={6}>
-          <FastField
-            name={`paymentList[${index}].creditCardPayment.creditCardTypeFK`}
-            render={(args) => (
-              <CodeSelect
-                {...args}
-                label='Card Type'
-                code='ctcreditcardtype'
-                onChange={(value) => {
-                  setFieldValue(
-                    `paymentList[${index}].creditCardPayment.creditCardType`,
-                    CREDIT_CARD_TYPE[value],
-                  )
-                }}
-              />
-            )}
-          />
+          <div className='CreditCardTypeContainer'>
+            <FastField
+              name={`paymentList[${index}].creditCardPayment.creditCardTypeFK`}
+              render={args => (
+                <CodeSelect
+                  {...args}
+                  label='Card Type'
+                  code='ctcreditcardtype'
+                  onChange={value => {
+                    setFieldValue(
+                      `paymentList[${index}].creditCardPayment.creditCardType`,
+                      CREDIT_CARD_TYPE[value],
+                    )
+                  }}
+                />
+              )}
+            />
+          </div>
         </GridItem>
         <GridItem md={6}>
           <FastField
             name={`paymentList[${index}].creditCardPayment.creditCardNo`}
-            render={(args) => (
-              <CreditCardNumberInput {...args} />
-            )}
+            render={args => <CreditCardNumberInput {...args} />}
           />
         </GridItem>
       </GridContainer>
@@ -59,7 +58,7 @@ const CreditCard = ({
         <GridItem md={6}>
           <FastField
             name={`paymentList[${index}].amt`}
-            render={(args) => (
+            render={args => (
               <NumberInput
                 label='Amount'
                 {...args}
@@ -73,7 +72,7 @@ const CreditCard = ({
         <GridItem md={6}>
           <FastField
             name={`paymentList[${index}].remark`}
-            render={(args) => <TextField label='Remarks' {...args} />}
+            render={args => <TextField label='Remarks' {...args} />}
           />
         </GridItem>
       </GridContainer>

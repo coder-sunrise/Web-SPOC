@@ -411,6 +411,7 @@ class CommonTableGrid extends PureComponent {
             // overflow: 'visible',
             backgroundColor: 'inherit',
             borderLeft: '1px solid rgba(0, 0, 0, 0.12)',
+            backgroundClip: 'border-box',
           },
           dividerRight: {
             borderRightWidth: 0,

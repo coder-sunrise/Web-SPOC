@@ -1,0 +1,8 @@
+.CreditCardTypeContainer {
+    position: relative;
+}
+
+.CreditCardTypeContainer .ant-select-dropdown {
+    position: absolute;
+    top: 50px !important
+}
