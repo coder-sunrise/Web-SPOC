@@ -231,6 +231,7 @@ const defaultColumns = (codetable, setDetailsId) => {
             onClick={() => {
               setDetailsId(rest.id)
             }}
+            style={{ width: 25, height: 25 }}
             type='primary'
             icon={<UnorderedListOutlined />}
           />

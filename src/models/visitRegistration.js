@@ -32,6 +32,7 @@ export default createFormViewModel({
           visitRemarks: undefined,
         },
       },
+      maxQueueNo: '',
       patientInfo: {},
       visitInfo: {},
       errorState: {},
@@ -253,6 +254,12 @@ export default createFormViewModel({
       *getBizSession({ payload }, { call, put }) {
         const response = yield call(service.getBizSession, payload)
         const { data } = response
+        if (data.data && data.data.length > 0 && data.data[0].maxQueueNo) {
+          yield put({
+            type: 'updateState',
+            payload: { maxQueueNo: data.data[0].maxQueueNo },
+          })
+        }
         return data
       },
     },

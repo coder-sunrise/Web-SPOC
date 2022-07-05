@@ -30,7 +30,7 @@ const PayerHeader = ({
       hideHeader
       className={classes.paymentModeContainer}
       style={{
-        maxHeight: maxHeight,
+        height: 260,
       }}
     >
       {paymentModes.map(mode => (

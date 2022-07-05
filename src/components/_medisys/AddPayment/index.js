@@ -36,6 +36,7 @@ import styles from './styles'
 import { ValidationSchema, getLargestID } from './variables'
 import { rounding } from './utils'
 import _ from 'lodash'
+import { Tag } from 'antd'
 
 @connect(({ clinicSettings, patient, codetable }) => ({
   clinicSettings: clinicSettings.settings || clinicSettings.default,
@@ -655,6 +656,15 @@ class AddPayment extends Component {
     const { selectedRows = [], invoicePayerItem = [] } = values
     const { bizSessionList, paymentModes } = this.state
     const payerHeaderProps = this.getPayerHeaderProps()
+    const sortedInvoicePayerItem = _.orderBy(
+      invoicePayerItem,
+      [
+        'isVisitPurposeItem',
+        x => (x.itemType || '').toLowerCase(),
+        x => (x.itemName || '').toLowerCase(),
+      ],
+      ['desc', 'asc', 'asc'],
+    )
     return (
       <div>
         <PayerHeader {...payerHeaderProps} />
@@ -668,7 +678,7 @@ class AddPayment extends Component {
                   </div>
                   <EditableTableGrid
                     size='sm'
-                    rows={invoicePayerItem}
+                    rows={sortedInvoicePayerItem}
                     forceRender
                     columns={[
                       {
@@ -703,9 +713,26 @@ class AddPayment extends Component {
                               (row.itemType || '').toUpperCase(),
                           )
                           return (
-                            <Tooltip title={row.itemType}>
-                              <span>{itemType?.displayValue}</span>
-                            </Tooltip>
+                            <div
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                              }}
+                            >
+                              <Tooltip title={row.itemType}>
+                                <span>{itemType?.displayValue}</span>
+                              </Tooltip>
+                              {row.isVisitPurposeItem && (
+                                <Tooltip
+                                  title='Visit Purpose Item'
+                                  placement='right'
+                                >
+                                  <Tag style={{ marginRight: 0 }} color='blue'>
+                                    V.P.
+                                  </Tag>
+                                </Tooltip>
+                              )}
+                            </div>
                           )
                         },
                       },
@@ -792,7 +819,7 @@ class AddPayment extends Component {
                       onCommitChanges: this.handleCommitChanges,
                     }}
                     TableProps={{
-                      height: invoicePayerItem.length > 4 ? 200 : undefined,
+                      height: invoicePayerItem.length > 8 ? 340 : undefined,
                     }}
                     schema={Yup.object().shape({
                       totalPaidAmount: Yup.number()
@@ -838,7 +865,7 @@ class AddPayment extends Component {
                 maxHeight={this.getModeMaxHeight()}
               />
             </GridItem>
-            <GridItem md={9} className={classes.noPaddingLeft}>
+            <GridItem md={6} className={classes.noPaddingLeft}>
               <PaymentCard
                 paymentList={values.paymentList}
                 handleDeletePayment={this.onDeleteClick}
@@ -848,15 +875,17 @@ class AddPayment extends Component {
                 maxHeight={this.getModeMaxHeight()}
               />
             </GridItem>
+            <GridItem md={3} className={classes.noPaddingLeft}>
+              <PaymentSummary
+                clinicSettings={clinicSettings}
+                handleCashReceivedChange={this.handleCashReceivedChange}
+                minCashReceived={this.state.cashPaymentAmount}
+                {...values}
+              />
+            </GridItem>
           </GridContainer>
 
           <GridContainer alignItems='flex-end'>
-            <PaymentSummary
-              clinicSettings={clinicSettings}
-              handleCashReceivedChange={this.handleCashReceivedChange}
-              minCashReceived={this.state.cashPaymentAmount}
-              {...values}
-            />
             <GridItem md={12} className={classes.addPaymentActionButtons}>
               <Button color='danger' onClick={onClose}>
                 Cancel

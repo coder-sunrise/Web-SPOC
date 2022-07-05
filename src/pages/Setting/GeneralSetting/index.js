@@ -30,9 +30,12 @@ import {
   TextField,
 } from '@/components'
 import { navigateDirtyCheck, getMappedVisitType } from '@/utils/utils'
-import { hourOptions, minuteOptions} from '@/pages/Reception/Appointment/components/form/ApptDuration'
+import {
+  hourOptions,
+  minuteOptions,
+} from '@/pages/Reception/Appointment/components/form/ApptDuration'
 
-const styles = (theme) => ({
+const styles = theme => ({
   ...basicStyle(theme),
   boldText: {
     fontWeight: '700',
@@ -43,9 +46,9 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ clinicSettings,codetable }) => ({
+@connect(({ clinicSettings, codetable }) => ({
   clinicSettings,
-  codetable : codetable,
+  codetable: codetable,
 }))
 @withFormikExtend({
   enableReinitialize: true,
@@ -65,7 +68,7 @@ const styles = (theme) => ({
         defaultVisitType,
         showTotalInvoiceAmtInConsultation,
         autoPrintReportsOnCompletePayment,
-        autoPrintReportsOnSignOff, 
+        autoPrintReportsOnSignOff,
       } = clinicSettings.entity
       return {
         ...clinicSettings.entity,
@@ -124,7 +127,7 @@ const styles = (theme) => ({
 
   handleSubmit: (values, { props }) => {
     const { dispatch, history } = props
-    const payload = Object.keys(values).map((o) => {
+    const payload = Object.keys(values).map(o => {
       if (
         o === 'autoPrintReportsOnCompletePayment' ||
         o === 'autoPrintReportsOnSignOff'
@@ -140,7 +143,7 @@ const styles = (theme) => ({
     dispatch({
       type: 'clinicSettings/upsert',
       payload,
-    }).then((r) => {
+    }).then(r => {
       if (r) {
         history.push('/setting')
         dispatch({
@@ -190,7 +193,6 @@ class GeneralSetting extends PureComponent {
         autoPrintOnSignOff: !checked,
       }
     })
-
   }
 
   autoPrintOnCompletePaymentChanged = (checked, e) => {
@@ -207,42 +209,53 @@ class GeneralSetting extends PureComponent {
   }
 
   calcApptDuration = durationMinutes => {
-    const apptDurationHour = Math.floor(durationMinutes/60)
-    const apptDurationMinute = durationMinutes%60
+    const apptDurationHour = Math.floor(durationMinutes / 60)
+    const apptDurationMinute = durationMinutes % 60
     return { apptDurationHour, apptDurationMinute }
   }
 
   setApptDurationH = (setFieldValue, durationMinutes, hour) => {
-    const { apptDurationHour, apptDurationMinute } = this.calcApptDuration(durationMinutes)
+    const { apptDurationHour, apptDurationMinute } = this.calcApptDuration(
+      durationMinutes,
+    )
     const newValue = apptDurationMinute + hour * 60
     setFieldValue('apptTimeSlotDuration.settingValue', newValue)
   }
 
   setApptDurationM = (setFieldValue, durationMinutes, minute) => {
-    const { apptDurationHour, apptDurationMinute } = this.calcApptDuration(durationMinutes)
+    const { apptDurationHour, apptDurationMinute } = this.calcApptDuration(
+      durationMinutes,
+    )
     const newValue = apptDurationHour * 60 + minute
     setFieldValue('apptTimeSlotDuration.settingValue', newValue)
   }
 
   appointmentTimeslotSetupPropsChange = () => {
-    const apptTimeRulerExtent = this.props.values?.apptTimeRulerExtent?.settingValue || 1400
-    const apptTimeIntervel = this.props.values?.apptTimeIntervel?.settingValue || 15
-    const apptTimeSlotDuration = this.props.values?.apptTimeSlotDuration?.settingValue || 15
+    const apptTimeRulerExtent =
+      this.props.values?.apptTimeRulerExtent?.settingValue || 1400
+    const apptTimeIntervel =
+      this.props.values?.apptTimeIntervel?.settingValue || 15
+    const apptTimeSlotDuration =
+      this.props.values?.apptTimeSlotDuration?.settingValue || 15
 
-    const isDefaultSetting = !(apptTimeRulerExtent != 1400 || apptTimeIntervel != 15 || apptTimeSlotDuration != 15)
+    const isDefaultSetting = !(
+      apptTimeRulerExtent != 1400 ||
+      apptTimeIntervel != 15 ||
+      apptTimeSlotDuration != 15
+    )
     return isDefaultSetting
   }
 
-  setApptTimeslotSettingsDefault = (e) => {
+  setApptTimeslotSettingsDefault = e => {
     const { setFieldValue } = this.props
-    if(e.target.value){
-      setFieldValue('apptTimeRulerExtent.settingValue',1400)
-      setFieldValue('apptTimeIntervel.settingValue',15)
-      setFieldValue('apptTimeSlotDuration.settingValue',15)
+    if (e.target.value) {
+      setFieldValue('apptTimeRulerExtent.settingValue', 1400)
+      setFieldValue('apptTimeIntervel.settingValue', 15)
+      setFieldValue('apptTimeSlotDuration.settingValue', 15)
     }
   }
 
-  render () {
+  render() {
     const {
       classes,
       clinicSettings,
@@ -254,8 +267,8 @@ class GeneralSetting extends PureComponent {
       ...restProps
     } = this.props
 
-    const {visitTypeSetting} = clinicSettings.settings
-    const { ctvisitpurpose = []} = codetable
+    const { visitTypeSetting } = clinicSettings.settings
+    const { ctvisitpurpose = [] } = codetable
 
     let visitTypeSettingsObj = undefined
     let visitPurpose = undefined
@@ -265,14 +278,21 @@ class GeneralSetting extends PureComponent {
       } catch {}
     }
     if ((ctvisitpurpose || []).length > 0) {
-      visitPurpose = getMappedVisitType(ctvisitpurpose, visitTypeSettingsObj).filter(
-        vstType => vstType['isEnabled'] === 'true',
-      )
+      visitPurpose = getMappedVisitType(
+        ctvisitpurpose,
+        visitTypeSettingsObj,
+      ).filter(vstType => vstType['isEnabled'] === 'true')
     }
 
-    const { hasActiveSession, autoPrintOnSignOff, autoPrintOnCompletePayment } = this.state
+    const {
+      hasActiveSession,
+      autoPrintOnSignOff,
+      autoPrintOnCompletePayment,
+    } = this.state
     const durationMinutes = values?.apptTimeSlotDuration?.settingValue || 15
-    const { apptDurationHour , apptDurationMinute } = this.calcApptDuration(durationMinutes)
+    const { apptDurationHour, apptDurationMinute } = this.calcApptDuration(
+      durationMinutes,
+    )
     const isApptDefaultSetting = this.appointmentTimeslotSetupPropsChange()
     return (
       <React.Fragment>
@@ -343,18 +363,20 @@ class GeneralSetting extends PureComponent {
                 )}
               />
             </GridItem>
-            <GridItem md={3} sm={6} xs={12}>
-              <Field
-                name='autoRefresh.settingValue'
-                render={args => (
-                  <Switch
-                    label='Queue Listing Auto Refresh'
-                    {...args}
-                    disabled={!!hasActiveSession}
-                  />
-                )}
-              />
-            </GridItem>
+            {false && (
+              <GridItem md={3} sm={6} xs={12}>
+                <Field
+                  name='autoRefresh.settingValue'
+                  render={args => (
+                    <Switch
+                      label='Queue Listing Auto Refresh'
+                      {...args}
+                      disabled={!!hasActiveSession}
+                    />
+                  )}
+                />
+              </GridItem>
+            )}
             <GridItem md={3} sm={6} xs={12}>
               <Field
                 name='isVisitReferralSourceMandatory.settingValue'

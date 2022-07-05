@@ -1051,3 +1051,10 @@ body {
   display: inline-flex;
   justify-content: end;
 }
+.text-auto-hide {
+  width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  overflow: hidden;
+}

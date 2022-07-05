@@ -2,7 +2,7 @@ import React from 'react'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { GridItem, Field, NumberInput } from '@/components'
+import { GridItem, Field, NumberInput, CardContainer } from '@/components'
 // styling
 import styles from './styles'
 import { PAYMENT_MODE } from '@/utils/constants'
@@ -27,27 +27,27 @@ const PaymentSummary = ({
     true,
   )
   return (
-    <React.Fragment>
-      <GridItem md={6} className={classes.paymentSummary} />
-      <GridItem md={6} container className={classes.paymentSummary}>
-        <GridItem md={6}>Total Payment: </GridItem>
-        <GridItem md={6}>
+    <CardContainer hideHeader style={{ padding: 0, height: 260 }}>
+      <GridItem xs={12} container className={classes.paymentSummary}>
+        <GridItem xs={7}>Total Payment: </GridItem>
+        <GridItem xs={5}>
           <NumberInput text currency value={totalAmtPaid} />
         </GridItem>
-        <GridItem md={6}>Cash Rounding: </GridItem>
-        <GridItem md={6}>
+        <GridItem xs={7}>Cash Rounding: </GridItem>
+        <GridItem xs={5}>
           <NumberInput value={cashRounding} text currency />
         </GridItem>
-        <GridItem md={6}>Collectable Amount: </GridItem>
-        <GridItem md={6}>
+        <GridItem xs={7}>Collectable Amount: </GridItem>
+        <GridItem xs={5}>
           <NumberInput value={collectableAmount} text currency />
         </GridItem>
-        <GridItem md={6}>Cash Received: </GridItem>
-        <GridItem md={3} />
-        <GridItem md={3}>
+        <GridItem xs={7}>
+          <span style={{ position: 'relative', top: 5 }}>Cash Received: </span>
+        </GridItem>
+        <GridItem xs={5}>
           <Field
             name='cashReceived'
-            render={(args) => (
+            render={args => (
               <NumberInput
                 onChange={handleCashReceivedChange}
                 min={shouldDisableCashReceived ? 0 : minCashReceived}
@@ -59,12 +59,12 @@ const PaymentSummary = ({
             )}
           />
         </GridItem>
-        <GridItem md={6}>Cash Returned: </GridItem>
-        <GridItem md={6}>
+        <GridItem xs={7}>Cash Returned: </GridItem>
+        <GridItem xs={5}>
           <NumberInput value={cashReturned} text currency />
         </GridItem>
       </GridItem>
-    </React.Fragment>
+    </CardContainer>
   )
 }
 

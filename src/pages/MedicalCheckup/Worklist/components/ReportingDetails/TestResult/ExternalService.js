@@ -56,6 +56,16 @@ const ExternalService = props => {
     })
   }
 
+  const toggleModalAndRefresh = () => {
+    dispatch({
+      type: 'labTrackingDetails/updateState',
+      payload: {
+        showModal: false,
+      },
+    })
+    queryExternalService()
+  }
+
   const onPreview = file => {
     const fileExtension = (file.fileExtension || '').toUpperCase()
     if (fileExtension === 'PDF') {
@@ -173,7 +183,7 @@ const ExternalService = props => {
         maxWidth='md'
         bodyNoPadding
         onClose={toggleModal}
-        onConfirm={toggleModal}
+        onConfirm={toggleModalAndRefresh}
       >
         <Detail
           mode='integrated'

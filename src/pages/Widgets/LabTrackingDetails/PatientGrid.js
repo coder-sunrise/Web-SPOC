@@ -16,11 +16,14 @@ class PatientGrid extends PureComponent {
       { name: 'serviceName', title: 'Service Name' },
       { name: 'serviceCenterName', title: 'Service Center Name' },
       { name: 'visitPurposeFK', title: 'Visit Type' },
+      { name: 'sentBy', title: 'Sent By' },
       { name: 'labTrackingStatusDisplayValue', title: 'Status' },
       { name: 'remarks', title: 'Remarks' },
       { name: 'action', title: 'Action' },
     ],
     columnExtensions: [
+      { columnName: 'sentBy', width: 100 },
+      { columnName: 'labTrackingStatusDisplayValue', width: 110 },
       { columnName: 'visitDate', type: 'date' },
       {
         columnName: 'doctorProfileFKNavigation.ClinicianProfile.Name',

@@ -74,6 +74,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, values, setFieldValue }) => {
                       setFieldValue('isPrintDetails', false)
                     }
                   }}
+                  isCheckedShowOnTop
                 />
               )}
             />

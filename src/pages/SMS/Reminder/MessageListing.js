@@ -5,6 +5,7 @@ import { compose } from 'redux'
 import { Paper, Grid } from '@material-ui/core'
 import { List, message, Avatar, Spin } from 'antd'
 import InfiniteScroll from 'react-infinite-scroller'
+import { Empty } from 'antd'
 import {
   ThemeProvider,
   MessageList,
@@ -73,27 +74,12 @@ const MessageListing = ({
   smsAppointment,
   smsPatient,
 }) => {
-  const [
-    historyList,
-    setHistoryList,
-  ] = useState([])
-  const [
-    loading,
-    setLoading,
-  ] = useState(false)
-  const [
-    hasMore,
-    setHasMore,
-  ] = useState(true)
-  const [
-    totalHistory,
-    setTotalHistory,
-  ] = useState(0)
+  const [historyList, setHistoryList] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+  const [totalHistory, setTotalHistory] = useState(0)
 
-  const [
-    currentPage,
-    setCurrentPage,
-  ] = useState(1)
+  const [currentPage, setCurrentPage] = useState(1)
 
   const getSMSHistory = () => {
     const phoneNum = `${recipient.countryCode}${recipient.patientContactNo}`
@@ -104,20 +90,17 @@ const MessageListing = ({
         current: currentPage,
         pagesize: 10,
       },
-    }).then((v) => {
+    }).then(v => {
       if (v) {
         const { data, totalRecords } = v.data
-        setHistoryList((prevList) => [
-          ...prevList,
-          ...data,
-        ])
+        setHistoryList(prevList => [...prevList, ...data])
         setTotalHistory(totalRecords)
         setLoading(false)
       }
     })
   }
 
-  const renderMessages = (messages) => {
+  const renderMessages = messages => {
     if (messages) {
       let i = 0
       let messageCount = messages.length
@@ -185,14 +168,9 @@ const MessageListing = ({
     return false
   }
 
-  useEffect(
-    () => {
-      getSMSHistory(currentPage)
-    },
-    [
-      currentPage,
-    ],
-  )
+  useEffect(() => {
+    getSMSHistory(currentPage)
+  }, [currentPage])
 
   const refresh = () => {
     setHistoryList([])
@@ -210,25 +188,28 @@ const MessageListing = ({
   return (
     <React.Fragment>
       <div className={classes.demoInfiniteContainer}>
-        <InfiniteScroll
-          initialLoad={false}
-          pageStart={0}
-          loadMore={handleInfiniteOnLoad}
-          hasMore={!loading && hasMore}
-          useWindow={false}
-        >
-          <ThemeProvider>
-            <Paper>
-              <MessageList active>{renderMessages(historyList)}</MessageList>
-              {loading &&
-              hasMore && (
-                <div className={classes.demoLoadingContainer}>
-                  <Spin />
-                </div>
-              )}
-            </Paper>
-          </ThemeProvider>
-        </InfiniteScroll>
+        {historyList && historyList.length > 0 ? (
+          <InfiniteScroll
+            initialLoad={false}
+            pageStart={0}
+            loadMore={handleInfiniteOnLoad}
+            hasMore={!loading && hasMore}
+            useWindow={false}
+          >
+            <ThemeProvider>
+              <Paper>
+                <MessageList active>{renderMessages(historyList)}</MessageList>
+                {loading && hasMore && (
+                  <div className={classes.demoLoadingContainer}>
+                    <Spin />
+                  </div>
+                )}
+              </Paper>
+            </ThemeProvider>
+          </InfiniteScroll>
+        ) : (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        )}
       </div>
       <Grid item>
         <Paper className={classes.sendBar}>
@@ -246,6 +227,7 @@ const MessageListing = ({
     </React.Fragment>
   )
 }
-export default compose(withStyles(styles, { withTheme: true }), React.memo)(
-  MessageListing,
-)
+export default compose(
+  withStyles(styles, { withTheme: true }),
+  React.memo,
+)(MessageListing)

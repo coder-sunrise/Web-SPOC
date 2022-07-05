@@ -110,6 +110,7 @@ const styles = theme => ({
     user,
     patient,
     queueCalling,
+    clinicSettings,
     codetable,
   }) => ({
     patientSearchResult: patientSearch.list,
@@ -119,6 +120,7 @@ const styles = theme => ({
     patient: patient.entity,
     DefaultPatientProfile: patient.default,
     queueCalling,
+    clinicSettings,
     codetable,
   }),
 )
@@ -161,13 +163,7 @@ class Queue extends React.Component {
       refreshInfo: moment().format('HH:mm'),
     })
     initRoomAssignment()
-
-    this._timer = setInterval(() => {
-      dispatch({ type: `${modelKey}refresh` })
-      this.setState({
-        refreshInfo: moment().format('HH:mm'),
-      })
-    }, 900000)
+    this.AutoRefreshQueueList()
   }
 
   componentWillUnmount() {
@@ -795,12 +791,28 @@ class Queue extends React.Component {
 
   onRefreshClick = () => {
     const { dispatch } = this.props
+    this.AutoRefreshQueueList()
     this.setState({ refreshInfo: moment().format('HH:mm') })
     dispatch({
       type: `${modelKey}refresh`,
     })
   }
 
+  AutoRefreshQueueList() {
+    let {
+      dispatch,
+      clinicSettings: {
+        settings: { autoRefreshQueueListingInterval },
+      },
+    } = this.props
+    clearInterval(this._timer)
+    this._timer = setInterval(() => {
+      dispatch({ type: `${modelKey}refresh` })
+      this.setState({
+        refreshInfo: moment().format('HH:mm'),
+      })
+    }, autoRefreshQueueListingInterval * 1000)
+  }
   onViewPatientProfileClick = (patientProfileFK, qid) => {
     this.props.history.push(
       getAppendUrl({

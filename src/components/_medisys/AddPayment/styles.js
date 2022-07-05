@@ -1,4 +1,4 @@
-export default (theme) => ({
+export default theme => ({
   payerHeader: {
     '& h4': {
       display: 'inline',
@@ -42,6 +42,7 @@ export default (theme) => ({
   paymentSummary: {
     textAlign: 'right',
     marginTop: theme.spacing(2),
+    padding: '0px!important',
     fontSize: '1rem',
   },
   addPaymentActionButtons: {

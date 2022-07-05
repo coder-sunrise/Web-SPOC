@@ -23,8 +23,9 @@ class OverallGrid extends PureComponent {
       { name: 'orderedDate', title: 'Ordered Date' },
       { name: 'estimateReceiveDate', title: 'Est. Receive Date' },
       { name: 'receivedDate', title: 'Received Date' },
-      { name: 'labTrackingStatusDisplayValue', title: 'Status' },
+      { name: 'sentBy', title: 'Sent By' },
       { name: 'remarks', title: 'Remarks' },
+      { name: 'labTrackingStatusDisplayValue', title: 'Status' },
       { name: 'action', title: 'Action' },
     ],
     columnExtensions: [
@@ -36,7 +37,22 @@ class OverallGrid extends PureComponent {
           'VisitFKNavigation.PatientProfileFkNavigation.PatientReferenceNo',
       },
       { columnName: 'patientAccountNo', width: 100 },
-      { columnName: 'patientName', width: 180 },
+      {
+        columnName: 'patientName',
+        width: 180,
+        render: r => {
+          return (
+            <Tooltip title={r.patientName}>
+              <span
+                className='text-auto-hide'
+                style={{ position: 'relative', top: 2 }}
+              >
+                {r.patientName}
+              </span>
+            </Tooltip>
+          )
+        },
+      },
       { columnName: 'estimateReceiveDate', type: 'date', width: 130 },
       { columnName: 'orderedDate', type: 'date', width: 100 },
       { columnName: 'receivedDate', type: 'date', width: 105 },
@@ -48,7 +64,8 @@ class OverallGrid extends PureComponent {
           'ServiceCenterServiceFKNavigation.ServiceCenterFKNavigation.DisplayValue',
       },
       { columnName: 'supplierName', width: 150 },
-      { columnName: 'labTrackingStatusDisplayValue', width: 80 },
+      { columnName: 'labTrackingStatusDisplayValue', width: 110 },
+      { columnName: 'sentBy', width: 100 },
       { columnName: 'remarks', width: 200 },
       {
         columnName: 'doctorProfileFKNavigation.ClinicianProfile.Name',
@@ -113,6 +130,13 @@ class OverallGrid extends PureComponent {
         },
       },
     ],
+    leftColumns: [
+      'visitDate',
+      'patientAccountNo',
+      'referreceNo',
+      'patientName',
+    ],
+    rightColumns: ['labTrackingStatusDisplayValue', 'action'],
   }
 
   editRow = (row, e) => {
