@@ -264,14 +264,6 @@ class PrescriptionSetList extends PureComponent {
                   }
                 }),
               )
-            } else {
-              ItemPrecautions = [
-                {
-                  precaution: '',
-                  sequence: 0,
-                  uid: getUniqueId(),
-                },
-              ]
             }
 
             if (item.inventoryMedicationFK) {

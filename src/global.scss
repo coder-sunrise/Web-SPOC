@@ -1058,3 +1058,7 @@ body {
   display: inline-block;
   overflow: hidden;
 }
+
+.minorPaddingTable .ant-table-thead th {
+  padding: 4px !important;
+}
