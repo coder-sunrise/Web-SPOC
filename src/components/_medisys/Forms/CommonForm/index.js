@@ -317,7 +317,8 @@ class CommonForm extends PureComponent {
             this.DEContainer.disableEdit = statusFK === 2
           }}
           zoomTarget='FitPageWidth'
-          height={'78vh'}
+          // height={'78vh'}
+          height={height-105}
           showPropertiesPane={false}
           enableToolbar={false}
           restrictEditing={disableEdit}
