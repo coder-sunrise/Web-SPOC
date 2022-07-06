@@ -25,7 +25,6 @@ class NoteDetails extends Component {
   }
 
   updateEditor = async result => {
-    console.log('UpdateEditor')
     if (this.richEditor && this.richEditor.props) {
       const { editorState } = this.richEditor.props
       this.richEditor.update(
