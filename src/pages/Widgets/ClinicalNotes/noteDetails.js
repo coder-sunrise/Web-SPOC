@@ -25,6 +25,7 @@ class NoteDetails extends Component {
   }
 
   updateEditor = async result => {
+    console.log('UpdateEditor')
     if (this.richEditor && this.richEditor.props) {
       const { editorState } = this.richEditor.props
       this.richEditor.update(
@@ -133,7 +134,7 @@ class NoteDetails extends Component {
           disabled={!consultation.entity?.loaded}
           style={{ marginBottom: 0 }}
           strongLabel
-          onRichEditorBlur={onRichEditorBlur}
+          onBlur={onRichEditorBlur}
           height={item.height}
           {...args}
         />
