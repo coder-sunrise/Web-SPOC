@@ -23,6 +23,7 @@ class DocumentEditor extends SampleBase {
       const { documentName, document, enableTitleBar, zoomTarget, initialized } = this.props
       this.container.documentEditor.open(document)
       this.container.documentEditor.documentName = documentName
+      if(initialized) initialized.call()
       if (enableTitleBar) {
         this.titleBar.updateDocumentTitle()
       }
@@ -36,7 +37,6 @@ class DocumentEditor extends SampleBase {
         }
         this.container.documentEditor.notify('internalZoomFactorChange') //trigger updateZoomContent();
       }
-      if(initialized) initialized.call()
     }
   }
 
