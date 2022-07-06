@@ -6,6 +6,7 @@ import {
   errMsgForOutOfRange as errMsg,
   navigateDirtyCheck,
   roundTo,
+  ableToViewByAuthority,
 } from '@/utils/utils'
 import {
   ProgressButton,
@@ -140,10 +141,12 @@ const Detail = ({
             >
               Close
             </Button>
-            <ProgressButton
-              submitKey='vaccinationDetail/submit'
-              onClick={handelSave}
-            />
+            {ableToViewByAuthority('inventorymaster.vaccination') && (
+              <ProgressButton
+                submitKey='vaccinationDetail/submit'
+                onClick={handelSave}
+              />
+            )}
           </div>
         </React.Fragment>
       )}

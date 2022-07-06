@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import { withStyles } from '@material-ui/core/styles'
-import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
+import {
+  getAppendUrl,
+  navigateDirtyCheck,
+  ableToViewByAuthority,
+} from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 
 import {
@@ -41,23 +45,11 @@ const Detail = ({
   values,
   ...props
 }) => {
-  const [
-    selectedItem,
-    setSelectedItem,
-  ] = useState(() => { })
+  const [selectedItem, setSelectedItem] = useState(() => {})
 
-  const [
-    serviceCenterServicess,
-    setServiceCenterServicess,
-  ] = useState(() => [])
-  const [
-    serviceCenterFK,
-    setServiceCenterFK,
-  ] = useState(() => { })
-  const [
-    price,
-    setPrice,
-  ] = useState(() => undefined)
+  const [serviceCenterServicess, setServiceCenterServicess] = useState(() => [])
+  const [serviceCenterFK, setServiceCenterFK] = useState(() => {})
+  const [price, setPrice] = useState(() => undefined)
 
   const detailProps = {
     values,
@@ -68,10 +60,7 @@ const Detail = ({
     errors: props.errors,
   }
 
-  const [
-    totalPrice,
-    setTotalPrice,
-  ] = useState(0)
+  const [totalPrice, setTotalPrice] = useState(0)
 
   const typeListingProps = {
     dispatch,
@@ -106,10 +95,12 @@ const Detail = ({
         >
           Close
         </Button>
-        <ProgressButton
-          submitKey='orderSetDetail/submit'
-          onClick={handleSubmit}
-        />
+        {ableToViewByAuthority('inventorymaster.orderset') && (
+          <ProgressButton
+            submitKey='orderSetDetail/submit'
+            onClick={handleSubmit}
+          />
+        )}
       </div>
     </React.Fragment>
   )
@@ -127,9 +118,12 @@ export default compose(
       const { serviceOrderSetItem } = returnValue
       let newserviceOrderSetItem = []
       if (serviceOrderSetItem.length > 0) {
-        newserviceOrderSetItem = serviceOrderSetItem.map((o) => {
+        newserviceOrderSetItem = serviceOrderSetItem.map(o => {
           const { service } = o
-          const serviceCenterService = service.ctServiceCenter_ServiceNavigation.find((x) => x.id === o.serviceCenterServiceFK) || {}
+          const serviceCenterService =
+            service.ctServiceCenter_ServiceNavigation.find(
+              x => x.id === o.serviceCenterServiceFK,
+            ) || {}
           return {
             ...o,
             tempServiceCenterServiceFK: o.serviceCenterServiceFK,
@@ -147,11 +141,16 @@ export default compose(
 
     validationSchema: Yup.object().shape({
       code: Yup.string().when('id', {
-        is: (id) => !!id,
-        then: Yup.string().trim().required(),
+        is: id => !!id,
+        then: Yup.string()
+          .trim()
+          .required(),
       }),
       displayValue: Yup.string().required(),
-      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+      effectiveDates: Yup.array()
+        .of(Yup.date())
+        .min(2)
+        .required(),
     }),
 
     handleSubmit: (values, { props, resetForm }) => {
@@ -165,7 +164,7 @@ export default compose(
           effectiveEndDate: values.effectiveDates[1],
           serviceOrderSetItem,
         },
-      }).then((r) => {
+      }).then(r => {
         if (r) {
           resetForm()
           history.push('/inventory/master?t=3')
