@@ -209,9 +209,10 @@ class Forms extends PureComponent {
   }
 
   editRow = row => {
-    const { isEnableEditOrder = true } = this.props
+    const { isEnableEditOrder = true, forms:{rows = []} } = this.props
     if (!isEnableEditOrder) return
-    if (row.statusFK === 3 || row.statusFK === 4) return
+    row = rows.find(r=>r.uid == row.uid)
+    if (row.statusFK === 4) return
     this.props.dispatch({
       type: 'forms/updateState',
       payload: {

@@ -68,9 +68,9 @@ const exportPDF = container => {
 class CommonForm extends PureComponent {
   componentDidMount() {
     const {
-      values: { id, formTemplateFK },
+      values: { formData:{ content }, formTemplateFK },
     } = this.props
-    if (id) return
+    if (content) return
     // setTimeout(() => {
     this.props
       .dispatch({
@@ -232,14 +232,13 @@ class CommonForm extends PureComponent {
       statusFK,
       formData: { content, signatureCounter = 0 },
     } = this.props.values
-    if (!content) return
-
-    this.fillFormFields()
     const isSigningMode = statusFK === 2 || signatureCounter > 0
     this.DEContainer.documentEditor.editor.enforceProtection(
       '',
       isSigningMode ? 'ReadOnly' : 'FormFieldsOnly',
     )
+    if (!content) return
+    this.fillFormFields()
     this.DEContainer.documentEditor.showRestrictEditingPane(false)
     this.DEContainer.showHidePropertiesPane(false)
     const deElement = this.DEContainer.documentEditor.getDocumentEditorElement()
