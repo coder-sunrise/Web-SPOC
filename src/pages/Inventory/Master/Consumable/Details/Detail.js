@@ -27,7 +27,7 @@ const Detail = ({
 }) => {
   const { settings = [] } = clinicSettings
   return (
-    <SharedContainer>
+    <SharedContainer hideHeader>
       <div
         hideHeader
         style={{

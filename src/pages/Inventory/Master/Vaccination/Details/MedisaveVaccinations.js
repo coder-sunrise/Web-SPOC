@@ -2,10 +2,10 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
 import { EditableTableGrid, notification } from '@/components'
-
+import { ableToViewByAuthority } from '@/utils/utils'
 @connect(({ codetable }) => ({ codetable }))
 class MedisaveVaccinations extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     const { title, titleChildren } = props
@@ -28,9 +28,9 @@ class MedisaveVaccinations extends PureComponent {
           type: 'codeSelect',
           code: 'ctMedisaveVaccination',
           sortingEnabled: false,
-          onChange: (e)=> {
+          onChange: e => {
             const { rows, setFieldValue } = this.props
-            const newRows = rows.map((r) => {
+            const newRows = rows.map(r => {
               if (r.id === e.row.id) {
                 return {
                   ...r,
@@ -43,9 +43,16 @@ class MedisaveVaccinations extends PureComponent {
             })
 
             setFieldValue('inventoryVaccination_MedisaveVaccination', newRows)
-            
-            const nonUnique = newRows.filter(u => newRows.filter(r => !r.isDeleted && r.medisaveVaccinationFK === u.medisaveVaccinationFK).length > 1)
-            if(nonUnique.length > 0) {
+
+            const nonUnique = newRows.filter(
+              u =>
+                newRows.filter(
+                  r =>
+                    !r.isDeleted &&
+                    r.medisaveVaccinationFK === u.medisaveVaccinationFK,
+                ).length > 1,
+            )
+            if (nonUnique.length > 0) {
               e.row.medisaveVaccinationFK = undefined
               notification.error({
                 message: 'Medisave Vaccination already exists.',
@@ -53,15 +60,13 @@ class MedisaveVaccinations extends PureComponent {
               e.onValueChange()
             }
           },
-          render: (row) => {
+          render: row => {
             const { ctmedisavevaccination = [] } = this.props.codetable
             const medisaveVacc = ctmedisavevaccination.find(
-              (item) => item.id === row.medisaveVaccinationFK,
+              item => item.id === row.medisaveVaccinationFK,
             )
-  
-            return (
-              <span>{medisaveVacc ? medisaveVacc.name : ''}</span>
-            )
+
+            return <span>{medisaveVacc ? medisaveVacc.name : ''}</span>
           },
         },
         {
@@ -70,11 +75,13 @@ class MedisaveVaccinations extends PureComponent {
           align: 'center',
           sortingEnabled: false,
           width: '100px',
-          onChange: (row) => {
+          isDisabled: row =>
+            !ableToViewByAuthority('inventorymaster.vaccination'),
+          onChange: row => {
             const { rows, setFieldValue } = this.props
 
-            const newRows = rows.map((r) => {
-              if(rows.filter(vv => !vv.isDeleted).length === 1) {
+            const newRows = rows.map(r => {
+              if (rows.filter(vv => !vv.isDeleted).length === 1) {
                 return {
                   ...r,
                   isDefault: true,
@@ -96,18 +103,19 @@ class MedisaveVaccinations extends PureComponent {
         },
       ],
     }
-    
+
     this.commitChanges = ({ rows }) => {
       const { setFieldValue } = this.props
-        
-      const newRows = rows && rows.filter(r => !r.isDeleted).length === 1 
-      ? rows.map(row => {
-        return {
-          ...row,
-          isDefault: true,
-        } // for dto to db
-      })
-      : rows
+
+      const newRows =
+        rows && rows.filter(r => !r.isDeleted).length === 1
+          ? rows.map(row => {
+              return {
+                ...row,
+                isDefault: true,
+              } // for dto to db
+            })
+          : rows
       setFieldValue('inventoryVaccination_MedisaveVaccination', newRows)
       // return _newRows
     }
@@ -115,7 +123,7 @@ class MedisaveVaccinations extends PureComponent {
 
   changeIsDefault = ({ row }) => {
     const { rows, setFieldValue } = this.props
-    const newRows = rows.map((r) => {
+    const newRows = rows.map(r => {
       if (r === row.row) {
         return {
           ...r,
@@ -132,14 +140,13 @@ class MedisaveVaccinations extends PureComponent {
 
   handleDelete = ({ row }) => {
     const { rows, setFieldValue } = this.props
-    const newRows = rows.forEach((o) => {
-      if(o.id === row.id)
-        o.isDeleted = true
+    const newRows = rows.forEach(o => {
+      if (o.id === row.id) o.isDeleted = true
     })
     setFieldValue('inventoryVaccination_MedisaveVaccination', newRows)
   }
 
-  render () {
+  render() {
     const { rows, schema } = this.props
 
     const EditingProps = {

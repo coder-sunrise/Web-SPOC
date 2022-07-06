@@ -802,7 +802,7 @@ class Queue extends React.Component {
     let {
       dispatch,
       clinicSettings: {
-        settings: { autoRefreshQueueListingInterval },
+        settings: { autoRefreshQueueListingInterval = 120 },
       },
     } = this.props
     clearInterval(this._timer)
@@ -811,7 +811,7 @@ class Queue extends React.Component {
       this.setState({
         refreshInfo: moment().format('HH:mm'),
       })
-    }, autoRefreshQueueListingInterval * 1000)
+    }, (autoRefreshQueueListingInterval || 120) * 1000)
   }
   onViewPatientProfileClick = (patientProfileFK, qid) => {
     this.props.history.push(

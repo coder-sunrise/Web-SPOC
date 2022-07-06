@@ -6,10 +6,9 @@ import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 import { compose } from 'redux'
 import { status } from '@/utils/codes'
-import Authorized from '@/utils/Authorized'
 import { LoadingWrapper } from '@/components/_medisys'
 import { downloadFile } from '@/services/file'
-import { convertToBase64 } from '@/utils/utils'
+import { convertToBase64, ableToViewByAuthority } from '@/utils/utils'
 import {
   GridContainer,
   GridItem,
@@ -213,7 +212,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
               >
                 <FormattedMessage id='form.search' />
               </ProgressButton>
-              <Authorized authority='inventorymaster.newinventoryitem'>
+              {ableToViewByAuthority('inventorymaster.vaccination') && (
                 <Button
                   variant='contained'
                   color='primary'
@@ -231,7 +230,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                   <Add />
                   Add New
                 </Button>
-              </Authorized>
+              )}
             </div>
           </LoadingWrapper>
         </GridItem>
@@ -242,7 +241,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
 export default compose(
   withStyles(styles, { withTheme: true }),
   withFormik({
-    mapPropsToValues: () => ({isActive:true,}),
+    mapPropsToValues: () => ({ isActive: true }),
   }),
   React.memo,
 )(FilterBar)
