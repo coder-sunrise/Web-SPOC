@@ -382,7 +382,8 @@ const InventoryTypeListing = ({
   const calSubtotal = e => {
     const { row } = e
     const { unitPrice, quantity } = row
-    if (unitPrice && quantity) row.subTotal = unitPrice * quantity
+    if ((unitPrice || unitPrice === 0) && (quantity || quantity === 0))
+      row.subTotal = unitPrice * quantity
   }
 
   const onAddedRowsChange = type => addedRows => {
