@@ -1810,7 +1810,6 @@ class Medication extends PureComponent {
             render={args => {
               return (
                 <Checkbox
-                  disabled={isStartedMedication}
                   style={{ position: 'absolute', bottom: 2 }}
                   label='Claimable'
                   {...args}
@@ -2050,7 +2049,7 @@ class Medication extends PureComponent {
                                   'drugCode',
                                   'DrugMixture',
                                 )
-                                this.props.setFieldValue('isClaimable', false)
+                                this.props.setFieldValue('isClaimable', true)
                               } else {
                                 this.props.setFieldValue('drugCode', undefined)
                                 this.props.setFieldValue('drugName', undefined)
