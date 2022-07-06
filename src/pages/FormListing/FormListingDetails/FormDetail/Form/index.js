@@ -224,7 +224,7 @@ class Form extends PureComponent {
           }}
         >
           <Button color='danger' icon={null} onClick={this.cancelForm}>
-            Cancel
+            Close
           </Button>
           {formCategory === FORM_CATEGORY.VISITFORM && !isHiddenModify && (
             // <Authorized authority='queue.consultation.form.modify'>
