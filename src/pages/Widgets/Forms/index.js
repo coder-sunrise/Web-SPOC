@@ -386,7 +386,7 @@ class Forms extends PureComponent {
     ])
     return (
       <div>
-        {/* <Checkbox
+        <Checkbox
           style={{ marginLeft: 10 }}
           label='Include voided forms'
           value={this.state.includeVoidForms}
@@ -398,7 +398,7 @@ class Forms extends PureComponent {
               }
             })
           }}
-        /> */}
+        />
         <CommonTableGrid
           getRowId={r => r.uid}
           size='sm'
@@ -506,7 +506,7 @@ class Forms extends PureComponent {
                         </Tooltip>
                       </AuthorizedContext.Provider>
                     )}
-                    {!isHiddenModify && (
+                    {row.statusFK === 1 && !isHiddenModify && (
                       <AuthorizedContext.Provider
                         value={this.getFormAccessRight()}
                       >
@@ -528,7 +528,7 @@ class Forms extends PureComponent {
                         </Popconfirm>
                       </AuthorizedContext.Provider>
                     )}
-                    {/* {row.statusFK === 2 && !isHiddenVoid && (
+                    {row.statusFK === 2 && !isHiddenVoid && (
                       <AuthorizedContext.Provider
                         value={this.getFormAccessRight()}
                       >
@@ -539,7 +539,7 @@ class Forms extends PureComponent {
                           user={user}
                         />
                       </AuthorizedContext.Provider>
-                    )} */}
+                    )}
                   </React.Fragment>
                 )
               },
