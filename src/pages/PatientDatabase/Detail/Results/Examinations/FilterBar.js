@@ -34,13 +34,13 @@ const searchResult = (values, props) => {
   const orderStartDate =
     orderDate && orderDate.length > 0
       ? moment(orderDate[0])
-          .set({ hour: 0, minute: 0, second: 0 })
-          .formatUTC(false)
+          .startOf('day')
+          .formatUTC()
       : undefined
   const orderEndDate =
     orderDate && orderDate.length > 1
       ? moment(orderDate[1])
-          .set({ hour: 23, minute: 59, second: 59 })
+          .endOf('day')
           .formatUTC(false)
       : undefined
   const payload = {
@@ -64,13 +64,13 @@ const FilterBar = props => {
     setFieldValue(
       'visitDate[0]',
       moment(new Date())
-        .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
-        .formatUTC(false),
+        .startOf('day')
+        .formatUTC(),
     )
     setFieldValue(
       'visitDate[1]',
       moment(new Date())
-        .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+        .endOf('day')
         .formatUTC(false),
     )
   }, [])
