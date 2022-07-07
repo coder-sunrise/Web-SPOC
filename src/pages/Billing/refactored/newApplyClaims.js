@@ -1271,8 +1271,9 @@ const ApplyClaims = ({
             itemName: invoiceItem.itemDescription,
             schemeCoverage: 100,
             schemeCoverageType: 'Percentage',
-            payableBalance:
+            payableBalance: roundTo(
               invoiceItem.totalBeforeGst - (invoiceItem._claimedAmount || 0),
+            ),
           }))}
           invoice={invoice}
         />
