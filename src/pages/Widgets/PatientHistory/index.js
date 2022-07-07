@@ -133,6 +133,7 @@ const styles = theme => ({
     scriblenotes,
     patient,
     patientHistory,
+    global,
   }) => ({
     clinicSettings,
     codetable,
@@ -141,6 +142,7 @@ const styles = theme => ({
     scriblenotes,
     patient: patient.entity || patient.default,
     patientHistory,
+    global,
   }),
 )
 @withFormikExtend({
@@ -433,6 +435,7 @@ class PatientHistory extends Component {
       clinicSettings,
       patient = {},
       fromModule,
+      global,
     } = this.props
     const {
       userTitle,
@@ -598,6 +601,22 @@ class PatientHistory extends Component {
                         justIcon
                         onClick={event => {
                           event.stopPropagation()
+                          const closeOtherPopup = () => {
+                            if (global.showVisitRegistration) {
+                              dispatch({
+                                type: 'visitRegistration/closeModal',
+                              })
+                            }
+                            if (global.showMedicalCheckupReportingDetails) {
+                              dispatch({
+                                type:
+                                  'medicalCheckupReportingDetails/closeMedicalCheckupReportingDetailsModal',
+                              })
+                            }
+                            dispatch({
+                              type: 'patient/closePatientModal',
+                            })
+                          }
 
                           dispatch({
                             type: `consultation/edit`,
@@ -628,9 +647,7 @@ class PatientHistory extends Component {
                                           version,
                                         },
                                       }).then(c => {
-                                        dispatch({
-                                          type: 'patient/closePatientModal',
-                                        })
+                                        closeOtherPopup()
                                         history.push(
                                           `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${c.id}&v=${version}`,
                                         )
@@ -639,11 +656,13 @@ class PatientHistory extends Component {
                                   },
                                 })
                               } else {
-                                dispatch({
-                                  type: 'patient/closePatientModal',
-                                })
+                                closeOtherPopup()
                                 history.push(
-                                  `/reception/queue/consultation?qid=${row.queueFK}&pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
+                                  `/reception/queue/consultation?qid=${
+                                    row.queueFK
+                                  }&pid=${patientID}&cid=${
+                                    o.id
+                                  }&v=${patientHistory.version || Date.now()}`,
                                 )
                               }
                             }

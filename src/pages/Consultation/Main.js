@@ -836,7 +836,7 @@ class Main extends React.Component {
       nextProps.visitRegistration &&
       nextProps.visitRegistration.entity &&
       nextProps.visitRegistration.entity.id !==
-        this.props.visitRegistration.entity.id
+        this.props.visitRegistration?.entity?.id
     )
       return true
     if (
