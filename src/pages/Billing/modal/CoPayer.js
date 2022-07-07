@@ -309,7 +309,7 @@ class CoPayer extends Component {
     return (
       <div className={classes.container}>
         <GridContainer style={{ maxHeight: 700, overflow: 'auto' }}>
-          <GridItem md={4} className={classes.dropdown}>
+          <GridItem md={6} className={classes.dropdown}>
             <FastField
               name='coPayer'
               render={args => {
@@ -337,7 +337,7 @@ class CoPayer extends Component {
               }}
             />
           </GridItem>
-          <GridItem md={3} />
+          <GridItem md={1} />
           <GridItem md={4}>
             <Field
               name='patientCopayAmount'
