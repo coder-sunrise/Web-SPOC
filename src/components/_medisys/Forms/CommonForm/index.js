@@ -237,7 +237,7 @@ class CommonForm extends PureComponent {
       '',
       isSigningMode ? 'ReadOnly' : 'FormFieldsOnly',
     )
-    if (!content) return
+    // if (!content) return
     this.fillFormFields()
     this.DEContainer.documentEditor.showRestrictEditingPane(false)
     this.DEContainer.showHidePropertiesPane(false)
