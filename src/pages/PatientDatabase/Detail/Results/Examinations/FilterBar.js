@@ -65,13 +65,13 @@ const FilterBar = props => {
       'visitDate[0]',
       moment(new Date())
         .startOf('day')
-        .formatUTC(),
+        .toDate(),
     )
     setFieldValue(
       'visitDate[1]',
       moment(new Date())
         .endOf('day')
-        .formatUTC(false),
+        .toDate(),
     )
   }, [])
   useEffect(() => {
