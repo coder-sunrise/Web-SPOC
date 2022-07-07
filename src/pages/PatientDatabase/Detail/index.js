@@ -416,9 +416,20 @@ class PatientDetail extends PureComponent {
   }
 
   registerVisit = e => {
-    this.props.dispatch({
-      type: 'visitRegistration/closeModal',
-    })
+    const { patient, global } = this.props
+    const patientId = patient.entity.id
+
+    if (global.showVisitRegistration) {
+      this.props.dispatch({
+        type: 'visitRegistration/closeModal',
+      })
+    }
+    if (global.showMedicalCheckupReportingDetails) {
+      this.props.dispatch({
+        type:
+          'medicalCheckupReportingDetails/closeMedicalCheckupReportingDetailsModal',
+      })
+    }
     navigateDirtyCheck({
       onProceed: () => {
         this.props
@@ -427,7 +438,7 @@ class PatientDetail extends PureComponent {
           })
           .then(() => {
             history.push(
-              `/reception/queue?md=visreg&pid=${this.props.patient.entity.id}&visitMode=edit`,
+              `/reception/queue?md=visreg&pid=${patientId}&visitMode=edit`,
             )
           })
       },
