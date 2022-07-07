@@ -272,50 +272,59 @@ const LabResults = ({
   }
   const visitColumnHeader = x => {
     return (
-      <div style={{ textAlign: 'center' }}>
+      <div style={{ textAlign: 'center', height: 34, lineHeight: '17px' }}>
         <div>
-          {`${moment(x.visitDate).format('DD MMM YYYY')} (${getVisitTypeCode(
-            x.visitTypeFK,
-          )})`}
-          {!x.isMigrate && (
-            <Tooltip
-              style={{ display: 'inline-block' }}
-              title='Print Lab Report'
+          {`${moment(x.visitDate).format('DD MMM YYYY')}`}
+          <div>
+            <span
+              style={{
+                position: 'relative',
+                top: '-3px',
+              }}
             >
-              <Print
-                style={{
-                  position: 'relative',
-                  top: 4,
-                  cursor: 'pointer',
-                  color: '#4255bd',
-                  left: 3,
-                }}
-                onClick={() => {
-                  setShowModal(true)
-                  setTargetVisitId(x.visitId)
-                }}
-              />
-            </Tooltip>
-          )}
-          {x.hasLabRemarks && (
-            <Tooltip style={{ display: 'inline-block' }} title='Result Details'>
-              <FileCopySharp
-                style={{
-                  width: 15,
-                  height: 15,
-                  position: 'relative',
-                  top: 4,
-                  cursor: 'pointer',
-                  color: '#4255bd',
-                  left: 5,
-                }}
-                onClick={() => {
-                  setTargetVisitId(x.visitId)
-                  setShowResultDetails(true)
-                }}
-              />
-            </Tooltip>
-          )}
+              {`(${getVisitTypeCode(x.visitTypeFK)})`}
+            </span>
+            {!x.isMigrate && (
+              <Tooltip
+                style={{ display: 'inline-block' }}
+                title='Print Lab Report'
+              >
+                <Print
+                  style={{
+                    display: 'inline-block',
+                    marginLeft: 4,
+                    cursor: 'pointer',
+                    color: '#4255bd',
+                  }}
+                  onClick={() => {
+                    setShowModal(true)
+                    setTargetVisitId(x.visitId)
+                  }}
+                />
+              </Tooltip>
+            )}
+            {x.hasLabRemarks && (
+              <Tooltip
+                style={{ display: 'inline-block' }}
+                title='Result Details'
+              >
+                <FileCopySharp
+                  style={{
+                    width: 15,
+                    height: 15,
+                    display: 'inline-block',
+                    marginLeft: 4,
+                    cursor: 'pointer',
+                    color: '#4255bd',
+                  }}
+                  onClick={() => {
+                    setTargetVisitId(x.visitId)
+                    setShowResultDetails(true)
+                  }}
+                />
+              </Tooltip>
+            )}
+          </div>
         </div>
       </div>
     )
@@ -369,7 +378,7 @@ const LabResults = ({
         className:
           visitColumn.dataIndex === newCol[0].dataIndex ? 'latestVisit' : '',
         visitId: visitColumn.visitId,
-        width: 180,
+        width: 120,
         render: (text, row) => {
           const title = (
             <div>
@@ -559,7 +568,7 @@ const LabResults = ({
       <Table
         size='small'
         bordered
-        className='noBgTable'
+        className='noBgTable minorPaddingTable'
         pagination={false}
         columns={onlyMC ? filteredAllColumns : allColumns}
         dataSource={finalData}

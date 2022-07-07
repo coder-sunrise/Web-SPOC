@@ -68,8 +68,9 @@ const exportPDF = container => {
 class CommonForm extends PureComponent {
   componentDidMount() {
     const {
-      values: { formTemplateFK },
+      values: { formData:{ content }, formTemplateFK },
     } = this.props
+    if (content) return
     // setTimeout(() => {
     this.props
       .dispatch({
@@ -227,16 +228,17 @@ class CommonForm extends PureComponent {
 
   documentChange = () => {
     if (!this.DEContainer) return
-    this.fillFormFields()
     const {
       statusFK,
-      formData: { signatureCounter = 0 },
+      formData: { content, signatureCounter = 0 },
     } = this.props.values
     const isSigningMode = statusFK === 2 || signatureCounter > 0
     this.DEContainer.documentEditor.editor.enforceProtection(
       '',
       isSigningMode ? 'ReadOnly' : 'FormFieldsOnly',
     )
+    if (!content) return
+    this.fillFormFields()
     this.DEContainer.documentEditor.showRestrictEditingPane(false)
     this.DEContainer.showHidePropertiesPane(false)
     const deElement = this.DEContainer.documentEditor.getDocumentEditorElement()
@@ -317,7 +319,8 @@ class CommonForm extends PureComponent {
             this.DEContainer.disableEdit = statusFK === 2
           }}
           zoomTarget='FitPageWidth'
-          height={'78vh'}
+          // height={'78vh'}
+          height={height-105}
           showPropertiesPane={false}
           enableToolbar={false}
           restrictEditing={disableEdit}

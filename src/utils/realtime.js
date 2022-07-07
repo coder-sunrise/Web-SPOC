@@ -93,8 +93,11 @@ const initStream = () => {
           const notification = list.find(x => x.toUserFK === user.data.id)
           if (notification) {
             notifications.unshift(notification)
-            appNotificationTotalUnreadCounts.find(x=>x.source === notification.source).count += 1
-            dispatch({
+            var antuc = appNotificationTotalUnreadCounts.find(x => x.source === notification.source)
+            if (!antuc)
+              appNotificationTotalUnreadCounts.push({source: notification.source,count: 1})
+            else antuc.count += 1
+          dispatch({
               type: 'appNotification/receiveMessage',
               payload: notification,
             })

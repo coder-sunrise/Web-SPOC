@@ -137,7 +137,7 @@ class Form extends PureComponent {
           }}
         >
           <Button color='danger' icon={null} onClick={this.cancelForm}>
-            Cancel
+            Close
           </Button>
           {statusFK === 1 && !isHiddenModify && (
             <ProgressButton

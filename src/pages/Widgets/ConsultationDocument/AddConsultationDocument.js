@@ -216,8 +216,8 @@ const loadFromCodesConfig = {
       getter: v => {
         const { corDiagnosis = [] } = v
         return corDiagnosis
-          .filter(o => !!o.diagnosisDescription)
-          .map(o => `<p>- ${o.diagnosisDescription}</p>`)
+          .filter(o => !!o.icD10DiagnosisDescription)
+          .map(o => `<p>- ${o.icD10DiagnosisDescription}</p>`)
           .join('')
       },
     },

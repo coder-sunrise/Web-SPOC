@@ -18,6 +18,7 @@ import {
   errMsgForOutOfRange as errMsg,
   navigateDirtyCheck,
   roundTo,
+  ableToViewByAuthority,
 } from '@/utils/utils'
 import { getBizSession } from '@/services/queue'
 import Authorized from '@/utils/Authorized'
@@ -119,10 +120,12 @@ const Detail = ({
             >
               Close
             </Button>
-            <ProgressButton
-              submitKey='consumableDetail/submit'
-              onClick={handleSubmit}
-            />
+            {ableToViewByAuthority('inventorymaster.consumable') && (
+              <ProgressButton
+                submitKey='consumableDetail/submit'
+                onClick={handleSubmit}
+              />
+            )}
           </div>
         </React.Fragment>
       )}

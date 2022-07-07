@@ -18,6 +18,7 @@ import {
   getTranslationValue,
   navigateDirtyCheck,
   roundTo,
+  ableToViewByAuthority,
 } from '@/utils/utils'
 import {
   ProgressButton,
@@ -355,11 +356,13 @@ const Detail = ({
         >
           Close
         </Button>
-        <ProgressButton
-          submitKey='medicationDetail/submit'
-          onClick={handleSubmit}
-          disabled={isEditingDosageRule}
-        />
+        {ableToViewByAuthority('inventorymaster.medication') && (
+          <ProgressButton
+            submitKey='medicationDetail/submit'
+            onClick={handleSubmit}
+            disabled={isEditingDosageRule}
+          />
+        )}
       </div>
     </React.Fragment>
   )
