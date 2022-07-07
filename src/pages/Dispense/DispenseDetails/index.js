@@ -714,19 +714,6 @@ const DispenseDetails = ({
   }
 
   const onHandelFinalize = () => {
-    if (isMandatoryWaistCircumference()) {
-      dispatch({
-        type: 'global/updateAppState',
-        payload: {
-          openConfirm: true,
-          isInformType: true,
-          openConfirmContent:
-            'Please fill in Waist Circumference before finalize.',
-          openConfirmText: 'OK',
-        },
-      })
-      return
-    }
     if (existsCanceledRadiology()) {
       dispatch({
         type: 'global/updateAppState',
