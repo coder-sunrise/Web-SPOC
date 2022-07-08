@@ -440,7 +440,7 @@ const isPharmacyOrderUpdated = orders => {
   const isItemUpdate = item => {
     let isEqual = true
     const currentRow = rows.find(r => r.id === item.id && r.type === item.type)
-    if (item.type === '1') {
+    if (item.type === '1' || item.type === '5') {
       if (
         !_.isEqual(generateMedication(item), generateMedication(currentRow))
       ) {
@@ -451,7 +451,7 @@ const isPharmacyOrderUpdated = orders => {
           currentRow.corPrescriptionItemPrecaution,
         )
       }
-    } else if (item.type === '5') {
+    } else if (item.type === '4') {
       isEqual = _.isEqual(
         generateConsumable(item),
         generateConsumable(currentRow),
