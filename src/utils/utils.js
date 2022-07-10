@@ -1057,7 +1057,7 @@ const calculateAmount = (
       !o.isDeleted &&
       (!o.isPreOrder || o.isChargeToday) &&
       !o.hasPaid &&
-      o[adjustedField] > 0,
+      o[totalField] > 0,
   )
   // zero amount
   allOrderRows
@@ -1066,7 +1066,7 @@ const calculateAmount = (
         !o.isDeleted &&
         (!o.isPreOrder || o.isChargeToday) &&
         !o.hasPaid &&
-        o[adjustedField] === 0,
+        o[totalField] === 0,
     )
     .forEach(r => {
       r[adjustedField] = r[totalField]
