@@ -1982,7 +1982,7 @@ class Medication extends PureComponent {
                           <TextField
                             label='Drug Mixture'
                             {...args}
-                            maxLength={90}
+                            maxLength={70}
                             disabled={isStartedMedication}
                           />
                         </div>
@@ -2004,7 +2004,7 @@ class Medication extends PureComponent {
                         fontWeight: 500,
                       }}
                     >
-                      {`Characters left: ${90 -
+                      {`Characters left: ${70 -
                         (drugName ? drugName.length : 0)}`}
                     </span>
                   </div>
