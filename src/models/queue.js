@@ -86,19 +86,6 @@ export default createListViewModel({
           })
         }
       })
-
-      subscribeNotification('QueueListing', {
-        callback: response => {
-          const { location } = history
-          const { user } = window.g_app._store.getState()
-          const { senderId } = response
-          if (
-            user.data.id !== senderId &&
-            location.pathname === '/reception/queue'
-          )
-            dispatch({ type: 'refresh' })
-        },
-      })
     },
     effects: {
       *initState(_, { select, put }) {
