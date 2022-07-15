@@ -29,7 +29,7 @@ class FolderList extends Component {
     showNewFolder: false,
     folderList: [],
     filterValue: '',
-    isShowEmptyTags: true,
+    isShowEmptyTags: false,
   }
 
   debouncedAction = _.debounce(e => {
