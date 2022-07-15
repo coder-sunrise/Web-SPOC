@@ -292,8 +292,10 @@ const PendingPreOrder: React.FC = (props: any) => {
       row.preOrderItemType === preOrderItemCategory[3].value ||
       row.preOrderItemType == preOrderItemCategory[4].value ||
       row.preOrderItemType == preOrderItemCategory[5].value
-    )
+    ) {
       row.preOrderServiceItem = { ServiceCenterServiceFK: option?.id }
+      row.serviceCenterName = option?.serviceCenter || '-'
+    }
     row.quantity = 1
     row.amount = 0
     row.remarks = undefined
@@ -373,7 +375,6 @@ const PendingPreOrder: React.FC = (props: any) => {
         width: 380,
         options: generateItemDataSource,
         renderDropdown: option => {
-          console.log(option)
           return (
             <Tooltip
               title={
@@ -399,8 +400,7 @@ const PendingPreOrder: React.FC = (props: any) => {
                   {`Name: ${row.itemName}`}
                   <br />
                   {row.preOrderServiceItem &&
-                    `Service Center: ${row.preOrderServiceItem
-                      .serviceCenterName ?? '-'}`}
+                    `Service Center: ${row.serviceCenterName ?? '-'}`}
                 </div>
               }
             >
