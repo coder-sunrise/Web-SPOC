@@ -374,6 +374,8 @@ const PendingPreOrder: React.FC = (props: any) => {
         sortingEnabled: false,
         width: 380,
         options: generateItemDataSource,
+        dropdownMatchSelectWidth: false,
+        dropdownStyle: { width: '770px' },
         renderDropdown: option => {
           return (
             <Tooltip
