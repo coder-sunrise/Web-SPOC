@@ -400,7 +400,9 @@ const PendingPreOrder: React.FC = (props: any) => {
                   {`Name: ${row.itemName}`}
                   <br />
                   {row.preOrderServiceItem &&
-                    `Service Center: ${row.serviceCenterName ?? '-'}`}
+                    `Service Center: ${row.serviceCenterName ??
+                      row.preOrderServiceItem.serviceCenterName ??
+                      '-'}`}
                 </div>
               }
             >
