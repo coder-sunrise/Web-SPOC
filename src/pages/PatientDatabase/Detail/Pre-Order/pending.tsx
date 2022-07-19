@@ -388,7 +388,12 @@ const PendingPreOrder: React.FC = (props: any) => {
                 </div>
               }
             >
-              <div>{option?.combinDisplayValue}</div>
+              <div>
+                <strong>{option?.displayValue}</strong> -&nbsp;
+                <strong>{option?.code}</strong> -&nbsp;
+                <span>{option?.serviceCenter}</span> -&nbsp;
+                <span> ${option?.unitPrice}</span>
+              </div>
             </Tooltip>
           )
         },
