@@ -369,7 +369,8 @@ const PendingPreOrder: React.FC = (props: any) => {
       {
         columnName: 'itemName',
         type: 'select',
-        // labelField: 'combinDisplayValue',
+        labelField: 'combinDisplayValue',
+        showOptionTitle: false,
         valueField: 'id',
         sortingEnabled: false,
         width: 380,
