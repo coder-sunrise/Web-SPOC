@@ -315,7 +315,7 @@ class AntdSelect extends React.PureComponent {
         match = false
       }
       match =
-        (option.props.title ?? option.props.label)
+        (option.props.label ?? option.props.title)
           .toLowerCase()
           .indexOf(input.toLowerCase()) >= 0
       if (
