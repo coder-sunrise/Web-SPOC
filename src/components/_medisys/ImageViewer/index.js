@@ -110,7 +110,7 @@ const ImageViewer = ({
 
   const toggleImage = arg => {
     let imgAtttachmentsList = fileAttachments.filter(item =>
-      ['png', 'jpg', 'gif', 'jpeg'].includes(item.fileExtension),
+      ['png', 'jpg', 'gif', 'jpeg', 'svg', 'bmp'].includes(item.fileExtension),
     )
     for (let [index, elem] of imgAtttachmentsList.entries()) {
       if (attachment.id == elem.id) {
