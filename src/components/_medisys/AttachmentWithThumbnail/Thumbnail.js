@@ -96,7 +96,6 @@ const Thumbnail = ({
   isReadOnly = false,
   simple,
   attachment,
-  fileAttachments,
   onConfirmDelete,
   onClickAttachment,
   noBorder = true,
@@ -172,7 +171,6 @@ const Thumbnail = ({
         type: 'imageViewer/updateState',
         payload: {
           attachment,
-          fileAttachments
         },
       })
       return
