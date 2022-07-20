@@ -529,6 +529,7 @@ class AttachmentWithThumbnail extends Component {
                   index={index}
                   indexInAllAttachments={indexInAllAttachments}
                   attachment={attachment}
+                  fileAttachments={fileAttachments}
                   {...commonProps}
                 />
               )
