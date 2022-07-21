@@ -1982,19 +1982,6 @@ export default ({
                       'Specimen Collected. No modification is allowed on processed order'
                   }
                 }
-
-                if (
-                  deleteEnable &&
-                  nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
-                ) {
-                  const lastNuseActualize = _.orderBy(
-                    nuseActualize,
-                    ['actulizeDate'],
-                    ['desc'],
-                  )[0]
-                  deleteEnable = false
-                  deleteMessage = `Item actualized by ${lastNuseActualize.actulizeByUser}. Deletion allowed after nurse cancel actualization`
-                }
               }
               if (
                 getOrderAccessRight(editAccessRight, row.isEnableEditOrder)
