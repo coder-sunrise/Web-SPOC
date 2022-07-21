@@ -125,7 +125,7 @@ const TagSelect = ({
             setDropdownOpen(open)
           }}
           dropdownRender={menu => (
-            <div>
+            <div style={{ minWidth: '300px' }}>
               {menu}
               {newTagInput !== undefined &&
                 newTagInput !== null &&
@@ -136,6 +136,7 @@ const TagSelect = ({
                     <div
                       style={{
                         display: 'flex',
+                        justifyContent: 'center',
                         flexWrap: 'nowrap',
                         padding: 4,
                       }}
