@@ -573,7 +573,7 @@ class AttachmentWithThumbnail extends Component {
       <div className={classes.root}>
         <CommonModal
           open={this.state.showImagePreview}
-          title='Lab Results Attachment Preview'
+          title='Results Attachment Preview'
           fullScreen
           onClose={() =>
             this.setState({ ...this.state, showImagePreview: false })
