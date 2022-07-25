@@ -514,7 +514,7 @@ const isPharmacyOrderUpdated = (orders, ignorePharmacy) => {
 
   if (!isUpdatedPharmacy) {
     isUpdatedPharmacy =
-      rows.filter(r => !r.id && isPushToPharmacy(r)).length > 0
+      rows.filter(r => !r.id && !r.isPreOrder && isPushToPharmacy(r)).length > 0
   }
   return isUpdatedPharmacy
 }
