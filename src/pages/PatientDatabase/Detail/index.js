@@ -103,6 +103,7 @@ class PatientDetail extends PureComponent {
       rights: 'enable',
     },
     hasActiveSession: false,
+    preSelectedMenu: '1',
   }
 
   constructor(props) {
@@ -198,6 +199,19 @@ class PatientDetail extends PureComponent {
         ],
         component: Loadable({
           loader: () => import('./ClaimHistory'),
+          render: (loaded, p) => {
+            let Cmpnet = loaded.default
+            return <Cmpnet {...p} patientProfileFK={props.values.id} />
+          },
+          loading: Loading,
+        }),
+      },
+      {
+        id: '13',
+        name: 'Patient Account',
+        access: ['patientdatabase.patientprofiledetails.patientaccount'],
+        component: Loadable({
+          loader: () => import('./PatientAccount'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
             return <Cmpnet {...p} patientProfileFK={props.values.id} />
@@ -397,6 +411,13 @@ class PatientDetail extends PureComponent {
     ) || { rights: 'hidden' }
     if (viewPatientResultsRight.rights === 'hidden') {
       this.widgets = this.widgets.filter(t => t.id !== '5')
+    }
+
+    const viewPatientAccountRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.patientaccount',
+    ) || { rights: 'hidden' }
+    if (viewPatientAccountRight.rights === 'hidden') {
+      this.widgets = this.widgets.filter(t => t.id !== '13')
     }
   }
 
