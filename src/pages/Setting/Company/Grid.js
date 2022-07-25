@@ -111,8 +111,8 @@ class Grid extends PureComponent {
               ? [
                   { name: 'code', title: 'Code' },
                   { name: 'displayValue', title: 'Name' },
-                  { name: 'copayerAddress', title: 'Address' },
                   { name: 'creditFacility', title: 'Credit Facility' },
+                  { name: 'copayerAddress', title: 'Address' },
                   { name: 'coPayerTypeName', title: 'Type' },
                   { name: 'copayerContactPerson', title: 'Contact Person' },
                   { name: 'contactNo', title: 'Contact No.' },
@@ -178,7 +178,7 @@ class Grid extends PureComponent {
                     ? row.address?.countryName + ', '
                     : ''
                 }${row.address?.postcode ? row.address?.postcode + ', ' : ''}`
-                address=_.trimEnd(address, ', ')
+                address = _.trimEnd(address, ', ')
                 return (
                   <Tooltip title={address}>
                     <span>{address}</span>
