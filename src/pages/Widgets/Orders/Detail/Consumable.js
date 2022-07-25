@@ -557,7 +557,7 @@ class Consumable extends PureComponent {
                           paddingRight: theme.spacing(6),
                         }}
                         step={1}
-                        // min={1}
+                        min={1}
                         onChange={e => {
                           const { values } = this.props
                           if (values.unitPrice) {
