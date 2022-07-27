@@ -180,9 +180,12 @@ class PatientNurseNotes extends PureComponent {
   }
   updateEditor = async result => {
     if (this.richEditor && this.richEditor.props) {
-      const { editorState } = this.richEditor.props
+      const {
+        editorState,
+        field: { value },
+      } = this.richEditor.props
       this.richEditor.update(
-        RichEditor.insertHtml(editorState, '<br/>' + result),
+        RichEditor.insertHtml(editorState, (value ? '<br/>' : '') + result),
       )
       setTimeout(() => {
         this.richEditor.focus()
