@@ -363,6 +363,7 @@ const saveConsultation = ({
 
   const { isEnablePharmacyModule } = clinicSettings
   if (isEnablePharmacyModule) {
+    values.isPrescriptionSheetUpdated = isPharmacyOrderUpdated(orders,true)
     values.isPharmacyOrderUpdated = isPharmacyOrderUpdated(orders)
   }
 
@@ -530,6 +531,7 @@ const pauseConsultation = async ({
   let settings = JSON.parse(localStorage.getItem('clinicSettings'))
   const { diagnosisDataSource, isEnablePharmacyModule } = settings
   if (isEnablePharmacyModule) {
+    values.isPrescriptionSheetUpdated = isPharmacyOrderUpdated(orders,true)
     values.isPharmacyOrderUpdated = isPharmacyOrderUpdated(orders)
   }
   const newValues = convertToConsultation(
@@ -714,7 +716,8 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
     const { summary } = orders
     const { isEnablePharmacyModule } = clinicSettings
     if (isEnablePharmacyModule) {
-      values.isPharmacyOrderUpdated = isPharmacyOrderUpdated(orders)
+    values.isPrescriptionSheetUpdated = isPharmacyOrderUpdated(orders,true)
+    values.isPharmacyOrderUpdated = isPharmacyOrderUpdated(orders)
     }
     if (!(await autoPrintSelection('sign', { values, ...props }))) {
       saveConsultation({
