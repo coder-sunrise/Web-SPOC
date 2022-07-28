@@ -424,6 +424,7 @@ class SchemesGrid extends PureComponent {
           } = option
           return (
             <Tooltip
+              placement='left'
               title={
                 <div>
                   <span>
@@ -431,16 +432,16 @@ class SchemesGrid extends PureComponent {
                     {option.name}
                   </span>
                   <br />
-                  <span>{`Copayer : ${copayerName}`}</span>
+                  <span>{`Copayer: ${copayerName}`}</span>
                   <br />
                   <span>
-                    {`Credit Facility : ${
+                    {`Credit Facility: ${
                       creditFacility ? creditFacility : ' - '
                     }`}
                   </span>
                   <br />
                   <span>
-                    {`Addr : ${[
+                    {`Addr.: ${[
                       blockNo,
                       street,
                       unitNo,
@@ -461,22 +462,22 @@ class SchemesGrid extends PureComponent {
                   whiteSpace: 'nowrap',
                 }}
               >
-                <div>
+                <div style={{ display: 'block', lineHeight: '0.9rem' }}>
                   {option.code ? `${option.code} - ` : ''}
                   <span style={{ fontWeight: option.code ? 'bold' : 'normal' }}>
                     {`${option.name}`}
                   </span>
                 </div>
-                <span>{`Copayer : ${copayerName}`}</span>
-                <br />
-                <span>
-                  {`Credit Facility : ${
+                <span
+                  style={{ display: 'block', lineHeight: '0.9rem' }}
+                >{`Copayer: ${copayerName}`}</span>
+                <span style={{ display: 'block', lineHeight: '0.9rem' }}>
+                  {`Credit Facility: ${
                     creditFacility ? creditFacility : ' - '
                   }`}
                 </span>
-                <br />
-                <span>
-                  {`Addr : ${[
+                <span style={{ display: 'block', lineHeight: '0.9rem' }}>
+                  {`Addr.: ${[
                     blockNo,
                     street,
                     unitNo,

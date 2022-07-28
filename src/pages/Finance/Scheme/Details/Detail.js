@@ -204,6 +204,7 @@ const Detail = ({ height, ...props }) => {
                     } = option
                     return (
                       <Tooltip
+                        placement='left'
                         title={
                           <>
                             <span>
@@ -211,11 +212,11 @@ const Detail = ({ height, ...props }) => {
                               <span>{`${option[labelField]}`}</span>
                             </span>
                             <br />
-                            <span>{`Cr. Facility : ${
+                            <span>{`Cr. Facility: ${
                               creditFacility == '' ? ' - ' : creditFacility
                             }`}</span>
                             <br />
-                            <span>{`Addr : ${
+                            <span>{`Addr: ${
                               copayerAddress == '' ? ' - ' : copayerAddress
                             }`}</span>
                           </>
@@ -238,12 +239,12 @@ const Detail = ({ height, ...props }) => {
                               {`${option[labelField]}`}
                             </span>
                           </span>
-                          <br />
-                          <span>{`Cr. Facility: ${
+                          <span
+                            style={{ display: 'block', lineHeight: '70%' }}
+                          >{`Cr. Facility: ${
                             creditFacility == '' ? ' - ' : creditFacility
                           }`}</span>
-                          <br />
-                          <span>{`Addr.: ${
+                          <span style={{ display: 'block' }}>{`Addr.: ${
                             copayerAddress == '' ? ' - ' : copayerAddress
                           }`}</span>
                         </div>

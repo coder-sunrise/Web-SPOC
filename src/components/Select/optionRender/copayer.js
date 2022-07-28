@@ -7,6 +7,7 @@ const CopayerDropdownOption = props => {
   } = props
   return (
     <Tooltip
+      placement='right'
       title={
         <>
           <div>
