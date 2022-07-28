@@ -181,6 +181,7 @@ const defaultColumns = [
             })}
             maxTagCount={0}
             mode='multiple'
+            showOptionTitle={false}
             renderDropdown={option => {
               return (
                 <CopayerDropdownOption option={option}></CopayerDropdownOption>

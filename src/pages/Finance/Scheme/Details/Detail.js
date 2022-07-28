@@ -191,11 +191,63 @@ const Detail = ({ height, ...props }) => {
                   localFilter={item => item.coPayerTypeFK === copayerTypeFK}
                   labelField='displayValueWithCode'
                   max={50}
+                  showOptionTitle={false}
+                  dropdownMatchSelectWidth={false}
+                  dropdownClassName='ant-select-dropdown-bottom-bordered'
+                  dropdownStyle={{ width: '42vw' }}
                   renderDropdown={option => {
+                    const {
+                      code = '',
+                      creditFacility = '',
+                      copayerAddress = '',
+                      labelField = 'displayValue',
+                    } = option
                     return (
-                      <CopayerDropdownOption
-                        option={option}
-                      ></CopayerDropdownOption>
+                      <Tooltip
+                        title={
+                          <>
+                            <span>
+                              {code ? `${code} - ` : ''}
+                              <span>{`${option[labelField]}`}</span>
+                            </span>
+                            <br />
+                            <span>{`Cr. Facility : ${
+                              creditFacility == '' ? ' - ' : creditFacility
+                            }`}</span>
+                            <br />
+                            <span>{`Addr : ${
+                              copayerAddress == '' ? ' - ' : copayerAddress
+                            }`}</span>
+                          </>
+                        }
+                      >
+                        <div
+                          style={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          <span>
+                            {option.code ? `${option.code} - ` : ''}
+                            <span
+                              style={{
+                                fontWeight: option.code ? 'bold' : 'normal',
+                              }}
+                            >
+                              {`${option[labelField]}`}
+                            </span>
+                          </span>
+                          <br />
+                          <span>{`Cr. Facility: ${
+                            creditFacility == '' ? ' - ' : creditFacility
+                          }`}</span>
+                          <br />
+                          <span>{`Addr.: ${
+                            copayerAddress == '' ? ' - ' : copayerAddress
+                          }`}</span>
+                        </div>
+                      </Tooltip>
                     )
                   }}
                   {...args}
