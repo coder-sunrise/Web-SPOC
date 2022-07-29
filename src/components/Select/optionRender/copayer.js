@@ -17,7 +17,7 @@ const CopayerDropdownOption = props => {
           <div>{`Cr. Facility: ${
             creditFacility == '' ? ' - ' : creditFacility
           } `}</div>
-          <div>{`Addr: ${
+          <div>{`Addr.: ${
             copayerAddress == '' ? ' - ' : copayerAddress
           } `}</div>
         </>
