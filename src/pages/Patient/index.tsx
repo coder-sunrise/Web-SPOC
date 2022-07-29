@@ -4,7 +4,11 @@ import patientService from '@/services/patient'
 import PersonAdd from '@material-ui/icons/PersonAdd'
 import { connect, history } from 'umi'
 import { formatMessage } from 'umi'
-import { getAppendUrl, ableToViewByAuthority } from '@/utils/utils'
+import {
+  getAppendUrl,
+  ableToViewByAuthority,
+  menuViewableByAuthoritys,
+} from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 
 import { TextField, DatePicker, CodeSelect } from '@/components'
@@ -38,7 +42,7 @@ const menus = [
     id: 1,
     label: 'Claim History',
     Icon: ArrowForwardIosOutlinedIcon,
-    authority: 'patientdatabase.patientprofiledetails.claimhistory',
+    access: 'patientdatabase.patientprofiledetails.claimhistory',
     cmt: 12,
     style: iconStyle,
   },
@@ -46,7 +50,6 @@ const menus = [
     id: 2,
     label: 'Patient Account',
     Icon: ArrowForwardIosOutlinedIcon,
-    authority: 'patientdatabase.patientprofiledetails.patientaccount',
     cmt: 13,
     style: iconStyle,
   },
@@ -54,7 +57,7 @@ const menus = [
     id: 3,
     label: 'Patient Result',
     Icon: ArrowForwardIosOutlinedIcon,
-    authority: 'patientdatabase.patientprofiledetails.patientresults',
+    access: 'patientdatabase.patientprofiledetails.patientresults',
     cmt: 5,
     style: iconStyle,
   },
@@ -68,7 +71,7 @@ const menus = [
   {
     id: 5,
     label: 'Patient Document',
-    authority: 'patientdatabase.patientprofiledetails.patientdocument',
+    access: 'patientdatabase.patientprofiledetails.patientdocument',
     Icon: ArrowForwardIosOutlinedIcon,
     cmt: 7,
     style: iconStyle,
@@ -76,7 +79,7 @@ const menus = [
   {
     id: 6,
     label: 'Pre-Order List',
-    authority: 'patientdatabase.modifypreorder',
+    access: 'patientdatabase.modifypreorder',
     Icon: ArrowForwardIosOutlinedIcon,
     cmt: 11,
     style: iconStyle,
@@ -418,7 +421,13 @@ const PatientIndex = ({
               )
                 return ''
               const activeMenus = menus.filter(m => {
-                const accessRight = Authorized.check(m.authority) || {
+                if (m.id === 2) {
+                  return menuViewableByAuthoritys([
+                    'patientdatabase.patientprofiledetails.patienthistory.deposit',
+                    'finance/invoicepayment',
+                  ])
+                }
+                const accessRight = Authorized.check(m.access) || {
                   rights: 'hidden',
                 }
                 return accessRight.rights !== 'hidden'

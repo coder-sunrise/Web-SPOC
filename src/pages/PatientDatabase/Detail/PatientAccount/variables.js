@@ -38,6 +38,7 @@ export const PatientAccountTabOption = props => {
       id: PATIENT_ACCOUNT_TABS.INVOICE,
       name: 'Invoice',
       content: addContent(PATIENT_ACCOUNT_TABS.INVOICE, props),
+      authority: ['finance/invoicepayment'],
     },
     {
       id: PATIENT_ACCOUNT_TABS.DEPOSIT,
@@ -49,4 +50,14 @@ export const PatientAccountTabOption = props => {
     },
   ]
   return Tabs.filter(f => checkAccessRight(f.authority))
+}
+
+export const getDefaultTab = () => {
+  const accessRight = Authorized.check('finance/invoicepayment') || {
+    rights: 'hidden',
+  }
+  if (accessRight.rights === 'hidden') {
+    return PATIENT_ACCOUNT_TABS.DEPOSIT
+  }
+  return PATIENT_ACCOUNT_TABS.INVOICE
 }

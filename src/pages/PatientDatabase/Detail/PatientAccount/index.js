@@ -1,7 +1,10 @@
 import React, { PureComponent, useEffect } from 'react'
 import { withStyles } from '@material-ui/core'
 import { Tabs } from '@/components'
-import { PatientAccountTabOption } from '@/pages/PatientDatabase/Detail/PatientAccount/variables'
+import {
+  PatientAccountTabOption,
+  getDefaultTab,
+} from '@/pages/PatientDatabase/Detail/PatientAccount/variables'
 
 const styles = () => ({
   container: {
@@ -16,7 +19,7 @@ class PatientAccount extends PureComponent {
   constructor() {
     super()
     this.state = {
-      activeTab: '1',
+      activeTab: `${getDefaultTab()}`,
       mounted: '1',
     }
   }

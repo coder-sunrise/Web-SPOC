@@ -40,7 +40,7 @@ import {
   CommonModal,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
-
+import { menuViewableByAuthoritys } from '@/utils/utils'
 import services from '@/services/patient'
 import { getBizSession } from '@/services/queue'
 import schema from './schema'
@@ -209,7 +209,10 @@ class PatientDetail extends PureComponent {
       {
         id: '13',
         name: 'Patient Account',
-        access: ['patientdatabase.patientprofiledetails.patientaccount'],
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         component: Loadable({
           loader: () => import('./PatientAccount'),
           render: (loaded, p) => {
@@ -413,10 +416,12 @@ class PatientDetail extends PureComponent {
       this.widgets = this.widgets.filter(t => t.id !== '5')
     }
 
-    const viewPatientAccountRight = Authorized.check(
-      'patientdatabase.patientprofiledetails.patientaccount',
-    ) || { rights: 'hidden' }
-    if (viewPatientAccountRight.rights === 'hidden') {
+    if (
+      !menuViewableByAuthoritys([
+        'patientdatabase.patientprofiledetails.patienthistory.deposit',
+        'finance/invoicepayment',
+      ])
+    ) {
       this.widgets = this.widgets.filter(t => t.id !== '13')
     }
   }
