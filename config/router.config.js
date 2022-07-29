@@ -1376,7 +1376,7 @@ const _routes = [
           {
             path: '/support/contactus',
             name: 'contactus',
-            component: './Support/teamviewer',
+            component: './Support/Teamviewer',
           },
           {
             path: '/support/printingtool',
