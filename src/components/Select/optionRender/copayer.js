@@ -14,10 +14,10 @@ const CopayerDropdownOption = props => {
             {option.code ? `${option.code} - ` : ''}
             <span>{`${option[labelField]}`}</span>
           </div>
-          <div>{`Cr. Facility : ${
+          <div>{`Cr. Facility: ${
             creditFacility == '' ? ' - ' : creditFacility
           } `}</div>
-          <div>{`Addr : ${
+          <div>{`Addr: ${
             copayerAddress == '' ? ' - ' : copayerAddress
           } `}</div>
         </>

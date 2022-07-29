@@ -194,7 +194,7 @@ const Detail = ({ height, ...props }) => {
                   showOptionTitle={false}
                   dropdownMatchSelectWidth={false}
                   dropdownClassName='ant-select-dropdown-bottom-bordered'
-                  dropdownStyle={{ width: '42vw' }}
+                  dropdownStyle={{ width: '810px' }}
                   renderDropdown={option => {
                     const {
                       code = '',
@@ -216,7 +216,7 @@ const Detail = ({ height, ...props }) => {
                               creditFacility == '' ? ' - ' : creditFacility
                             }`}</span>
                             <br />
-                            <span>{`Addr: ${
+                            <span>{`Addr.: ${
                               copayerAddress == '' ? ' - ' : copayerAddress
                             }`}</span>
                           </>
@@ -240,7 +240,7 @@ const Detail = ({ height, ...props }) => {
                             </span>
                           </span>
                           <span
-                            style={{ display: 'block', lineHeight: '70%' }}
+                            style={{ display: 'block', lineHeight: '15px' }}
                           >{`Cr. Facility: ${
                             creditFacility == '' ? ' - ' : creditFacility
                           }`}</span>

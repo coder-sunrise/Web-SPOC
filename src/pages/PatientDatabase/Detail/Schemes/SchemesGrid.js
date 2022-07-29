@@ -407,7 +407,7 @@ class SchemesGrid extends PureComponent {
         additionalSearchField: 'code',
         showOptionTitle: false,
         dropdownMatchSelectWidth: false,
-        dropdownStyle: { width: '65vw' },
+        dropdownStyle: { width: '1250px' },
         dropdownClassName: 'ant-select-dropdown-bottom-bordered',
         renderDropdown: option => {
           let {
@@ -449,8 +449,8 @@ class SchemesGrid extends PureComponent {
                       countryName,
                       postcode,
                     ]
-                      .filter(item => item.trim() != '')
-                      .join(' , ')}`}
+                      .filter(item => item?.trim() != '')
+                      .join(', ')}`}
                   </span>
                 </div>
               }
@@ -462,21 +462,21 @@ class SchemesGrid extends PureComponent {
                   whiteSpace: 'nowrap',
                 }}
               >
-                <div style={{ display: 'block', lineHeight: '0.9rem' }}>
+                <div style={{ display: 'block', lineHeight: '17px' }}>
                   {option.code ? `${option.code} - ` : ''}
                   <span style={{ fontWeight: option.code ? 'bold' : 'normal' }}>
                     {`${option.name}`}
                   </span>
                 </div>
                 <span
-                  style={{ display: 'block', lineHeight: '0.9rem' }}
+                  style={{ display: 'block', lineHeight: '17px' }}
                 >{`Copayer: ${copayerName}`}</span>
-                <span style={{ display: 'block', lineHeight: '0.9rem' }}>
+                <span style={{ display: 'block', lineHeight: '17px' }}>
                   {`Credit Facility: ${
                     creditFacility ? creditFacility : ' - '
                   }`}
                 </span>
-                <span style={{ display: 'block', lineHeight: '0.9rem' }}>
+                <span style={{ display: 'block', lineHeight: '17px' }}>
                   {`Addr.: ${[
                     blockNo,
                     street,
@@ -485,8 +485,8 @@ class SchemesGrid extends PureComponent {
                     countryName,
                     postcode,
                   ]
-                    .filter(item => item.trim() != '')
-                    .join(' , ')}`}
+                    .filter(item => item?.trim() != '')
+                    .join(', ')}`}
                 </span>
               </div>
             </Tooltip>
