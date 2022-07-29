@@ -42,13 +42,17 @@ const menus = [
     id: 1,
     label: 'Claim History',
     Icon: ArrowForwardIosOutlinedIcon,
-    access: 'patientdatabase.patientprofiledetails.claimhistory',
+    access: ['patientdatabase.patientprofiledetails.claimhistory'],
     cmt: 12,
     style: iconStyle,
   },
   {
     id: 2,
     label: 'Patient Account',
+    access: [
+      'patientdatabase.patientprofiledetails.patienthistory.deposit',
+      'finance/invoicepayment',
+    ],
     Icon: ArrowForwardIosOutlinedIcon,
     cmt: 13,
     style: iconStyle,
@@ -57,7 +61,7 @@ const menus = [
     id: 3,
     label: 'Patient Result',
     Icon: ArrowForwardIosOutlinedIcon,
-    access: 'patientdatabase.patientprofiledetails.patientresults',
+    access: ['patientdatabase.patientprofiledetails.patientresults'],
     cmt: 5,
     style: iconStyle,
   },
@@ -71,7 +75,7 @@ const menus = [
   {
     id: 5,
     label: 'Patient Document',
-    access: 'patientdatabase.patientprofiledetails.patientdocument',
+    access: ['patientdatabase.patientprofiledetails.patientdocument'],
     Icon: ArrowForwardIosOutlinedIcon,
     cmt: 7,
     style: iconStyle,
@@ -79,7 +83,7 @@ const menus = [
   {
     id: 6,
     label: 'Pre-Order List',
-    access: 'patientdatabase.modifypreorder',
+    access: ['patientdatabase.modifypreorder'],
     Icon: ArrowForwardIosOutlinedIcon,
     cmt: 11,
     style: iconStyle,
@@ -420,18 +424,9 @@ const PatientIndex = ({
                 !ableToViewByAuthority('patientdatabase.patientprofiledetails')
               )
                 return ''
-              const activeMenus = menus.filter(m => {
-                if (m.id === 2) {
-                  return menuViewableByAuthoritys([
-                    'patientdatabase.patientprofiledetails.patienthistory.deposit',
-                    'finance/invoicepayment',
-                  ])
-                }
-                const accessRight = Authorized.check(m.access) || {
-                  rights: 'hidden',
-                }
-                return accessRight.rights !== 'hidden'
-              })
+              const activeMenus = menus.filter(m =>
+                menuViewableByAuthoritys(m.access),
+              )
               if (activeMenus.length <= 0) return ''
               return (
                 <Tooltip title='More Options'>
