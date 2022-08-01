@@ -892,7 +892,6 @@ class Vaccination extends PureComponent {
                 render={args => {
                   return (
                     <CodeSelect
-                      disabled
                       label='UOM'
                       allowClear={false}
                       code='ctvaccinationunitofmeasurement'
@@ -905,6 +904,9 @@ class Vaccination extends PureComponent {
                         setTimeout(this.calculateQuantity, 1)
                       }}
                       {...args}
+                      disabled={
+                        isDisabledHasPaidPreOrder || isStartedVaccination
+                      }
                     />
                   )
                 }}
