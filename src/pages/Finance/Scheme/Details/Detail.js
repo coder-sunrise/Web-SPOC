@@ -244,9 +244,9 @@ const Detail = ({ height, ...props }) => {
                           >{`Cr. Facility: ${
                             creditFacility == '' ? ' - ' : creditFacility
                           }`}</span>
-                          <span style={{ display: 'block' }}>{`Addr.: ${
-                            copayerAddress == '' ? ' - ' : copayerAddress
-                          }`}</span>
+                          <span
+                            style={{ display: 'block' }}
+                          >{`Addr.: ${copayerAddress || ' - '}`}</span>
                         </div>
                       </Tooltip>
                     )

@@ -410,26 +410,7 @@ class SchemesGrid extends PureComponent {
         dropdownStyle: { width: '1250px' },
         dropdownClassName: 'ant-select-dropdown-bottom-bordered',
         renderDropdown: option => {
-          let {
-            copayerName,
-            creditFacility,
-            copayerAddress: {
-              countryName,
-              street,
-              buildingName,
-              unitNo,
-              blockNo,
-              postcode,
-            },
-          } = option
-          let detailedAddressArr = [
-            blockNo,
-            street,
-            unitNo,
-            buildingName,
-            countryName,
-            postcode,
-          ]
+          let { copayerName, creditFacility, copayerAddress } = option
           return (
             <Tooltip
               placement='left'
@@ -448,16 +429,7 @@ class SchemesGrid extends PureComponent {
                     }`}
                   </span>
                   <br />
-                  <span>
-                    {`Addr.: ${
-                      detailedAddressArr.filter(item => item?.trim() != '')
-                        .length != 0
-                        ? detailedAddressArr
-                            .filter(item => item?.trim() != '')
-                            .join(', ')
-                        : '-'
-                    }`}
-                  </span>
+                  <span>{`Addr.: ${copayerAddress || ' - '}`}</span>
                 </div>
               }
             >
@@ -483,14 +455,7 @@ class SchemesGrid extends PureComponent {
                   }`}
                 </span>
                 <span style={{ display: 'block', lineHeight: '17px' }}>
-                  {`Addr.: ${
-                    detailedAddressArr.filter(item => item?.trim() != '')
-                      .length != 0
-                      ? detailedAddressArr
-                          .filter(item => item?.trim() != '')
-                          .join(', ')
-                      : '-'
-                  }`}
+                  {`Addr.: ${copayerAddress || ' - '}`}
                 </span>
               </div>
             </Tooltip>
