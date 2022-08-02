@@ -403,7 +403,7 @@ class SchemesGrid extends PureComponent {
       {
         columnName: 'coPaymentSchemeFK',
         sortingEnabled: false,
-        type: 'codeSelect',
+        type: 'localSearchSelect',
         additionalSearchField: 'code',
         showOptionTitle: false,
         dropdownMatchSelectWidth: false,
@@ -533,7 +533,7 @@ class SchemesGrid extends PureComponent {
             item => item.id === row.coPaymentSchemeFK,
           )
           row.copayerFK = option?.copayerFK
-          if (!patCoPaymentScheme.isActive) {
+          if (patCoPaymentScheme && !patCoPaymentScheme.isActive) {
             row.coPaymentSchemeFK = undefined
             notification.error({
               message: 'Selected scheme is an inactive schemes',
