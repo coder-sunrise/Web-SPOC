@@ -71,9 +71,7 @@ const Grid = ({ history, height }) => {
                 <div>{`Cr. Facility: ${
                   creditFacility !== '' ? creditFacility : '-'
                 }`}</div>
-                <div>{`Addr.: ${
-                  copayerAddress !== '' ? copayerAddress : '-'
-                }`}</div>
+                <div>{`Addr.: ${copayerAddress || ' - '}`}</div>
               </>
             }
           >
