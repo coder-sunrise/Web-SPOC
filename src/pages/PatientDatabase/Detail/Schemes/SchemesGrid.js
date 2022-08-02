@@ -422,6 +422,14 @@ class SchemesGrid extends PureComponent {
               postcode,
             },
           } = option
+          let detailedAddressArr = [
+            blockNo,
+            street,
+            unitNo,
+            buildingName,
+            countryName,
+            postcode,
+          ]
           return (
             <Tooltip
               placement='left'
@@ -442,22 +450,9 @@ class SchemesGrid extends PureComponent {
                   <br />
                   <span>
                     {`Addr.: ${
-                      [
-                        blockNo,
-                        street,
-                        unitNo,
-                        buildingName,
-                        countryName,
-                        postcode,
-                      ].filter(item => item?.trim() != '').length != 0
-                        ? [
-                            blockNo,
-                            street,
-                            unitNo,
-                            buildingName,
-                            countryName,
-                            postcode,
-                          ]
+                      detailedAddressArr.filter(item => item?.trim() != '')
+                        .length != 0
+                        ? detailedAddressArr
                             .filter(item => item?.trim() != '')
                             .join(', ')
                         : '-'
@@ -489,22 +484,9 @@ class SchemesGrid extends PureComponent {
                 </span>
                 <span style={{ display: 'block', lineHeight: '17px' }}>
                   {`Addr.: ${
-                    [
-                      blockNo,
-                      street,
-                      unitNo,
-                      buildingName,
-                      countryName,
-                      postcode,
-                    ].filter(item => item?.trim() != '').length != 0
-                      ? [
-                          blockNo,
-                          street,
-                          unitNo,
-                          buildingName,
-                          countryName,
-                          postcode,
-                        ]
+                    detailedAddressArr.filter(item => item?.trim() != '')
+                      .length != 0
+                      ? detailedAddressArr
                           .filter(item => item?.trim() != '')
                           .join(', ')
                       : '-'
