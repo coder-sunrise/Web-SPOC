@@ -440,21 +440,21 @@ class SchemesGrid extends PureComponent {
                   whiteSpace: 'nowrap',
                 }}
               >
-                <div style={{ display: 'block', lineHeight: '17px' }}>
+                <div style={{ display: 'block', lineHeight: '20px' }}>
                   {option.code ? `${option.code} - ` : ''}
                   <span style={{ fontWeight: option.code ? 'bold' : 'normal' }}>
                     {`${option.name}`}
                   </span>
                 </div>
                 <span
-                  style={{ display: 'block', lineHeight: '17px' }}
+                  style={{ display: 'block', lineHeight: '20px' }}
                 >{`Copayer: ${copayerName}`}</span>
-                <span style={{ display: 'block', lineHeight: '17px' }}>
+                <span style={{ display: 'block', lineHeight: '20px' }}>
                   {`Credit Facility: ${
                     creditFacility ? creditFacility : ' - '
                   }`}
                 </span>
-                <span style={{ display: 'block', lineHeight: '17px' }}>
+                <span style={{ display: 'block', lineHeight: '20px' }}>
                   {`Addr.: ${copayerAddress || ' - '}`}
                 </span>
               </div>
