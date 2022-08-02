@@ -292,6 +292,13 @@ class SchemesGrid extends PureComponent {
       this.setState({ copayerCoverPageCopies: value || 1 })
     }
   }
+  matchSearch = (option, input) => {
+    const lowerCaseInput = input.toLowerCase()
+    return (
+      option.code.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+      option.name.toLowerCase().indexOf(lowerCaseInput) >= 0
+    )
+  }
 
   render() {
     const labelTypes = ['Co-Payer Label', 'Co-Payer Cover Page']
@@ -473,7 +480,11 @@ class SchemesGrid extends PureComponent {
             filterOptions = copaymentscheme.filter(
               cps => cps.schemeTypeName === 'Insurance',
             )
-          return filterOptions
+          return _.orderBy(
+            filterOptions,
+            [data => data.name.toLowerCase()],
+            ['asc'],
+          )
         },
         isDisabled: row => !this.isCorporate(row),
         render: row => {
@@ -501,6 +512,7 @@ class SchemesGrid extends PureComponent {
             <span>{patCoPaymentScheme ? patCoPaymentScheme.name : ''}</span>
           )
         },
+        matchSearch: this.matchSearch,
         onChange: ({ val, option, row, onValueChange }) => {
           let { rows } = this.props
           if (!row.id) {
