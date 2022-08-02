@@ -422,6 +422,14 @@ class SchemesGrid extends PureComponent {
               postcode,
             },
           } = option
+          let detailedAddressArr = [
+            blockNo,
+            street,
+            unitNo,
+            buildingName,
+            countryName,
+            postcode,
+          ]
           return (
             <Tooltip
               placement='left'
@@ -441,16 +449,14 @@ class SchemesGrid extends PureComponent {
                   </span>
                   <br />
                   <span>
-                    {`Addr.: ${[
-                      blockNo,
-                      street,
-                      unitNo,
-                      buildingName,
-                      countryName,
-                      postcode,
-                    ]
-                      .filter(item => item?.trim() != '')
-                      .join(', ')}`}
+                    {`Addr.: ${
+                      detailedAddressArr.filter(item => item?.trim() != '')
+                        .length != 0
+                        ? detailedAddressArr
+                            .filter(item => item?.trim() != '')
+                            .join(', ')
+                        : '-'
+                    }`}
                   </span>
                 </div>
               }
@@ -477,16 +483,14 @@ class SchemesGrid extends PureComponent {
                   }`}
                 </span>
                 <span style={{ display: 'block', lineHeight: '17px' }}>
-                  {`Addr.: ${[
-                    blockNo,
-                    street,
-                    unitNo,
-                    buildingName,
-                    countryName,
-                    postcode,
-                  ]
-                    .filter(item => item?.trim() != '')
-                    .join(', ')}`}
+                  {`Addr.: ${
+                    detailedAddressArr.filter(item => item?.trim() != '')
+                      .length != 0
+                      ? detailedAddressArr
+                          .filter(item => item?.trim() != '')
+                          .join(', ')
+                      : '-'
+                  }`}
                 </span>
               </div>
             </Tooltip>
