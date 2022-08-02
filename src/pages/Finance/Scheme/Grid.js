@@ -56,7 +56,7 @@ const Grid = ({ history, height }) => {
       render: row => {
         let {
           coPayerCode,
-          coPayerName,
+          coPayerName = '',
           creditFacility = '',
           copayerAddress = '',
         } = row
