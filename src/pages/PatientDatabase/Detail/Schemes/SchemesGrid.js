@@ -441,16 +441,27 @@ class SchemesGrid extends PureComponent {
                   </span>
                   <br />
                   <span>
-                    {`Addr.: ${[
-                      blockNo,
-                      street,
-                      unitNo,
-                      buildingName,
-                      countryName,
-                      postcode,
-                    ]
-                      .filter(item => item?.trim() != '')
-                      .join(', ')}`}
+                    {`Addr.: ${
+                      [
+                        blockNo,
+                        street,
+                        unitNo,
+                        buildingName,
+                        countryName,
+                        postcode,
+                      ].filter(item => item?.trim() != '').length != 0
+                        ? [
+                            blockNo,
+                            street,
+                            unitNo,
+                            buildingName,
+                            countryName,
+                            postcode,
+                          ]
+                            .filter(item => item?.trim() != '')
+                            .join(', ')
+                        : '-'
+                    }`}
                   </span>
                 </div>
               }
@@ -477,16 +488,27 @@ class SchemesGrid extends PureComponent {
                   }`}
                 </span>
                 <span style={{ display: 'block', lineHeight: '17px' }}>
-                  {`Addr.: ${[
-                    blockNo,
-                    street,
-                    unitNo,
-                    buildingName,
-                    countryName,
-                    postcode,
-                  ]
-                    .filter(item => item?.trim() != '')
-                    .join(', ')}`}
+                  {`Addr.: ${
+                    [
+                      blockNo,
+                      street,
+                      unitNo,
+                      buildingName,
+                      countryName,
+                      postcode,
+                    ].filter(item => item?.trim() != '').length != 0
+                      ? [
+                          blockNo,
+                          street,
+                          unitNo,
+                          buildingName,
+                          countryName,
+                          postcode,
+                        ]
+                          .filter(item => item?.trim() != '')
+                          .join(', ')
+                      : '-'
+                  }`}
                 </span>
               </div>
             </Tooltip>
