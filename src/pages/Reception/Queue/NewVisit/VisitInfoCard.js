@@ -406,6 +406,8 @@ const VisitInfoCard = ({
       values.visitStatus !== VISIT_STATUS.UPCOMING_APPT) ||
     visitMode === 'view'
 
+  const hasCOR = values.clinicalObjectRecordFK
+  const activeCORCreatedBy = values.activeCORCreatedBy
   const mcWorkItemInProgress =
     values?.medicalCheckupWorkitem &&
     values?.medicalCheckupWorkitem.length > 0 &&
@@ -420,7 +422,7 @@ const VisitInfoCard = ({
               name={FormField['visit.visitType']}
               render={args => (
                 <CodeSelect
-                  disabled={notWaiting || isReadOnly}
+                  disabled={notWaiting || isReadOnly || hasCOR}
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.visitType',
                   })}
@@ -1007,6 +1009,15 @@ const VisitInfoCard = ({
             fieldName='visitAttachment'
           />
         </GridItem>
+        {hasCOR && (
+          <GridItem xs md={12}>
+            <div style={{ color: 'red', padding: '10px 0' }}>
+              <strong>*Information</strong>:{' '}
+              {`${activeCORCreatedBy} is occupying this visit.`}, Visit Type is
+              not able to change.
+            </div>
+          </GridItem>
+        )}
       </GridContainer>
     </CommonCard>
   )
