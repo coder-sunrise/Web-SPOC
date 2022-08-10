@@ -1009,12 +1009,12 @@ const VisitInfoCard = ({
             fieldName='visitAttachment'
           />
         </GridItem>
-        {hasCOR && (
+        {values.visitStatus === VISIT_STATUS.WAITING && hasCOR && (
           <GridItem xs md={12}>
             <div style={{ color: 'red', padding: '10px 0' }}>
               <strong>*Information</strong>:{' '}
-              {`${activeCORCreatedBy} is occupying this visit.`}, Visit Type is
-              not able to change.
+              {`${activeCORCreatedBy} is
+              occupying this visit, Visit Type is not able to change.`}
             </div>
           </GridItem>
         )}
