@@ -420,7 +420,7 @@ export default ({
       isExternalPrescription: false,
       visitPurposeFK: currentVisitOrderTemplate.visitOrderTemplateFK,
       isDrugMixture: false,
-      isClaimable: true,
+      isClaimable: false,
       caution: itemDrugCaution,
       performingUserFK: user.data.clinicianProfile.userProfile.id,
       packageGlobalId: '',
@@ -1779,27 +1779,21 @@ export default ({
                       >
                         {drugMixtureIndicator(row)}
                       </div>
-                      {row.isPreOrder && (
-                        <Tooltip title='New Pre-Order'>
+                      {(row.isPreOrder || row.actualizedPreOrderItemFK) && (
+                        <Tooltip
+                          title={
+                            row.isPreOrder
+                              ? 'New Pre-Order'
+                              : 'Actualized Pre-Order'
+                          }
+                        >
                           <div
                             className={classes.rightIcon}
                             style={{
                               borderRadius: 4,
-                              backgroundColor: '#4255bd',
-                              display: 'inline-block',
-                            }}
-                          >
-                            Pre
-                          </div>
-                        </Tooltip>
-                      )}
-                      {row.actualizedPreOrderItemFK && (
-                        <Tooltip title='Actualized Pre-Order'>
-                          <div
-                            className={classes.rightIcon}
-                            style={{
-                              borderRadius: 4,
-                              backgroundColor: 'green',
+                              backgroundColor: row.isPreOrder
+                                ? '#4255bd'
+                                : 'green',
                               display: 'inline-block',
                             }}
                           >
