@@ -55,6 +55,7 @@ const ReportingDetails = props => {
     user,
     onClose = () => {},
     clinicSettings,
+    visitRegistration,
   } = props
   const reportingStatus = medicalCheckupReportingDetails.entity?.statusFK
   const { primaryPrintoutLanguage = 'EN' } = clinicSettings.settings
@@ -64,9 +65,30 @@ const ReportingDetails = props => {
   const [selectedLanguage, setSelectedLanguage] = useState(
     primaryPrintoutLanguage,
   )
+  const [reportLanguage, setReportLanguage] = useState(undefined)
   const [showReportHistory, setShowReportHistory] = useState(false)
   const [showResultDetails, setShowResultDetails] = useState(false)
   const [placement, setPlacement] = useState('right')
+  useEffect(() => {
+    if (visitRegistration.entity?.visit) {
+      const medicalCheckupWorkitems =
+        visitRegistration.entity?.visit?.medicalCheckupWorkitem || []
+      if (
+        medicalCheckupWorkitems.length > 0 &&
+        medicalCheckupWorkitems[0].reportLanguage !== reportLanguage
+      ) {
+        setReportLanguage(medicalCheckupWorkitems[0].reportLanguage)
+
+        if (
+          (medicalCheckupWorkitems[0].reportLanguage || '').indexOf('JP') >= 0
+        ) {
+          setSelectedLanguage('JP')
+        } else {
+          setSelectedLanguage('EN')
+        }
+      }
+    }
+  }, [visitRegistration])
   const generateReport = (reportType, message) => {
     dispatch({
       type: 'medicalCheckupReportingDetails/generateReport',
@@ -600,6 +622,7 @@ export default compose(
       user,
       labTrackingDetails,
       clinicSettings,
+      visitRegistration,
     }) => ({
       patient: patient.entity || {},
       loading,
@@ -607,6 +630,7 @@ export default compose(
       labTrackingDetails,
       user,
       clinicSettings,
+      visitRegistration,
     }),
   ),
 )(ReportingDetails)
