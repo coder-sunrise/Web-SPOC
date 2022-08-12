@@ -496,10 +496,12 @@ const getDispenseItems = (clinicSettings, entity = {}) => {
       })
     } else {
       const inventoryItemStock = _.orderBy(
-        (item.vaccination?.vaccinationStock || []).filter(
-          s => s.isDefault || s.stock >= item.quantity,
-        ),
-        ['isDefault', 'expiryDate'],
+        (item.vaccination?.vaccinationStock || [])
+          .filter(s => s.isDefault || s.stock >= item.quantity)
+          .map(t =>
+            t.batchNo === item.batchNo ? { ...t, isChecked: true } : t,
+          ),
+        ['isChecked', 'isDefault', 'expiryDate'],
         ['asc'],
       )
       let remainQty = item.quantity
