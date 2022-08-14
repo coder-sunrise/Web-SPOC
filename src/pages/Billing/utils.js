@@ -186,8 +186,13 @@ export const reCalculateInvoicePayerGst = (invoicePayer, invoice) => {
           return _invoicePayerItem
         }),
     }
-
-    _payer.gstAmount = roundTo(_.sumBy(_payer.invoicePayerItem, '_gstamount'))
+    const payerGSTAmountChanged =
+      roundTo(_.sumBy(_payer.invoicePayerItem, '_gstamount')) !==
+      _payer.gstAmount
+    if (payerGSTAmountChanged) {
+      _payer.gstAmount = roundTo(_.sumBy(_payer.invoicePayerItem, '_gstamount'))
+      _payer.isModified = true
+    }
     _payer.payerDistributedAmtBeforeGST = roundTo(
       _.sumBy(_payer.invoicePayerItem, 'claimAmountBeforeGST'),
     )
@@ -195,7 +200,6 @@ export const reCalculateInvoicePayerGst = (invoicePayer, invoice) => {
       _payer.gstAmount + _payer.payerDistributedAmtBeforeGST,
     )
     _payer.payerOutstanding = _payer.payerDistributedAmt
-    _payer.isModified = true
     return _payer
   })
   return _invoicePayer
