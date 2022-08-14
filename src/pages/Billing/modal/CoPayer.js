@@ -209,9 +209,9 @@ class CoPayer extends Component {
     const returnValue = {
       invoicePayerItem,
       payerDistributedAmtBeforeGST: totalClaimAmountBeforeGST,
-      payerDistributedAmt: totalClaimAmountBeforeGST + totalGst,
+      payerDistributedAmt: roundTo(totalClaimAmountBeforeGST + totalGst),
       gstAmount: totalGst,
-      payerOutstanding: totalClaimAmountBeforeGST + totalGst,
+      payerOutstanding: roundTo(totalClaimAmountBeforeGST + totalGst),
       payerTypeFK: INVOICE_PAYER_TYPE.COMPANY,
       name: copayerItem.displayValue,
       companyFK: copayerItem.id,
