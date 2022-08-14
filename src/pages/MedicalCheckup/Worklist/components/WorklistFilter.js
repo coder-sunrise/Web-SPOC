@@ -86,6 +86,9 @@ export const WorklistFilter = ({ medicalCheckupWorklist }) => {
     dispatch({
       type: 'medicalCheckupWorklist/updateState',
       payload: {
+        filterBar: {
+          ...form.getFieldsValue(true),
+        },
         list: [],
       },
     })
@@ -192,22 +195,6 @@ export const WorklistFilter = ({ medicalCheckupWorklist }) => {
                   icon={<Search />}
                   size='small'
                   onClick={() => {
-                    const {
-                      searchValue,
-                      isOnlyUrgent,
-                      isMyPatient,
-                      visitDoctor,
-                      dateFrom,
-                      dateTo,
-                    } = form.getFieldsValue(true)
-                    dispatch({
-                      type: 'medicalCheckupWorklist/updateState',
-                      payload: {
-                        filterBar: {
-                          ...form.getFieldsValue(true),
-                        },
-                      },
-                    })
                     handleSearch()
                   }}
                 >
