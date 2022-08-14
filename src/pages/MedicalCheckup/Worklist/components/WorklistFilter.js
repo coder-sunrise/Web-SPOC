@@ -22,7 +22,7 @@ import {
 } from '@/components'
 import WorklistContext from '../WorklistContext'
 
-export const WorklistFilter = () => {
+export const WorklistFilter = ({ medicalCheckupWorklist }) => {
   const [form] = Form.useForm()
   const { isAnyWorklistModelOpened } = useContext(WorklistContext)
   const [refreshDate, setRefreshDate] = useState(moment())
@@ -127,14 +127,20 @@ export const WorklistFilter = () => {
               flexWrap: 'wrap',
             }}
           >
-            <Form form={form} layout='inline' initialValues={{}}>
+            <Form
+              form={form}
+              layout='inline'
+              initialValues={{
+                ...(medicalCheckupWorklist?.filterBar || {}),
+              }}
+            >
               <Form.Item name='searchValue'>
                 <TextField
                   label='Patient Name, Acc. No., Patient Ref. No.'
                   style={{ width: 350 }}
                 />
               </Form.Item>
-              <Form.Item name='visitDoctor' initialValue={[-99]}>
+              <Form.Item name='visitDoctor'>
                 <Tooltip
                   placement='right'
                   title='Select "All" will retrieve active and inactive doctors'
@@ -164,12 +170,12 @@ export const WorklistFilter = () => {
                 />
               </Form.Item>
 
-              <Form.Item name='isOnlyUrgent' initialValue={false}>
+              <Form.Item name='isOnlyUrgent'>
                 <Checkbox simple label='Urgent' style={{ marginTop: 25 }} />
               </Form.Item>
 
               {clinicRoleFK === 1 && (
-                <Form.Item name='isMyPatient' initialValue={true}>
+                <Form.Item name='isMyPatient'>
                   <Checkbox
                     simple
                     label='My Patient'
@@ -186,6 +192,22 @@ export const WorklistFilter = () => {
                   icon={<Search />}
                   size='small'
                   onClick={() => {
+                    const {
+                      searchValue,
+                      isOnlyUrgent,
+                      isMyPatient,
+                      visitDoctor,
+                      dateFrom,
+                      dateTo,
+                    } = form.getFieldsValue(true)
+                    dispatch({
+                      type: 'medicalCheckupWorklist/updateState',
+                      payload: {
+                        filterBar: {
+                          ...form.getFieldsValue(true),
+                        },
+                      },
+                    })
                     handleSearch()
                   }}
                 >
