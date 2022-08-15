@@ -192,14 +192,13 @@ class SyncfusionCalendar extends React.PureComponent {
                 }
               }}
               eventClick={event => {
+                event.cancel = true
+              }}
+              popupOpen={event => {
                 if (event.type === 'Editor') {
                   event.cancel = true
                   eventDoubleClick(event.data)
                 }
-              }}
-              popupOpen={event => {
-                event.cancel = true
-                eventDoubleClick(event.data)
               }}
               cellDoubleClick={cellDoubleClick}
               cellClick={event => {
