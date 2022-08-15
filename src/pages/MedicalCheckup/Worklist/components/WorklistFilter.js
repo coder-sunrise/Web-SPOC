@@ -174,7 +174,14 @@ export const WorklistFilter = ({ medicalCheckupWorklist }) => {
               </Form.Item>
 
               <Form.Item name='isOnlyUrgent'>
-                <Checkbox simple label='Urgent' style={{ marginTop: 25 }} />
+                <Checkbox
+                  simple
+                  label='Urgent'
+                  style={{ marginTop: 25 }}
+                  defaultChecked={
+                    medicalCheckupWorklist?.filterBar?.isOnlyUrgent
+                  }
+                />
               </Form.Item>
 
               {clinicRoleFK === 1 && (
@@ -183,7 +190,9 @@ export const WorklistFilter = ({ medicalCheckupWorklist }) => {
                     simple
                     label='My Patient'
                     style={{ marginTop: 25 }}
-                    defaultChecked={true}
+                    defaultChecked={
+                      medicalCheckupWorklist?.filterBar?.isMyPatient
+                    }
                   />
                 </Form.Item>
               )}
