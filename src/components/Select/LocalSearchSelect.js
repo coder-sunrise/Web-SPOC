@@ -60,7 +60,7 @@ class LocalSearchSelect extends React.PureComponent {
   onSearch = v => {
     const { setFieldValue, matchSearch = () => true } = this.props
     if (v === undefined || v === null || !v.trim().length) {
-      this.setState({ filterOptions: [] })
+      this.setSelectValue(this.props)
       return
     }
     const { options = [] } = this.state
