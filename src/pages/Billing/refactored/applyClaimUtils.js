@@ -690,8 +690,6 @@ export const updateInvoicePayerPayableBalance = (
   list,
   updatedIndex,
   autoApply = false,
-  gstValue,
-  invoice,
 ) => {
   const result = list.reduce((_payers, payer, index) => {
     // dp nothing when payer isCancelled
@@ -796,34 +794,14 @@ export const updateInvoicePayerPayableBalance = (
       },
     ]
   }, [])
-
-  // recalculate GST
-  result.forEach(payer => {
-    payer.gstAmount = roundTo(
-      (payer.payerDistributedAmtBeforeGST * gstValue) / 100,
-    )
-  })
-  const isFullyClaimed =
-    _.sumBy(
-      result.filter(t => !t.isCancelled),
-      'payerDistributedAmtBeforeGST',
-    ) === invoice.totalAftAdj
-  if (isFullyClaimed) {
-    const lastGstAmount = _.last(result.filter(x => !x.isCancelled)).gstAmount
-    _.last(result.filter(x => !x.isCancelled)).gstAmount =
-      invoice.gstAmount -
-      (_.sumBy(
-        result.filter(x => !x.isCancelled),
-        'gstAmount',
-      ) -
-        lastGstAmount)
-  }
   result.forEach(payer => {
     if (!payer.isCancelled) {
-      payer.payerOutstanding =
-        payer.payerDistributedAmtBeforeGST + payer.gstAmount
-      payer.payerDistributedAmt =
-        payer.payerDistributedAmtBeforeGST + payer.gstAmount
+      payer.payerOutstanding = roundTo(
+        payer.payerDistributedAmtBeforeGST + payer.gstAmount,
+      )
+      payer.payerDistributedAmt = roundTo(
+        payer.payerDistributedAmtBeforeGST + payer.gstAmount,
+      )
     }
   })
   return result

@@ -8,7 +8,13 @@ export default createListViewModel({
   config: { queryOnLoad: false },
   param: {
     service,
-    state: {},
+    state: {
+      filterBar: {
+        visitDoctor: [-99],
+        isOnlyUrgent: false,
+        isMyPatient: true,
+      },
+    },
     setting: {},
     subscriptions: ({ dispatch, history }) => {
       history.listen(async loct => {

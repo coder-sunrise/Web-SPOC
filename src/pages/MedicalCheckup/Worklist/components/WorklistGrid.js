@@ -49,6 +49,7 @@ import {
   getVisitOrderTemplateContent,
 } from './Util'
 import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
+import { useVT } from 'virtualizedtableforantd4'
 
 const allMedicalCheckupReportStatuses = Object.values(
   MEDICALCHECKUP_WORKITEM_STATUS,
@@ -93,6 +94,7 @@ const WorklistGrid = ({
   const [workitems, setWorkitems] = useState([])
   const [showForms, setShowForms] = useState(false)
   const { setIsAnyWorklistModelOpened } = useContext(WorklistContext)
+  const [vt] = useVT(() => ({ scroll: { y: height - 50 - 95 } }), [])
   useEffect(() => {
     if (originalWorklist) {
       const currentFilteredWorklist = originalWorklist.filter(item =>
@@ -615,6 +617,7 @@ const WorklistGrid = ({
       <div style={{ height: tableHeight }}>
         <ProTable
           rowSelection={false}
+          components={vt}
           columns={columns}
           tableClassName='custom_pro'
           search={false}
