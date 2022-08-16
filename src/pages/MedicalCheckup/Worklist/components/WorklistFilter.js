@@ -98,7 +98,7 @@ export const WorklistFilter = ({ medicalCheckupWorklist }) => {
         apiCriteria: {
           searchValue: searchValue,
           isOnlyUrgent,
-          isMyPatient,
+          isMyPatient: clinicRoleFK === 1 ? isMyPatient : false,
           visitDoctor:
             visitDoctor && !visitDoctor.includes(-99)
               ? visitDoctor.join(',')
