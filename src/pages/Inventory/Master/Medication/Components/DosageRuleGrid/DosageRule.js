@@ -691,6 +691,7 @@ const DosageRuleTable = ({
   return (
     <Form form={form} component={false}>
       <Table
+        id='InstructionSettingTable'
         components={{
           body: {
             row: EditableRow,
