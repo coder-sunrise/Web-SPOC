@@ -58,17 +58,33 @@ class LocalSearchSelect extends React.PureComponent {
   }
 
   onSearch = v => {
-    const { setFieldValue, matchSearch = () => true } = this.props
+    const {
+      setFieldValue,
+      matchSearch = (option, input) => {
+        const lowerCaseInput = input.toLowerCase()
+        return (
+          (option.code || '').toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+          (option.name || '').toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+          (option.displayValue || '').toLowerCase().indexOf(lowerCaseInput) >= 0
+        )
+      },
+    } = this.props
     if (v === undefined || v === null || !v.trim().length) {
       this.setSelectValue(this.props)
       return
     }
     const { options = [] } = this.state
 
-    const currentOptions = _.take(
-      options.filter(m => matchSearch(m, v)),
-      20,
-    )
+    let currentOptions = []
+    for (let index = 0; index < options.length; index++) {
+      if (matchSearch(options[index], v)) {
+        currentOptions.push(options[index])
+        if (currentOptions.length === 20) {
+          break
+        }
+      }
+    }
+
     this.setState({ filterOptions: currentOptions })
   }
 
