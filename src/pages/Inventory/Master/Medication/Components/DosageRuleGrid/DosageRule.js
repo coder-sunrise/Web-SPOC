@@ -20,6 +20,7 @@ import Edit from '@material-ui/icons/Edit'
 import Save from '@material-ui/icons/Save'
 import Cancel from '@material-ui/icons/Cancel'
 import Delete from '@material-ui/icons/Delete'
+import './DosageRule.less'
 
 const formItemStyle = {
   margin: 0,
