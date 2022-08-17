@@ -111,7 +111,7 @@ class LocalSearchSelect extends React.PureComponent {
     }
   }
   render() {
-    const { filterOptions, options = [] } = this.state
+    const { filterOptions } = this.state
     const { valueField = 'id' } = this.props
     return (
       <Select
@@ -120,7 +120,6 @@ class LocalSearchSelect extends React.PureComponent {
         onChange={this.onChange}
         options={filterOptions}
         onSearch={this.onSearch}
-        disabled={!options.length}
       />
     )
   }
