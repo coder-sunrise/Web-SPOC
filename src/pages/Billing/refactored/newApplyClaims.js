@@ -27,7 +27,6 @@ import Scheme from './newScheme'
 import ResetButton from './ResetButton'
 import CoPayer from '../modal/CoPayer'
 import ApplicableClaims from '../modal/ApplicableClaims'
-import { reCalculateInvoicePayerGst } from '../utils'
 // styles
 import styles from './styles'
 // utils
@@ -225,17 +224,11 @@ const ApplyClaims = ({
     const returnInvoicePayers = newInvoicePayers
       ? newInvoicePayerList
       : newInvoicePayerAmt // end up replacing list
-
-    const newPayer = preSetTempInvoicePayer(returnInvoicePayers)
+    setTempInvoicePayer(returnInvoicePayers || [])
     incrementCommitCount()
-    return newPayer
+    return returnInvoicePayers
   }
 
-  const preSetTempInvoicePayer = invoicePayers => {
-    const newPayer = reCalculateInvoicePayerGst(invoicePayers || [], invoice)
-    setTempInvoicePayer(newPayer || [])
-    return newPayer
-  }
   const handleSchemeChange = (
     value,
     index,
@@ -435,7 +428,7 @@ const ApplyClaims = ({
       setInitialState(newInvoicePayers)
       return newInvoicePayers
     }
-    return preSetTempInvoicePayer(newTempInvoicePayer || [])
+    return setTempInvoicePayer(newTempInvoicePayer || [])
   }
 
   const checkUpdatedAppliedInvoicePayerInfo = () => {
@@ -672,7 +665,7 @@ const ApplyClaims = ({
         }
       }
       const newInvoicePayer = payerList.map(mapResponseToInvoicePayers)
-      preSetTempInvoicePayer(newInvoicePayer || [])
+      setTempInvoicePayer(newInvoicePayer || [])
       setInitialState(newInvoicePayer)
     } else if (
       !invoice.isBillingSaved &&
@@ -690,11 +683,11 @@ const ApplyClaims = ({
         )
         const newInvoicePayers = processAvailableClaims([], invoicePayerList)
         setInitialState(newInvoicePayers)
-        preSetTempInvoicePayer(newInvoicePayers || [])
+        setTempInvoicePayer(newInvoicePayers || [])
       }
     } else {
       setInitialState([])
-      preSetTempInvoicePayer([])
+      setTempInvoicePayer([])
       setCurEditInvoicePayerBackup(undefined)
     }
   }
@@ -723,15 +716,15 @@ const ApplyClaims = ({
       )
       const newInvoicePayers = processAvailableClaims([], invoicePayerList)
       setInitialState(newInvoicePayers)
-      preSetTempInvoicePayer(newInvoicePayers || [])
+      setTempInvoicePayer(newInvoicePayers || [])
     } else {
       setCurEditInvoicePayerBackup(undefined)
-      preSetTempInvoicePayer(_newTempInvoicePayer || [])
+      setTempInvoicePayer(_newTempInvoicePayer || [])
     }
   }, [tempInvoicePayer, claimableSchemes, invoice.invoiceItems])
 
   const restoreClaims = useCallback(() => {
-    preSetTempInvoicePayer(initialState)
+    setTempInvoicePayer(initialState)
     setCurEditInvoicePayerBackup(undefined)
   }, [initialState])
 
@@ -803,17 +796,44 @@ const ApplyClaims = ({
         false,
       )
 
+      const total = roundTo(
+        invoiceItems.reduce(
+          (total, item) => total + item.claimAmountBeforeGST,
+          0,
+        ),
+      )
+      let gstAmount = roundTo((total * (invoice.gstValue || 0)) / 100)
+
+      const isFullyClaimed =
+        _.sumBy(
+          tempInvoicePayer.filter(t => !t.isCancelled),
+          'payerDistributedAmtBeforeGST',
+        ) === invoice.totalAftAdj
+
+      // make sure the total gst of invoice payer will not over than invoice gst.
+      if (index === tempInvoicePayer.length - 1 && isFullyClaimed) {
+        const otherPayerGST =
+          _.sumBy(
+            tempInvoicePayer.filter(t => t.isCancelled),
+            t => t.gstAmount,
+          ) - tempInvoicePayer[index].gstAmount
+        gstAmount = invoice.gstAmount - otherPayerGST
+      }
+
       const updatedPayer = {
         ...tempInvoicePayer[index],
-        payerOutstanding: roundTo(
-          tempInvoicePayer[index].payerDistributedAmt -
-            _.sumBy(
-              (tempInvoicePayer[index].invoicePayment || []).filter(
-                p => !p.isCancelled,
-              ),
-              'totalAmtPaid',
+        payerDistributedAmtBeforeGST: total,
+        gstAmount: gstAmount,
+        payerDistributedAmt: total + gstAmount,
+        payerOutstanding:
+          total +
+          gstAmount -
+          _.sumBy(
+            (tempInvoicePayer[index].invoicePayment || []).filter(
+              p => !p.isCancelled,
             ),
-        ),
+            'totalAmtPaid',
+          ),
         isModified: true,
         invoicePayerItem: invoiceItems,
         _isConfirmed: !hasInvalidRow,
@@ -932,7 +952,37 @@ const ApplyClaims = ({
   const handleAddCoPayer = invoicePayer => {
     toggleCopayerModal()
     const newTempInvoicePayer = [...tempInvoicePayer, invoicePayer]
-    preSetTempInvoicePayer([...tempInvoicePayer, invoicePayer])
+
+    // recalculate GST
+    newTempInvoicePayer.forEach(payer => {
+      payer.gstAmount = roundTo(
+        (payer.payerDistributedAmtBeforeGST * invoice.gstValue) / 100,
+      )
+    })
+
+    const isFullyClaimed =
+      _.sumBy(
+        newTempInvoicePayer.filter(t => !t.isCancelled),
+        'payerDistributedAmtBeforeGST',
+      ) === invoice.totalAftAdj
+    if (isFullyClaimed) {
+      _.last(newTempInvoicePayer.filter(x => !x.isCancelled)).gstAmount =
+        invoice.gstAmount -
+        _.sumBy(
+          tempInvoicePayer.filter(x => !x.isCancelled),
+          'gstAmount',
+        )
+    }
+    newTempInvoicePayer.forEach(payer => {
+      if (!payer.isCancelled) {
+        payer.payerOutstanding =
+          payer.payerDistributedAmtBeforeGST + payer.gstAmount
+        payer.payerDistributedAmt =
+          payer.payerDistributedAmtBeforeGST + payer.gstAmount
+      }
+    })
+
+    setTempInvoicePayer([...tempInvoicePayer, invoicePayer])
   }
 
   const handleAddClaimClick = () => {
@@ -986,7 +1036,7 @@ const ApplyClaims = ({
       ...(invoicePayer.invoicePayment || []),
       invoicePaymentList,
     ]
-    await preSetTempInvoicePayer([...tempInvoicePayer])
+    await setTempInvoicePayer([...tempInvoicePayer])
     saveBilling()
   }
 
@@ -1023,7 +1073,7 @@ const ApplyClaims = ({
       payment.isCancelled = true
       payment.cancelReason = cancelReason
     }
-    await preSetTempInvoicePayer([...tempInvoicePayer])
+    await setTempInvoicePayer([...tempInvoicePayer])
     saveBilling()
   }
   const onPaymentVoidClick = (index, payment) => {
@@ -1032,7 +1082,7 @@ const ApplyClaims = ({
   }
 
   const ClearAllInvoicePayer = () => {
-    preSetTempInvoicePayer([
+    setTempInvoicePayer([
       ...tempInvoicePayer.map(payer => {
         if (payer.isCancelled) return payer
         return {
@@ -1045,7 +1095,7 @@ const ApplyClaims = ({
   }
 
   const cancelEdittingInvoicePayer = () => {
-    preSetTempInvoicePayer([
+    setTempInvoicePayer([
       ...tempInvoicePayer.map(payer => {
         if (payer.isCancelled || !payer._isEditing) return payer
         return {

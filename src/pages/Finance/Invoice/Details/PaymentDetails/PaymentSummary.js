@@ -14,6 +14,7 @@ const amountProps = {
 }
 
 const PaymentSummary = ({
+  payerDistributedAmt = 0.0,
   payerDistributedAmtBeforeGST = 0.0,
   outstanding = 0.0,
   gstAmount,
