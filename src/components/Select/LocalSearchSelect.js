@@ -78,7 +78,7 @@ class LocalSearchSelect extends React.PureComponent {
     let currentOptions = []
     for (let index = 0; index < options.length; index++) {
       if (matchSearch(options[index], v)) {
-        currentOptions.push({ ...options[index] })
+        currentOptions.push(options[index])
         if (currentOptions.length === 20) {
           break
         }
