@@ -632,11 +632,7 @@ export default createFormViewModel({
       history.listen((loct, method) => {
         const { pathname, search, query = {} } = loct
 
-        if (
-          (pathname === '/reception/queue/dispense' ||
-            pathname === '/medicalcheckup/worklist/orderdetails') &&
-          Number(query.vid)
-        ) {
+        if (pathname === '/reception/queue/dispense' && Number(query.vid)) {
           dispatch({
             type: 'initState',
             payload: {

@@ -203,7 +203,6 @@ export default {
   'menu.report.expiringstockreport': 'Expiring Stock Report',
   'menu.report.radiologystatisticreport': 'Radiology Statistic Report',
   'menu.report.partialdispensereport': 'Dispensary Report',
-  'menu.report.preorderlistingreport': ' Pre-Order Listing Report',
   'menu.report.visitListingReport': 'Visit Listing Report',
 
   'menu.support': 'Support',
@@ -214,25 +213,6 @@ export default {
 
   'menu.wardmanagement': 'Ward Management',
   'menu.patient-monitoring': 'Patient Monitoring',
-
-  'menu.radiology': 'Radiology Center',
-  'menu.radiology.worklist': 'Worklist',
-  'menu.radiology.history': 'History',
-
-  'menu.medicalcheckup': 'Medical Checkup',
-  'menu.medicalcheckup.worklist': 'Worklist',
-  'menu.medicalcheckup.history': 'History',
-  'menu.medicalcheckup.worklist.reportingdetails': 'Reporting details',
-  'menu.medicalcheckup.orderdetails': 'Order Details',
-
-  'menu.pharmacy': 'Pharmacy',
-  'menu.pharmacy.worklist': 'Worklist',
-  'menu.pharmacy.history': 'History',
-
-  'menu.lab': 'Lab Center',
-  'menu.lab.worklist': 'Worklist',
-  'menu.lab.history': 'History',
-  'menu.lab.specimenCollection': 'Specimen Collection',
 
   'menu.not-found': 'Not Found',
   'menu.forbidden': 'Forbidden',

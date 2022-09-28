@@ -888,36 +888,6 @@ class Detail extends PureComponent {
                       }}
                     />
                   </GridItem>
-                  {settings.isEnableMedicalCheckupModule && (
-                    <GridItem xs={6}>
-                      <Tooltip
-                        title='When this service is ordered in Medical Checkup, comment for this service will be written in the selected examination'
-                        placement='right-start'
-                      >
-                        <div>
-                          <FastField
-                            name='examinationItems'
-                            render={args => {
-                              return (
-                                <CodeSelect
-                                  label='Medical Checkup Examination'
-                                  code='ctexaminationitem'
-                                  labelField='displayValueWithCategory'
-                                  allClear={true}
-                                  maxTagCount={0}
-                                  mode='multiple'
-                                  onChange={v => {
-                                    this.handleExaminationItemChange(v)
-                                  }}
-                                  {...args}
-                                />
-                              )
-                            }}
-                          />
-                        </div>
-                      </Tooltip>
-                    </GridItem>
-                  )}
                   {settings.isEnableMedisave && (
                     <GridItem xs={12}>
                       <FastField
@@ -938,29 +908,28 @@ class Detail extends PureComponent {
                       />
                     </GridItem>
                   )}
-                  {labAndRadiologySetting &&
-                    !hiddenFields.includes('ctService_Tag') && (
-                      <GridItem xs={12}>
-                        <Field
-                          name='ctService_Tag'
-                          render={args => (
-                            <TagPanel
-                              label='Tags:'
-                              tagCategory='Service'
-                              defaultTagNames={this.state.serviceTags}
-                              {...args}
-                              onChange={(value, tags) =>
-                                this.handleTagPanelChange(
-                                  value,
-                                  tags,
-                                  args.form.setFieldValue,
-                                )
-                              }
-                            ></TagPanel>
-                          )}
-                        />
-                      </GridItem>
-                    )}
+                  {!hiddenFields.includes('ctService_Tag') && (
+                    <GridItem xs={12}>
+                      <Field
+                        name='ctService_Tag'
+                        render={args => (
+                          <TagPanel
+                            label='Tags:'
+                            tagCategory='Service'
+                            defaultTagNames={this.state.serviceTags}
+                            {...args}
+                            onChange={(value, tags) =>
+                              this.handleTagPanelChange(
+                                value,
+                                tags,
+                                args.form.setFieldValue,
+                              )
+                            }
+                          ></TagPanel>
+                        )}
+                      />
+                    </GridItem>
+                  )}
                   <GridItem xs={12}>
                     <GridContainer>
                       <GridItem xs={3}>

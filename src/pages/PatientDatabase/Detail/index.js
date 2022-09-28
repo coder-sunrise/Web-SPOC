@@ -144,23 +144,23 @@ class PatientDetail extends PureComponent {
           loading: Loading,
         }),
       },
-      {
-        id: '3',
-        name: 'Allergies',
-        access: [
-          'patientdatabase.newpatient',
-          'patientdatabase.patientprofiledetails',
-        ],
-        schema: schemas.allergies,
-        component: Loadable({
-          loader: () => import('./Allergies'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet schema={schemas.allergies} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
+      // {
+      //   id: '3',
+      //   name: 'Allergies',
+      //   access: [
+      //     'patientdatabase.newpatient',
+      //     'patientdatabase.patientprofiledetails',
+      //   ],
+      //   schema: schemas.allergies,
+      //   component: Loadable({
+      //     loader: () => import('./Allergies'),
+      //     render: (loaded, p) => {
+      //       let Cmpnet = loaded.default
+      //       return <Cmpnet schema={schemas.allergies} {...p} />
+      //     },
+      //     loading: Loading,
+      //   }),
+      // },
       {
         id: '9',
         name: 'Medical History',
@@ -318,18 +318,6 @@ class PatientDetail extends PureComponent {
           loading: Loading,
         }),
       },
-      {
-        id: '11',
-        name: 'Pre-Order List',
-        component: Loadable({
-          loader: () => import('./Pre-Order'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...p} />
-          },
-          loading: Loading,
-        }),
-      },
     ]
 
     const { dispatch } = props
@@ -446,16 +434,10 @@ class PatientDetail extends PureComponent {
     const patientId = patient.entity.id
 
     if (global.showVisitRegistration) {
-      this.props.dispatch({
-        type: 'visitRegistration/closeModal',
-      })
-    }
-    if (global.showMedicalCheckupReportingDetails) {
-      this.props.dispatch({
-        type:
-          'medicalCheckupReportingDetails/closeMedicalCheckupReportingDetailsModal',
-      })
-    }
+                                        this.props.dispatch({
+                                          type: 'visitRegistration/closeModal',
+                                        })
+                                      }
     navigateDirtyCheck({
       onProceed: () => {
         this.props

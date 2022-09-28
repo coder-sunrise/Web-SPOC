@@ -272,12 +272,6 @@ class Banner extends PureComponent {
     await dispatch({
       type: 'codetable/fetchCodes',
       payload: {
-        code: 'ctdrugallergy',
-      },
-    })
-    await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
         code: 'ctsalutation',
       },
     })
@@ -1044,14 +1038,7 @@ class Banner extends PureComponent {
         schemeDataList.push(this.getSchemePayerDetails(row))
       })
 
-    const g6PD =
-      codetable.ctg6pd &&
-      codetable.ctg6pd.length > 0 &&
-      entity.patientAllergyMetaData.length > 0
-        ? codetable.ctg6pd.find(
-            o => o.id === entity.patientAllergyMetaData[0].g6PDFK,
-          )
-        : null
+    const g6PD = null
 
     const pendingPreOrderItems =
       entity.pendingPreOrderItem?.filter(item => !item.isDeleted) || []
@@ -1460,50 +1447,6 @@ class Banner extends PureComponent {
         </Col>
       </Row>
     )
-    const mcWorkItem =
-      visitRegistration?.entity?.visit?.medicalCheckupWorkitem &&
-      visitRegistration?.entity?.visit?.medicalCheckupWorkitem[0]
-    const visitPriorityElm = (
-      <Row wrap={false}>
-        <Col flex='none'>
-          <span
-            className={classes.header}
-            style={{
-              color:
-                mcWorkItem?.reportPriority === 'Urgent' ? 'red' : 'darkblue',
-            }}
-          >
-            Report Priority:
-          </span>
-        </Col>
-        <Col flex='auto' className={contentClass}>
-          <Tooltip
-            enterDelay={100}
-            title={mcWorkItem?.urgentReportRemarks}
-            interactive='true'
-          >
-            <span>
-              {mcWorkItem?.reportPriority}
-              {mcWorkItem?.urgentReportRemarks
-                ? ' (' + mcWorkItem?.urgentReportRemarks + ')'
-                : ''}
-            </span>
-          </Tooltip>
-        </Col>
-      </Row>
-    )
-    const visitLanguageElm = (
-      <Row wrap={false}>
-        <Col flex='none'>
-          <span className={classes.header}>Report Language:</span>
-        </Col>
-        <Col flex='auto' className={contentClass}>
-          {visitRegistration?.entity?.visit?.medicalCheckupWorkitem &&
-            visitRegistration?.entity?.visit?.medicalCheckupWorkitem[0]
-              ?.reportLanguage}
-        </Col>
-      </Row>
-    )
     const patientNotesLinkElm = (
       <span
         className={classes.header}
@@ -1543,68 +1486,92 @@ class Banner extends PureComponent {
 
     return (
       <Paper id='patientBanner' style={style}>
-        {/* Please do not change the height below (By default is 100) */}
-        {from != 'MedicalCheckup' && (
-          <GridContainer
-            style={{ minHeight: 100, width: '100%', padding: '5px 0' }}
+        <GridContainer
+          style={{ minHeight: 100, width: '100%', padding: '5px 0' }}
+        >
+          <GridItem
+            style={{ padding: 0 }}
+            xs={this.getBannerMd()}
+            md={this.getBannerMd()}
           >
-            <GridItem
-              style={{ padding: 0 }}
-              xs={this.getBannerMd()}
-              md={this.getBannerMd()}
-            >
-              <GridContainer>
-                <GridItem xs={10} md={10}>
-                  <GridContainer>
-                    <GridItem md={12}>{patientTitle}</GridItem>
-                    <GridItem xs={6} md={4}>
-                      {patientTag}
+            <GridContainer>
+              <GridItem xs={10} md={10}>
+                <GridContainer>
+                  <GridItem md={12}>{patientTitle}</GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientTag}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientG6PD}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientOS}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientSchemeDetails}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientRequest}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientHRP}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientPersistDiagnosis}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {longTermMedication}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientAllergy}
+                  </GridItem>
+                </GridContainer>
+              </GridItem>
+              <GridItem xs={2} md={2}>
+                {/* right half */}
+                <GridContainer>
+                  {entity?.lastVisitDate ? (
+                    <GridItem
+                      xs={12}
+                      md={12}
+                      style={{ height: 26, paddingTop: 5 }}
+                    >
+                      <span className={classes.header}>Last Visit: </span>
+                      <span style={{ paddingLeft: 5 }}>
+                        {moment(entity.lastVisitDate).format('DD MMM YYYY')}
+                      </span>
                     </GridItem>
-                    <GridItem xs={6} md={4}>
-                      {patientG6PD}
-                    </GridItem>
-                    <GridItem xs={6} md={4}>
-                      {patientOS}
-                    </GridItem>
-                    <GridItem xs={6} md={4}>
-                      {patientSchemeDetails}
-                    </GridItem>
-                    <GridItem xs={6} md={4}>
-                      {patientRequest}
-                    </GridItem>
-                    <GridItem xs={6} md={4}>
-                      {patientHRP}
-                    </GridItem>
-                    <GridItem xs={6} md={4}>
-                      {patientPersistDiagnosis}
-                    </GridItem>
-                    <GridItem xs={6} md={4}>
-                      {longTermMedication}
-                    </GridItem>
-                    <GridItem xs={6} md={4}>
-                      {patientAllergy}
-                    </GridItem>
-                  </GridContainer>
-                </GridItem>
-                <GridItem xs={2} md={2}>
-                  {/* right half */}
-                  <GridContainer>
-                    {entity?.lastVisitDate ? (
-                      <GridItem
-                        xs={12}
-                        md={12}
-                        style={{ height: 26, paddingTop: 5 }}
-                      >
-                        <span className={classes.header}>Last Visit: </span>
-                        <span style={{ paddingLeft: 5 }}>
-                          {moment(entity.lastVisitDate).format('DD MMM YYYY')}
+                  ) : (
+                    <GridItem xs={12} md={12}></GridItem>
+                  )}
+                  <GridItem xs={12} md={12}>
+                    {viewNonClaimableHistoryRight.rights === 'enable' && (
+                      <span className={classes.header}>
+                        <span
+                          style={{
+                            display: 'block',
+                            textDecoration: 'underline',
+                            cursor: 'pointer',
+                          }}
+                          onClick={e => {
+                            this.openNonClaimableHistory()
+                          }}
+                        >
+                          {`Non Claimable History (${info.nonClaimableHistoryCount ||
+                            0})`}
                         </span>
-                      </GridItem>
-                    ) : (
-                      <GridItem xs={12} md={12}></GridItem>
+                      </span>
                     )}
-                    <GridItem xs={12} md={12}>
-                      {viewNonClaimableHistoryRight.rights === 'enable' && (
+                    <div>
+                      {notesHistoryAccessRight.rights !== 'hidden' && (
+                        <span
+                          className={classes.header}
+                          style={{ marginRight: 10 }}
+                        >
+                          {patientNotesLinkElm}
+                        </span>
+                      )}
+                      {preOrderAccessRight.rights === 'enable' && (
                         <span className={classes.header}>
                           <span
                             style={{
@@ -1613,140 +1580,82 @@ class Banner extends PureComponent {
                               cursor: 'pointer',
                             }}
                             onClick={e => {
-                              this.openNonClaimableHistory()
+                              e.preventDefault()
+                              if (preOrderAccessRight.rights === 'disable') {
+                                notification.error({
+                                  message:
+                                    'Current user is not authorized to access',
+                                })
+                                return
+                              }
+
+                              if (
+                                disablePreOrder &&
+                                disablePreOrder.some(cond => {
+                                  if (cond.condition) {
+                                    dispatch({
+                                      type: 'global/updateAppState',
+                                      payload: {
+                                        openConfirm: true,
+                                        isInformType: true,
+                                        openConfirmText: 'OK',
+                                        openConfirmContent: cond.message,
+                                      },
+                                    })
+                                    return true
+                                  }
+                                  return false
+                                })
+                              )
+                                return
+
+                              this.openPreOrders()
                             }}
                           >
-                            {`Non Claimable History (${info.nonClaimableHistoryCount ||
-                              0})`}
+                            {`Pre-Order (${
+                              activePreOrderItems
+                                ? activePreOrderItems.length
+                                : (pendingPreOrderItems &&
+                                    pendingPreOrderItems.length) ||
+                                  0
+                            })`}
                           </span>
                         </span>
                       )}
-                      <div>
-                        {notesHistoryAccessRight.rights !== 'hidden' && (
-                          <span
-                            className={classes.header}
-                            style={{ marginRight: 10 }}
-                          >
-                            {patientNotesLinkElm}
-                          </span>
-                        )}
-                        {preOrderAccessRight.rights === 'enable' && (
-                          <span className={classes.header}>
-                            <span
-                              style={{
-                                display: 'block',
-                                textDecoration: 'underline',
-                                cursor: 'pointer',
-                              }}
-                              onClick={e => {
-                                e.preventDefault()
-                                if (preOrderAccessRight.rights === 'disable') {
-                                  notification.error({
-                                    message:
-                                      'Current user is not authorized to access',
-                                  })
-                                  return
-                                }
-
-                                if (
-                                  disablePreOrder &&
-                                  disablePreOrder.some(cond => {
-                                    if (cond.condition) {
-                                      dispatch({
-                                        type: 'global/updateAppState',
-                                        payload: {
-                                          openConfirm: true,
-                                          isInformType: true,
-                                          openConfirmText: 'OK',
-                                          openConfirmContent: cond.message,
-                                        },
-                                      })
-                                      return true
-                                    }
-                                    return false
-                                  })
-                                )
-                                  return
-
-                                this.openPreOrders()
-                              }}
-                            >
-                              {`Pre-Order (${
-                                activePreOrderItems
-                                  ? activePreOrderItems.length
-                                  : (pendingPreOrderItems &&
-                                      pendingPreOrderItems.length) ||
-                                    0
-                              })`}
-                            </span>
-                          </span>
-                        )}
-                      </div>
-                      <span
-                        className={classes.header}
-                        style={{
-                          display: 'block',
-                          paddingRight: 10,
-                          textDecoration: 'underline',
-                          cursor: 'pointer',
-                        }}
-                        to={getAppendUrl({
-                          md: 'pt',
-                          cmt: 1,
-                          pid: info.id,
-                        })}
-                        onClick={e => {
-                          this.openExaminationResults()
-                        }}
-                        // disabled={}
-                        tabIndex='-1'
-                      >
-                        Examination Results
-                      </span>
-                    </GridItem>
-                  </GridContainer>
-                </GridItem>
-              </GridContainer>
-            </GridItem>
-
-            {extraCmt && (
-              <GridItem xs={3} md={12 - this.getBannerMd()}>
-                {extraCmt()}
+                    </div>
+                    <span
+                      className={classes.header}
+                      style={{
+                        display: 'block',
+                        paddingRight: 10,
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                      }}
+                      to={getAppendUrl({
+                        md: 'pt',
+                        cmt: 1,
+                        pid: info.id,
+                      })}
+                      onClick={e => {
+                        this.openExaminationResults()
+                      }}
+                      // disabled={}
+                      tabIndex='-1'
+                    >
+                      Examination Results
+                    </span>
+                  </GridItem>
+                </GridContainer>
               </GridItem>
-            )}
-          </GridContainer>
-        )}
-        {from === 'MedicalCheckup' && (
-          <GridContainer
-            style={{ minHeight: 100, width: '100%', padding: '5px' }}
-          >
-            <GridItem md={12}>{patientTitle}</GridItem>
-            <GridItem md={3}>{patientG6PD}</GridItem>
-            <GridItem md={3}>{patientHRP}</GridItem>
-            <GridItem md={3}>{visitDateElm}</GridItem>
-            <GridItem md={3}>{visitPriorityElm}</GridItem>
-            <GridItem md={3}>{patientSchemeDetails}</GridItem>
-            <GridItem md={3}>{patientAllergy}</GridItem>
-            <GridItem md={3}>{visitPurposeElm}</GridItem>
-            <GridItem md={3}>{visitLanguageElm}</GridItem>
-            <GridItem md={3}>{patientPersistDiagnosis}</GridItem>
-            <GridItem md={3}>{longTermMedication}</GridItem>
-            <GridItem md={3}>{visitRemarksElm}</GridItem>
-            <GridItem md={3}>
-              <div>
-                <span style={{ display: 'inline-block', marginRight: 10 }}>
-                  {patientNotesLinkElm}
-                </span>
-                {isEditVisitEnable && (
-                  <span style={{ display: 'inline-block' }}>
-                    {patientEditVisitElm}
-                  </span>
-                )}
-              </div>
-            </GridItem>
-          </GridContainer>
-        )}
+            </GridContainer>
+          </GridItem>
 
+          {extraCmt && (
+            <GridItem xs={3} md={12 - this.getBannerMd()}>
+              {extraCmt()}
+            </GridItem>
+          )}
+        </GridContainer>
         <span
           style={{
             top: 5,

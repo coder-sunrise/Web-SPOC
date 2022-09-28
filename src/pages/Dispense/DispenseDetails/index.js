@@ -74,11 +74,6 @@ import {
 
 import CONSTANTS from './constants'
 import { ServePatientButton } from '@/components/_medisys'
-import RadiologyDetails from '@/pages/Radiology/Worklist/Details'
-import WorklistContext, {
-  WorklistContextProvider,
-} from '@/pages/Radiology/Worklist/WorklistContext'
-import DispenseDetailsSpecimenCollection from '@/pages/Lab/SpecimenCollection/components/DispenseDetailsSpecimenCollection'
 import customtyles from './Style.less'
 import style from '@/components/CommonCard/style'
 
@@ -182,7 +177,6 @@ const DispenseDetails = ({
   } = invoice
 
   const { openFrom } = dispense
-  const isFromMedicalCheckup = openFrom === DISPENSE_FROM.MEDICALCHECKUP
   const [popperOpen, setPopperOpen] = useState(false)
   const [patientLabelCopies, setPatientLabelCopies] = useState(1)
   const [labLabelCopies, setLabLabelCopies] = useState(1)
@@ -1022,7 +1016,7 @@ const DispenseDetails = ({
         </GridItem>
         {!viewOnly && (
           <GridItem className={classes.rightActionButtons} md={5}>
-            {!isFromMedicalCheckup && (isRetailVisit || isBillFirstVisit) && (
+            {(isRetailVisit || isBillFirstVisit) && (
               <ProgressButton
                 color='danger'
                 size='sm'
@@ -1033,7 +1027,7 @@ const DispenseDetails = ({
                 Discard
               </ProgressButton>
             )}
-            {!isFromMedicalCheckup && !isBillFirstVisit && (
+            {!isBillFirstVisit && (
               <Authorized authority='queue.dispense.savedispense'>
                 <ProgressButton
                   color='success'
@@ -1071,9 +1065,8 @@ const DispenseDetails = ({
                 />
               </Authorized>
             }
-            {(!isFromMedicalCheckup ||
-              (medicalCheckupWorkitemStatusFK !== 3 &&
-                medicalCheckupWorkitemStatusFK !== 4)) &&
+            {medicalCheckupWorkitemStatusFK !== 3 &&
+              medicalCheckupWorkitemStatusFK !== 4 &&
               !isRetailVisit &&
               visitStatus !== VISIT_STATUS.PAUSED && (
                 <Authorized authority='queue.dispense.editorder'>
@@ -1087,7 +1080,7 @@ const DispenseDetails = ({
                   </ProgressButton>
                 </Authorized>
               )}
-            {!isFromMedicalCheckup && visitStatus !== VISIT_STATUS.PAUSED && (
+            {visitStatus !== VISIT_STATUS.PAUSED && (
               <Authorized authority='queue.dispense.makepayment'>
                 <ProgressButton
                   color='primary'
@@ -1129,7 +1122,6 @@ const DispenseDetails = ({
                       showDrugLabelRemark,
                       onDispenseItemsValueChange,
                       isShowDispenseActualie,
-                      isFromMedicalCheckup,
                     )}
                   />
                   <div
@@ -1197,15 +1189,6 @@ const DispenseDetails = ({
                 </div>
               </div>
             </div>
-
-            {(hasAnySpecimenCollected || hasAnyLabWorkitems) && (
-              <DispenseDetailsSpecimenCollection
-                handlePrint={handlePrint}
-                patient={patient}
-                visitId={visitId}
-                classes={classes}
-              />
-            )}
 
             <div className={classes.tableContainer}>
               <div>

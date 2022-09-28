@@ -28,17 +28,6 @@ import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
 
 const orderTypes = [
   {
-    name: 'Medication',
-    value: ORDER_TYPES.MEDICATION,
-    prop: 'corPrescriptionItem',
-    accessRight: 'queue.consultation.order.medication',
-    filter: r => r.inventoryMedicationFK || r.isDrugMixture,
-    getSubject: r => {
-      return r.drugName
-    },
-    component: props => <Medication {...props} />,
-  },
-  {
     name: 'Service',
     value: ORDER_TYPES.SERVICE,
     prop: 'corService',
@@ -50,47 +39,12 @@ const orderTypes = [
     component: props => <Service {...props} />,
   },
   {
-    name: 'Radiology',
-    value: ORDER_TYPES.RADIOLOGY,
-    prop: 'corService',
-    accessRight: 'queue.consultation.order.radiology',
-    getSubject: r => r.serviceName,
-    filter: r => RADIOLOGY_CATEGORY.indexOf(r.serviceCenterCategoryFK) >= 0,
-    component: props => <Radiology {...props} />,
-  },
-  {
-    name: 'Lab',
-    value: ORDER_TYPES.LAB,
-    prop: 'corService',
-    accessRight: 'queue.consultation.order.lab',
-    getSubject: r => r.serviceName,
-    filter: r => LAB_CATEGORY.indexOf(r.serviceCenterCategoryFK) >= 0,
-    component: props => <Lab {...props} />,
-  },
-  {
-    name: 'Vaccination',
-    value: ORDER_TYPES.VACCINATION,
-    prop: 'corVaccinationItem',
-    accessRight: 'queue.consultation.order.vaccination',
-    getSubject: r => r.vaccinationName,
-    component: props => <Vaccination {...props} />,
-  },
-  {
     name: 'Consumable',
     value: ORDER_TYPES.CONSUMABLE,
     prop: 'corConsumable',
     accessRight: 'queue.consultation.order.consumable',
     getSubject: r => r.consumableName,
     component: props => <Consumable {...props} />,
-  },
-  {
-    name: 'Open Prescription',
-    value: ORDER_TYPES.OPEN_PRESCRIPTION,
-    prop: 'corPrescriptionItem',
-    accessRight: 'queue.consultation.order.openprescription',
-    filter: r => !r.inventoryMedicationFK && !r.isDrugMixture,
-    getSubject: r => r.drugName,
-    component: props => <Medication openPrescription {...props} />,
   },
   {
     name: 'Order Set',
@@ -105,12 +59,6 @@ const orderTypes = [
     accessRight: 'queue.consultation.order.treatment',
     getSubject: r => r.itemName,
     component: props => <Treatment {...props} />,
-  },
-  {
-    name: 'Package',
-    value: ORDER_TYPES.PACKAGE,
-    accessRight: 'queue.consultation.order.package',
-    component: props => <Package {...props} />,
   },
 ]
 

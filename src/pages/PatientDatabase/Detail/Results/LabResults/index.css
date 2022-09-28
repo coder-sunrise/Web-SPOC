@@ -1,8 +1,0 @@
-.ant-table.ant-table-small .ant-table-tbody > tr > td {
-  padding: 3px 6px;
-}
-/* .ant-table-row td:nth-child(3){ background-color: #daecf5!important;} */
-.latestVisit {
-  background-color: #daecf5 !important
-}
-.ant-table-thead .latestVisit{ background-color: #fafafa!important;}

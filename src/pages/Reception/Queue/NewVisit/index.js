@@ -536,8 +536,7 @@ class NewVisit extends PureComponent {
       codetable,
     } = this.props
 
-    const fromMedicalCheckupReporting =
-      global.showMedicalCheckupReportingDetails || false
+    const fromMedicalCheckupReporting = false
     const { visitPreOrderItem = [] } = values
 
     const vitalAccessRight = Authorized.check(

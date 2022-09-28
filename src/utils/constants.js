@@ -1198,9 +1198,8 @@ export const MEDICALCHECKUP_WORKITEM_STATUSES = [
   },
 ]
 export const DISPENSE_FROM = {
-  QUEUE: 1,
-  MEDICALCHECKUP: 2,
-}
+         QUEUE: 1,
+       }
 
 export const REPORTINGDOCTOR_STATUS = {
   NEW: 'New',

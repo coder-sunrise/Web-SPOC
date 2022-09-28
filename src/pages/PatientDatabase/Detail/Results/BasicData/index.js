@@ -19,13 +19,12 @@ class BasicData extends Component {
     this.visitTypeSetting = JSON.parse(
       props.clinicSettings.settings.visitTypeSetting,
     )
-    const { genderFK, defaultSelectMedicalCheckup = false } = props
+    const { genderFK } = props
     this.state = {
       data: defaultData,
       columns: defaultColumns(genderFK),
       currentPage: 0,
       total: 0,
-      isOnlySearchMC: defaultSelectMedicalCheckup,
       loadedData: [],
     }
   }

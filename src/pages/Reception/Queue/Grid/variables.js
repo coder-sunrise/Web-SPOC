@@ -183,7 +183,6 @@ export const QueueTableConfig = {
       title: 'Cons. Ready',
       fullTitle: 'Ready for Consultation',
     },
-    { name: 'workItemSummary', title: 'Work Item' },
     { name: 'servingByList', title: 'Serving By' },
     { name: 'patientReferenceNo', title: 'Ref. No.' },
     { name: 'patientName', title: 'Patient Name' },
@@ -443,58 +442,6 @@ export const QueueColumnExtensions = props => {
           ></VisitOrderTemplateIndicateString>
         ) : (
           <span>-</span>
-        )
-      },
-    },
-    {
-      columnName: 'workItemSummary',
-      width: 140,
-      render: row => {
-        const labWorkItems = row.workItemSummary.find(
-          t => t.type === WORK_ITEM_TYPES.LAB,
-        )
-        const radioWorkItems = row.workItemSummary.find(
-          t => t.type === WORK_ITEM_TYPES.RADIOLOGY,
-        )
-        const nurseWorkItems = row.workItemSummary.find(
-          t => t.type === WORK_ITEM_TYPES.NURSEACTUALIZE,
-        )
-        const labWorkItemsAccessRight = Authorized.check(
-          'queue.workitem.labworkitem',
-        ) || { rights: 'hidden' }
-        const radiologyWorkItemsAccessRight = Authorized.check(
-          'queue.workitem.radiologyworkitem',
-        ) || { rights: 'hidden' }
-        const nurseWorkItemsAccessRight = Authorized.check(
-          'queue.workitem.nurseworkitem',
-        ) || { rights: 'hidden' }
-        return (
-          <div style={{ justifyContent: 'space-between' }}>
-            {labWorkItemsAccessRight.rights === 'enable' &&
-              labWorkItems &&
-              labWorkItems.totalWorkItem > 0 && (
-                <LabWorkItemInfo
-                  visitFK={row.visitFK}
-                  workItemSummary={labWorkItems}
-                />
-              )}
-            {radiologyWorkItemsAccessRight.rights === 'enable' &&
-              radioWorkItems &&
-              radioWorkItems.totalWorkItem > 0 && (
-                <RadioWorkItemInfo
-                  visitFK={row.visitFK}
-                  workItemSummary={radioWorkItems}
-                />
-              )}
-            {nurseWorkItemsAccessRight.rights === 'enable' &&
-              nurseWorkItems &&
-              nurseWorkItems.totalWorkItem > 0 && (
-                <NurseWorkItemInfo
-                  visitFK={row.visitFK}
-                  workItemSummary={nurseWorkItems}
-                />
-              )}
-          </div>
         )
       },
     },

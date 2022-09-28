@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import React, { Component } from 'react'
 import { Collapse } from 'antd'
 import _ from 'lodash'
@@ -12,10 +11,8 @@ import { Field } from 'formik'
 import numeral from 'numeral'
 import Search from '@material-ui/icons/Search'
 import { VisitTypeTag } from '@/components/_medisys'
-// material ui
 import { withStyles, Link } from '@material-ui/core'
 import { Tooltip } from '@/components'
-// common components
 import {
   CardContainer,
   withFormikExtend,
@@ -45,7 +42,6 @@ import HistoryDetails from './HistoryDetails'
 import customtyles from './PatientHistoryStyle.less'
 import NurseActualization from '@/pages/Dispense/DispenseDetails/NurseActualization'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
-import { getMedicalCheckupReportPayload } from '@/pages/MedicalCheckup/Worklist/components/Util'
 
 const defaultValue = {
   visitDate: [
@@ -73,7 +69,6 @@ const styles = theme => ({
   note: {
     fontSize: '0.85em',
     fontWeight: 400,
-    // marginTop: -3,
     lineHeight: '10px',
   },
   listRoot: {
@@ -504,10 +499,7 @@ class PatientHistory extends Component {
             {fromModule !== 'Consultation' && (
               <div
                 style={{
-                  marginTop:
-                    fromModule === 'History' || fromModule === 'MedicalCheckup'
-                      ? -12
-                      : -16,
+                  marginTop: fromModule === 'History' ? -12 : -16,
                   height: 24,
                   width: 30,
                 }}
@@ -586,8 +578,7 @@ class PatientHistory extends Component {
                 visitStatus != VISIT_STATUS.PAUSED &&
                 fromModule !== 'Consultation' &&
                 fromModule !== 'History' &&
-                ableToEditConsultation &&
-                fromModule !== 'MedicalCheckup' && (
+                ableToEditConsultation && (
                   <Authorized authority='patientdashboard.editconsultation'>
                     <Tooltip title='Edit Consultation'>
                       <Button
@@ -605,12 +596,6 @@ class PatientHistory extends Component {
                             if (global.showVisitRegistration) {
                               dispatch({
                                 type: 'visitRegistration/closeModal',
-                              })
-                            }
-                            if (global.showMedicalCheckupReportingDetails) {
-                              dispatch({
-                                type:
-                                  'medicalCheckupReportingDetails/closeMedicalCheckupReportingDetailsModal',
                               })
                             }
                             dispatch({
@@ -684,24 +669,6 @@ class PatientHistory extends Component {
             top: 0,
           }}
         >
-          {isExistsVerifiedReport && (
-            <div style={{ display: 'inline-block' }}>
-              <Tooltip title='Medical Checkup Report'>
-                <Button
-                  color='primary'
-                  icon={null}
-                  size='sm'
-                  onClick={event => {
-                    event.stopPropagation()
-                    this.handelPrintMedicalCheckup(medicalCheckupWorkitemFK)
-                  }}
-                >
-                  <Print />
-                  MC Report
-                </Button>
-              </Tooltip>
-            </div>
-          )}
           {isForInvoiceReplacement && (
             <Tooltip title='For Invoice Replacement'>
               <div
@@ -1871,7 +1838,7 @@ class PatientHistory extends Component {
                   mode='multiple'
                   maxTagPlaceholder='Visit Types'
                   style={{
-                    width: fromModule === 'MedicalCheckup' ? 170 : 200,
+                    width: 200,
                     display: 'inline-Block',
                     marginBottom: -12,
                   }}
@@ -1893,7 +1860,7 @@ class PatientHistory extends Component {
                 render={args => (
                   <DateRangePicker
                     style={{
-                      width: fromModule === 'MedicalCheckup' ? 210 : 300,
+                      width: 300,
                     }}
                     label='Visit Date From'
                     label2='To'
@@ -1929,7 +1896,7 @@ class PatientHistory extends Component {
                   mode='multiple'
                   maxTagCount={0}
                   style={{
-                    width: fromModule === 'MedicalCheckup' ? 168 : 240,
+                    width: 240,
                     display: 'inline-Block',
                     marginBottom: -12,
                     marginLeft: 10,
@@ -1944,7 +1911,7 @@ class PatientHistory extends Component {
               render={args => (
                 <DoctorProfileSelect
                   style={{
-                    width: fromModule === 'MedicalCheckup' ? 180 : 240,
+                    width: 240,
                     display: 'inline-Block',
                     marginLeft: 10,
                     marginBottom: -12,
@@ -2410,20 +2377,6 @@ class PatientHistory extends Component {
     this.queryVisitHistory()
   }
 
-  handelPrintMedicalCheckup = medicalCheckupWorkitemFK => {
-    const { dispatch, handlePreviewReport } = this.props
-    dispatch({
-      type: 'medicalCheckupWorklist/queryLastReportData',
-      payload: {
-        id: medicalCheckupWorkitemFK,
-      },
-    }).then(response => {
-      if (response && response.status === '200') {
-        const payload = getMedicalCheckupReportPayload(response.data)
-        handlePreviewReport(JSON.stringify(payload))
-      }
-    })
-  }
   render() {
     const { clinicSettings, scriblenotes, fromModule, height } = this.props
     const cfg = {}
@@ -2451,9 +2404,7 @@ class PatientHistory extends Component {
       otherHeight = 390
     }
     let visitContentHeight = currentHeight - otherHeight
-    if (fromModule === 'MedicalCheckup') {
-      visitContentHeight = height - 165
-    }
+
     return (
       <div {...cfg}>
         <CardContainer hideHeader size='sm'>

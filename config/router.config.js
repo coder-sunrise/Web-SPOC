@@ -131,131 +131,6 @@ const _routes = [
           // },
         ],
       },
-      {
-        path: '/radiology',
-        icon: 'icon-radiology',
-        name: 'radiology',
-        moduleName: 'Radiology',
-        authority: ['radiology'],
-        clinicSetting: ['isEnableRadiologyModule'],
-        specialist: ['GP', 'Dental'],
-        routes: [
-          {
-            path: '/radiology/worklist',
-            name: 'worklist',
-            component: './Radiology/Worklist',
-            mini: 'RW',
-            exact: true,
-            authority: ['radiology/worklist'],
-          },
-          {
-            path: '/radiology/history',
-            name: 'history',
-            component: './Radiology/History',
-            mini: 'RW',
-            exact: true,
-            authority: ['radiology/worklisthistory'],
-          },
-        ],
-      },
-      {
-        path: '/lab',
-        icon: 'icon-lab',
-        name: 'lab',
-        moduleName: 'Lab',
-        authority: ['lab'],
-        clinicSetting: ['isEnableLabModule'],
-        specialist: ['GP'],
-        routes: [
-          {
-            path: '/lab/worklist',
-            name: 'worklist',
-            component: './Lab/Worklist',
-            mini: 'LW',
-            exact: true,
-            authority: ['lab/worklist'],
-          },
-          {
-            path: '/lab/specimenCollection',
-            name: 'specimenCollection',
-            component: './Lab/SpecimenCollection',
-            mini: 'PS',
-            exact: true,
-            authority: ['lab/specimencollection'],
-          },
-          {
-            path: '/lab/history',
-            name: 'history',
-            component: './Lab/History',
-            mini: 'LH',
-            exact: true,
-            authority: ['lab/history'],
-          },
-        ],
-      },
-      {
-        path: '/medicalcheckup',
-        icon: 'icon-xueshengtijianshuju',
-        name: 'medicalcheckup',
-        moduleName: 'MedicalCheckup',
-        authority: ['medicalcheckup'],
-        clinicSetting: ['isEnableMedicalCheckupModule'],
-        specialist: ['GP', 'Dental'],
-        routes: [
-          {
-            path: '/medicalcheckup/worklist',
-            name: 'worklist',
-            component: './MedicalCheckup/Worklist',
-            mini: 'MC',
-            exact: true,
-            authority: ['medicalcheckup/worklist'],
-          },
-          {
-            path: '/medicalcheckup/history',
-            name: 'history',
-            component: './MedicalCheckup/History',
-            mini: 'MC',
-            exact: true,
-            authority: ['medicalcheckup/history'],
-          },
-          {
-            path: '/medicalcheckup/worklist/orderdetails',
-            name: 'orderdetails',
-            observe: 'EditOrder',
-            hideInMenu: true,
-            exact: true,
-            component: './Dispense',
-            authority: ['queue.dispense'],
-          },
-        ],
-      },
-      {
-        path: '/pharmacy',
-        icon: 'icon-medicinebox-fill',
-        name: 'pharmacy',
-        moduleName: 'Pharmacy',
-        authority: ['pharmacy'],
-        clinicSetting: ['isEnablePharmacyModule'],
-        specialist: ['GP', 'Dental'],
-        routes: [
-          {
-            path: '/pharmacy/worklist',
-            name: 'worklist',
-            component: './Pharmacy/Worklist',
-            mini: 'PW',
-            exact: true,
-            authority: ['pharmacy/pharmacyworklist'],
-          },
-          {
-            path: '/pharmacy/history',
-            name: 'history',
-            component: './Pharmacy/History',
-            mini: 'PW',
-            exact: true,
-            authority: ['pharmacy/worklisthistory'],
-          },
-        ],
-      },
       //
       // Patient New
       {
@@ -267,57 +142,6 @@ const _routes = [
         specialist: ['GP', 'Dental'],
         component: './Patient',
       },
-      // Patient Database
-      // {
-      //   path: '/patientdb',
-      //   icon: 'icon-team',
-      //   name: 'patient',
-      //   moduleName: 'PatientDataBase',
-      //   authority: ['patientdatabase'],
-      //   specialist: ['GP', 'Dental'],
-      //   component: './PatientDatabase/Search',
-      // routes: [
-      //   // {
-      //   //   path: '/patientdb/new',
-      //   //   name: 'new',
-      //   //   mini: 'NP',
-      //   //   component: './PatientDatabase/New',
-      //   //   hideChildrenInMenu: true,
-      //   //   routes: [
-      //   //     {
-      //   //       path: '/patientdb/new/personal',
-      //   //       name: 'Personal Info',
-      //   //       // component: './PatientDatabase/Personal',
-      //   //     },
-      //   //     {
-      //   //       path: '/patientdb/new/emergency',
-      //   //       name: 'Emergency Contact',
-      //   //       // component: './PatientDatabase/EmergencyContact',
-      //   //     },
-      //   //     {
-      //   //       path: '/patientdb/new/allergies',
-      //   //       name: 'Allergies',
-      //   //       // component: './PatientDatabase/Allergies',
-      //   //     },
-      //   //     {
-      //   //       path: '/patientdb/new/schemes',
-      //   //       name: 'Schemes',
-      //   //       // component: './PatientDatabase/Schemes',
-      //   //     },
-      //   //   ],
-      //   // },
-      //   {
-      //     path: '/patientdb/search',
-      //     name: 'search',
-      //     mini: 'SP',
-      //     component: './PatientDatabase/Search',
-      //     authority: [
-      //       'patientdatabase',
-      //     ],
-      //   },
-      // ],
-      // },
-      //
       // SMS
       {
         path: '/communication',
@@ -334,11 +158,6 @@ const _routes = [
             component: './SMS',
             authority: ['communication/sms'],
           },
-          // {
-          //   path: '/sms/adhoc',
-          //   name: 'Adhoc',
-          //   // component: './sms/adhoc',
-          // },
         ],
       },
       //
@@ -354,13 +173,6 @@ const _routes = [
 
         routes: [
           { path: '/inventory', redirect: '/inventory/master' },
-          // {
-          //   path: '/inventory/master/v2',
-          //   name: 'master',
-          //   component: './Inventory/Master/v2',
-          //   authority: ['inventory/inventorymaster'],
-          //   mini: 'IM',
-          // },
           {
             path: '/inventory/master',
             name: 'master',
@@ -383,34 +195,6 @@ const _routes = [
             authority: ['inventory/inventorymaster'],
           },
           {
-            path: '/inventory/master/medication',
-            name: 'medication.medication',
-            hideInMenu: true,
-            component: './Inventory/Master/Medication/Details',
-            authority: ['inventory/inventorymaster'],
-          },
-          {
-            path: '/inventory/master/editmedication',
-            name: 'medication.editmedication',
-            hideInMenu: true,
-            component: './Inventory/Master/Medication/Details',
-            authority: ['inventory/inventorymaster'],
-          },
-          {
-            path: '/inventory/master/vaccination',
-            name: 'vaccination.vaccination',
-            hideInMenu: true,
-            component: './Inventory/Master/Vaccination/Details',
-            authority: ['inventory/inventorymaster'],
-          },
-          {
-            path: '/inventory/master/editvaccination',
-            name: 'vaccination.editvaccination',
-            hideInMenu: true,
-            component: './Inventory/Master/Vaccination/Details',
-            authority: ['inventory/inventorymaster'],
-          },
-          {
             path: '/inventory/master/orderset',
             name: 'orderset.orderset',
             hideInMenu: true,
@@ -424,18 +208,6 @@ const _routes = [
             component: './Inventory/Master/OrderSet/Details',
             authority: ['inventory/inventorymaster'],
           },
-          // {
-          //   path: '/inventory/pd',
-          //   name: 'pd',
-          //   // component: './Inventory/PurchaseReceving',
-          //   mini: 'PD',
-          // },
-          // {
-          //   path: '/inventory/pd/detail',
-          //   name: 'pd.detail',
-          //   hideInMenu: true,
-          //   component: './Inventory/PurchaseDelivery/Detail',
-          // },
           {
             path: '/inventory/purchaserequest',
             name: 'purchaserequest',
@@ -486,10 +258,6 @@ const _routes = [
           },
         ],
       },
-      //
-      // Test Component
-
-      //
       // Finance
       {
         path: '/finance',
@@ -637,16 +405,6 @@ const _routes = [
           },
         ],
       },
-      //
-      // Lab Report
-      // {
-      //   path: '/labsresult',
-      //   icon: 'poll',
-      //   name: 'labsresult',
-      //   // component: '',
-      // },
-      // Lab Report
-      //
       // Report
       {
         path: '/report',
@@ -832,12 +590,6 @@ const _routes = [
             authority: ['report.finance.saleslistingbyperformerreport'],
           },
           {
-            path: '/report/packageexpiry',
-            name: 'packageexpiry',
-            component: './Report/PackageExpiry',
-            authority: ['report.finance.packageexpiryreport'],
-          },
-          {
             path: '/report/xeroinvoicesreport',
             name: 'xeroinvoicesreport',
             component: './Report/XeroInvoicesReport',
@@ -850,97 +602,14 @@ const _routes = [
             authority: ['report.inventory.expiringstockreport'],
           },
           {
-            path: '/report/radiologystatisticreport',
-            name: 'radiologystatisticreport',
-            component: './Report/RadiologyStatisticReport',
-            authority: ['report.finance.radiologystatisticreport'],
-          },
-          {
             path: '/report/dispensaryreport',
             name: 'partialdispensereport',
             component: './Report/PartialDispenseReport',
             authority: ['report.inventory.partialdispensereport'],
           },
-          {
-            path: '/report/preorderlistingreport',
-            name: 'preorderlistingreport',
-            component: './Report/PreOrderListingReport',
-            authority: ['report.finance.preorderlistingreport'],
-          },
         ],
       },
       // Report
-      //
-      // Human Resource
-      {
-        path: '/human-resource',
-        icon: 'perm_identity',
-        name: 'humanResource',
-        hideInMenu: true,
-        // component: '',
-      },
-      // Human Resource
-      //
-      // Claim Submission
-      {
-        path: '/claim-submission',
-        icon: 'icon-container',
-        name: 'claimSubmission',
-        moduleName: 'Claim Submission',
-        hideChildrenInMenu: true,
-        authority: ['claimsubmission'],
-        clinicSetting: ['isEnableCHAS', 'isEnableMedisave'],
-        specialist: ['GP'],
-        routes: [
-          {
-            path: '/claim-submission',
-            name: 'chas',
-            component: './ClaimSubmission',
-            authority: ['claimsubmission'],
-          },
-          {
-            path: '/claim-submission/chas',
-            name: 'chas',
-            component: './ClaimSubmission/chas',
-            authority: ['claimsubmission'],
-            clinicSetting: ['isEnableCHAS'],
-          },
-          {
-            path: '/claim-submission/chas/invoice/:invoiceNo',
-            name: 'patientInvoice',
-            hideInMenu: true,
-            component: './Finance/Invoice/Details',
-            authority: ['claimsubmission'],
-          },
-          {
-            path: '/claim-submission/medisave',
-            name: 'medisave',
-            component: './ClaimSubmission/medisave',
-            authority: ['claimsubmission'],
-            clinicSetting: ['isEnableMedisave'],
-          },
-          {
-            path: '/claim-submission/medisave/invoice/:invoiceNo',
-            name: 'patientInvoice',
-            hideInMenu: true,
-            component: './Finance/Invoice/Details',
-            authority: ['claimsubmission'],
-          },
-        ],
-      },
-      // Claim Submission
-      //
-      // Forms
-      // {
-      //   path: '/forms',
-      //   icon: 'icon-pic-right',
-      //   name: 'forms',
-      //   moduleName: 'Forms',
-      //   component: './FormListing',
-      //   authority: ['forms'],
-      // },
-      // Forms
-      //
       // Settings
       {
         path: '/setting',
@@ -1078,28 +747,10 @@ const _routes = [
             authority: ['settings.clinicsetting.consumableuom'],
           },
           {
-            path: '/setting/medicationuom',
-            name: 'medicationuom',
-            component: './Setting/MedicationUOM',
-            authority: ['settings.clinicsetting.medicationuom'],
-          },
-          {
-            path: '/setting/medicationgroup',
-            name: 'medicationgroup',
-            component: './Setting/MedicationGroup',
-            authority: ['settings.clinicsetting.medicationgroup'],
-          },
-          {
             path: '/setting/consumablegroup',
             name: 'consumablegroup',
             component: './Setting/ConsumableGroup',
             authority: ['settings.clinicsetting.consumablecategory'],
-          },
-          {
-            path: '/setting/medicationdosage',
-            name: 'medicationdosage',
-            component: './Setting/MedicationDosage',
-            authority: ['settings.clinicsetting.medicationdosage'],
           },
           {
             path: '/setting/clinicoperationhour',
@@ -1166,24 +817,6 @@ const _routes = [
             authority: ['settings.clinicsetting.servicecategory'],
           },
           {
-            path: '/setting/medicationfrequency',
-            name: 'medicationfrequency',
-            component: './Setting/MedicationFrequency',
-            authority: ['settings.clinicsetting.medicationfrequency'],
-          },
-          {
-            path: '/setting/medicationprecautions',
-            name: 'medicationprecautions',
-            component: './Setting/MedicationPrecautions',
-            authority: ['settings.clinicsetting.medicationprecaution'],
-          },
-          {
-            path: '/setting/medicationconsumptionmethod',
-            name: 'medicationconsumptionmethod',
-            component: './Setting/MedicationConsumptionMethod',
-            authority: ['settings.clinicsetting.medicationconsumptionmethod'],
-          },
-          {
             path: '/setting/smstemplate',
             name: 'smstemplate',
             component: './Setting/SmsTemplate',
@@ -1238,24 +871,6 @@ const _routes = [
             authority: ['settings.templates.visitordertemplate'],
           },
           {
-            path: '/setting/medicinetrivia',
-            name: 'medicinetrivia',
-            component: './Setting/MedicineTrivia',
-            authority: ['settings.clinicsetting.medicinetrivia'],
-          },
-          {
-            path: '/setting/refractiontesttype',
-            name: 'refractiontesttype',
-            component: './Setting/RefractionTestType',
-            authority: ['settings.clinicsetting.refractiontesttype'],
-          },
-          {
-            path: '/setting/package',
-            name: 'package',
-            component: './Setting/Package',
-            authority: ['settings.clinicsetting.package'],
-          },
-          {
             path: '/setting/invoiceadjustment',
             name: 'invoiceadjustment',
             component: './Setting/InvoiceAdjustment',
@@ -1274,91 +889,14 @@ const _routes = [
             authority: ['settings.clinicsetting.tag'],
           },
           {
-            path: '/setting/medicationingredient',
-            name: 'medicationingredient',
-            component: './Setting/MedicationIngredient',
-            authority: ['settings.clinicsetting.medicationingredient'],
-          },
-          {
-            path: '/setting/drugallergy',
-            name: 'drugallergy',
-            component: './Setting/DrugAllergy',
-            authority: ['settings.clinicsetting.drugallergy'],
-          },
-          {
-            path: '/setting/medicationcontraindication',
-            name: 'medicationcontraindication',
-            component: './Setting/MedicationContraIndication',
-            authority: ['settings.clinicsetting.medicationcontraindication'],
-          },
-          {
-            path: '/setting/medicationinteraction',
-            name: 'medicationinteraction',
-            component: './Setting/MedicationInteraction',
-            authority: ['settings.clinicsetting.medicationinteraction'],
-          },
-          {
-            path: '/setting/medicationsideeffect',
-            name: 'medicationsideeffect',
-            component: './Setting/MedicationSideEffect',
-            authority: ['settings.clinicsetting.medicationsideeffect'],
-          },
-          {
-            path: '/setting/genericmedication',
-            name: 'genericmedication',
-            component: './Setting/GenericMedication',
-            authority: ['settings.clinicsetting.genericmedication'],
-          },
-          {
-            path: '/setting/administrationroute',
-            name: 'administrationroute',
-            component: './Setting/AdministrationRoute',
-            authority: ['settings.clinicsetting.administrationroute'],
-          },
-          {
             path: '/setting/resource',
             name: 'resource',
             component: './Setting/Resource',
             authority: ['settings.clinicsetting.resource'],
           },
-          {
-            path: '/setting/individualcomment',
-            name: 'individualcomment',
-            component: './Setting/IndividualComment',
-            // authority: ['settings.clinicsetting.individualcomment'],
-          },
-          {
-            path: '/setting/summarycomment',
-            name: 'summarycomment',
-            component: './Setting/SummaryComment',
-            // authority: ['settings.clinicsetting.individualcomment'],
-          },
-          {
-            path: '/setting/creditfacility',
-            name: 'creditfacility',
-            component: './Setting/CreditFacility',
-            authority: ['settings.clinicsetting.creditfacility'],
-          },
         ],
       },
       // Settings
-      //
-      // AiOT
-      // {
-      //   path: '/patient-monitoring',
-      //   icon: 'group',
-      //   name: 'patient-monitoring',
-      //   hideChildrenInMenu: true,
-      //   routes: [
-      //     {
-      //       path: '/patient-monitoring',
-      //       name: 'patient-monitoring',
-      //       component: './PatientMonitoring',
-      //     },
-      //   ],
-      // },
-      // AiOT
-      //
       // Support
       {
         path: '/support',
@@ -1407,17 +945,6 @@ const _routes = [
     ],
   },
   // Main routes
-  //
 ]
-
-// const routes =
-//   process.env.NODE_ENV === 'production'
-//     ? _routes
-//     : _routes.map((r, index) => {
-//         return {
-//           ...r,
-//           routes: [devRoutes, ...r.routes],
-//         }
-//       })
 
 export default _routes

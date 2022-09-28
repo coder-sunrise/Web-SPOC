@@ -42,24 +42,6 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
       dispatch({
         type: 'codetable/fetchCodes',
         payload: {
-          code: 'ctmedicationgroup',
-        },
-      }),
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'ctgenericmedication',
-        },
-      }),
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'ctmedicationunitofmeasurement',
-        },
-      }),
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
           code: 'ctConsumableUnitOfMeasurement',
         },
       }),
@@ -69,7 +51,7 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
     if (!tabIndex) {
       if (itemTabs.length > 0) tabIndex = itemTabs[0].id
     }
-    setActiveTab(tabIndex)
+    setActiveTab(tabIndex) 
   }
 
   useEffect(() => {

@@ -134,7 +134,6 @@ export default createFormViewModel({
     },
     effects: {
       *initState({ payload }, { put, select, take }) {
-        yield put({ type: 'initAllergyCodetable' })
         yield put({ type: 'initSchemeCodetable' })
         let { currentId, version, md, newPatient } = payload
         if (newPatient) {
@@ -164,17 +163,6 @@ export default createFormViewModel({
               showPatientInfoPanel: true,
             },
           })
-      },
-      *initAllergyCodetable(_, { put }) {
-        yield put({
-          type: 'codetable/fetchCodes',
-          payload: {
-            code: 'ctdrugallergy',
-            filter: {
-              isActive: true,
-            },
-          },
-        })
       },
       *initSchemeCodetable(_, { put }) {
         yield put({
@@ -221,7 +209,6 @@ export default createFormViewModel({
           'dispense',
           'consultation',
           'patientdashboard',
-          'reportingdetails',
         ]
 
         const matchesExceptionalPath =

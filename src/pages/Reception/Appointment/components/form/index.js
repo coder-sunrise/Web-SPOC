@@ -1510,15 +1510,6 @@ class Form extends React.PureComponent {
                     checkedRecurrence={this.checkedRecurrence}
                   />
                 </GridItem>
-                <GridItem xs md={12}>
-                  {this.showPreOrder() && (
-                    <PreOrder
-                      {...this.props}
-                      deletePreOrderItem={this.deletePreOrderItem}
-                      disabled={disableDataGrid}
-                    ></PreOrder>
-                  )}
-                </GridItem>
                 <GridItem xs md={12} className={classes.footerGrid}>
                   <FormFooter
                     // isNew={slotInfo.type === 'add'}
