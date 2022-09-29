@@ -50,24 +50,14 @@ const MaxCapInfo = ({ classes, claimableSchemes = [], copaymentSchemeFK }) => {
       patientMinCoPaymentAmount,
       patientMinCoPaymentAmountType,
 
-      isMedicationCoverageMaxCapCheckRequired,
       isConsumableCoverageMaxCapCheckRequired,
       isOrderSetCoverageMaxCapCheckRequired,
       isServiceCoverageMaxCapCheckRequired,
-      isVaccinationCoverageMaxCapCheckRequired,
 
-      medicationCoverageMaxCap,
       consumableCoverageMaxCap,
       serviceCoverageMaxCap,
       orderSetCoverageMaxCap,
-      vaccinationCoverageMaxCap,
     } = scheme[0]
-
-    if (isMedicationCoverageMaxCapCheckRequired)
-      categoriesMaxCap.push({
-        type: 'Medication',
-        value: medicationCoverageMaxCap,
-      })
 
     if (isConsumableCoverageMaxCapCheckRequired)
       categoriesMaxCap.push({
@@ -87,11 +77,6 @@ const MaxCapInfo = ({ classes, claimableSchemes = [], copaymentSchemeFK }) => {
         value: orderSetCoverageMaxCap,
       })
 
-    if (isVaccinationCoverageMaxCapCheckRequired)
-      categoriesMaxCap.push({
-        type: 'Vaccination',
-        value: vaccinationCoverageMaxCap,
-      })
     patientMinPayable = parseToPercentOrDollar(
       patientMinCoPaymentAmountType,
       patientMinCoPaymentAmount,

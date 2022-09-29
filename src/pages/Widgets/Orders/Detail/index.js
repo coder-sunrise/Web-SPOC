@@ -54,7 +54,7 @@ class Details extends PureComponent {
 
   autoFocuseItem = type => {
     setTimeout(() => {
-      if (type === '5') {
+      if (type === '4') {
         $(`#autofocus_${type} input`).focus()
       } else $(`#autofocus_${type} .ant-select`).click()
 
@@ -191,30 +191,12 @@ class Details extends PureComponent {
     if (fromDispense) {
       orderTypeArray = orderTypes.filter(
         o =>
-          o.value !== ORDER_TYPES.VACCINATION &&
-          o.value !== ORDER_TYPES.ORDER_SET &&
-          o.value !== ORDER_TYPES.PACKAGE &&
-          o.value !== ORDER_TYPES.RADIOLOGY &&
-          o.value !== ORDER_TYPES.LAB,
+          o.value !== ORDER_TYPES.ORDER_SET  
       )
     } else {
       const { settings = [] } = clinicSettings
 
       orderTypeArray = orderTypes.filter(o => {
-        if (!settings.isEnablePackage && o.value === ORDER_TYPES.PACKAGE)
-          return false
-
-        if (
-          !settings.isEnableRadiologyModule &&
-          o.value === ORDER_TYPES.RADIOLOGY
-        ) {
-          return false
-        }
-
-        if (!settings.isEnableLabModule && o.value === ORDER_TYPES.LAB) {
-          return false
-        }
-
         return true
       })
     }

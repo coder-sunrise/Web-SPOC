@@ -33,15 +33,11 @@ import Authorized from '@/utils/Authorized'
 import { sendNotification } from '@/utils/realtime'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
 import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
-import ConsumePackage from '@/pages/Widgets/Orders/Detail/ConsumePackage'
 import {
   visitBasicExaminationsSchema,
   eyeExaminationsSchema,
 } from '@/pages/Reception/Queue/NewVisit/validationScheme'
-import {
-  showEyeExaminations,
-  showAudiometryTest,
-} from '../Widgets/PatientHistory/config'
+import { showEyeExaminations } from '../Widgets/PatientHistory/config'
 
 const discardConsultation = async ({
   dispatch,
@@ -129,14 +125,11 @@ class EditOrder extends Component {
   constructor(props) {
     super(props)
     this.eyeExaminationsRef = React.createRef()
-    this.audiometryTestRef = React.createRef()
   }
 
   state = {
     acknowledged: true,
-    isShowPackageSelectModal: false,
     expandedEyeExaminations: false,
-    expandedAudiometryTest: false,
   }
 
   componentDidMount() {
@@ -144,22 +137,6 @@ class EditOrder extends Component {
     setTimeout(() => {
       setFieldValue('fakeField', 'setdirty')
     }, 500)
-
-    const { pendingPackage } = values
-
-    if (pendingPackage) {
-      const packages = pendingPackage.reduce(
-        (distinct, data) =>
-          distinct.includes(data.patientPackageFK)
-            ? [...distinct]
-            : [...distinct, data.patientPackageFK],
-        [],
-      )
-
-      if (packages && packages.length > 1) {
-        this.setState({ isShowPackageSelectModal: true })
-      }
-    }
   }
 
   componentWillUnmount() {
@@ -290,14 +267,10 @@ class EditOrder extends Component {
         orders,
         forms,
       })
-      const isPharmacyOrderUpdate =
-        isEnablePharmacyModule && isPharmacyOrderUpdated(orders)
       const signResult = await dispatch({
         type: `consultation/signOrder`,
         payload: {
           ...payload,
-          isPharmacyOrderUpdated: isPharmacyOrderUpdate,
-          isPrescriptionSheetUpdated: isPharmacyOrderUpdated(orders,true)
         },
       })
       if (signResult) {
@@ -310,24 +283,6 @@ class EditOrder extends Component {
           message: 'Completed Consultation',
           visitID: id,
         })
-
-        if (isPharmacyOrderUpdate) {
-          const userProfile = user.data.clinicianProfile
-          const userName = `${
-            userProfile.title && userProfile.title.trim().length
-              ? `${userProfile.title}. ${userProfile.name || ''}`
-              : `${userProfile.name || ''}`
-          }`
-          const message = `${userName} amended prescription at ${moment().format(
-            'HH:mm',
-          )}`
-          sendNotification('PharmacyOrderUpdate', {
-            type: NOTIFICATION_TYPE.CONSULTAION,
-            status: NOTIFICATION_STATUS.OK,
-            message,
-            visitID: id,
-          })
-        }
 
         notification.success({
           message: 'Order signed',
@@ -356,10 +311,6 @@ class EditOrder extends Component {
     }
   }
 
-  closePackageSelectModal = () => {
-    this.setState({ isShowPackageSelectModal: false })
-  }
-
   render() {
     const { classes, theme, values } = this.props
     const orderWidget = widgets.find(o => o.id === '5')
@@ -367,7 +318,6 @@ class EditOrder extends Component {
     const formsWidget = widgets.find(o => o.id === '12')
     const basicExaminationsWidget = widgets.find(o => o.id === '7')
     const eyeExaminationsWidget = widgets.find(o => o.id === '23')
-    const audiometryTestWidget = widgets.find(o => o.id === '24')
     const Order = orderWidget.component
     const ConsultationDocument = cdWidget.component
     const consultationDocumentAccessRight = Authorized.check(
@@ -383,11 +333,6 @@ class EditOrder extends Component {
     const eyeExaminationsAccessRight = Authorized.check(
       eyeExaminationsWidget.accessRight,
     )
-    const AudiometryTest = audiometryTestWidget.component
-    const audiometryTestAccessRight = Authorized.check(
-      audiometryTestWidget.accessRight,
-    )
-
     if (
       eyeExaminationsAccessRight.rights !== 'hidden' &&
       !this.state.expandedEyeExaminations &&
@@ -399,16 +344,6 @@ class EditOrder extends Component {
       if (div.attr('aria-expanded') === 'false') div.click()
     }
 
-    if (
-      audiometryTestAccessRight.rights !== 'hidden' &&
-      !this.state.expandedEyeExaminations &&
-      showAudiometryTest(values.corAudiometryTest)
-    ) {
-      let div = $(this.audiometryTestRef.current).find(
-        'div[aria-expanded]:eq(0)',
-      )
-      if (div.attr('aria-expanded') === 'false') div.click()
-    }
     const visitRemarks = this.props.visitRegistration?.entity?.visit
       ?.visitRemarks
     return (
@@ -564,42 +499,8 @@ class EditOrder extends Component {
                   />
                 </div>
               )}
-            {audiometryTestAccessRight &&
-              audiometryTestAccessRight.rights !== 'hidden' && (
-                <div ref={this.audiometryTestRef}>
-                  <Accordion
-                    mode='multiple'
-                    onChange={(event, p, expanded) => {
-                      if (expanded && !this.state.expandedAudiometryTest) {
-                        this.setState({ expandedAudiometryTest: true })
-                      }
-                    }}
-                    collapses={[
-                      {
-                        title: 'Audiometry Test',
-                        content: (
-                          <div style={{ padding: '5px' }}>
-                            <AudiometryTest />
-                          </div>
-                        ),
-                      },
-                    ]}
-                  />
-                </div>
-              )}
           </GridItem>
         </GridContainer>
-
-        <CommonModal
-          cancelText='Cancel'
-          maxWidth='lg'
-          title='Package Details'
-          onClose={this.closePackageSelectModal}
-          onConfirm={this.closePackageSelectModal}
-          open={this.state.isShowPackageSelectModal}
-        >
-          <ConsumePackage {...this.props} />
-        </CommonModal>
         <ViewPatientHistory top='170px' />
       </div>
     )

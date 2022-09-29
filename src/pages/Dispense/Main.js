@@ -13,7 +13,6 @@ import { calculateAmount, navigateDirtyCheck } from '@/utils/utils'
 import Yup from '@/utils/yup'
 import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
-import { openCautionAlertOnStartConsultation } from '@/pages/Widgets/Orders/utils'
 import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 import AddOrder from './DispenseDetails/AddOrder'
 import DispenseDetails from './DispenseDetails/WebSocketWrapper'
@@ -115,14 +114,6 @@ const constructPayload = values => {
 
   const _values = {
     ...values,
-    prescription: updateTempDispenseItem(
-      values.prescription,
-      'inventoryMedicationFK',
-    ),
-    vaccination: updateTempDispenseItem(
-      values.vaccination,
-      'inventoryVaccinationFK',
-    ),
     consumable: updateTempDispenseItem(
       values.consumable,
       'inventoryConsumableFK',
@@ -217,14 +208,7 @@ const validDispense = (dispenseItems = []) => {
     const result = calculateInvoiceAmounts(obj)
     return result
   },
-  validationSchema: Yup.object().shape({
-    prescription: Yup.array().of(
-      Yup.object().shape({
-        batchNo: Yup.string(),
-        expiryDate: Yup.date(),
-      }),
-    ),
-  }),
+  validationSchema: Yup.object().shape({}),
   handleSubmit: (values, { props, ...restProps }) => {
     const { dispatch, dispense } = props
     if (!validDispense(values.dispenseItems)) return
@@ -262,41 +246,12 @@ class Main extends Component {
   state = {
     showOrderModal: false,
     hasShowOrderModal: false,
-    showDrugLabelSelection: false,
-    showCautionAlert: false,
     isShowOrderUpdated: false,
     currentDrugToPrint: {},
-    packageItem: [],
-    dispenseItems: [],
-    packageItem: [],
     dispenseItems: [],
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const { prescription = [], packageItem = [] } = nextProps.values
-
-    let drugList = []
-    prescription.forEach(item => {
-      drugList.push(item)
-    })
-    packageItem.forEach(item => {
-      if (item.type === 'Medication') {
-        drugList.push({
-          ...item,
-          name: item.description,
-          dispensedQuanity: item.packageConsumeQuantity,
-        })
-      }
-    })
-
-    this.setState(() => {
-      return {
-        selectedDrugs: drugList.map(x => {
-          return { ...x, no: 1, selected: true }
-        }),
-      }
-    })
-  }
+  UNSAFE_componentWillReceiveProps(nextProps) {}
 
   componentWillUnmount = () => {
     this.props.dispatch({
@@ -320,8 +275,8 @@ class Main extends Component {
     dispatch({
       type: 'dispense/incrementLoadCount',
     })
-    const { otherOrder = [], prescription = [], packageItem = [] } = values
-    const isEmptyDispense = otherOrder.length === 0 && prescription.length === 0
+    const { otherOrder = [] } = values
+    const isEmptyDispense = otherOrder.length === 0
 
     // set default language based on patient tranlsation and clinic setting.
     const preferLanguage =
@@ -380,11 +335,6 @@ class Main extends Component {
             },
           })
           reloadDispense(this.props)
-
-          if (this.state.showCautionAlert) {
-            this.setState({ showCautionAlert: false })
-            openCautionAlertOnStartConsultation(o)
-          }
         }
       })
     }
@@ -584,11 +534,8 @@ class Main extends Component {
     }
     const { entity = {} } = visitRegistration
     const { visit = {} } = entity
-    const { service = [], prescription = [], consumable = [] } = values
-    const isEmptyDispense =
-      service.length === 0 &&
-      prescription.length === 0 &&
-      consumable.length === 0
+    const { service = [], consumable = [] } = values
+    const isEmptyDispense = service.length === 0 && consumable.length === 0
     const noClinicalObjectRecord = !values.clinicalObjectRecordFK
     if (visit.visitPurposeFK === VISIT_TYPE.OTC && isEmptyDispense) {
       this.setState(
@@ -606,7 +553,7 @@ class Main extends Component {
     }
   }
 
-  checkBillFirstAndMC = () => {
+  checkBillFirst = () => {
     const {
       dispatch,
       values,
@@ -626,26 +573,15 @@ class Main extends Component {
     }
     const { entity = {} } = visitRegistration
     const { visit = {} } = entity
-    const {
-      service = [],
-      prescription = [],
-      consumable = [],
-      vaccination = [],
-      packageItem = [],
-    } = values
-    const isEmptyDispense =
-      service.length === 0 &&
-      prescription.length === 0 &&
-      consumable.length === 0 &&
-      vaccination.length === 0
+    const { service = [], consumable = [] } = values
+    const isEmptyDispense = service.length === 0 && consumable.length === 0
     const accessRights = Authorized.check('queue.dispense.editorder')
     const noClinicalObjectRecord = !values.clinicalObjectRecordFK
 
     if (
       accessRights &&
       accessRights.rights !== 'hidden' &&
-      (visit.visitPurposeFK === VISIT_TYPE.BF ||
-        visit.visitPurposeFK === VISIT_TYPE.MC) &&
+      visit.visitPurposeFK === VISIT_TYPE.BF &&
       isEmptyDispense &&
       noClinicalObjectRecord &&
       !query.backToDispense
@@ -666,27 +602,7 @@ class Main extends Component {
       )
     }
 
-    let drugList = []
-    prescription.forEach(item => {
-      drugList.push(item)
-    })
-    packageItem.forEach(item => {
-      if (item.type === 'Medication') {
-        drugList.push({
-          ...item,
-          name: item.description,
-          dispensedQuanity: item.packageConsumeQuantity,
-        })
-      }
-    })
     if (dispense.loadCount === 0) {
-      this.setState(() => {
-        return {
-          selectedDrugs: drugList.map(x => {
-            return { ...x, no: 1, selected: true }
-          }),
-        }
-      })
       dispatch({
         type: 'dispense/incrementLoadCount',
       })
@@ -694,7 +610,7 @@ class Main extends Component {
   }
   render() {
     this.checkOTCAddOrder()
-    this.checkBillFirstAndMC()
+    this.checkBillFirst()
     const {
       classes,
       handleSubmit,

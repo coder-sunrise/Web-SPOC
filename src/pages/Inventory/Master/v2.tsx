@@ -11,8 +11,8 @@ const tabs = InventoryMasterOption().map(o => {
   }
 })
 
-const InventoryMasterIndex = ({ dispatch }) => {
-  const [tabKey, setTabKey] = useState('medication')
+const InventoryMasterIndex = () => {
+  const [tabKey, setTabKey] = useState('consumable')
   const currentTab = tabs.find(o => o.key === tabKey)
   if (!currentTab?.component) return null
   const TabContent = currentTab?.component

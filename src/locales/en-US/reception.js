@@ -162,10 +162,6 @@ export default {
   'reception.queue.visitRegistration.waistCircumference.suffix': 'CM',
   'reception.queue.visitRegistration.isChild': 'Child',
   'reception.queue.visitRegistration.isPregnancy': 'Pregnancy',
-  'reception.queue.visitRegistration.hepetitisVaccinationA':
-    'Hepetitis A Vaccination',
-  'reception.queue.visitRegistration.hepetitisVaccinationB':
-    'Hepetitis B Vaccination',
   'reception.queue.visitRegistration.isFasting': 'Fasting',
   'reception.queue.visitRegistration.isSmoking': 'Smoking',
   'reception.queue.visitRegistration.isAlcohol': 'Alcohol',

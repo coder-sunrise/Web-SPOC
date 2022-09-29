@@ -12,7 +12,11 @@ import {
   EditableTableGrid,
   Field,
 } from '@/components'
-import { podoOrderType, getOutstandingInventoryItem, groupByFKFunc } from '@/utils/codes'
+import {
+  podoOrderType,
+  getOutstandingInventoryItem,
+  groupByFKFunc,
+} from '@/utils/codes'
 import { INVENTORY_TYPE } from '@/utils/constants'
 import AuthorizedContext from '@/components/Context/Authorized'
 import CommonTableGrid from '@/components/CommonTableGrid'
@@ -31,14 +35,19 @@ const receivingDetailsSchema = Yup.object().shape({
       return `Current Receiving Quantity must be less than or equal to ${
         e.max ? e.max.toFixed(1) : e.max
       }`
-    }).required(),
+    })
+    .required(),
   currentReceivingBonusQty: Yup.number()
-    .min(0, 'Current Receiving Bonus Quantity must be greater than or equal to 0')
+    .min(
+      0,
+      'Current Receiving Bonus Quantity must be greater than or equal to 0',
+    )
     .max(Yup.ref('maxCurrentReceivingBonusQty'), e => {
       return `Current Receiving Bonus Quantity must be less than or equal to ${
         e.max ? e.max.toFixed(1) : e.max
       }`
-    }).required(),
+    })
+    .required(),
 })
 
 @withFormikExtend({
@@ -69,16 +78,8 @@ const receivingDetailsSchema = Yup.object().shape({
       if (!v.id || v.id <= 0) {
         let purchaseItemName = ''
         switch (v.type) {
-          case INVENTORY_TYPE.MEDICATION: {
-            purchaseItemName = 'purchaseOrderMedicationItem'
-            break
-          }
           case INVENTORY_TYPE.CONSUMABLE: {
             purchaseItemName = 'purchaseOrderConsumableItem'
-            break
-          }
-          case INVENTORY_TYPE.VACCINATION: {
-            purchaseItemName = 'purchaseOrderVaccinationItem'
             break
           }
           default: {
@@ -150,22 +151,14 @@ class DODetails extends PureComponent {
     selectedItem: {},
 
     ConsumableItemList: [],
-    MedicationItemList: [],
-    VaccinationItemList: [],
 
     filterConsumableItemList: [],
-    filterMedicationItemList: [],
-    filterVaccinationItemList: [],
 
     // Batch No. #
     expiryDateAvailability: false,
     selectedBatch: {},
-    stockMedication: [], // medication
-    stockVaccination: [], // vaccination
     stockConsumable: [], // consumable
 
-    filterStockMedication: [], // medication
-    filterStockVaccination: [], // vaccination
     filterStockConsumable: [], // consumable
 
     itemType: podoOrderType,
@@ -187,11 +180,18 @@ class DODetails extends PureComponent {
     this.setState({ itemType: osItemType })
 
     podoOrderType.forEach(x => {
-      if(mode === 'Add') {
-        const inventoryItemList = getOutstandingInventoryItem(deliveryOrderDetails[x.stateName],x.value,x.itemFKName,rows,purchaseOrderOutstandingItem,values.id)
-        this.setState({[x.stateName]: inventoryItemList})
-      }else {
-        this.setState({[x.stateName]: deliveryOrderDetails[x.stateName]})
+      if (mode === 'Add') {
+        const inventoryItemList = getOutstandingInventoryItem(
+          deliveryOrderDetails[x.stateName],
+          x.value,
+          x.itemFKName,
+          rows,
+          purchaseOrderOutstandingItem,
+          values.id,
+        )
+        this.setState({ [x.stateName]: inventoryItemList })
+      } else {
+        this.setState({ [x.stateName]: deliveryOrderDetails[x.stateName] })
       }
     })
     // await this.props.refreshDeliveryOrder()
@@ -240,8 +240,15 @@ class DODetails extends PureComponent {
     const { value, itemFKName, stateName } = option
     const originItemList = this.state[stateName]
 
-    const inventoryItemList = getOutstandingInventoryItem(originItemList,value,itemFKName,rows,purchaseOrderItem,values.id)
-    this.setState({[`filter${stateName}`]: inventoryItemList})
+    const inventoryItemList = getOutstandingInventoryItem(
+      originItemList,
+      value,
+      itemFKName,
+      rows,
+      purchaseOrderItem,
+      values.id,
+    )
+    this.setState({ [`filter${stateName}`]: inventoryItemList })
 
     row.code = ''
     row.name = ''
@@ -259,7 +266,13 @@ class DODetails extends PureComponent {
   handleItemOnChange = (e, type) => {
     const { option, row } = e
 
-    const { itemFK, value, remainingQty, remainingBonusQty, purchaseOrderItemFK } = option
+    const {
+      itemFK,
+      value,
+      remainingQty,
+      remainingBonusQty,
+      purchaseOrderItemFK,
+    } = option
     if (type === 'code') {
       row.name = purchaseOrderItemFK
     } else {
@@ -350,49 +363,40 @@ class DODetails extends PureComponent {
     const { uid, code, name, isNew, purchaseOrderItemFK, itemFK } = row
     if (code && name) {
       return this.state[stateName].filter(o => {
-        if(mode === 'add')
-          return o.purchaseOrderItemFK === purchaseOrderItemFK
-        else
-          return o.itemFK === itemFK
+        if (mode === 'add') return o.purchaseOrderItemFK === purchaseOrderItemFK
+        else return o.itemFK === itemFK
       })
     }
-    if(isNew) {
+    if (isNew) {
       return this.state[filteredStateName]
     }
     const { rows } = this.props.values
-    const newRows = rows.filter(x => x.uid != uid && !x.isDeleted && x.code && x.name)
-    const updatedRemainReceiveItems = this.state[stateName].map(x=>{
-      const rowsGroupByFK = groupByFKFunc(newRows)
-      const item = rowsGroupByFK.find(i => i.purchaseOrderItemFK === x.purchaseOrderItemFK)
-      return {
-        ...x,
-        remainingQty: x.remainingQty - (item?.totalCurrentReceivingQty || 0),
-        remainingBonusQty: x.remainingBonusQty - (item?.totalCurrentReceivingBonusQty || 0),
-      }
-    }).filter(x => x.remainingQty > 0 || x.remainingBonusQty > 0)
+    const newRows = rows.filter(
+      x => x.uid != uid && !x.isDeleted && x.code && x.name,
+    )
+    const updatedRemainReceiveItems = this.state[stateName]
+      .map(x => {
+        const rowsGroupByFK = groupByFKFunc(newRows)
+        const item = rowsGroupByFK.find(
+          i => i.purchaseOrderItemFK === x.purchaseOrderItemFK,
+        )
+        return {
+          ...x,
+          remainingQty: x.remainingQty - (item?.totalCurrentReceivingQty || 0),
+          remainingBonusQty:
+            x.remainingBonusQty - (item?.totalCurrentReceivingBonusQty || 0),
+        }
+      })
+      .filter(x => x.remainingQty > 0 || x.remainingBonusQty > 0)
     return updatedRemainReceiveItems
   }
 
   rowOptions = row => {
-    if (row.type === INVENTORY_TYPE.MEDICATION) {
-      return this.getItemOptions(
-        row,
-        'filterMedicationItemList',
-        'MedicationItemList',
-      )
-    }
     if (row.type === INVENTORY_TYPE.CONSUMABLE) {
       return this.getItemOptions(
         row,
         'filterConsumableItemList',
         'ConsumableItemList',
-      )
-    }
-    if (row.type === INVENTORY_TYPE.VACCINATION) {
-      return this.getItemOptions(
-        row,
-        'filterVaccinationItemList',
-        'VaccinationItemList',
       )
     }
     return []
@@ -412,24 +416,10 @@ class DODetails extends PureComponent {
     } = this.props.deliveryOrderDetails
 
     if (row.code && row.name) {
-      if (row.type === INVENTORY_TYPE.MEDICATION) {
-        return this.getOptions(
-          this.state.MedicationItemList,
-          MedicationItemList,
-          row,
-        )
-      }
       if (row.type === INVENTORY_TYPE.CONSUMABLE) {
         return this.getOptions(
           this.state.ConsumableItemList,
           ConsumableItemList,
-          row,
-        )
-      }
-      if (row.type === INVENTORY_TYPE.VACCINATION) {
-        return this.getOptions(
-          this.state.VaccinationItemList,
-          VaccinationItemList,
           row,
         )
       }
@@ -500,8 +490,11 @@ class DODetails extends PureComponent {
               this.handleItemOnChange(e, 'code')
             }
           },
-          renderDropdown: (o) => {
-            const extendInfo = o.orderQuantity > 0 ? `Order: ${o.orderQuantity}` : `Bonus: ${o.bonusQuantity}`
+          renderDropdown: o => {
+            const extendInfo =
+              o.orderQuantity > 0
+                ? `Order: ${o.orderQuantity}`
+                : `Bonus: ${o.bonusQuantity}`
             return `${o.code} - ${extendInfo}`
           },
           isDisabled: row => row.id >= 0,
@@ -519,8 +512,11 @@ class DODetails extends PureComponent {
               this.handleItemOnChange(e, 'name')
             }
           },
-          renderDropdown: (o) => {
-            const extendInfo = o.orderQuantity > 0 ? `Order: ${o.orderQuantity}` : `Bonus: ${o.bonusQuantity}`
+          renderDropdown: o => {
+            const extendInfo =
+              o.orderQuantity > 0
+                ? `Order: ${o.orderQuantity}`
+                : `Bonus: ${o.bonusQuantity}`
             return `${o.name} - ${extendInfo}`
           },
           isDisabled: row => row.id >= 0,
@@ -531,14 +527,8 @@ class DODetails extends PureComponent {
           labelField: 'uom',
           disabled: true,
           options: row => {
-            if (row.type === INVENTORY_TYPE.MEDICATION) {
-              return this.state.MedicationItemList
-            }
             if (row.type === INVENTORY_TYPE.CONSUMABLE) {
               return this.state.ConsumableItemList
-            }
-            if (row.type === INVENTORY_TYPE.VACCINATION) {
-              return this.state.VaccinationItemList
             }
             return []
           },
@@ -581,14 +571,16 @@ class DODetails extends PureComponent {
           type: 'number',
           format: '0.0',
           width: 150,
-          isDisabled: row => row.id >= 0 || row.orderQuantity - row.quantityReceived <= 0,
+          isDisabled: row =>
+            row.id >= 0 || row.orderQuantity - row.quantityReceived <= 0,
         },
         {
           columnName: 'currentReceivingBonusQty',
           type: 'number',
           format: '0.0',
           width: 200,
-          isDisabled: row => row.id >= 0 || row.bonusQuantity - row.totalBonusReceived <= 0,
+          isDisabled: row =>
+            row.id >= 0 || row.bonusQuantity - row.totalBonusReceived <= 0,
         },
         {
           columnName: 'batchNo',

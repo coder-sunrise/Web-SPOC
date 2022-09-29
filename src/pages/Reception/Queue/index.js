@@ -10,7 +10,6 @@ import { Divider, withStyles } from '@material-ui/core'
 import Refresh from '@material-ui/icons/Refresh'
 import Stop from '@material-ui/icons/Stop'
 import EventNote from '@material-ui/icons/EventNote'
-import { openCautionAlertOnStartConsultation } from '@/pages/Widgets/Orders/utils'
 
 // custom components
 import {
@@ -626,7 +625,6 @@ class Queue extends React.Component {
               history.push(
                 `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
               )
-              openCautionAlertOnStartConsultation(o)
             }
           })
         }
@@ -1004,7 +1002,7 @@ class Queue extends React.Component {
                   >
                     Refresh
                   </ProgressButton>
-                  <QueueDashboardButton size='sm' />
+                  {/* <QueueDashboardButton size='sm' /> */}
 
                   <Authorized authority='queue.endsession'>
                     <ProgressButton

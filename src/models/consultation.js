@@ -71,7 +71,6 @@ export default createFormViewModel({
       default: {
         corAttachment: [],
         corPatientNoteVitalSign: [],
-        corAudiometryTest: [],
         corEyeExaminations: [],
       },
       selectedWidgets: ['1'],
@@ -478,36 +477,6 @@ export default createFormViewModel({
                 let newObj = {
                   ...d,
                 }
-                let instructionArray = []
-                if (d.corPrescriptionItemInstruction) {
-                  instructionArray = d.corPrescriptionItemInstruction.map(
-                    instruction => {
-                      return {
-                        ...instruction,
-                        stepdose: instruction.stepdose || 'AND',
-                      }
-                    },
-                  )
-                  newObj = {
-                    ...newObj,
-                    corPrescriptionItemInstruction: instructionArray,
-                  }
-                }
-
-                if (p.value === '2') {
-                  // put auto generated certificate to document
-                  newObj.corVaccinationCert = newObj.corVaccinationCert.map(
-                    vc => {
-                      return {
-                        ...vc,
-                        uid: getUniqueId(),
-                        type: '3',
-                        vaccinationUFK: newObj.uid,
-                      }
-                    },
-                  )
-                  cdRows = cdRows.concat(newObj.corVaccinationCert)
-                }
 
                 return p.convert ? p.convert(newObj) : newObj
               }),
@@ -581,10 +550,6 @@ export default createFormViewModel({
           ...vs,
           visitPurposeFK: data.visitPurposeFK,
         }))
-
-        data.corAudiometryTest = (data.corAudiometryTest || []).length
-          ? data.corAudiometryTest
-          : [{}]
 
         data.corEyeExaminations = (data.corEyeExaminations || []).length
           ? data.corEyeExaminations

@@ -30,7 +30,7 @@ class LowStockReport extends ReportBase {
 const LowStockReportWithFormik = withFormik({
   validationSchema: Yup.object().shape({}),
   mapPropsToValues: () => ({
-    inventoryType: 'MEDICATION',
+    inventoryType: 'CONSUMABLE',
     Status: 'active',
     ThresholdType: 'All',
   }),

@@ -203,16 +203,12 @@ export const validateClaimAmount = (schemeRow, totalPayable) => {
     coverageMaxCap,
     patientMinCoPaymentAmount,
     patientMinCoPaymentAmountType,
-    medicationCoverageMaxCap,
     consumableCoverageMaxCap,
     serviceCoverageMaxCap,
-    vaccinationCoverageMaxCap,
     orderSetCoverageMaxCap,
 
     isCoverageMaxCapCheckRequired,
-    isMedicationCoverageMaxCapCheckRequired,
     isConsumableCoverageMaxCapCheckRequired,
-    isVaccinationCoverageMaxCapCheckRequired,
     isServiceCoverageMaxCapCheckRequired,
     isOrderSetCoverageMaxCapCheckRequired,
     schemeCategoryFK,
@@ -238,29 +234,15 @@ export const validateClaimAmount = (schemeRow, totalPayable) => {
   } else {
     // check for each item category
     // return isValid = false early
-    const medicationTotalClaim = getItemTypeSubtotal(invoicePayerItem, 1)
     const consumableTotalClaim = getItemTypeSubtotal(invoicePayerItem, 2)
-    const vaccinationTotalClaim = getItemTypeSubtotal(invoicePayerItem, 3)
     const serviceTotalClaim = getItemTypeSubtotal(invoicePayerItem, 4)
     const orderSetTotalClaim = getItemTypeSubtotal(invoicePayerItem, 5)
-
-    if (
-      isMedicationCoverageMaxCapCheckRequired &&
-      medicationTotalClaim > medicationCoverageMaxCap
-    )
-      invalidMessage.push('Medication claim amount has exceed the max cap')
 
     if (
       isConsumableCoverageMaxCapCheckRequired &&
       consumableTotalClaim > consumableCoverageMaxCap
     )
       invalidMessage.push('Consumable claim amount has exceed the max cap')
-
-    if (
-      isVaccinationCoverageMaxCapCheckRequired &&
-      vaccinationTotalClaim > vaccinationCoverageMaxCap
-    )
-      invalidMessage.push('Vaccination claim amount has exceed the max cap')
 
     if (
       isServiceCoverageMaxCapCheckRequired &&

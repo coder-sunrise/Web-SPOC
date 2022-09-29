@@ -42,8 +42,6 @@ import {
   VISIT_TYPE,
   NOTIFICATION_TYPE,
   NOTIFICATION_STATUS,
-  NURSE_WORKITEM_STATUS,
-  RADIOLOGY_WORKITEM_STATUS,
   DISPENSE_FROM,
 } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
@@ -51,29 +49,18 @@ import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 // sub components
 import TableData from './TableData'
-import DrugLabelSelection from './DrugLabelSelection'
-import NurseActualization from './NurseActualization'
 import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 
 // variables
 import {
   DispenseItemsColumns,
-  DispenseItemsColumnExtensions,
-  ServiceColumns,
-  OtherOrdersColumns,
-  OtherOrdersColumnExtensions,
-  PackageColumns,
-  PackageColumnExtensions,
-  actualizeTableConfig,
   getRowId,
-  isActualizable,
   ServiceColumns1,
   OtherOrdersColumns1,
   DispenseItemsColumns1,
 } from '../variables'
 
 import CONSTANTS from './constants'
-import { ServePatientButton } from '@/components/_medisys'
 import customtyles from './Style.less'
 import style from '@/components/CommonCard/style'
 
@@ -136,13 +123,7 @@ const DispenseDetails = ({
   onFinalizeClick,
   codetable,
   dispense = {},
-  handlePrint,
   history,
-  onDrugLabelClick,
-  showDrugLabelSelection,
-  onDrugLabelSelectionClose,
-  selectedDrugs,
-  currentDrugToPrint,
   clinicSettings,
   servingPersons = [],
   patient,
@@ -164,7 +145,6 @@ const DispenseDetails = ({
     visitStatus,
     hasAnySpecimenCollected,
     id: visitId,
-    medicalCheckupWorkitemStatusFK,
     isClinicSessionClosed,
   } = values || {
     invoice: { invoiceItem: [] },
@@ -179,13 +159,11 @@ const DispenseDetails = ({
   const { openFrom } = dispense
   const [popperOpen, setPopperOpen] = useState(false)
   const [patientLabelCopies, setPatientLabelCopies] = useState(1)
-  const [labLabelCopies, setLabLabelCopies] = useState(1)
   const openPopper = () => setPopperOpen(true)
   const closePopper = () => setPopperOpen(false)
   const [selectedAll, setSelectedAll] = useState(false)
   const [selectedServiceAll, setSelectedServiceAll] = useState(false)
 
-  const { inventorymedication, inventoryvaccination } = codetable
   const { settings = {} } = clinicSettings
   const discardCallback = r => {
     if (r) {
@@ -205,16 +183,6 @@ const DispenseDetails = ({
         queueNo: entity.queueNo,
         visitID: entity.id,
       })
-      const message = `${userName} discard prescription at ${moment().format(
-        'HH:mm',
-      )}`
-      sendNotification('PharmacyOrderDiscard', {
-        type: NOTIFICATION_TYPE.CONSULTAION,
-        status: NOTIFICATION_STATUS.OK,
-        message,
-        visitID: values.id,
-      })
-
       history.push('/reception/queue')
     }
   }
@@ -379,28 +347,10 @@ const DispenseDetails = ({
   }
 
   const [selectedServiceRows, setSelectedServiceRows] = useState([])
-  const [selectedActualizeRows, setSelectedActualizeRows] = useState([])
-  const [showActualization, setShowActualization] = useState(false)
-  const [actualizationStatus, setActualizationStatus] = useState(-1)
 
   const handleReloadClick = () => {
     setSelectedServiceRows([])
-    setSelectedActualizeRows([])
-    setShowActualization(false)
-    setActualizationStatus(-1)
     onReloadClick()
-  }
-
-  const isShowActualizeSelection = (records = []) => {
-    if (viewOnly) {
-      return false
-    }
-    let actualizeOrderItemsRight = Authorized.check(
-      'dispense.actualizeorderitems',
-    )
-    let viewable =
-      actualizeOrderItemsRight && actualizeOrderItemsRight.rights !== 'hidden'
-    return viewable && records.filter(x => isActualizable(x)).length > 0
   }
 
   const handleSelectionChange = (type, value) => {
@@ -411,96 +361,12 @@ const DispenseDetails = ({
     }
   }
 
-  const onActualizeBtnClick = (row, status) => {
-    setSelectedActualizeRows([row])
-    setActualizationStatus(status)
-    setShowActualization(true)
-  }
-
-  const { detailsId, setDetailsId } = useContext(WorklistContext)
-  const onRadiologyBtnClick = radiologyWorkitemID => {
-    setDetailsId(radiologyWorkitemID, true)
-  }
-
-  const handleMultiActualizationClick = type => {
-    let selectedRows = []
-    let records = []
-    switch (type) {
-      case 'DispenseItems':
-        records = dispenseItems
-        break
-      case 'Service':
-        records = service
-        break
-    }
-    selectedRows = records.filter(x => x.isCheckActualize)
-    if (selectedRows.length > 0) {
-      let selectedRecords = []
-      if (type === 'DispenseItems') {
-        selectedRecords = [
-          ...records.filter(x => x.isCheckActualize && !x.isDrugMixture),
-          ..._.uniqBy(
-            records.filter(x => x.isCheckActualize && x.isDrugMixture),
-            'id',
-          ),
-        ]
-      } else {
-        selectedRecords = selectedRows
-      }
-      setSelectedActualizeRows(selectedRecords)
-      setActualizationStatus(NURSE_WORKITEM_STATUS.NEW)
-      setShowActualization(true)
-    } else {
-      notification.error({
-        message: 'Please select at least one order item to actualize.',
-      })
-    }
-  }
-
-  const actualizeSelectedItemButton = (type, records = []) => {
-    if (records.filter(x => isActualizable(x)).length > 0) {
-      return (
-        <Authorized authority='dispense.actualizeorderitems'>
-          <Link
-            component='button'
-            style={{ marginLeft: 10, textDecoration: 'underline' }}
-            onClick={() => {
-              handleMultiActualizationClick(type)
-            }}
-          >
-            Actualize Selected Item
-          </Link>
-        </Authorized>
-      )
-    }
-    return null
-  }
-
-  const onNurseActualizationClose = () => {
-    setSelectedAll(false)
-    setSelectedServiceAll(false)
-    setShowActualization(false)
-    dispatch({
-      type: 'dispense/query',
-      payload: {
-        id: values.id,
-        version: Date.now(),
-      },
-    })
-  }
-
-  const { labelPrinterSize } = settings
-  const showDrugLabelRemark = labelPrinterSize === '8.0cmx4.5cm_V2'
-
-  const isShowDispenseActualie =
-    !viewOnly && isShowActualizeSelection(dispenseItems)
-  const isShowServiceActualie = !viewOnly && isShowActualizeSelection(service)
   const orderItemRow = p => {
     const { row, children, tableRow } = p
     let newchildren = []
 
-    const startColIndex = isShowDispenseActualie ? 7 : 6
-    let endColIndex = isShowDispenseActualie ? 11 : 10
+    const startColIndex = 6
+    let endColIndex = 10
     if (viewOnly) {
       endColIndex = endColIndex - 1
     }
@@ -509,7 +375,7 @@ const DispenseDetails = ({
     if (row.groupNumber === 1) {
       newchildren.push(
         children
-          .filter((value, index) => index < (isShowDispenseActualie ? 3 : 2))
+          .filter((value, index) => index < 2)
           .map(item => ({
             ...item,
             props: {
@@ -523,10 +389,7 @@ const DispenseDetails = ({
     if (row.countNumber === 1) {
       newchildren.push(
         children
-          .filter(
-            (value, index) =>
-              index < startColIndex && index > (isShowDispenseActualie ? 2 : 1),
-          )
+          .filter((value, index) => index < startColIndex && index > 1)
           .map(item => ({
             ...item,
             props: {
@@ -576,9 +439,6 @@ const DispenseDetails = ({
   }
 
   let columns = DispenseItemsColumns
-  if (!isShowDispenseActualie || viewOnly) {
-    columns = columns.filter(c => c.name !== 'isCheckActualize')
-  }
   if (viewOnly) {
     columns = columns.filter(c => c.name !== 'stock')
   }
@@ -601,10 +461,6 @@ const DispenseDetails = ({
       updateSelectAll(rows)
       setFieldValue('dispenseItems', rows)
     }
-  }
-  const printDrugLabel = () => {
-    setPopperOpen(false)
-    onDrugLabelClick()
   }
 
   const finalizeInvoice = () => {
@@ -652,141 +508,13 @@ const DispenseDetails = ({
     } else if (coPayerPayments.length > 0) {
       setShowRemovePayment(true)
     } else {
-      if (
-        (dispense.entity?.visitPurposeFK !== VISIT_TYPE.MC ||
-          dispense.entity?.isForInvoiceReplacement) &&
-        (dispenseItems?.filter(x => isActualizable(x)).length > 0 ||
-          service?.filter(x => isActualizable(x)).length > 0)
-      )
-        notification.error({
-          message: 'Actualize all nursing work items before finalize.',
-        })
-      else onFinalizeClick()
+      onFinalizeClick()
     }
-  }
-
-  const existsCanceledRadiology = () => {
-    const { entity = {} } = dispense
-    const { service = [] } = entity
-    if (
-      service.find(s => {
-        const { workitem = {} } = s
-        const { radiologyWorkitem = {} } = workitem
-        return (
-          radiologyWorkitem.statusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED
-        )
-      })
-    ) {
-      return true
-    }
-    return false
-  }
-
-  const isMandatoryWaistCircumference = () => {
-    const { entity = {} } = visitRegistration
-    const { visit = {} } = entity
-    const {
-      visitPurposeFK,
-      visitBasicExaminations = [],
-      corBasicExaminations = [],
-    } = visit
-    if (
-      visitPurposeFK === VISIT_TYPE.MC &&
-      !dispense.entity?.isForInvoiceReplacement
-    ) {
-      const basicExamination = corBasicExaminations.length
-        ? corBasicExaminations
-        : visitBasicExaminations
-      if (
-        !basicExamination[0].isChild &&
-        !basicExamination[0].isPregnancy &&
-        !hasValue(basicExamination[0].waistCircumference)
-      ) {
-        return true
-      }
-    }
-    return false
   }
 
   const onHandelFinalize = () => {
-    if (existsCanceledRadiology()) {
-      dispatch({
-        type: 'global/updateAppState',
-        payload: {
-          openConfirm: true,
-          openConfirmContent: 'Confirm to finalize with cancelled item?',
-          onConfirmSave: finalizeInvoice,
-          openConfirmText: 'Yes',
-          cancelText: 'No',
-        },
-      })
-    } else {
-      finalizeInvoice()
-    }
+    finalizeInvoice()
   }
-  const onChangeSelectAll = value => {
-    let newItems = [...dispenseItems]
-    newItems.forEach(item => {
-      if (isActualizable(item) && item.isCheckActualize !== value) {
-        item.isCheckActualize = value
-      }
-    })
-    setFieldValue('dispenseItems', newItems)
-  }
-
-  const updateSelectAll = newItems => {
-    var enableItems = newItems.filter(item => isActualizable(item))
-    if (
-      enableItems.filter(item => item.isCheckActualize).length ===
-      enableItems.length
-    ) {
-      if (!selectedAll) {
-        setSelectedAll(true)
-      }
-    } else {
-      if (selectedAll) {
-        setSelectedAll(false)
-      }
-    }
-  }
-  const onChangeSelectServiceAll = value => {
-    let newItems = [...service]
-    newItems.forEach(item => {
-      if (isActualizable(item) && item.isCheckActualize !== value) {
-        item.isCheckActualize = value
-      }
-    })
-    setFieldValue('service', newItems)
-  }
-
-  const updateSelectServiceAll = newItems => {
-    var enableItems = newItems.filter(item => isActualizable(item))
-    if (
-      enableItems.filter(item => item.isCheckActualize).length ===
-      enableItems.length
-    ) {
-      if (!selectedServiceAll) {
-        setSelectedServiceAll(true)
-      }
-    } else {
-      if (selectedServiceAll) {
-        setSelectedServiceAll(false)
-      }
-    }
-  }
-
-  const hasAnyLabWorkitems = (() => {
-    if (!service) return false
-
-    return (
-      service.filter(
-        svc =>
-          svc.workitem &&
-          svc.workitem.labWorkitems &&
-          svc.workitem.labWorkitems.length > 0,
-      ).length > 0
-    )
-  })()
 
   const onDispenseItemsValueChange = (uid, valueField, value) => {
     const newItems = [...dispenseItems]
@@ -838,7 +566,6 @@ const DispenseDetails = ({
     const newItems = [...service]
     const editRow = newItems.find(r => r.id === id)
     editRow[valueField] = value
-    updateSelectServiceAll(newItems)
     setFieldValue('service', newItems)
   }
 
@@ -911,48 +638,6 @@ const DispenseDetails = ({
                         />
                         <span className={classes.qtyFont}>&nbsp;Copies</span>
                       </MenuItem>
-                      <MenuItem>
-                        <Button
-                          color='primary'
-                          size='sm'
-                          style={{ width: 120 }}
-                          onClick={() => {
-                            onPrint({
-                              type: CONSTANTS.LAB_LABEL,
-                              undefined,
-                              undefined,
-                              undefined,
-                              copies: labLabelCopies,
-                            })
-                          }}
-                          disabled={sendingJob}
-                        >
-                          Lab Label
-                        </Button>
-                        <InputNumber
-                          size='small'
-                          min={1}
-                          max={10}
-                          value={labLabelCopies}
-                          onChange={v => {
-                            setLabLabelCopies(v || 1)
-                            console.log(v)
-                          }}
-                          className={classes.inputStyle}
-                        />
-                        <span className={classes.qtyFont}>&nbsp;Copies</span>
-                      </MenuItem>
-                      <MenuItem>
-                        <Button
-                          color='primary'
-                          size='sm'
-                          onClick={printDrugLabel}
-                          disabled={sendingJob}
-                          style={{ width: 120 }}
-                        >
-                          Drug Label
-                        </Button>
-                      </MenuItem>
                     </MenuList>
                   </ClickAwayListener>
                 }
@@ -984,14 +669,6 @@ const DispenseDetails = ({
                       {` ${orderCreateTime.format('DD MMM yyyy HH:mm')}`}.
                     </span>
                   </span>{' '}
-                </span>
-              )}
-              {servingPersons.length > 0 && (
-                <span>
-                  Served by{' '}
-                  <span style={{ fontWeight: 500 }}>{`${servingPersons
-                    .map(x => x.servingBy)
-                    .join(', ')}.`}</span>
                 </span>
               )}
               {invoice.finalizedDateTime && (
@@ -1050,36 +727,18 @@ const DispenseDetails = ({
                 Add Order
               </ProgressButton>
             )}
-            {
-              <Authorized authority='queue.servepatient'>
-                <ServePatientButton
-                  patientName={patient.name}
-                  justIcon={false}
-                  servingPersons={servingPersons}
-                  onConfirm={() => {
-                    dispatch({
-                      type: 'dispense/setServingPerson',
-                      payload: { visitFK: values?.id },
-                    })
-                  }}
-                />
+            {!isRetailVisit && visitStatus !== VISIT_STATUS.PAUSED && (
+              <Authorized authority='queue.dispense.editorder'>
+                <ProgressButton
+                  color='primary'
+                  size='sm'
+                  icon={<Edit />}
+                  onClick={onEditOrderClick}
+                >
+                  Edit Order
+                </ProgressButton>
               </Authorized>
-            }
-            {medicalCheckupWorkitemStatusFK !== 3 &&
-              medicalCheckupWorkitemStatusFK !== 4 &&
-              !isRetailVisit &&
-              visitStatus !== VISIT_STATUS.PAUSED && (
-                <Authorized authority='queue.dispense.editorder'>
-                  <ProgressButton
-                    color='primary'
-                    size='sm'
-                    icon={<Edit />}
-                    onClick={onEditOrderClick}
-                  >
-                    Edit Order
-                  </ProgressButton>
-                </Authorized>
-              )}
+            )}
             {visitStatus !== VISIT_STATUS.PAUSED && (
               <Authorized authority='queue.dispense.makepayment'>
                 <ProgressButton
@@ -1101,12 +760,6 @@ const DispenseDetails = ({
               <div className={classes.tableContainer}>
                 <div>
                   <h5 style={{ display: 'inline-block' }}>Dispense Details</h5>
-                  {viewOnly
-                    ? ''
-                    : actualizeSelectedItemButton(
-                        'DispenseItems',
-                        dispenseItems,
-                      )}
                 </div>
                 <div style={{ position: 'relative', overflowX: 'auto' }}>
                   <AntdTable
@@ -1117,30 +770,9 @@ const DispenseDetails = ({
                     dataSource={getGroupDispenseItem()}
                     columns={DispenseItemsColumns1(
                       viewOnly,
-                      onDrugLabelClick,
-                      onActualizeBtnClick,
-                      showDrugLabelRemark,
                       onDispenseItemsValueChange,
-                      isShowDispenseActualie,
                     )}
                   />
-                  <div
-                    style={{
-                      position: 'absolute',
-                      left: 18,
-                      top: 14,
-                    }}
-                  >
-                    {isShowDispenseActualie && !viewOnly && (
-                      <Checkbox
-                        checked={selectedAll}
-                        onClick={e => {
-                          setSelectedAll(!selectedAll)
-                          onChangeSelectAll(!selectedAll)
-                        }}
-                      />
-                    )}
-                  </div>
                 </div>
               </div>
             </div>
@@ -1148,9 +780,6 @@ const DispenseDetails = ({
             <div className={classes.tableContainer}>
               <div>
                 <h5 style={{ display: 'inline-block' }}>Service</h5>
-                {viewOnly
-                  ? ''
-                  : actualizeSelectedItemButton('Service', service)}
               </div>
               <div style={{ position: 'relative', overflowX: 'auto' }}>
                 <AntdTable
@@ -1162,31 +791,11 @@ const DispenseDetails = ({
                   columns={ServiceColumns1(
                     viewOnly,
                     onPrint,
-                    onActualizeBtnClick,
-                    onRadiologyBtnClick,
                     dispatch,
                     history?.location?.query?.vid,
                     onServiceValueChange,
-                    isShowServiceActualie,
                   )}
                 />
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: 18,
-                    top: 8,
-                  }}
-                >
-                  {isShowServiceActualie && !viewOnly && (
-                    <Checkbox
-                      checked={selectedServiceAll}
-                      onClick={e => {
-                        setSelectedServiceAll(!selectedServiceAll)
-                        onChangeSelectServiceAll(!selectedServiceAll)
-                      }}
-                    />
-                  )}
-                </div>
               </div>
             </div>
 
@@ -1205,36 +814,6 @@ const DispenseDetails = ({
                 />
               </div>
             </div>
-
-            {false &&
-              settings.isEnablePackage &&
-              visitPurposeFK !== VISIT_TYPE.OTC && (
-                <TableData
-                  oddEven={false}
-                  title='Package'
-                  idPrefix='package'
-                  columns={PackageColumns}
-                  colExtensions={PackageColumnExtensions(
-                    onPrint,
-                    showDrugLabelRemark,
-                  )}
-                  data={packageItem}
-                  FuncProps={{
-                    pager: false,
-                    grouping: true,
-                    groupingConfig: {
-                      state: {
-                        grouping: [{ columnName: 'packageGlobalId' }],
-                        expandedGroups: [...expandedGroups],
-                        onExpandedGroupsChange: handleExpandedGroupsChange,
-                      },
-                      row: {
-                        contentComponent: packageGroupCellContent,
-                      },
-                    },
-                  }}
-                />
-              )}
           </Paper>
         </GridItem>
         <GridItem xs={7} md={7} style={{ marginTop: -14 }}>
@@ -1274,28 +853,6 @@ const DispenseDetails = ({
           </GridItem>
         )}
       </GridContainer>
-      <CommonModal
-        maxWidth='sm'
-        title='Print Drug Labels'
-        open={showDrugLabelSelection}
-        observe='DispenseDetails'
-        onClose={() => {
-          onDrugLabelSelectionClose()
-        }}
-      >
-        <DrugLabelSelection
-          handlePrint={handlePrint}
-          values={values}
-          currentDrugToPrint={currentDrugToPrint}
-          dispatch={dispatch}
-          patient={patient}
-          source='dispense'
-          visitid={values?.id}
-          handleSubmit={() => {
-            onDrugLabelSelectionClose()
-          }}
-        />
-      </CommonModal>
       <CommonModal
         title='Information'
         open={showRemovePayment}
@@ -1392,35 +949,11 @@ const DispenseDetails = ({
           </GridContainer>
         </div>
       </CommonModal>
-      <CommonModal
-        maxWidth='xl'
-        title='Actualization'
-        open={showActualization}
-        observe='DispenseDetails'
-        onClose={() => {
-          setShowActualization(false)
-        }}
-      >
-        <NurseActualization
-          status={actualizationStatus}
-          nurseWorkitemIds={selectedActualizeRows
-            .map(x => x.workitem?.nurseWorkitem?.id)
-            .filter(x => x)
-            .join(',')}
-          dispatch={dispatch}
-          handleSubmit={onNurseActualizationClose}
-        />
-      </CommonModal>
-      <RadiologyDetails />
     </React.Fragment>
   )
 }
 
-const _DispenseDetails = props => (
-  <WorklistContextProvider>
-    <DispenseDetails {...props}></DispenseDetails>
-  </WorklistContextProvider>
-)
+const _DispenseDetails = props => <DispenseDetails {...props}></DispenseDetails>
 
 export default compose(
   withWebSocket(),

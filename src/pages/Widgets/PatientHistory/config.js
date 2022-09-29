@@ -29,7 +29,6 @@ export const WIDGETS_ID = {
   NURSENOTES: '21',
   DOCTORNOTE: '22',
   EYEEXAMINATIONS: '23',
-  AUDIOMETRYTEST: '24',
 }
 
 export const GPCategory = [
@@ -42,7 +41,6 @@ export const GPCategory = [
   WIDGETS_ID.REFERRAL,
   WIDGETS_ID.VITALSIGN,
   WIDGETS_ID.EYEEXAMINATIONS,
-  WIDGETS_ID.AUDIOMETRYTEST,
   WIDGETS_ID.ORDERS,
   WIDGETS_ID.INVOICE,
   WIDGETS_ID.CONSULTATION_DOCUMENT,
@@ -64,7 +62,6 @@ export const EyeCategory = [
   WIDGETS_ID.REFERRAL,
   WIDGETS_ID.VITALSIGN,
   WIDGETS_ID.EYEEXAMINATIONS,
-  WIDGETS_ID.AUDIOMETRYTEST,
   WIDGETS_ID.ORDERS,
   WIDGETS_ID.INVOICE,
   WIDGETS_ID.CONSULTATION_DOCUMENT,
@@ -163,12 +160,6 @@ export const categoryTypes = [
     name: 'Eye Examinations',
     shortname: 'Eye Exam.',
     authority: 'queue.consultation.widgets.eyeexaminations',
-  },
-  {
-    value: WIDGETS_ID.AUDIOMETRYTEST,
-    name: 'Audiometry Test',
-    shortname: 'Audiometry',
-    authority: 'queue.consultation.widgets.audiometrytest',
   },
   {
     value: WIDGETS_ID.ORDERS,
@@ -372,19 +363,6 @@ export const widgets = (
     authority: 'queue.consultation.widgets.eyeexaminations',
     component: Loadable({
       loader: () => import('./EyeExaminations'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: WIDGETS_ID.AUDIOMETRYTEST,
-    name: 'Audiometry Test',
-    authority: 'queue.consultation.widgets.audiometrytest',
-    component: Loadable({
-      loader: () => import('./AudiometryTest'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return <Cmpnet {...props} {...p} />
@@ -631,7 +609,8 @@ export const showWidget = (current, widgetId, selectNoteTypes = []) => {
   // check show orders
   if (
     widgetId === WIDGETS_ID.ORDERS &&
-    (!current.orders || current.orders.length === 0) && !current.isFromEditOrder
+    (!current.orders || current.orders.length === 0) &&
+    !current.isFromEditOrder
   )
     return false
   // check show document
@@ -669,12 +648,6 @@ export const showWidget = (current, widgetId, selectNoteTypes = []) => {
   )
     return false
 
-  // check show Audiometry Test
-  if (
-    widgetId === WIDGETS_ID.AUDIOMETRYTEST &&
-    !showAudiometryTest(current.corAudiometryTest)
-  )
-    return false
   // check show visit referral
   if (widgetId === WIDGETS_ID.REFERRAL) {
     const {
@@ -769,16 +742,3 @@ export const showEyeExaminations = (corEyeExaminations = []) => {
   return false
 }
 
-export const showAudiometryTest = (corEyeExaminations = []) => {
-  if (
-    corEyeExaminations.find(
-      row =>
-        hasValue(row.leftResult1000Hz) ||
-        hasValue(row.leftResult4000Hz) ||
-        hasValue(row.rightResult1000Hz) ||
-        hasValue(row.rightResult4000Hz),
-    )
-  )
-    return true
-  return false
-}

@@ -35,9 +35,13 @@ const ExpiringStockReportWithFormik = withFormik({
     stockType: Yup.string().required(),
   }),
   mapPropsToValues: () => ({
-    dateFrom: moment(new Date()).startOf('month').toDate(),
-    dateTo: moment(new Date()).endOf('month').toDate(),
-    stockType: 'MEDICATION',
+    dateFrom: moment(new Date())
+      .startOf('month')
+      .toDate(),
+    dateTo: moment(new Date())
+      .endOf('month')
+      .toDate(),
+    stockType: 'CONSUMABLE',
   }),
 })(ExpiringStockReport)
 

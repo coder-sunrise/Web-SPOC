@@ -46,10 +46,6 @@ const Stock = ({
   authority,
 }) => {
   const objectType = () => {
-    if (vaccinationDetail)
-      return { name: 'vaccination', stockProp: 'vaccinationStock' }
-    if (medicationDetail)
-      return { name: 'medication', stockProp: 'medicationStock' }
     if (consumableDetail)
       return { name: 'consumable', stockProp: 'consumableStock' }
     return ''

@@ -230,9 +230,7 @@ const Detail = ({
                   name='manufacturerFK'
                   render={args => (
                     <CodeSelect
-                      label={formatMessage({
-                        id: 'inventory.master.medication.manufacturer',
-                      })}
+                      label='Manufacture'
                       code='ctManufacturer'
                       labelField='displayValue'
                       max={10}
@@ -275,9 +273,7 @@ const Detail = ({
                   name='revenueCategoryFK'
                   render={args => (
                     <CodeSelect
-                      label={formatMessage({
-                        id: 'inventory.master.medication.revenueCategory',
-                      })}
+                      label='Revenue Category'
                       code='ctRevenueCategory'
                       {...args}
                     />

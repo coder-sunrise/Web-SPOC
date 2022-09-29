@@ -36,11 +36,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, values }) => {
                     {...args}
                     label='Inventory Type'
                     mode='multiple'
-                    options={[
-                      { name: 'Medication', value: 'MEDICATION' },
-                      { name: 'Consumable', value: 'CONSUMABLE' },
-                      { name: 'Vaccination', value: 'VACCINATION' },
-                    ]}
+                    options={[{ name: 'Consumable', value: 'CONSUMABLE' }]}
                     all={-99}
                     maxTagCount={maxinventorytypeCount}
                     maxTagPlaceholder='inventory types'

@@ -96,41 +96,6 @@ const fns = {
   removeBillFirstVisit: params =>
     service.remove(`${url}/billFirstOrder`, params),
 
-  getServingPersons: async params => {
-    const r = await request(`${urlQueue}/getServingPersons/${params.visitFK}`, {
-      method: 'GET',
-    })
-    return r
-  },
-  setServingPerson: async params => {
-    const r = await request(`${urlQueue}/setServingPerson/${params.visitFK}`, {
-      method: 'POST',
-    })
-    return r
-  },
-  addActualize: async params => {
-    const r = await request(`${url}/addActualize`, {
-      method: 'POST',
-      body: params,
-    })
-    return r
-  },
-  getActualize: async params => {
-    const r = await request(
-      `${url}/getActualize/${params.status}?nurseWorkitemIds=${params.nurseWorkitemIds}`,
-      {
-        method: 'GET',
-      },
-    )
-    return r
-  },
-  cancelActualize: async params => {
-    const r = await request(`${url}/cancelActualize`, {
-      method: 'PUT',
-      body: params,
-    })
-    return r
-  },
   getSeparatedDrugInstructions: async params =>
     await request(
       `/api/pharmacyWorklist/GetSeparatedDrugInstructions/${params.id}`,

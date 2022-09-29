@@ -1,6 +1,5 @@
 import React from 'react'
 import { CardContainer } from '@/components'
-import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import numeral from 'numeral'
 import { currencySymbol } from '@/utils/config'
 import moment from 'moment'
@@ -16,14 +15,6 @@ export default ({
   clinicSettings,
   isFullScreen = true,
 }) => {
-  const drugMixtureIndicator = (row, right) => {
-    if (!row.isDrugMixture) return null
-
-    return (
-      <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
-    )
-  }
-
   const showCurrency = (value = 0) => {
     if (value >= 0)
       return (
@@ -83,32 +74,6 @@ export default ({
                 <div>{row.name}</div>
               </Tooltip>
               <div style={{ position: 'absolute', top: '-1px', right: '-4px' }}>
-                <div
-                  style={{
-                    display: 'inline-block',
-                    position: 'relative',
-                  }}
-                >
-                  {drugMixtureIndicator(row)}
-                </div>
-                {(row.isPreOrder || row.isActualizedPreOrder) && (
-                  <Tooltip
-                    title={
-                      row.isPreOrder ? 'New Pre-Order' : 'Actualized Pre-Order'
-                    }
-                  >
-                    <div
-                      className={classes.rightIcon}
-                      style={{
-                        borderRadius: 4,
-                        backgroundColor: row.isPreOrder ? '#4255bd' : 'green',
-                        display: 'inline-block',
-                      }}
-                    >
-                      Pre
-                    </div>
-                  </Tooltip>
-                )}
                 {row.isExclusive && (
                   <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                     <div

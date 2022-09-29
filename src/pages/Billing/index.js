@@ -42,7 +42,6 @@ import Signature from '@/components/_medisys/Forms/Signature'
 import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 import SchemeValidationPrompt from './components/SchemeValidationPrompt'
-import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
 import InvoicePaymentDetails from './components/InvoicePaymentDetails'
 // page utils
 import {
@@ -87,12 +86,7 @@ const styles = theme => ({
 const base64Prefix = 'data:image/jpeg;base64,'
 
 const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
-  const {
-    inventorymedication = [],
-    inventoryconsumable = [],
-    inventoryvaccination = [],
-    ctmedicationunitofmeasurement = [],
-  } = codetable
+  const { inventoryconsumable = [] } = codetable
 
   const {
     primaryPrintoutLanguage = 'EN',
@@ -132,53 +126,6 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
     }
   }
 
-  const generateFromDrugmixture = item => {
-    const drugMixtures = _.orderBy(
-      item.prescriptionDrugMixture,
-      ['sequence'],
-      ['asc'],
-    )
-    drugMixtures.forEach(drugMixture => {
-      const detaultDrugMixture = {
-        ...defaultItem(item, `DrugMixture-${item.id}`),
-        drugMixtureFK: drugMixture.id,
-        inventoryMedicationFK: drugMixture.inventoryMedicationFK,
-        code: drugMixture.drugCode,
-        name: drugMixture.drugName,
-        quantity: drugMixture.quantity,
-        dispenseUOM: drugMixture.uomDisplayValue,
-        isDispensedByPharmacy: drugMixture.isDispensedByPharmacy,
-        drugMixtureName: item.name,
-        stockBalance: drugMixture.quantity,
-        uid: getUniqueId(),
-      }
-      if (drugMixture.dispenseItem.length) {
-        drugMixture.dispenseItem.forEach((di, index) => {
-          orderItems.push({
-            ...detaultDrugMixture,
-            ...transactionDetails(di),
-            stockBalance:
-              drugMixture.quantity -
-              _.sumBy(drugMixture.dispenseItem, 'transactionQty'),
-            countNumber: index === 0 ? 1 : 0,
-            rowspan: index === 0 ? drugMixture.dispenseItem.length : 0,
-            uid: getUniqueId(),
-          })
-        })
-      } else {
-        orderItems.push({
-          ...detaultDrugMixture,
-        })
-      }
-    })
-
-    const groupItems = orderItems.filter(
-      oi => oi.type === item.type && oi.id === item.id,
-    )
-    groupItems[0].groupNumber = 1
-    groupItems[0].groupRowSpan = groupItems.length
-  }
-
   const generateFromTransaction = item => {
     const groupName = 'NormalDispense'
     if (item.isPreOrder) {
@@ -212,46 +159,10 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
     groupItems[0].groupRowSpan = groupItems.length
   }
 
-  const sortOrderItems = [
-    ...(entity.prescription || [])
-      .filter(item => item.type === 'Medication' && !item.isDrugMixture)
-      .map(item => {
-        return { ...item, quantity: item.dispensedQuanity }
-      }),
-    ...(entity.vaccination || []),
-    ...(entity.consumable || []),
-    ...(entity.prescription || []).filter(
-      item => item.type === 'Medication' && item.isDrugMixture,
-    ),
-    ...(entity.prescription || [])
-      .filter(item => item.type === 'Open Prescription')
-      .map(item => {
-        return { ...item, quantity: item.dispensedQuanity }
-      }),
-    ...(entity.externalPrescription || []).map(item => {
-      return { ...item, quantity: item.dispensedQuanity }
-    }),
-  ]
+  const sortOrderItems = [...(entity.consumable || [])]
 
   sortOrderItems.forEach(item => {
-    if (item.type === 'Medication') {
-      if (item.isDrugMixture) {
-        generateFromDrugmixture(item)
-      } else {
-        generateFromTransaction(item)
-      }
-    } else if (
-      item.type === 'Open Prescription' ||
-      item.type === 'External Prescription'
-    ) {
-      orderItems.push({
-        ...defaultItem(item, 'NoNeedToDispense'),
-        groupNumber: 1,
-        groupRowSpan: 1,
-      })
-    } else {
-      generateFromTransaction(item)
-    }
+    generateFromTransaction(item)
   })
   const defaultExpandedGroups = _.uniqBy(orderItems, 'dispenseGroupId').map(
     o => o.dispenseGroupId,
@@ -285,8 +196,6 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
     ctcopaymentscheme: codetable.copaymentscheme || [],
     ctschemetype: codetable.ctschemetype || [],
     ctcopayer: codetable.ctcopayer || [],
-    inventorymedication: codetable.inventorymedication || [],
-    inventoryvaccination: codetable.inventoryvaccination || [],
     ctservice: codetable.ctservice || [],
     commitCount: global.commitCount,
     clinicSettings: clinicSettings.settings,
@@ -449,18 +358,6 @@ class Billing extends Component {
         code: 'ctservice',
       },
     })
-    await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventoryvaccination',
-      },
-    })
-    await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventorymedication',
-      },
-    })
     if (query.vid) {
       const { invoice } = billing.entity || billing.default
       const { invoiceItems } = invoice
@@ -506,13 +403,7 @@ class Billing extends Component {
       await this.onExpandDispenseDetails()
 
       const { values, dispense } = this.props
-      const { prescription = [] } = dispense.entity
       const { invoice, invoicePayment } = values
-      this.setState({
-        selectedDrugs: prescription.map(x => {
-          return { ...x, no: 1, selected: true }
-        }),
-      })
       let reportsOnCompletePayment = autoPrintReportsOnCompletePayment
       let printData = []
       if (
@@ -554,14 +445,6 @@ class Billing extends Component {
         }
       }
 
-      const printDrugLabel =
-        reportsOnCompletePayment.indexOf(
-          ReportsOnCompletePaymentOption.DrugLabel,
-        ) > -1
-      if (!printDrugLabel) {
-        this.setState({ selectedDrugs: [] })
-      }
-
       if (printData && printData.length > 0) {
         const token = localStorage.getItem('token')
         printData = printData.map(item => ({
@@ -571,11 +454,10 @@ class Billing extends Component {
         }))
       }
 
-      if (printData.length > 0 || printDrugLabel) {
+      if (printData.length > 0) {
         await this.childOnPrintRef({
           type: 1,
           printData,
-          printAllDrugLabel: printDrugLabel,
         })
       }
     }
@@ -1109,61 +991,6 @@ class Billing extends Component {
     }))
   }
 
-  handleDrugLabelClick = () => {
-    const { dispense } = this.props
-    const { prescription = [], packageItem = [] } = dispense.entity
-
-    let drugList = []
-
-    prescription.forEach(item => {
-      drugList.push(item)
-    })
-    packageItem.forEach(item => {
-      if (item.type === 'Medication') {
-        drugList.push({
-          ...item,
-          name: item.description,
-          dispensedQuanity: item.packageConsumeQuantity,
-        })
-      }
-    })
-
-    this.setState(prevState => {
-      return {
-        showDrugLabelSelection: !prevState.showDrugLabelSelection,
-        selectedDrugs: drugList.map(x => {
-          return { ...x, no: 1, selected: true }
-        }),
-      }
-    })
-  }
-
-  handleDrugLabelSelectionClose = () => {
-    this.setState(prevState => {
-      return {
-        showDrugLabelSelection: !prevState.showDrugLabelSelection,
-      }
-    })
-  }
-
-  handleDrugLabelSelected = (itemId, selected) => {
-    this.setState(prevState => ({
-      selectedDrugs: prevState.selectedDrugs.map(drug =>
-        drug.id === itemId ? { ...drug, selected } : { ...drug },
-      ),
-    }))
-    this.props.dispatch({ type: 'global/incrementCommitCount' })
-  }
-
-  handleDrugLabelNoChanged = (itemId, no) => {
-    this.setState(prevState => ({
-      selectedDrugs: prevState.selectedDrugs.map(drug =>
-        drug.id === itemId ? { ...drug, no } : { ...drug },
-      ),
-    }))
-    this.props.dispatch({ type: 'global/incrementCommitCount' })
-  }
-
   onShowReport = (reportID, reportParameters, printType) => {
     this.setState({
       showReport: true,
@@ -1250,8 +1077,6 @@ class Billing extends Component {
       ctcopaymentscheme,
       ctcopayer,
       ctservice,
-      inventoryvaccination,
-      inventorymedication,
       clinicSettings,
       codetable,
     } = this.props
@@ -1286,8 +1111,6 @@ class Billing extends Component {
       sessionInfo,
       user,
       clinicSettings,
-      inventoryvaccination,
-      inventorymedication,
       ctservice,
       ctcopayer,
     }
@@ -1343,17 +1166,6 @@ class Billing extends Component {
                         }
                         history={this.props.history}
                         dispatch={this.props.dispatch}
-                        onDrugLabelClick={this.handleDrugLabelClick}
-                        showDrugLabelSelection={
-                          this.state.showDrugLabelSelection
-                        }
-                        onDrugLabelSelectionClose={
-                          this.handleDrugLabelSelectionClose
-                        }
-                        onDrugLabelSelected={this.handleDrugLabelSelected}
-                        onDrugLabelNoChanged={this.handleDrugLabelNoChanged}
-                        selectedDrugs={this.state.selectedDrugs}
-                        onPrintRef={this.onPrintRef}
                       />
                     </div>
                   ),

@@ -46,17 +46,6 @@ const PatientResultButton = ({ handlePrint, clinicSettings, row }) => {
           <ClickAwayListener onClickAway={closePopper}>
             <MenuList role='menu'>
               <MenuItem>
-                <Button
-                  color='primary'
-                  onClick={() => {
-                    closePopper()
-                    handlePrint(row)
-                  }}
-                >
-                  Patient Lab Label
-                </Button>
-              </MenuItem>
-              <MenuItem>
                 <Button color='primary' onClick={openReportViewer}>
                   Patient Result
                 </Button>

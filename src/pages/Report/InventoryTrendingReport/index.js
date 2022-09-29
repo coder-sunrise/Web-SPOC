@@ -52,10 +52,14 @@ const InventoryTrendingReportWithFormik = withFormik({
     listingFrom: Yup.date().required(),
   }),
   mapPropsToValues: () => ({
-    listingFrom: moment(new Date()).startOf('month').toDate(),
-    listingTo: moment(new Date()).endOf('month').toDate(),
+    listingFrom: moment(new Date())
+      .startOf('month')
+      .toDate(),
+    listingTo: moment(new Date())
+      .endOf('month')
+      .toDate(),
     viewBy: 'Monthly',
-    inventoryType: 'MEDICATION',
+    inventoryType: 'CONSUMABLE',
   }),
 })(InventoryTrendingReport)
 

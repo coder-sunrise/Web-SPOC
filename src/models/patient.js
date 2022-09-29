@@ -4,12 +4,7 @@ import moment from 'moment'
 import service from '@/services/patient'
 import { getUserPreference, saveUserPreference } from '@/services/user'
 import { USER_PREFERENCE_TYPE } from '@/utils/constants'
-import {
-  getRemovedUrl,
-  getAppendUrl,
-  getRefreshChasBalanceStatus,
-  getRefreshMedisaveBalanceStatus,
-} from '@/utils/utils'
+import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 
 const defaultPatientEntity = {
   effectiveStartDate: moment().formatUTC(),
@@ -266,57 +261,6 @@ export default createFormViewModel({
             new: 1,
           }),
         )
-      },
-      *refreshChasBalance({ payload }, { call }) {
-        const {
-          patientAccountNo,
-          patientCoPaymentSchemeFK,
-          isSaveToDb = false,
-          patientProfileId,
-        } = payload
-        const newPayload = {
-          patientNric: patientAccountNo,
-          patientCoPaymentSchemeFK,
-          year: moment().year(),
-          isSaveToDb,
-          patientProfileId,
-        }
-
-        const response = yield call(service.requestChasBalance, newPayload)
-
-        const { data } = response
-        let result = { isSuccessful: false }
-
-        if (data) {
-          const status = getRefreshChasBalanceStatus(data.status)
-          return { ...data, ...status }
-        }
-
-        return result
-      },
-      *refreshMedisaveBalance({ payload }, { call }) {
-        const {
-          patientAccountNo,
-          isSaveToDb = false,
-          patientProfileId,
-          schemePayer,
-        } = payload
-        const newPayload = {
-          patientNric: patientAccountNo,
-          year: moment().year(),
-          isSaveToDb,
-          patientProfileId,
-          schemePayers: schemePayer,
-        }
-
-        const response = yield call(service.requestMedisaveBalance, newPayload)
-        const { data } = response
-        if (data) {
-          const status = getRefreshMedisaveBalanceStatus(data)
-          return { ...data, ...status }
-        }
-
-        return data
       },
       *queryDone({ payload }, { put }) {
         const { data } = payload

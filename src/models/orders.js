@@ -4,40 +4,11 @@ import _ from 'lodash'
 import service from '@/pages/Inventory/InventoryAdjustment/services'
 
 import { getUniqueId, maxReducer, calculateAmount } from '@/utils/utils'
-
-const sharedMedicationValue = {
-  isMinus: true,
-  adjValue: 0,
-  isExactAmount: true,
-  corPrescriptionItemPrecaution: [
-    {
-      precaution: '',
-      sequence: 0,
-      uid: getUniqueId(),
-    },
-  ],
-  corPrescriptionItemInstruction: [
-    {
-      sequence: 0,
-      stepdose: 'AND',
-      unitPrice: 0,
-      uid: getUniqueId(),
-    },
-  ],
-  corPrescriptionItemDrugMixture: [],
-  isDrugMixture: false,
-  isClaimable: true,
-  isDispensedByPharmacy: false,
-  isNurseActualizeRequired: false,
-  isExclusive: false,
-}
+ 
 const initialState = {
   rows: [],
   finalAdjustments: [],
   summary: {},
-  defaultMedication: {
-    ...sharedMedicationValue,
-  },
   defaultService: {
     editServiceId: undefined,
     isEdit: false,
@@ -47,16 +18,6 @@ const initialState = {
     filterService: '',
     isMinus: true,
     isExactAmount: true,
-  },
-  defaultVaccination: {
-    vaccinationGivenDate: moment(),
-    quantity: 1,
-    unitPrice: 0,
-    isMinus: true,
-    adjValue: 0,
-    isExactAmount: true,
-    corVaccinationCert: [],
-    isNurseActualizeRequired: false,
   },
   defaultConsumable: {
     quantity: 1,
@@ -74,26 +35,6 @@ const initialState = {
   corPackage: [],
   defaultPackage: {
     packageItems: [],
-  },
-  defaultRadiology: {
-    editServiceId: undefined,
-    isEdit: false,
-    radiologyItems: [],
-    selectCategory: 'All',
-    selectTag: 'All',
-    filterService: '',
-    isMinus: true,
-    isExactAmount: true,
-  },
-  defaultLab: {
-    editServiceId: undefined,
-    isEdit: false,
-    labItems: [],
-    selectCategory: 'All',
-    selectTag: 'All',
-    filterService: '',
-    isMinus: true,
-    isExactAmount: true,
   },
 }
 export default createListViewModel({

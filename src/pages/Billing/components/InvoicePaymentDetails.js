@@ -5,7 +5,6 @@ import { roundTo } from '@/utils/utils'
 import { orderItemTypes } from '@/utils/codes'
 import { GridContainer, GridItem, Tooltip } from '@/components'
 import AmountSummary from '@/pages/Widgets/PatientHistory/AmountSummary'
-import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 
 import { Tag } from 'antd'
 
@@ -21,11 +20,6 @@ const showMoney = (v = 0) => {
       style={{ fontWeight: 500, color: 'darkblue' }}
     >{`${currencySymbol}${numeral(v).format('0.00')}`}</span>
   )
-}
-const drugMixtureIndicator = (row, right) => {
-  if (!row.isDrugMixture) return null
-
-  return <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
 }
 const InvoicePaymentDetails = ({ invoice = {}, classes }) => {
   const { invoiceNo, invoiceItems = [], invoiceAdjustments = [] } = invoice
@@ -82,36 +76,6 @@ const InvoicePaymentDetails = ({ invoice = {}, classes }) => {
                         <span>{itemType?.displayValue}</span>
                       </Tooltip>
                       <div>
-                        <div
-                          style={{
-                            display: 'inline-block',
-                            position: 'relative',
-                          }}
-                        >
-                          {drugMixtureIndicator(row)}
-                        </div>
-                        {(row.isActualizedPreOrder || row.isPreOrder) && (
-                          <Tooltip
-                            title={
-                              row.isPreOrder
-                                ? 'New Pre-Order'
-                                : 'Actualized Pre-Order'
-                            }
-                          >
-                            <div
-                              className={classes.rightIcon}
-                              style={{
-                                borderRadius: 4,
-                                backgroundColor: row.isPreOrder
-                                  ? '#4255bd'
-                                  : 'green',
-                                display: 'inline-block',
-                              }}
-                            >
-                              Pre
-                            </div>
-                          </Tooltip>
-                        )}
                         {row.isVisitPurposeItem && (
                           <Tooltip title='Visit Purpose Item' placement='right'>
                             <Tag style={{ marginRight: 0 }} color='blue'>

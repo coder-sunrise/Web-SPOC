@@ -51,10 +51,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                   <Select
                     {...args}
                     label='Inventory Type'
-                    options={[
-                      { name: 'Medication', value: 'MEDICATION' },
-                      { name: 'Consumable', value: 'CONSUMABLE' },
-                    ]}
+                    options={[{ name: 'Consumable', value: 'CONSUMABLE' }]}
                     allowClear={false}
                     onChange={e => {
                       if (e) {

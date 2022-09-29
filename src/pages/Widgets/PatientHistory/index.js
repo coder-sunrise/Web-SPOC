@@ -32,7 +32,7 @@ import Authorized from '@/utils/Authorized'
 import { findGetParameter, commonDataReaderTransform } from '@/utils/utils'
 import { VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
 import { scribbleTypes } from '@/utils/codes'
-import { DoctorProfileSelect, ServePatientButton } from '@/components/_medisys'
+import { DoctorProfileSelect } from '@/components/_medisys'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 import { getReportContext } from '@/services/report'
 import { getFileContentByFileID } from '@/services/file'
@@ -40,7 +40,6 @@ import * as WidgetConfig from './config'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import HistoryDetails from './HistoryDetails'
 import customtyles from './PatientHistoryStyle.less'
-import NurseActualization from '@/pages/Dispense/DispenseDetails/NurseActualization'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 
 const defaultValue = {
@@ -445,7 +444,6 @@ class PatientHistory extends Component {
       coHistory = [],
       isNurseNote,
       visitStatus,
-      medicalCheckupWorkitemFK,
       isExistsVerifiedReport,
     } = row
     const { settings = [] } = clinicSettings
@@ -555,13 +553,6 @@ class PatientHistory extends Component {
                   {`Last Update By: ${LastUpdateBy || ''} on ${moment(
                     signOffDate,
                   ).format(dateFormatLongWithTimeNoSec)}`}
-                </span>
-                <span style={{ marginLeft: 5 }}>
-                  {row.servingByList?.length > 0
-                    ? `Served by ${row.servingByList
-                        .map(x => x.servingBy)
-                        .join(', ')}.`
-                    : null}
                 </span>
               </div>
             </div>
@@ -1343,7 +1334,6 @@ class PatientHistory extends Component {
     let consultationDocument = []
     let doctorNote = []
     let corEyeExaminations = []
-    let corAudiometryTest = []
 
     var printVisit = loadVisits.filter(visit =>
       selectItems.find(item => item === visit.currentId),
@@ -1448,12 +1438,6 @@ class PatientHistory extends Component {
         visitPurposeFK,
         isNurseNote,
       )
-      const isShowAudiometryTest = this.checkShowData(
-        WidgetConfig.WIDGETS_ID.AUDIOMETRYTEST,
-        current,
-        visitPurposeFK,
-        isNurseNote,
-      )
       if (
         isNurseNote ||
         isShowDoctorNote ||
@@ -1467,8 +1451,7 @@ class PatientHistory extends Component {
         isShowBasicExaminations ||
         isShowOrders ||
         isShowConsultationDocument ||
-        isShowJGHEyeExaminations ||
-        isShowAudiometryTest
+        isShowJGHEyeExaminations
       ) {
         let referral = { isShowReferral: false }
         if (isShowReferral) {
@@ -1727,29 +1710,6 @@ class PatientHistory extends Component {
           )
         }
 
-        //  Audiometry Test
-        if (isShowAudiometryTest) {
-          corAudiometryTest = corAudiometryTest.concat(
-            current.corAudiometryTest.map(o => {
-              return {
-                visitFK: current.currentId,
-                rightResult1000Hz: WidgetConfig.hasValue(o.rightResult1000Hz)
-                  ? `${o.rightResult1000Hz} dB`
-                  : '-',
-                rightResult4000Hz: WidgetConfig.hasValue(o.rightResult4000Hz)
-                  ? `${o.rightResult4000Hz} dB`
-                  : '-',
-                leftResult1000Hz: WidgetConfig.hasValue(o.leftResult1000Hz)
-                  ? `${o.leftResult1000Hz} dB`
-                  : '-',
-                leftResult4000Hz: WidgetConfig.hasValue(o.leftResult4000Hz)
-                  ? `${o.leftResult4000Hz} dB`
-                  : '-',
-              }
-            }),
-          )
-        }
-
         // orders
         if (isShowOrders) {
           orders = orders.concat(
@@ -1806,7 +1766,6 @@ class PatientHistory extends Component {
       ConsultationDocument: consultationDocument,
       DoctorNote: doctorNote,
       COREyeExaminations: corEyeExaminations,
-      CORAudiometryTest: corAudiometryTest,
       ReportContext: reportContext,
     }
     const payload1 = [
@@ -2489,22 +2448,6 @@ class PatientHistory extends Component {
             selectHistory={selectHistory}
             scribbleNoteUpdateState={this.scribbleNoteUpdateState}
             getCategoriesOptions={this.getCategoriesOptions}
-          />
-        </CommonModal>
-        <CommonModal
-          maxWidth='xl'
-          title='Actualization History'
-          className={customtyles.deepCommomModel}
-          open={this.state.showActualizationHistory}
-          onClose={this.closeActualizationHistory}
-        >
-          <NurseActualization
-            nurseWorkitemIds={this.state.currentOrders
-              .map(x => x.nurseWorkitemFK)
-              .filter(x => x)
-              .join(',')}
-            dispatch={this.props.dispatch}
-            onClose={this.closeActualizationHistory}
           />
         </CommonModal>
       </div>

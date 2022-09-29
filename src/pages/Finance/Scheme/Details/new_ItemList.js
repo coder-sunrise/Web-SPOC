@@ -161,11 +161,6 @@ class ItemList extends React.Component {
           onChange={this.onTabChange}
           options={[
             {
-              id: 1,
-              name: 'Medication',
-              content: this.addContent('inventorymedication'),
-            },
-            {
               id: 2,
               name: 'Consumable',
               content: this.addContent('inventoryconsumable'),
@@ -191,7 +186,7 @@ class ItemList extends React.Component {
         <CommonTableGrid
           rows={values.rows}
           // {...tableConfigs}
-          getRowId={(r) => r.uid}
+          getRowId={r => r.uid}
           columns={[
             { name: 'type', title: 'Type' },
             { name: 'itemFK', title: 'Item' },
@@ -207,9 +202,9 @@ class ItemList extends React.Component {
             },
             {
               columnName: 'itemFK',
-              render: (row) => {
+              render: row => {
                 const inventory = InventoryTypes.filter(
-                  (x) => x.value === row.type,
+                  x => x.value === row.type,
                 )[0]
                 const { ctName, itemFKName } = inventory
                 return row.name ? row.name : ''
@@ -221,9 +216,9 @@ class ItemList extends React.Component {
             },
             {
               columnName: 'cpAmount',
-              render: (row) => {
+              render: row => {
                 const { rows = [] } = values
-                const index = rows.map((i) => i.uid).indexOf(row.uid)
+                const index = rows.map(i => i.uid).indexOf(row.uid)
                 return (
                   <GridContainer>
                     <GridItem xs={8}>
@@ -250,7 +245,7 @@ class ItemList extends React.Component {
             {
               columnName: 'action',
               align: 'center',
-              render: (row) => {
+              render: row => {
                 const onConfirm = () => this.onDeleteClick(row)
                 return (
                   <Popconfirm onConfirm={onConfirm}>

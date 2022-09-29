@@ -72,19 +72,7 @@ class InvoiceDetails extends Component {
       payload: {
         code: 'ctservice',
       },
-    })
-    this.props.dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventoryvaccination',
-      },
-    })
-    this.props.dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventorymedication',
-      },
-    })
+    }) 
   }
 
   refresh = () => {

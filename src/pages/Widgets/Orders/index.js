@@ -35,7 +35,6 @@ import { sumReducer, calculateAdjustAmount } from '@/utils/utils'
 
 import Grid from './Grid'
 import Detail from './Detail/index'
-import Details from './Detail/PrescriptionSet/Details'
 
 const styles = theme => ({
   rightAlign: {
@@ -86,25 +85,9 @@ class Orders extends PureComponent {
     gst: 0,
     totalWithGst: 0,
     adjustments: [],
-    showPrescriptionSetDetailModal: false,
   }
 
-  componentWillMount() {
-    const { dispatch, status, visitRegistration } = this.props
-    const codeTableNameArray = [
-      'inventorymedication',
-      'ctMedicationUsage',
-      'ctMedicationDosage',
-      'ctMedicationUnitOfMeasurement',
-      'ctMedicationFrequency',
-    ]
-    dispatch({
-      type: 'codetable/batchFetch',
-      payload: {
-        codes: codeTableNameArray,
-      },
-    })
-  }
+  componentWillMount() {}
 
   getServiceCenterService = () => {
     const { values, setFieldValue, setValues } = this.props
@@ -129,20 +112,6 @@ class Orders extends PureComponent {
     }
   }
 
-  toggleShowPrescriptionSetDetailModal = () => {
-    const { dispatch } = this.props
-    dispatch({
-      type: 'prescriptionSet/updateState',
-      payload: {
-        entity: undefined,
-        prescriptionSetItems: [],
-        editPrescriptionSetItem: undefined,
-      },
-    })
-
-    this.setState({ showPrescriptionSetDetailModal: false })
-  }
-
   render() {
     const { props } = this
     const { className, footer, isEnableEditOrder = true, ...restProps } = props
@@ -158,19 +127,6 @@ class Orders extends PureComponent {
           // handleAddAdjustment={this.addAdjustment}
         />
         {/* {this.generateFinalAmount()} */}
-        <CommonModal
-          open={this.state.showPrescriptionSetDetailModal}
-          title='Add New Prescription Set'
-          onClose={this.toggleShowPrescriptionSetDetailModal}
-          onConfirm={this.toggleShowPrescriptionSetDetailModal}
-          observe='PrescriptionSetDetail'
-          maxWidth='md'
-          showFooter={false}
-          overrideLoading
-          cancelText='Cancel'
-        >
-          <Details {...this.props} />
-        </CommonModal>
       </div>
     )
   }

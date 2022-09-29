@@ -5,8 +5,7 @@ import numeral from 'numeral'
 import { currencySymbol, currencyFormat } from '@/utils/config'
 import { GridContainer, GridItem, TextField, Tooltip } from '@/components'
 import { orderItemTypes } from '@/utils/codes'
-import { VISIT_TYPE, RADIOLOGY_CATEGORY, LAB_CATEGORY } from '@/utils/constants'
-import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
+import { VISIT_TYPE } from '@/utils/constants'
 import AmountSummary from './AmountSummary'
 import tablestyles from './PatientHistoryStyle.less'
 import { mergeClasses } from '@material-ui/styles'
@@ -24,12 +23,6 @@ const negativeNumberstyle = {
 const wrapCellTextStyle = {
   wordWrap: 'break-word',
   whiteSpace: 'pre-wrap',
-}
-
-const drugMixtureIndicator = (row, right) => {
-  if (!row.isDrugMixture) return null
-
-  return <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
 }
 
 const urgentIndicator = row => {
@@ -112,32 +105,6 @@ const baseColumns = (classes, isFullScreen) => {
                 <span>{itemType?.displayValue}</span>
               </Tooltip>
               <div style={{ position: 'absolute', top: '-1px', right: '-4px' }}>
-                <div
-                  style={{
-                    display: 'inline-block',
-                    position: 'relative',
-                  }}
-                >
-                  {drugMixtureIndicator(row)}
-                </div>
-                {(row.isPreOrder || row.isActualizedPreOrder) && (
-                  <Tooltip
-                    title={
-                      row.isPreOrder ? 'New Pre-Order' : 'Actualized Pre-Order'
-                    }
-                  >
-                    <div
-                      className={classes.rightIcon}
-                      style={{
-                        borderRadius: 4,
-                        backgroundColor: row.isPreOrder ? '#4255bd' : 'green',
-                        display: 'inline-block',
-                      }}
-                    >
-                      Pre
-                    </div>
-                  </Tooltip>
-                )}
                 {row.isExclusive && (
                   <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                     <div

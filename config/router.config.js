@@ -470,12 +470,6 @@ const _routes = [
             authority: ['report.inventory.lowstock'],
           },
           {
-            path: '/report/chasclaimreport',
-            name: 'chasClaimReport',
-            component: './Report/ChasClaimReport',
-            authority: ['report.finance.chasclaim'],
-          },
-          {
             path: '/report/creditnotelistingreport',
             name: 'creditNoteListingReport',
             component: './Report/CreditNoteListingReport',

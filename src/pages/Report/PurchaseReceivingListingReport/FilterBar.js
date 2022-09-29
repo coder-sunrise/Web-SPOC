@@ -32,17 +32,13 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={4}>
             <FastField
               name='inventoryTypeIDs'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   {...args}
                   label='Inventory Type'
                   mode='multiple'
                   valueField='value'
-                  options={[
-                    { value: 1, name: 'Medication' },
-                    { value: 2, name: 'Consumable' },
-                    { value: 3, name: 'Vaccination' },
-                  ]}
+                  options={[{ value: 2, name: 'Consumable' }]}
                   temp
                 />
               )}
@@ -52,7 +48,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={4}>
             <FastField
               name='transactionTypeIDs'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   {...args}
                   label='Transaction'
@@ -71,7 +67,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={4}>
             <FastField
               name='supplierIDs'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   {...args}
                   label='Supplier'
@@ -86,9 +82,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={2}>
             <FastField
               name='groupBySupplier'
-              render={(args) => (
-                <Checkbox {...args} label='Group By Supplier' />
-              )}
+              render={args => <Checkbox {...args} label='Group By Supplier' />}
             />
           </GridItem>
         </GridContainer>

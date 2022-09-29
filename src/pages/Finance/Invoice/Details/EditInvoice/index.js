@@ -31,7 +31,6 @@ import {
 } from '@/utils/utils'
 // sub component
 import AmountSummary from '@/pages/Shared/AmountSummary'
-import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 
 const styles = theme => ({
   cardContainer: {
@@ -234,14 +233,6 @@ class EditInvoice extends Component {
       finalAmount.amount,
     )
     setFieldValue(`invoiceItem[${index}].adjAmt`, finalAmount.adjAmount)
-  }
-
-  drugMixtureIndicator = (row, right) => {
-    if (!row.isDrugMixture) return null
-
-    return (
-      <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
-    )
   }
 
   render() {

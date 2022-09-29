@@ -72,7 +72,6 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
     updateDate,
     resourceName,
     visitPurposeValue,
-    preOrder = [],
     patientDOB,
   } = popoverEvent
 
@@ -107,14 +106,6 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
     ? appointmentType.tagColorHex
     : primaryColor
 
-  const preOrderStr = preOrder
-    .map(
-      x =>
-        `${x.itemName || ''} ${numeral(x.quantity || '').format('0.0')}${
-          x.uom ? ` ${x.uom}` : ''
-        }`,
-    )
-    .join(', ')
   const status = APPOINTMENT_STATUSOPTIONS.find(
     x => x.id === appointmentStatusFk,
   )
@@ -191,11 +182,6 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
             value={appointmentRemarks}
           />
         </GridItem>
-        {preOrderStr.trim().length > 0 && (
-          <GridItem md={12}>
-            <span>Pre-Order : {preOrderStr}</span>
-          </GridItem>
-        )}
       </GridContainer>
     </div>
   )

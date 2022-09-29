@@ -48,14 +48,10 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                 return (
                   <Select
                     {...args}
-                    label="Inventory Type"
-                    options={[
-                      { name: 'Medication', value: 'MEDICATION' },
-                      { name: 'Consumable', value: 'CONSUMABLE' },
-                      { name: 'Vaccination', value: 'VACCINATION' },
-                    ]}
+                    label='Inventory Type'
+                    options={[{ name: 'Consumable', value: 'CONSUMABLE' }]}
                     allowClear={false}
-                    onChange={(e) => {
+                    onChange={e => {
                       if (e) {
                         fm.setFieldValue('items', undefined)
                       }

@@ -2,27 +2,12 @@ import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
 
 export const WIDGETS_ID = {
-  MEDICATION: '1',
   CONSUMABLE: '2',
-  VACCINATION: '3',
   SERVICE: '4',
   TREATMENT: '5',
 }
 
-export const widgets = (props) => [
-  {
-    id: WIDGETS_ID.MEDICATION,
-    name: 'Medication',
-    authority: undefined,
-    component: Loadable({
-      loader: () => import('./Medication'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='Medication' />
-      },
-      loading: Loading,
-    }),
-  },
+export const widgets = props => [
   {
     id: WIDGETS_ID.CONSUMABLE,
     name: 'Consumable',
@@ -32,20 +17,6 @@ export const widgets = (props) => [
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return <Cmpnet {...props} {...p} fieldName='consumable' />
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: WIDGETS_ID.VACCINATION,
-    name: 'Vaccination',
-    authority:
-      'patientdatabase.patientprofiledetails.patienthistory.dispensehistory.vaccination',
-    component: Loadable({
-      loader: () => import('./Vaccination'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='vaccination' />
       },
       loading: Loading,
     }),

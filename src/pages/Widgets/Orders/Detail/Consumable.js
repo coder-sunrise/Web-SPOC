@@ -20,7 +20,6 @@ import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
-import { NURSE_WORKITEM_STATUS } from '@/utils/constants'
 import { currencySymbol } from '@/utils/config'
 import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
 import moment from 'moment'
@@ -162,7 +161,6 @@ class Consumable extends PureComponent {
       selectedConsumable,
       batchNo: '',
       expiryDate: '',
-      isPreOrderItemExists: false,
     }
   }
 
@@ -187,9 +185,6 @@ class Consumable extends PureComponent {
 
   changeConsumable = (v, op = {}) => {
     const { setFieldValue, values, disableEdit } = this.props
-    const { isPreOrderItemExists } = this.state
-    setFieldValue('isDispensedByPharmacy', op.isDispensedByPharmacy)
-    setFieldValue('isNurseActualizeRequired', op.isNurseActualizable)
 
     let defaultBatch
     if (op.consumableStock) {
@@ -225,9 +220,6 @@ class Consumable extends PureComponent {
     setFieldValue('totalPrice', unitprice * values.quantity)
     this.updateTotalPrice(unitprice * values.quantity)
     this.onExpiryDateChange()
-
-    if (values.isPreOrder) this.props.setFieldValue('isPreOrder', false)
-    if (isPreOrderItemExists) this.setState({ isPreOrderItemExists: false })
   }
 
   updateTotalPrice = v => {
@@ -386,36 +378,6 @@ class Consumable extends PureComponent {
     }, 300)
   }
 
-  checkIsPreOrderItemExistsInListing = isPreOrderChecked => {
-    const {
-      setFieldValue,
-      values,
-      codetable,
-      visitRegistration,
-      patient,
-      orders = {},
-    } = this.props
-    if (isPreOrderChecked) {
-      const consumablePreOrderItem = patient?.entity?.pendingPreOrderItem.filter(
-        x => x.preOrderItemType === 'Consumable',
-      )
-      if (consumablePreOrderItem) {
-        consumablePreOrderItem.filter(item => {
-          const { preOrderConsumableItem = {} } = item
-          const CheckIfPreOrderItemExists =
-            preOrderConsumableItem.inventoryConsumableFK ===
-            values.inventoryConsumableFK
-          if (CheckIfPreOrderItemExists) {
-            this.setState({ isPreOrderItemExists: true })
-            return
-          }
-        })
-      }
-    } else {
-      this.setState({ isPreOrderItemExists: false })
-    }
-  }
-
   matchSearch = (option, input) => {
     const lowerCaseInput = input.toLowerCase()
     return (
@@ -437,29 +399,10 @@ class Consumable extends PureComponent {
       orders,
     } = this.props
 
-    const { isPreOrderItemExists } = this.state
-
     const totalPriceReadonly =
       Authorized.check('queue.consultation.modifyorderitemtotalprice')
         .rights !== 'enable'
 
-    const isDisabledHasPaidPreOrder =
-      orders.entity?.actualizedPreOrderItemFK && orders.entity?.hasPaid == true
-        ? true
-        : false
-
-    const isDisabledNoPaidPreOrder = orders.entity?.actualizedPreOrderItemFK
-      ? true
-      : false
-
-    if (orders.isPreOrderItemExists === false && !values.isPreOrder)
-      this.setState({ isPreOrderItemExists: false })
-
-    const { workitem = {} } = values
-    const { nurseWorkitem = {} } = workitem
-    const isStartedConsumable =
-      !values.isPreOrder &&
-      nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
     return (
       <Authorized
         authority={GetOrderItemAccessRight(
@@ -485,11 +428,6 @@ class Consumable extends PureComponent {
                         onChange={this.changeConsumable}
                         options={this.getConsumableOptions()}
                         {...args}
-                        disabled={
-                          values.isPackage ||
-                          isDisabledNoPaidPreOrder ||
-                          isStartedConsumable
-                        }
                         matchSearch={this.matchSearch}
                       />
                       <LowStockInfo sourceType='consumable' {...this.props} />
@@ -565,9 +503,6 @@ class Consumable extends PureComponent {
                             this.updateTotalPrice(total)
                           }
                         }}
-                        disabled={
-                          isDisabledHasPaidPreOrder || isStartedConsumable
-                        }
                         {...args}
                       />
                     )
@@ -601,7 +536,7 @@ class Consumable extends PureComponent {
                           }
                           this.onExpiryDateChange()
                         }}
-                        disabled={disableEdit || isStartedConsumable}
+                        disabled={disableEdit}
                         {...args}
                       />
                     )
@@ -620,7 +555,7 @@ class Consumable extends PureComponent {
                         onChange={() => {
                           this.onExpiryDateChange()
                         }}
-                        disabled={disableEdit || isStartedConsumable}
+                        disabled={disableEdit}
                         {...args}
                       />
                     )
@@ -659,11 +594,7 @@ class Consumable extends PureComponent {
                         this.updateTotalPrice(e.target.value)
                       }}
                       min={0}
-                      disabled={
-                        totalPriceReadonly ||
-                        values.isPackage ||
-                        isDisabledHasPaidPreOrder
-                      }
+                      disabled={totalPriceReadonly}
                       {...args}
                     />
                   )
@@ -672,78 +603,7 @@ class Consumable extends PureComponent {
             </GridItem>
           </GridContainer>
           <GridContainer>
-            <GridItem xs={8} className={classes.editor}>
-              {values.isPackage ? (
-                <Field
-                  name='performingUserFK'
-                  render={args => (
-                    <DoctorProfileSelect
-                      label='Performed By'
-                      {...args}
-                      valueField='clinicianProfile.userProfileFK'
-                    />
-                  )}
-                />
-              ) : (
-                values.visitPurposeFK !== VISIT_TYPE.OTC && (
-                  <div>
-                    <div style={{ display: 'inline-block', marginTop: '15px' }}>
-                      <Field
-                        name='isPreOrder'
-                        render={args => {
-                          return (
-                            <Checkbox
-                              label='Pre-Order'
-                              {...args}
-                              disabled={
-                                isDisabledNoPaidPreOrder || isStartedConsumable
-                              }
-                              onChange={e => {
-                                if (!e.target.value) {
-                                  setFieldValue('isChargeToday', false)
-                                }
-                                this.checkIsPreOrderItemExistsInListing(
-                                  e.target.value,
-                                )
-                              }}
-                            />
-                          )
-                        }}
-                      />
-                    </div>
-                    {values.isPreOrder && (
-                      <div style={{ display: 'inline-block' }}>
-                        <FastField
-                          name='isChargeToday'
-                          render={args => {
-                            return <Checkbox label='Charge Today' {...args} />
-                          }}
-                        />
-                      </div>
-                    )}
-                    {isPreOrderItemExists && (
-                      <Alert
-                        message={
-                          "Item exists in Pre-Order. Plesae check patient's Pre-Order."
-                        }
-                        type='warning'
-                        style={{
-                          position: 'absolute',
-                          top: 30,
-                          left: 10,
-                          whiteSpace: 'nowrap',
-                          textOverflow: 'ellipsis',
-                          display: 'inline-block',
-                          overflow: 'hidden',
-                          lineHeight: '25px',
-                          fontSize: '0.85rem',
-                        }}
-                      />
-                    )}
-                  </div>
-                )
-              )}
-            </GridItem>
+            <GridItem xs={8} className={classes.editor}></GridItem>
             <GridItem xs={3} className={classes.editor}>
               <div style={{ position: 'relative' }}>
                 <div
@@ -762,11 +622,7 @@ class Consumable extends PureComponent {
                               this.onAdjustmentConditionChange()
                             }, 1)
                           }}
-                          disabled={
-                            totalPriceReadonly ||
-                            values.isPackage ||
-                            isDisabledHasPaidPreOrder
-                          }
+                          disabled={totalPriceReadonly}
                           {...args}
                         />
                       )
@@ -793,11 +649,7 @@ class Consumable extends PureComponent {
                               this.onAdjustmentConditionChange()
                             }, 1)
                           }}
-                          disabled={
-                            totalPriceReadonly ||
-                            values.isPackage ||
-                            isDisabledHasPaidPreOrder
-                          }
+                          disabled={totalPriceReadonly}
                           {...args}
                         />
                       )
@@ -817,11 +669,7 @@ class Consumable extends PureComponent {
                             this.onAdjustmentConditionChange()
                           }, 1)
                         }}
-                        disabled={
-                          totalPriceReadonly ||
-                          values.isPackage ||
-                          isDisabledHasPaidPreOrder
-                        }
+                        disabled={totalPriceReadonly}
                         {...args}
                       />
                     )
@@ -844,11 +692,7 @@ class Consumable extends PureComponent {
                             this.onAdjustmentConditionChange()
                           }, 1)
                         }}
-                        disabled={
-                          totalPriceReadonly ||
-                          values.isPackage ||
-                          isDisabledHasPaidPreOrder
-                        }
+                        disabled={totalPriceReadonly}
                         {...args}
                       />
                     )

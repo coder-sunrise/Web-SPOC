@@ -28,7 +28,6 @@ import { GetOrderItemAccessRight } from '@/pages/Widgets/Orders/utils'
 import {
   VISIT_TYPE,
   CANNED_TEXT_TYPE,
-  NURSE_WORKITEM_STATUS,
   SERVICE_CENTER_CATEGORY,
 } from '@/utils/constants'
 import CannedTextButton from './CannedTextButton'
@@ -257,7 +256,6 @@ class Service extends PureComponent {
           serviceTags: [],
         },
       ],
-      isPreOrderItemExists: false,
       currentPage: 1,
     }
 
@@ -499,40 +497,6 @@ class Service extends PureComponent {
       'totalAfterItemAdjustment',
       selectService.totalAfterItemAdjustment,
     )
-
-    if (selectService.isPreOrder === true)
-      this.checkIsPreOrderItemExistsInListing(selectService.serviceFK, true)
-    else this.setState({ isPreOrderItemExists: false })
-  }
-
-  checkIsPreOrderItemExistsInListing = (editServiceId, val) => {
-    const {
-      setFieldValue,
-      values,
-      codetable,
-      visitRegistration,
-      patient,
-      orders = {},
-    } = this.props
-
-    if (val) {
-      const servicePreOrderItem = patient?.entity?.pendingPreOrderItem.filter(
-        x => x.preOrderItemType === 'Service',
-      )
-      if (servicePreOrderItem) {
-        servicePreOrderItem.filter(item => {
-          const { preOrderServiceItem = {} } = item
-          const CheckIfPreOrderItemExists =
-            preOrderServiceItem.serviceFK === editServiceId
-          if (CheckIfPreOrderItemExists) {
-            this.setState({ isPreOrderItemExists: true })
-            return
-          }
-        })
-      }
-    } else {
-      this.setState({ isPreOrderItemExists: false })
-    }
   }
 
   isEditingService = value => {
@@ -579,7 +543,6 @@ class Service extends PureComponent {
 
   resetSelectItem = () => {
     const { setFieldValue } = this.props
-    const { isPreOrderItemExists } = this.state
     setFieldValue('editServiceId', undefined)
     setFieldValue('serviceCenterFK', undefined)
     setFieldValue('quantity', undefined)
@@ -588,10 +551,6 @@ class Service extends PureComponent {
     setFieldValue('isExactAmount', true)
     setFieldValue('total', undefined)
     setFieldValue('totalAfterItemAdjustment', undefined)
-    if (isPreOrderItemExists)
-      this.setState({
-        isPreOrderItemExists: false,
-      })
   }
 
   resetPage = () => {
@@ -613,7 +572,6 @@ class Service extends PureComponent {
       services = [],
       serviceCenters = [],
       serviceCatetorys = [],
-      isPreOrderItemExists,
       currentPage = 1,
     } = this.state
     const {
@@ -632,23 +590,6 @@ class Service extends PureComponent {
     const selectService = serviceItems.map(r => r.serviceName).join(', ')
     const editService =
       serviceItems.find(r => r.serviceFK === editServiceId) || {}
-    const isDisabledHasPaidPreOrder =
-      editService?.actualizedPreOrderItemFK && editService?.hasPaid == true
-        ? true
-        : false
-
-    const isDisabledNoPaidPreOrder = editService?.actualizedPreOrderItemFK
-      ? true
-      : false
-
-    if (orders.isPreOrderItemExists === false && !values.isPreOrder)
-      this.setState({ isPreOrderItemExists: false })
-
-    const { workitem = {}, isPreOrder } = editService
-    const { nurseWorkitem = {} } = workitem
-    const isStartedService =
-      !isPreOrder && nurseWorkitem.statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED
-
     const debouncedFilterChangeAction = _.debounce(
       e => {
         setFieldValue('filterService', e.target.value)
@@ -888,19 +829,7 @@ class Service extends PureComponent {
                                         serviceCode: r.code,
                                         priority: 'Normal',
                                         type,
-                                        packageGlobalId: '',
-                                        performingUserFK: getVisitDoctorUserId(
-                                          this.props,
-                                        ),
-                                        isDisplayValueChangable:
-                                          r.isDisplayValueChangable,
-                                        isNurseActualizeRequired:
-                                          r.isNurseActualizable,
                                       }
-                                      if (isPreOrderItemExists)
-                                        this.setState({
-                                          isPreOrderItemExists: false,
-                                        })
 
                                       this.getServiceCenterService(newService)
                                       setFieldValue('serviceItems', [
@@ -1063,11 +992,7 @@ class Service extends PureComponent {
                 render={args => {
                   return (
                     <Select
-                      disabled={
-                        !editServiceId ||
-                        isStartedService ||
-                        isDisabledNoPaidPreOrder
-                      }
+                      disabled={!editServiceId}
                       allowClear={false}
                       label='Service Center Name'
                       options={serviceCenters.filter(o =>
@@ -1098,11 +1023,7 @@ class Service extends PureComponent {
                 render={args => {
                   return (
                     <NumberInput
-                      disabled={
-                        !editServiceId ||
-                        isStartedService ||
-                        isDisabledHasPaidPreOrder
-                      }
+                      disabled={!editServiceId}
                       label='Quantity'
                       style={{
                         marginLeft: theme.spacing(7),
@@ -1140,7 +1061,7 @@ class Service extends PureComponent {
               <div style={{ position: 'relative' }}>
                 <TextField
                   value={editService.instruction}
-                  disabled={!editServiceId || isStartedService}
+                  disabled={!editServiceId}
                   label='Instructions'
                   onChange={e => {
                     editService.instruction = e.target.value
@@ -1148,7 +1069,7 @@ class Service extends PureComponent {
                   }}
                 />
                 <CannedTextButton
-                  disabled={!editServiceId || isStartedService}
+                  disabled={!editServiceId}
                   cannedTextTypeFK={CANNED_TEXT_TYPE.SERVICEINSTRUCTION}
                   style={{
                     position: 'absolute',
@@ -1188,11 +1109,7 @@ class Service extends PureComponent {
                           editService.totalAfterItemAdjustment,
                         )
                       }}
-                      disabled={
-                        totalPriceReadonly ||
-                        !editServiceId ||
-                        isDisabledHasPaidPreOrder
-                      }
+                      disabled={totalPriceReadonly || !editServiceId}
                       {...args}
                     />
                   )
@@ -1204,7 +1121,7 @@ class Service extends PureComponent {
             <GridItem xs={8} className={classes.editor}>
               <TextField
                 value={editService.remark}
-                disabled={!editServiceId || isStartedService}
+                disabled={!editServiceId}
                 label='Remarks'
                 onChange={e => {
                   editService.remark = e.target.value
@@ -1235,11 +1152,7 @@ class Service extends PureComponent {
                               editService.totalAfterItemAdjustment,
                             )
                           }}
-                          disabled={
-                            totalPriceReadonly ||
-                            !editServiceId ||
-                            isDisabledHasPaidPreOrder
-                          }
+                          disabled={totalPriceReadonly || !editServiceId}
                           {...args}
                         />
                       )
@@ -1273,11 +1186,7 @@ class Service extends PureComponent {
                               editService.totalAfterItemAdjustment,
                             )
                           }}
-                          disabled={
-                            totalPriceReadonly ||
-                            !editServiceId ||
-                            isDisabledHasPaidPreOrder
-                          }
+                          disabled={totalPriceReadonly || !editServiceId}
                           {...args}
                         />
                       )
@@ -1301,11 +1210,7 @@ class Service extends PureComponent {
                             editService.totalAfterItemAdjustment,
                           )
                         }}
-                        disabled={
-                          totalPriceReadonly ||
-                          !editServiceId ||
-                          isDisabledHasPaidPreOrder
-                        }
+                        disabled={totalPriceReadonly || !editServiceId}
                         {...args}
                       />
                     )
@@ -1332,11 +1237,7 @@ class Service extends PureComponent {
                             editService.totalAfterItemAdjustment,
                           )
                         }}
-                        disabled={
-                          totalPriceReadonly ||
-                          !editServiceId ||
-                          isDisabledHasPaidPreOrder
-                        }
+                        disabled={totalPriceReadonly || !editServiceId}
                         {...args}
                       />
                     )
@@ -1350,7 +1251,7 @@ class Service extends PureComponent {
               <GridItem xs={8} className={classes.editor}>
                 <TextField
                   value={editService.newServiceName}
-                  disabled={!editServiceId || isStartedService}
+                  disabled={!editServiceId}
                   label='New Service Display Name'
                   maxLength={40}
                   onChange={e => {
@@ -1377,7 +1278,7 @@ class Service extends PureComponent {
                     </span>
                     <div style={{ marginLeft: 60, marginTop: 14 }}>
                       <RadioGroup
-                        disabled={!editServiceId || isStartedService}
+                        disabled={!editServiceId}
                         value={editService.priority || 'Normal'}
                         label=''
                         onChange={e => {
@@ -1397,65 +1298,6 @@ class Service extends PureComponent {
                       />
                     </div>
                   </div>
-                  {values.visitPurposeFK !== VISIT_TYPE.OTC && (
-                    <div style={{ display: 'inline-block', marginLeft: 20 }}>
-                      <Checkbox
-                        checked={editService.isPreOrder || false}
-                        disabled={
-                          !editServiceId ||
-                          isStartedService ||
-                          isDisabledNoPaidPreOrder
-                        }
-                        label='Pre-Order'
-                        onClick={e => {
-                          const newIsPreOrder = !editService.isPreOrder
-                          editService.isPreOrder = newIsPreOrder
-                          if (!newIsPreOrder) {
-                            editService.isChargeToday = false
-                          }
-                          this.checkIsPreOrderItemExistsInListing(
-                            editServiceId,
-                            newIsPreOrder,
-                          )
-                          setFieldValue('serviceItems', [...serviceItems])
-                        }}
-                      >
-                        Pre-Order
-                      </Checkbox>
-                      {editService.isPreOrder && (
-                        <Checkbox
-                          checked={editService.isChargeToday || false}
-                          disabled={!editServiceId || isStartedService}
-                          label='Charge Today'
-                          onClick={e => {
-                            editService.isChargeToday = !editService.isChargeToday
-                            setFieldValue('serviceItems', [...serviceItems])
-                          }}
-                        >
-                          Charge Today
-                        </Checkbox>
-                      )}
-                      {isPreOrderItemExists && (
-                        <Alert
-                          message={
-                            "Item exists in Pre-Order. Plesae check patient's Pre-Order."
-                          }
-                          type='warning'
-                          style={{
-                            position: 'absolute',
-                            top: 45,
-                            left: 200,
-                            whiteSpace: 'nowrap',
-                            textOverflow: 'ellipsis',
-                            display: 'inline-block',
-                            overflow: 'hidden',
-                            lineHeight: '25px',
-                            fontSize: '0.85rem',
-                          }}
-                        />
-                      )}
-                    </div>
-                  )}
                 </div>
               </GridItem>
             )}
@@ -1498,7 +1340,7 @@ class Service extends PureComponent {
                     </span>
                     <div style={{ marginLeft: 60, marginTop: 14 }}>
                       <RadioGroup
-                        disabled={!editServiceId || isStartedService}
+                        disabled={!editServiceId}
                         value={editService.priority || 'Normal'}
                         label=''
                         onChange={e => {
@@ -1518,65 +1360,6 @@ class Service extends PureComponent {
                       />
                     </div>
                   </div>
-                  {values.visitPurposeFK !== VISIT_TYPE.OTC && (
-                    <div style={{ display: 'inline-block', marginLeft: 20 }}>
-                      <Checkbox
-                        checked={editService.isPreOrder || false}
-                        disabled={
-                          !editServiceId ||
-                          isStartedService ||
-                          isDisabledNoPaidPreOrder
-                        }
-                        label='Pre-Order'
-                        onClick={e => {
-                          const newIsPreOrder = !editService.isPreOrder
-                          editService.isPreOrder = newIsPreOrder
-                          if (!newIsPreOrder) {
-                            editService.isChargeToday = false
-                          }
-                          this.checkIsPreOrderItemExistsInListing(
-                            editServiceId,
-                            newIsPreOrder,
-                          )
-                          setFieldValue('serviceItems', [...serviceItems])
-                        }}
-                      >
-                        Pre-Order
-                      </Checkbox>
-                      {editService.isPreOrder && (
-                        <Checkbox
-                          checked={editService.isChargeToday || false}
-                          disabled={!editServiceId || isStartedService}
-                          label='Charge Today'
-                          onClick={e => {
-                            editService.isChargeToday = !editService.isChargeToday
-                            setFieldValue('serviceItems', [...serviceItems])
-                          }}
-                        >
-                          Charge Today
-                        </Checkbox>
-                      )}
-                      {isPreOrderItemExists && (
-                        <Alert
-                          message={
-                            "Item exists in Pre-Order. Plesae check patient's Pre-Order."
-                          }
-                          type='warning'
-                          style={{
-                            position: 'absolute',
-                            top: 45,
-                            left: 200,
-                            whiteSpace: 'nowrap',
-                            textOverflow: 'ellipsis',
-                            display: 'inline-block',
-                            overflow: 'hidden',
-                            lineHeight: '25px',
-                            fontSize: '0.85rem',
-                          }}
-                        />
-                      )}
-                    </div>
-                  )}
                 </div>
               </GridItem>
             )}

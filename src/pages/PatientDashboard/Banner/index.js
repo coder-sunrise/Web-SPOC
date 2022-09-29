@@ -16,7 +16,6 @@ import classnames from 'classnames'
 import { withStyles } from '@material-ui/core/styles'
 import PatientNurseNotes from '@/pages/PatientDatabase/Detail/PatientNurseNotes'
 import PatientStickyNotesBtn from '@/components/_medisys/PatientInfoSideBanner/PatientStickyNotesBtn'
-import SelectPreOrder from '@/pages/Reception/Appointment/components/form/SelectPreOrder'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import { MoreButton, LoadingWrapper } from '@/components/_medisys'
 import PatientLabelBtn from '@/components/_medisys/PatientInfoSideBanner/PatientLabelBtn'
@@ -1701,32 +1700,6 @@ class Banner extends PureComponent {
           maxWidth='lg'
         >
           <PatientNurseNotes {...this.props} />
-        </CommonModal>
-        <CommonModal
-          open={this.state.showPreOrderModal}
-          title='Pre-Orders'
-          onClose={this.closePreOrders}
-          maxWidth='lg'
-        >
-          <SelectPreOrder
-            {...this.props}
-            disabled={
-              !(
-                from === 'Appointment' ||
-                (from === 'VisitReg' && !isReadOnly) ||
-                from === 'Consultation' ||
-                (from === 'Dispense' && editingOrder) ||
-                (from === 'Pharmacy' && editingOrder)
-              ) || actualizePreOrderAccessRight.rights !== 'enable'
-            }
-            onSelectPreOrder={select => {
-              if (onSelectPreOrder) onSelectPreOrder(select)
-              this.closePreOrders()
-            }}
-            isRetail={isRetail}
-            activePreOrderItem={activePreOrderItems || pendingPreOrderItems}
-            actualizePreOrderAccessRight={actualizePreOrderAccessRight}
-          />
         </CommonModal>
         <CommonModal
           open={this.state.showSchemeModal}

@@ -457,17 +457,6 @@ export const countryCodes = [
 
 export const podoOrderType = [
   {
-    value: 1,
-    name: 'Medication',
-    prop: 'purchaseOrderMedicationItem',
-    itemFKName: 'inventoryMedicationFK',
-    ctName: 'inventorymedication',
-    stateName: 'MedicationItemList',
-    itemCode: 'inventoryMedicationCode',
-    itemName: 'inventoryMedicationName',
-    stockName: 'medicationStock',
-  },
-  {
     value: 2,
     name: 'Consumable',
     prop: 'purchaseOrderConsumableItem',
@@ -478,31 +467,9 @@ export const podoOrderType = [
     itemName: 'inventoryConsumableName',
     stockName: 'consumableStock',
   },
-  {
-    value: 3,
-    name: 'Vaccination',
-    prop: 'purchaseOrderVaccinationItem',
-    itemFKName: 'inventoryVaccinationFK',
-    ctName: 'inventoryvaccination',
-    stateName: 'VaccinationItemList',
-    itemCode: 'inventoryVaccinationCode',
-    itemName: 'inventoryVaccinationName',
-    stockName: 'vaccinationStock',
-  },
 ]
 
 export const rgType = [
-  {
-    value: 1,
-    name: 'Medication',
-    prop: 'receivingGoodsMedicationItem',
-    itemFKName: 'inventoryMedicationFK',
-    ctName: 'inventorymedication',
-    stateName: 'MedicationItemList',
-    itemCode: 'inventoryMedicationCode',
-    itemName: 'inventoryMedicationName',
-    stockName: 'medicationStock',
-  },
   {
     value: 2,
     name: 'Consumable',
@@ -514,146 +481,9 @@ export const rgType = [
     itemName: 'inventoryConsumableName',
     stockName: 'consumableStock',
   },
-  {
-    value: 3,
-    name: 'Vaccination',
-    prop: 'receivingGoodsVaccinationItem',
-    itemFKName: 'inventoryVaccinationFK',
-    ctName: 'inventoryvaccination',
-    stateName: 'VaccinationItemList',
-    itemCode: 'inventoryVaccinationCode',
-    itemName: 'inventoryVaccinationName',
-    stockName: 'vaccinationStock',
-  },
 ]
 
 const loadFromCodesConfig = {
-  mapPrescriptions: (rows, codetable, patient, isExtPrescription = false) => {
-    return rows.map(o => {
-      const {
-        instruction,
-        corPrescriptionItemPrecaution: precaution = [],
-        remarks = '',
-        quantity = 0,
-        dispenseUOMDisplayValue = '',
-      } = o
-      const qtyFormatStr = numeral(quantity).format(qtyFormat)
-      const { ctmedicationprecaution = [] } = codetable
-      const subjectHtml = `<li> - ${o.subject} ${
-        isExtPrescription ? ' (Ext.)' : ''
-      }</li>`
-      const instHtml = instruction !== '' ? `<li>${instruction}</li>` : ''
-      const remarksHtml = remarks !== '' ? `<li>${remarks}</li>` : ''
-      const qtyHtml = `<li>Quantity: ${qtyFormatStr} ${dispenseUOMDisplayValue}</li>`
-      const precautionHtml = precaution
-        .map(i => {
-          const codetablePrecaution = ctmedicationprecaution.find(
-            c => c.id === i.medicationPrecautionFK,
-          )
-          if (codetablePrecaution && codetablePrecaution.translationLink) {
-            const {
-              translationLink: { translationMasters = [] },
-            } = codetablePrecaution
-
-            const transHtml = translationMasters
-              .filter(t => patient.translationLinkFK === t.languageFK)
-              .map(m => {
-                return `<li>${m.displayValue}</li>`
-              })
-              .join('')
-
-            if (i.precaution !== '' && transHtml !== '') {
-              return `<li>${i.precaution}</li>
-                    ${transHtml}`
-            }
-          }
-          return ''
-        })
-        .join('')
-
-      return `<ul>${subjectHtml}<ul>${instHtml}${qtyHtml}${precautionHtml}${remarksHtml}</ul></ul>`
-    })
-  },
-  InsertMedication: (rows, codetable, patient, isExtPrescription = false) => {
-    const pRows = rows.filter(
-      o =>
-        !o.isDeleted &&
-        o.type === '1' &&
-        (o.isExternalPrescription || false) === isExtPrescription,
-    )
-    if (pRows && pRows.length > 0) {
-      const rowHTMLs = loadFromCodesConfig.mapPrescriptions(
-        pRows,
-        codetable,
-        patient,
-        isExtPrescription,
-      )
-      return `<ul>
-              <li><strong>${
-                isExtPrescription ? 'External Prescription' : 'Medication'
-              }</strong></li>
-               ${rowHTMLs.join('')}
-            </ul>`
-    }
-    return ''
-  },
-  InsertVaccination: (rows, isGenerateCertificate) => {
-    const vRows = (isGenerateCertificate
-      ? rows
-      : rows.filter(o => !o.isDeleted && o.type === '2')
-    ).map(v => {
-      const {
-        subject = '',
-        usageMethodDisplayValue: usage = '',
-        dosageDisplayValue: dosage = '',
-        uomDisplayValue: uom = '',
-        remarks = '',
-        quantity = 0,
-        uomDisplayValue = '',
-      } = v
-      const qtyFormatStr = numeral(quantity).format(qtyFormat)
-      const subjectHtml = `<li> - ${subject}</li>`
-      const precautionHtml =
-        usage + dosage + uom !== '' ? `<li>${usage} ${dosage} ${uom} </li>` : ''
-      const qtyHtml = `<li>Quantity: ${qtyFormatStr} ${uomDisplayValue}</li>`
-      const remarksHtml = remarks !== '' ? `<li>${remarks}</li>` : ''
-
-      return `<ul>${subjectHtml} <ul> ${precautionHtml}${qtyHtml}${remarksHtml}</ul></ul>`
-    })
-    if (vRows && vRows.length > 0)
-      return `<ul>
-              <li><strong>Vaccination</strong></li>
-              ${vRows.join('')}
-            </ul>`
-    return ''
-  },
-
-  InsertOpenPrescription: (
-    rows,
-    codetable,
-    patient,
-    isExtPrescription = false,
-  ) => {
-    const pRows = rows.filter(
-      o =>
-        !o.isDeleted &&
-        o.type === '5' &&
-        (o.isExternalPrescription || false) === isExtPrescription,
-    )
-    if (pRows && pRows.length > 0) {
-      const rowHTMLs = loadFromCodesConfig.mapPrescriptions(
-        pRows,
-        codetable,
-        patient,
-      )
-      return `<ul>
-              <li><strong>Open Prescription</strong></li>
-              ${rowHTMLs.join('')}
-           </ul>`
-    }
-    return ''
-  },
-
   InsertConsumable: rows => {
     const pRows = rows.filter(o => !o.isDeleted && o.type === '4')
     if (pRows && pRows.length > 0) {
@@ -706,28 +536,12 @@ const loadFromCodesConfig = {
 
 export const InventoryTypes = [
   {
-    value: 1,
-    name: 'Medication',
-    prop: 'medicationValueDto',
-    itemFKName: 'inventoryMedicationFK',
-    ctName: 'inventorymedication',
-    field: 'inventoryMedication',
-  },
-  {
     value: 2,
     name: 'Consumable',
     prop: 'consumableValueDto',
     itemFKName: 'inventoryConsumableFK',
     ctName: 'inventoryconsumable',
     field: 'inventoryConsumable',
-  },
-  {
-    value: 3,
-    name: 'Vaccination',
-    prop: 'vaccinationValueDto',
-    itemFKName: 'inventoryVaccinationFK',
-    ctName: 'inventoryvaccination',
-    field: 'inventoryVaccination',
   },
   {
     value: 4,
@@ -875,67 +689,8 @@ const tagList = [
         .join('')
 
       const ordersHTML = [
-        loadFromCodesConfig.InsertMedication(rows, codetable, patient, false),
-        loadFromCodesConfig.InsertVaccination(
-          newVaccination ? [...rows, newVaccination] : rows,
-          false,
-        ),
-        loadFromCodesConfig.InsertOpenPrescription(rows, codetable, patient),
         loadFromCodesConfig.InsertConsumable(rows, codetable, patient),
         service,
-      ]
-
-      let htmls = ordersHTML.join('')
-      return htmls
-    },
-  },
-  {
-    value: 'Vaccination',
-    text: '<#Vaccination#>',
-    url: '',
-    getter: newVaccination => {
-      const { orders, consultationDocument } = window.g_app._store.getState()
-      if (!orders) return '-'
-      const { rows = [] } = orders
-      const { entity = {} } = consultationDocument
-      let insertRows = rows
-      let isGenerateCertificate = false
-      if (newVaccination) {
-        insertRows = [newVaccination]
-        isGenerateCertificate = true
-      } else if (entity.vaccinationUFK) {
-        insertRows = rows.filter(vc => vc.uid === entity.vaccinationUFK)
-        isGenerateCertificate = true
-      }
-
-      const ordersHTML = [
-        loadFromCodesConfig.InsertVaccination(
-          insertRows,
-          isGenerateCertificate,
-        ),
-      ]
-
-      let htmls = ordersHTML.join('')
-      return htmls
-    },
-  },
-  {
-    value: 'ExternalPrescription',
-    text: '<#ExternalPrescription#>',
-    url: '',
-    getter: () => {
-      const { orders, patient, codetable } = window.g_app._store.getState()
-      if (!orders) return '-'
-      const { rows = [] } = orders
-
-      const ordersHTML = [
-        loadFromCodesConfig.InsertMedication(rows, codetable, patient, true),
-        loadFromCodesConfig.InsertOpenPrescription(
-          rows,
-          codetable,
-          patient,
-          true,
-        ),
       ]
 
       let htmls = ordersHTML.join('')
@@ -1123,7 +878,6 @@ export const getOutstandingInventoryItem = (
   outstandingItem = undefined,
   existingData = false,
 ) => {
-
   let newRows = rows.filter(x => x.type === value && x.isDeleted === false)
   //get current received qty group by poitemfk
   const rowsGroupByFK = groupByFKFunc(newRows)
@@ -1134,31 +888,45 @@ export const getOutstandingInventoryItem = (
       orderQuantity,
       quantityReceivedFromOtherDOs = 0,
       bonusQuantity,
-      bonusReceived
+      bonusReceived,
     } = o
 
-    const activeItem = rowsGroupByFK.find(i => i.purchaseOrderItemFK === o.purchaseOrderItemFK)
-    const remainingQuantityShouldReceive = orderQuantity + bonusQuantity - quantityReceivedFromOtherDOs
+    const activeItem = rowsGroupByFK.find(
+      i => i.purchaseOrderItemFK === o.purchaseOrderItemFK,
+    )
+    const remainingQuantityShouldReceive =
+      orderQuantity + bonusQuantity - quantityReceivedFromOtherDOs
     let remainingQuantity = orderQuantity - quantityReceived
     let remainingBonusQuantity = bonusQuantity - bonusReceived
 
     if (activeItem) {
       if (existingData) {
-        remainingQuantity = orderQuantity > 0 ? orderQuantity - activeItem.totalCurrentReceivingQty - quantityReceivedFromOtherDOs : 0
-        remainingBonusQuantity = bonusQuantity > 0 ? bonusQuantity - activeItem.totalCurrentReceivingBonusQty - quantityReceivedFromOtherDOs : 0
+        remainingQuantity =
+          orderQuantity > 0
+            ? orderQuantity -
+              activeItem.totalCurrentReceivingQty -
+              quantityReceivedFromOtherDOs
+            : 0
+        remainingBonusQuantity =
+          bonusQuantity > 0
+            ? bonusQuantity -
+              activeItem.totalCurrentReceivingBonusQty -
+              quantityReceivedFromOtherDOs
+            : 0
       } else {
-        remainingQuantity -= activeItem.totalCurrentReceivingQty 
+        remainingQuantity -= activeItem.totalCurrentReceivingQty
         remainingBonusQuantity -= activeItem.totalCurrentReceivingBonusQty
       }
     } else if (existingData && !activeItem) {
       remainingQuantity = orderQuantity > 0 ? remainingQuantityShouldReceive : 0
-      remainingBonusQuantity = bonusQuantity > 0 ? remainingQuantityShouldReceive : 0
+      remainingBonusQuantity =
+        bonusQuantity > 0 ? remainingQuantityShouldReceive : 0
     }
 
     return {
       ...o,
       remainingQuantity,
-      remainingBonusQuantity
+      remainingBonusQuantity,
     }
   })
 
@@ -1176,33 +944,35 @@ export const getOutstandingInventoryItem = (
   // let inventoryItemList = _.differenceBy(list, newRows, itemFKName)//same itemfkname have diff remain qty : 0 or > 0
 
   // get current inventory item outstanding item
-  const filterOutstandingItem = newOutstandingItem.filter(x => x.type === value && (x.remainingQuantity > 0 || x.remainingBonusQuantity > 0))
+  const filterOutstandingItem = newOutstandingItem.filter(
+    x =>
+      x.type === value &&
+      (x.remainingQuantity > 0 || x.remainingBonusQuantity > 0),
+  )
 
   // get the all the not fully received item based on outstanding item
 
-let inventoryItemList = filterOutstandingItem.map(o => {
-    const ivtItem = list.find(
-      i => i[itemFKName] === o[itemFKName],
-    )
+  let inventoryItemList = filterOutstandingItem
+    .map(o => {
+      const ivtItem = list.find(i => i[itemFKName] === o[itemFKName])
 
-    let remainingQty,remainingBonusQty
-    if (ivtItem) {
-      const { remainingQuantity, remainingBonusQuantity } = o
-      remainingQty = remainingQuantity
-      remainingBonusQty = remainingBonusQuantity
-    }
-    else 
-      return null
-    return {
-      ...ivtItem,
-      value: o.id,
-      orderQuantity: o.orderQuantity,
-      remainingQty: remainingQty,
-      bonusQuantity: o.bonusQuantity,
-      remainingBonusQty: remainingBonusQty,
-      purchaseOrderItemFK: o.id,
-    }
-  }).filter(x => x)
+      let remainingQty, remainingBonusQty
+      if (ivtItem) {
+        const { remainingQuantity, remainingBonusQuantity } = o
+        remainingQty = remainingQuantity
+        remainingBonusQty = remainingBonusQuantity
+      } else return null
+      return {
+        ...ivtItem,
+        value: o.id,
+        orderQuantity: o.orderQuantity,
+        remainingQty: remainingQty,
+        bonusQuantity: o.bonusQuantity,
+        remainingBonusQty: remainingBonusQty,
+        purchaseOrderItemFK: o.id,
+      }
+    })
+    .filter(x => x)
   return inventoryItemList
 }
 
@@ -1301,22 +1071,10 @@ export const groupByFKFunc = array => {
 
 export const visitOrderTemplateItemTypes = [
   {
-    id: 1,
-    dtoName: 'visitOrderTemplateMedicationItemDto',
-    itemFKName: 'inventoryMedicationFK',
-    keyName: 'inventoryMedication',
-  },
-  {
     id: 2,
     dtoName: 'visitOrderTemplateConsumableItemDto',
     itemFKName: 'inventoryConsumableFK',
     keyName: 'inventoryConsumable',
-  },
-  {
-    id: 3,
-    dtoName: 'visitOrderTemplateVaccinationItemDto',
-    itemFKName: 'inventoryVaccinationFK',
-    keyName: 'inventoryVaccination',
   },
   {
     id: 4,
@@ -1354,11 +1112,11 @@ export const corAttchementTypes = [
     name: 'Visual Acuity Test',
     accessRight: 'queue.consultation.widgets.eyevisualacuity',
   },
-  {
-    id: 5,
-    type: 'QueueDisplay',
-    name: 'Queue Display',
-  },
+  // {
+  //   id: 5,
+  //   type: 'QueueDisplay',
+  //   name: 'Queue Display',
+  // },
 ]
 
 export const ReportsOnSignOffOption = {
@@ -1387,20 +1145,11 @@ export const ReportsOnSignOff = [
   },
   { code: ReportsOnSignOffOption.Memo, description: 'Memo' },
   {
-    code: ReportsOnSignOffOption.VaccinationCertificate,
-    description: 'Vaccination Certificate',
-  },
-  {
     code: ReportsOnSignOffOption.OtherDocuments,
     description: 'Other Documents',
   },
-  {
-    code: ReportsOnSignOffOption.PrescriptionSheet,
-    description: 'Prescription Sheet',
-  },
 ]
 export const ReportsOnCompletePaymentOption = {
-  DrugLabel: 'Drug Label',
   Invoice: 'Invoice',
   Receipt: 'Receipt',
 }
@@ -1428,7 +1177,6 @@ const scribbleTypes = [
   { type: 'chiefComplaints', typeFK: SCRIBBLE_NOTE_TYPE.CHIEFCOMPLAINTS },
   { type: 'note', typeFK: SCRIBBLE_NOTE_TYPE.CLINICALNOTES },
   { type: 'plan', typeFK: SCRIBBLE_NOTE_TYPE.PLAN },
-  { type: 'radiology', typeFK: SCRIBBLE_NOTE_TYPE.RADIOLOGY },
 ]
 
 const formTypes = [
@@ -1901,28 +1649,12 @@ const queueItemStatus = [
 
 const preOrderItemCategory = [
   {
-    value: 'Medication',
-    name: 'Medication',
-  },
-  {
     value: 'Consumable',
     name: 'Consumable',
   },
   {
-    value: 'Vaccination',
-    name: 'Vaccination',
-  },
-  {
     value: 'Service',
     name: 'Service',
-  },
-  {
-    value: 'Lab',
-    name: 'Lab',
-  },
-  {
-    value: 'Radiology',
-    name: 'Radiology',
   },
 ]
 
@@ -2041,15 +1773,8 @@ const visitDoctorConsultationStatusColor = [
 ]
 
 const orderItemTypes = [
-  { type: 'Medication', displayValue: 'Med' },
-  { type: 'Open Prescription', displayValue: 'Med(Opn)' },
-  { type: 'External Prescription', displayValue: 'Med(Ext)' },
   { type: 'Consumable', displayValue: 'Con' },
-  { type: 'Vaccination', displayValue: 'Vac' },
   { type: 'Service', displayValue: 'Svc' },
-  { type: 'Radiology', displayValue: 'Rad' },
-  { type: 'Lab', displayValue: 'Lab' },
-  { type: 'Drug Mixture', displayValue: 'Med(Mix)' },
 ]
 
 export {

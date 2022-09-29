@@ -322,24 +322,10 @@ class Grid extends PureComponent {
     } = this.props.receivingGoodsDetails
 
     if (row.code && row.name) {
-      if (row.type === INVENTORY_TYPE.MEDICATION) {
-        return this.getOptions(
-          this.state.MedicationItemList,
-          MedicationItemList,
-          row,
-        )
-      }
       if (row.type === INVENTORY_TYPE.CONSUMABLE) {
         return this.getOptions(
           this.state.ConsumableItemList,
           ConsumableItemList,
-          row,
-        )
-      }
-      if (row.type === INVENTORY_TYPE.VACCINATION) {
-        return this.getOptions(
-          this.state.VaccinationItemList,
-          VaccinationItemList,
           row,
         )
       }

@@ -318,30 +318,6 @@ class Detail extends PureComponent {
     ],
   }
 
-  testPanelTableParas = {
-    columns: [{ name: 'testPanelFK', title: 'Lab Test Panel' }],
-    columnExtensions: [
-      {
-        columnName: 'testPanelFK',
-        type: 'codeSelect',
-        code: 'ctTestPanel',
-        valueField: 'id',
-        labelField: 'displayValue',
-        onChange: ({ val, row }) => {
-          const { testPanels } = this.state
-          const rs = testPanels.filter(
-            o => !o.isDeleted && o.testPanelFK === val && o.id !== row.id,
-          )
-          if (rs.length > 0) {
-            notification.error({
-              message: 'The lab test panel already exist in the list',
-            })
-          }
-        },
-      },
-    ],
-  }
-
   componentDidMount() {
     this.checkHasActiveSession()
 
@@ -1140,49 +1116,6 @@ class Detail extends PureComponent {
                   />
                 </React.Fragment>
               )}
-
-              {!hiddenFields.includes('ctService_TestPanel') &&
-                settings.isEnableLabModule && (
-                  <React.Fragment>
-                    <h4 style={{ fontWeight: 400 }}>
-                      <b>Lab Test Panel Settings</b>
-                    </h4>
-                    {testPanelErrMsg && (
-                      <p className={classes.serviceSettingStyle}>
-                        {testPanelErrMsg}
-                      </p>
-                    )}
-                    <EditableTableGrid
-                      forceRender
-                      style={{
-                        marginTop: theme.spacing(1),
-                        margin: theme.spacing(2),
-                      }}
-                      rows={this.state.testPanels}
-                      FuncProps={{
-                        pagerConfig: {
-                          containerExtraComponent: this.PagerContent,
-                        },
-                      }}
-                      EditingProps={{
-                        showAddCommand: true,
-                        onCommitChanges: this.commitTestPanelChanges,
-                        isDeletable: row => {
-                          if (row.id && row.id <= 0) return true //Newly added row can be deletable before saving.
-
-                          const isUsedByOthers =
-                            (serviceSettings ?? []).findIndex(
-                              s => s.isUsedByOthers,
-                            ) !== -1
-
-                          return !isUsedByOthers
-                        },
-                      }}
-                      schema={testPanelSchema}
-                      {...this.testPanelTableParas}
-                    />
-                  </React.Fragment>
-                )}
             </div>
           </div>
         </GridContainer>

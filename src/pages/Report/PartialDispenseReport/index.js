@@ -35,7 +35,7 @@ const PartialDispenseReportWithFormik = withFormik({
   validationSchema: Yup.object().shape({}),
   mapPropsToValues: () => ({
     patientCriteria: '',
-    inventoryType: 'MEDICATION',
+    inventoryType: 'CONSUMABLE',
     dateFrom: moment(new Date())
       .add('-1', 'M')
       .toDate(),

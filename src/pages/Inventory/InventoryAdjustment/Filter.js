@@ -28,10 +28,19 @@ import { inventoryAdjustmentStatus } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
 
 @withFormikExtend({
-  mapPropsToValues: ({ inventoryAdjustment }) =>{
-    const defaultDateFrom = moment().add(-30,'day').formatUTC()
-    const defaultDateTo = moment().endOf('day').formatUTC(false)
-    return ({...(inventoryAdjustment.filter),transDates:[defaultDateFrom,defaultDateTo]}) || {}
+  mapPropsToValues: ({ inventoryAdjustment }) => {
+    const defaultDateFrom = moment()
+      .add(-30, 'day')
+      .formatUTC()
+    const defaultDateTo = moment()
+      .endOf('day')
+      .formatUTC(false)
+    return (
+      {
+        ...inventoryAdjustment.filter,
+        transDates: [defaultDateFrom, defaultDateTo],
+      } || {}
+    )
   },
   handleSubmit: () => {},
   displayName: 'InventoryAdjustmentFilter',
@@ -216,19 +225,9 @@ class Filter extends PureComponent {
                       <ClickAwayListener onClickAway={this.handleToggle}>
                         <MenuList role='menu'>
                           <MenuItem
-                            onClick={() => this.handleMassAdjustment(1)}
-                          >
-                            Medication
-                          </MenuItem>
-                          <MenuItem
                             onClick={() => this.handleMassAdjustment(2)}
                           >
                             Consumable
-                          </MenuItem>
-                          <MenuItem
-                            onClick={() => this.handleMassAdjustment(3)}
-                          >
-                            Vaccination
                           </MenuItem>
                         </MenuList>
                       </ClickAwayListener>

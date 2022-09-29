@@ -37,8 +37,6 @@ const styles = (theme) => ({
     patient: patient.entity || patient.default,
     ctcopayer: codetable.ctcopayer || [],
     ctservice: codetable.ctservice || [],
-    inventoryvaccination: codetable.inventoryvaccination || [],
-    inventorymedication: codetable.inventorymedication || [],
     ctcopaymentscheme: codetable.copaymentscheme || [],
     ctschemetype: codetable.ctschemetype || [],
     loading: loading.effects['appliedSchemes/fetchInvoicePayers'],
@@ -81,8 +79,7 @@ const styles = (theme) => ({
 
         return values
       }
-    } catch (error) {
-    }
+    } catch (error) {}
     return { ...appliedSchemes.default, visitId: appliedSchemes.visitID }
   },
 })
@@ -93,7 +90,7 @@ class AppliedScheme extends Component {
     loadInvoicePayer: false,
   }
 
-  componentWillMount () {
+  componentWillMount() {
     const { dispatch, invoiceDetail } = this.props
     const { entity } = invoiceDetail
     dispatch({
@@ -107,7 +104,7 @@ class AppliedScheme extends Component {
     })
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.dispatch({
       type: 'appliedSchemes/updateState',
       payload: {
@@ -128,7 +125,7 @@ class AppliedScheme extends Component {
   handleBackToDetailsClick = () =>
     navigateDirtyCheck({ onProceed: this.switchMode })
 
-  handleIsEditing = (editing) => {
+  handleIsEditing = editing => {
     this.setState({ isEditing: editing })
   }
 
@@ -144,7 +141,7 @@ class AppliedScheme extends Component {
       },
     })
     setTimeout(() => {
-      this.setState((preState) => ({ submitCount: preState.submitCount + 1 }))
+      this.setState(preState => ({ submitCount: preState.submitCount + 1 }))
     }, 500)
     return result
   }
@@ -163,8 +160,7 @@ class AppliedScheme extends Component {
       })
     }
 
-    const editedInvoicePayer =
-      payload.invoicePayer.filter((ip) => !!ip.id) || []
+    const editedInvoicePayer = payload.invoicePayer.filter(ip => !!ip.id) || []
     const shouldValidate = editedInvoicePayer.length > 0
 
     let result = {}
@@ -172,7 +168,7 @@ class AppliedScheme extends Component {
     if (shouldValidate)
       result = await validateInvoicePayer({
         invoiceFK: invoiceDetail.entity.id,
-        invoicePayerFKs: editedInvoicePayer.map((ip) => ip.id),
+        invoicePayerFKs: editedInvoicePayer.map(ip => ip.id),
       })
 
     const { data, status } = result
@@ -188,7 +184,9 @@ class AppliedScheme extends Component {
           confirmText: 'Confirm to proceed?',
           additionalInfo: (
             <div className={classes.errorPromptContainer}>
-              {data.content.map((message) => <p>{message}</p>)}
+              {data.content.map(message => (
+                <p>{message}</p>
+              ))}
             </div>
           ),
         },
@@ -198,7 +196,7 @@ class AppliedScheme extends Component {
     }
   }
 
-  render () {
+  render() {
     const {
       classes,
       dispatch,
@@ -211,8 +209,6 @@ class AppliedScheme extends Component {
       ctschemetype,
       ctcopaymentscheme,
       ctservice,
-      inventoryvaccination,
-      inventorymedication,
       loading = false,
     } = this.props
     const { submitCount } = this.state
@@ -227,8 +223,6 @@ class AppliedScheme extends Component {
       ctcopaymentscheme,
       ctcopayer,
       ctservice,
-      inventoryvaccination,
-      inventorymedication,
     }
 
     return (
@@ -245,7 +239,8 @@ class AppliedScheme extends Component {
             color='primary'
             onClick={navigateDirtyCheck({ onProceed: this.switchMode })}
           >
-            <ArrowLeft />Back To Invoice Details
+            <ArrowLeft />
+            Back To Invoice Details
           </Button>
           <Button
             size='sm'
@@ -253,7 +248,8 @@ class AppliedScheme extends Component {
             onClick={this.handleSaveClick}
             disabled={!this.state.loadInvoicePayer}
           >
-            <Save />Save Changes
+            <Save />
+            Save Changes
           </Button>
         </div>
         <LoadingWrapper
@@ -268,8 +264,6 @@ class AppliedScheme extends Component {
               submitCount={submitCount}
               dispatch={dispatch}
               commitCount={commitCount}
-              inventoryvaccination={inventoryvaccination}
-              inventorymedication={inventorymedication}
               ctservice={ctservice}
               patient={patient}
               ctcopayer={ctcopayer}

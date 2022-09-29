@@ -73,12 +73,6 @@ export const menuData = [
          },
          {
            title: 'Finance',
-           text: 'CHAS Claim Report',
-           url: '/report/chasclaimreport',
-           authority: 'report.finance.chasclaim',
-         },
-         {
-           title: 'Finance',
            text: 'Invoice Listing Report',
            url: '/report/invoicelistingreport',
            authority: 'report.finance.invoicelisting',

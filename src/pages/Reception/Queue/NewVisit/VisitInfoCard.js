@@ -34,11 +34,7 @@ import {
   Attachment,
   AttachmentWithThumbnail,
 } from '@/components/_medisys'
-import {
-  VISIT_TYPE,
-  CANNED_TEXT_TYPE,
-  MEDICALCHECKUP_WORKITEM_STATUS,
-} from '@/utils/constants'
+import { VISIT_TYPE, CANNED_TEXT_TYPE } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
 import { roundTo, getMappedVisitType } from '@/utils/utils'
@@ -102,7 +98,6 @@ const amountProps = {
 const VisitInfoCard = ({
   classes,
   isReadOnly = false,
-  fromMedicalCheckupReporting = false,
   isVisitReadonlyAfterSigned = false,
   isDoctorConsulted = false,
   attachments,
@@ -137,14 +132,13 @@ const VisitInfoCard = ({
         setFieldValue(FormField['visit.VisitOrderTemplateTotal'], undefined)
     }
   }, [currentVisitTemplate, visitType])
-  // console.log(fromMedicalCheckupReporting)
   const disableConsReady = Authorized.check('queue.modifyconsultationready')
 
   const validateQNo = value => {
     const qNo = parseFloat(value).toFixed(
       clinicSettings.settings.isQueueNoDecimal ? 1 : 0,
     )
-    if (!fromMedicalCheckupReporting && existingQNo.includes(qNo))
+    if (existingQNo.includes(qNo))
       return 'Queue No. already existed in current queue list'
     return ''
   }
@@ -226,38 +220,14 @@ const VisitInfoCard = ({
       setFieldValue(FormField['visit.consReady'], false)
     }
     setFieldValue(FormField['visit.isDoctorInCharge'], true)
-    updateMedicalCheckup(v, values.isForInvoiceReplacement)
     setFieldValue('visitBasicExaminations[0].visitPurposeFK', v)
     if (currentVisitTemplate) {
       handleVisitOrderTemplateChange(v, currentVisitTemplate)
     }
   }
 
-  const updateMedicalCheckup = (visitPurposeFK, isForInvoiceReplacement) => {
-    if (visitPurposeFK != VISIT_TYPE.MC || isForInvoiceReplacement) {
-      setFieldValue('visitDoctor', [
-        ...values.visitDoctor.map(d => {
-          return { ...d, isDeleted: true }
-        }),
-      ])
-      setFieldValue('medicalCheckupWorkitem[0].reportLanguage', undefined)
-      setFieldValue('medicalCheckupWorkitem[0].reportPriority', undefined)
-      setFieldValue('medicalCheckupWorkitem[0].urgentReportRemarks', undefined)
-    } else {
-      setFieldValue('medicalCheckupWorkitem[0].reportLanguage', [
-        getMCReportLanguage(patientInfo, clinicSettings.settings),
-      ])
-      setFieldValue('medicalCheckupWorkitem[0].reportPriority', 'Normal')
-      setFieldValue(
-        'medicalCheckupWorkitem[0].statusFK',
-        MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS,
-      )
-    }
-  }
-
   const handleIsForInvoiceReplacementChange = v => {
     const { values } = restProps
-    updateMedicalCheckup(values.visitPurposeFK, v.target.value)
   }
 
   const handleVisitGroupChange = (v, op) => {
@@ -415,11 +385,6 @@ const VisitInfoCard = ({
 
   const hasCOR = values.clinicalObjectRecordFK
   const activeCORCreatedBy = values.activeCORCreatedBy
-  const mcWorkItemInProgress =
-    values?.medicalCheckupWorkitem &&
-    values?.medicalCheckupWorkitem.length > 0 &&
-    (values?.medicalCheckupWorkitem[0].statusFK === 1 ||
-      values?.medicalCheckupWorkitem[0].statusFK === 2)
   const isSpecialtyDoctor = () => {
     var primaryDoctor = doctorProfiles.find(
       x => x.id === values?.doctorProfileFK,
@@ -455,11 +420,7 @@ const VisitInfoCard = ({
               name={FormField['visit.doctorProfileFk']}
               render={args => (
                 <DoctorProfileSelect
-                  disabled={
-                    fromMedicalCheckupReporting
-                      ? isPrimaryDoctorConsultated || !mcWorkItemInProgress
-                      : isPrimaryDoctorConsultated || isReadOnly
-                  }
+                  disabled={isPrimaryDoctorConsultated || isReadOnly}
                   authority='none'
                   onChange={(v, op = {}) => handleDoctorChange(v, op)}
                   label={
@@ -507,11 +468,7 @@ const VisitInfoCard = ({
                   <NumberInput
                     {...args}
                     precision={isQueueNoDecimal ? 1 : 0}
-                    disabled={
-                      fromMedicalCheckupReporting
-                        ? true
-                        : notWaiting || isReadOnly
-                    }
+                    disabled={notWaiting || isReadOnly}
                     label={formatMessage({
                       id: 'reception.queue.visitRegistration.queueNo',
                     })}
@@ -548,11 +505,7 @@ const VisitInfoCard = ({
                 <Checkbox
                   style={{ position: 'relative', top: 16 }}
                   {...args}
-                  disabled={
-                    fromMedicalCheckupReporting
-                      ? true
-                      : notWaiting || isReadOnly
-                  }
+                  disabled={notWaiting || isReadOnly}
                   tooltip='This visit is created for past invoice replacement.'
                   label='For Invoice Replacement'
                   onChange={handleIsForInvoiceReplacementChange}
@@ -567,9 +520,7 @@ const VisitInfoCard = ({
             name={FormField['visit.roomFK']}
             render={args => (
               <CodeSelect
-                disabled={
-                  fromMedicalCheckupReporting ? true : notWaiting || isReadOnly
-                }
+                disabled={notWaiting || isReadOnly}
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.room',
                 })}
@@ -593,11 +544,7 @@ const VisitInfoCard = ({
                   dropdownStyle={{ width: 500 }}
                   dropdownMatchSelectWidth={false}
                   authority='none'
-                  disabled={
-                    fromMedicalCheckupReporting
-                      ? true
-                      : notWaiting || isReadOnly
-                  }
+                  disabled={notWaiting || isReadOnly}
                   onChange={(e, opts) =>
                     handleVisitOrderTemplateChange(visitType, opts)
                   }
@@ -689,11 +636,7 @@ const VisitInfoCard = ({
                   currency
                   authority='none'
                   suffix='$'
-                  disabled={
-                    fromMedicalCheckupReporting
-                      ? true
-                      : readOnly || notWaiting || isReadOnly
-                  }
+                  disabled={readOnly || notWaiting || isReadOnly}
                   label={formatMessage({
                     id:
                       'reception.queue.visitRegistration.visitOrderTotalCharge',
@@ -715,11 +658,9 @@ const VisitInfoCard = ({
                   })}
                   tooltip='Ready for Consultaton'
                   disabled={
-                    fromMedicalCheckupReporting
-                      ? true
-                      : (disableConsReady &&
-                          disableConsReady.rights === 'Disable') ||
-                        isReadOnly
+                    (disableConsReady &&
+                      disableConsReady.rights === 'Disable') ||
+                    isReadOnly
                   }
                   {...args}
                 />
@@ -737,7 +678,7 @@ const VisitInfoCard = ({
                   multiline
                   rowsMax={3}
                   authority='none'
-                  disabled={fromMedicalCheckupReporting ? false : isReadOnly}
+                  disabled={isReadOnly}
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.visitRemarks',
                   })}
@@ -745,7 +686,7 @@ const VisitInfoCard = ({
               )}
             />
             <CannedTextButton
-              disabled={fromMedicalCheckupReporting ? false : isReadOnly}
+              disabled={isReadOnly}
               cannedTextTypeFK={CANNED_TEXT_TYPE.APPOINTMENTREMARKS}
               style={{
                 position: 'absolute',
@@ -1039,12 +980,8 @@ const VisitInfoCard = ({
             attachmentType='Visit'
             handleUpdateAttachments={handleUpdateAttachments}
             attachments={attachments}
-            isReadOnly={
-              fromMedicalCheckupReporting ? !mcWorkItemInProgress : isReadOnly
-            }
-            disableScanner={
-              fromMedicalCheckupReporting ? !mcWorkItemInProgress : isReadOnly
-            }
+            isReadOnly={isReadOnly}
+            disableScanner={isReadOnly}
             fieldName='visitAttachment'
           />
         </GridItem>
