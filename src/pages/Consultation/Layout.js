@@ -14,7 +14,7 @@ import Fullscreen from '@material-ui/icons/Fullscreen'
 import FullscreenExit from '@material-ui/icons/FullscreenExit'
 import CompareArrows from '@material-ui/icons/CompareArrows'
 import Accessibility from '@material-ui/icons/Accessibility'
-import { connect } from 'dva'
+import { connect } from 'dva' 
 import { headerHeight } from 'mui-pro-jss'
 // common components
 import {
