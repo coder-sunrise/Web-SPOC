@@ -65,7 +65,6 @@ export const PATIENT_LAB = {
   PATIENT_PROFILE: 1,
   CONSULTATION: 2,
   LAB_TRACKING: 3,
-  MEDICAL_CHECKUP: 4,
 }
 
 export const CANCELLATION_REASON_TYPE = {
@@ -108,9 +107,6 @@ export const INVOICE_PAYER_TYPE = {
 export const CLINICAL_ROLE = {
   DOCTOR: 1,
   OTHERS: 2,
-  RADIOGRAPHER: 3,
-  PHARMACIST: 4,
-  LABTECH: 5,
   NURSE: 6,
   PRO: 7,
 }
