@@ -102,7 +102,6 @@ const parseUserRights = user => {
     'report',
     'settings',
     'support',
-    'claimsubmission',
   ]
   const result = {
     ...user,

@@ -79,10 +79,6 @@ const styles = theme => ({
       },
     },
   },
-  visitGroupLabel: {
-    fontSize: '0.7rem',
-    fontWeight: 300,
-  },
 })
 
 const amountProps = {
@@ -117,9 +113,6 @@ const VisitInfoCard = ({
   doctorProfiles,
   ...restProps
 }) => {
-  const [visitGroupMessage, setVisitGroupMessage] = useState()
-  const [visitGroupPopup, setVisitGroupPopup] = useState(false)
-
   useEffect(() => {
     if (currentVisitTemplate) {
       let activeItemTotal = getVisitOrderTemplateTotal(
@@ -230,28 +223,6 @@ const VisitInfoCard = ({
     const { values } = restProps
   }
 
-  const handleVisitGroupChange = (v, op) => {
-    setFieldValue(FormField['visit.visitGroup'], op ? op.data.visitGroup : null)
-    setFieldValue(FormField['visit.consReady'], false)
-    setFieldValue(
-      FormField['visit.visitGroupRef'],
-      op && op.data.visitGroup === op.data.order ? op.data.order : null,
-    )
-    setVisitGroupMessage(
-      op && op.data.visitGroup === op.data.order
-        ? 'New group create with ' + op.data.patientName
-        : null,
-    )
-  }
-
-  const handleVisitGroupFocus = (v, op) => {
-    setVisitGroupPopup(true)
-  }
-
-  const handleVisitGroupBlur = (v, op) => {
-    setVisitGroupPopup(false)
-  }
-
   const { values, dispatch } = restProps
   let totalTempCharge = 0
   if ((values.visitOrderTemplateFK || 0) > 0 && currentVisitTemplate) {
@@ -284,46 +255,6 @@ const VisitInfoCard = ({
       visitTypeSettingsObj,
     ).filter(vstType => vstType['isEnabled'] === 'true')
   }
-
-  const family = patientInfo?.patientFamilyGroup?.patientFamilyMember
-  const familyMembers = family
-    ? [...family.map(mem => mem.name), patientInfo?.patientFamilyGroup.name]
-    : []
-  const visitGroups = [
-    ...queueLog.list
-      .filter((q, i, a) => {
-        return (
-          patientInfo &&
-          patientInfo.name !== q.patientName &&
-          a.map(m => m.patientName).indexOf(q.patientName) === i
-        )
-      })
-      .map(l => {
-        return {
-          visitGroup: l.visitGroup || l.id,
-          displayValue: l.visitGroup || 'New Group Number',
-          patientName: l.patientName,
-          order: l.id,
-          isFamilyMember: familyMembers?.indexOf(l.patientName) >= 0,
-        }
-      }),
-  ]
-
-  useEffect(() => {
-    const noVisitGroup = !values.visitGroup
-    if (noVisitGroup && familyMembers) {
-      const groupsList = visitGroups.map(vg => vg.patientName)
-      familyMembers.some(member => {
-        const group = groupsList.indexOf(member) >= 0
-        if (group) {
-          setVisitGroupMessage(`Family member ${member} is registered in queue`)
-          return true
-        }
-        return false
-      })
-    } else if (!noVisitGroup) return
-    else setVisitGroupMessage(null)
-  }, [values, familyMembers])
 
   const getAvailableOrderTemplate = () => {
     let availableVisitOrderTemplate = []
@@ -703,107 +634,9 @@ const VisitInfoCard = ({
             />
           </div>
         </GridItem>
+        <GridItem xs md={3}></GridItem>
         <GridItem xs md={3}>
-          <Authorized authority='queue.visitgroup'>
-            <React.Fragment>
-              <Select
-                valueField='order'
-                labelField='displayValue'
-                value={values.visitGroup}
-                disabled={isReadOnly}
-                options={_.orderBy(
-                  visitGroups,
-                  ['isFamilyMember', 'order'],
-                  ['desc', 'desc'],
-                )}
-                handleFilter={(input, option) => {
-                  return (
-                    option.data.visitGroup
-                      .toString()
-                      .toLowerCase()
-                      .indexOf(input.toString().toLowerCase()) >= 0 ||
-                    option.data.patientName
-                      .toString()
-                      .toLowerCase()
-                      .indexOf(input.toString().toLowerCase()) >= 0 ||
-                    input === ''
-                  )
-                }}
-                label='Visit Group Number'
-                dropdownStyle={{ minWidth: '20%' }}
-                onClear={handleVisitGroupChange}
-                onSelect={handleVisitGroupChange}
-                // onFocus={handleVisitGroupFocus}
-                // onBlur={handleVisitGroupBlur}
-                renderDropdown={option => {
-                  return (
-                    <GridContainer>
-                      <GridItem sm={2} md={2}>
-                        <b>
-                          {option.visitGroup === option.order
-                            ? ''
-                            : option.visitGroup}
-                        </b>
-                      </GridItem>
-                      <GridItem sm={9} md={9} style={{ overflow: 'hidden' }}>
-                        {option.patientName}
-                      </GridItem>
-                      {option.isFamilyMember ? (
-                        <GridItem style={{ padding: 0 }} sm={1} md={1}>
-                          <Icon style={{ fontSize: 20 }} type='family' />
-                        </GridItem>
-                      ) : (
-                        ''
-                      )}
-                    </GridContainer>
-                  )
-                }}
-              />
-              {visitGroupMessage && (
-                <div style={{ position: 'relative' }}>
-                  <Alert
-                    message={visitGroupMessage}
-                    type='warning'
-                    showIcon={false}
-                    style={{
-                      position: 'absolute',
-                      maxWidth: '440px',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      padding: '0 3px',
-                      fontSize: '0.85rem',
-                    }}
-                  />
-                </div>
-              )}
-            </React.Fragment>
-          </Authorized>
-        </GridItem>
-        <GridItem xs md={3}>
-          <Fragment>
-            <Authorized authority='queue.visitgroup'>
-              <Popover
-                icon={null}
-                visible={visitGroupPopup}
-                placement='topLeft'
-                content={
-                  <div>
-                    <p>- Search by existing group number or patient name.</p>
-                    <p>- Selecting visit group will set Cons. Ready to "No".</p>
-                  </div>
-                }
-              >
-                <IconButton
-                  size='small'
-                  style={{ position: 'relative', top: 8 }}
-                  onMouseOver={handleVisitGroupFocus}
-                  onMouseOut={handleVisitGroupBlur}
-                >
-                  <InfoCircleOutlined />
-                </IconButton>
-              </Popover>
-            </Authorized>
-          </Fragment>
+          <Fragment></Fragment>
         </GridItem>
         {showAdjusment &&
         ((ctinvoiceadjustment || []).length > 0 ||

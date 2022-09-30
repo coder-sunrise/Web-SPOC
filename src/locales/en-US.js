@@ -15,10 +15,6 @@ import sms from './en-US/sms'
 import finance from './en-US/finance'
 import reception from './en-US/reception'
 import general from './en-US/general'
-import claimsubmission from './en-US/claimSubmission'
-import radiology from './en-US/radiology'
-import pharmacy from './en-US/pharmacy'
-import lab from './en-US/lab'
 
 export default {
   'navBar.lang': 'Languages',
@@ -46,8 +42,4 @@ export default {
   ...reception,
   ...inventory,
   ...sms,
-  ...claimsubmission,
-  ...radiology,
-  ...pharmacy,
-  ...lab,
 }

@@ -546,7 +546,6 @@ export const SCRIBBLE_NOTE_TYPE = {
   CHIEFCOMPLAINTS: 2,
   PLAN: 6,
   HISTORY: 3,
-  RADIOLOGY: 9,
 }
 
 export const SMS_STATUS = {
@@ -848,7 +847,6 @@ export const PHARMACY_ACTION = {
 }
 
 export const CHECKLIST_CATEGORY = {
-  RADIOLOGY: 1,
   DOCTORCONSULTATION: 2,
 }
 
@@ -931,95 +929,11 @@ export const ORDER_TYPES = {
   TREATMENT: '7',
 }
 
-export const LAB_WORKITEM_STATUS = {
-  NEW: 1,
-  SPECIMENCOLLECTED: 2,
-  SPECIMENRECEIVED: 3,
-  INPROGRESS: 4,
-  FORRETEST: 5,
-  PENDINGFIRSTVERIFIER: 6,
-  PENDINGSECONDVERIFIER: 7,
-  COMPLETED: 8,
-}
-
-export const LAB_SPECIMEN_STATUS = {
-  NEW: 1,
-  INPROGRESS: 2,
-  FORRETEST: 3,
-  PENDINGFIRSTVERIFIER: 4,
-  PENDINGSECONDVERIFIER: 5,
-  COMPLETED: 6,
-  DISCARDED: 7,
-}
-
-export const LAB_SPECIMEN_TIMELINE_STATUS = {
-  FIRSTORDERED: 'First Ordered',
-  SPECIMENCOLLECTED: 'Specimen Collected',
-  SPECIMENRECEIVED: 'Specimen Received',
-  TESTSTARTED: 'Test Started',
-  FIRSTVERIFIED: 'First Verified',
-  COMPLETED: 'Completed',
-}
-
-export const LAB_SPECIMEN_ALL_COLOR = '#5a9cde'
-export const LAB_SPECIMEN_STATUS_COLORS = {
-  1: '#999900',
-  2: '#009999',
-  3: '#DA6300',
-  4: '#993333',
-  5: '#0000ff',
-  6: '#009933',
-  7: '#777777',
-}
-
-export const LAB_SPECIMEN_ALL_LABEL = 'All'
-export const LAB_SPECIMEN_STATUS_LABELS = {
-  1: 'New',
-  2: 'In Progress',
-  3: 'P. Retest',
-  4: 'P. 1st Verify',
-  5: 'P. 2nd Verify',
-  6: 'Completed',
-  7: 'Discarded',
-}
-
-export const LAB_SPECIMEN_ALL_DESCRIPTION = 'All'
-export const LAB_SPECIMEN_STATUS_DESCRIPTION = {
-  1: 'New',
-  2: 'In Progress',
-  3: 'Pending for Retest',
-  4: 'Pending First Verification',
-  5: 'Pending Second Verification',
-  6: 'Completed',
-  7: 'Discarded',
-}
-
-export const LAB_SPECIMEN_DETAILS_STEP = {
-  1: 'New',
-  2: 'In Progress',
-  3: 'P. Retest',
-  4: 'P. 1st Verify',
-  5: 'P. 2nd Verify',
-  6: 'Completed',
-  7: 'Discarded',
-}
-
-export const LAB_RESULT_TYPE = {
-  NUMERIC: 1,
-  STRING: 2,
-  ATTACHMENT: 3,
-}
-
 export const VISITDOCTOR_CONSULTATIONSTATUS = {
   WAITING: 'Waiting',
   INPROGRESS: 'In Progress',
   PAUSED: 'Paused',
   COMPLETED: 'Completed',
-}
-
-export const LANGUAGES = {
-  2: 'EN',
-  5: 'JP',
 }
 
 export const YESNOOPTIUONS = [
@@ -1035,7 +949,6 @@ export const AGETYPE = {
 
 export const INVOICE_REPORT_TYPES = {
   SUMMARYINVOICE: 'Summary Invoice',
-  GROUPINVOICE: 'Group Invoice',
   INDIVIDUALINVOICE: 'Individual Invoice',
   CLAIMABLEITEMCATEGORYINVOICE: 'Claimable Item Category Invoice',
   ITEMCATEGORYINVOICE: 'Item Category Invoice',

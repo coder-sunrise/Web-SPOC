@@ -345,23 +345,14 @@ class Queue extends React.Component {
     const { dispatch, queueLog } = this.props
     const { sessionInfo } = queueLog
     const { sessionNo } = sessionInfo
-    const hasWaitingVisitGroup = queueLog.list.find(
-      q => q.visitGroup && q.visitStatus === VISIT_STATUS.WAITING,
-    )
 
     dispatch({
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
         openConfirmTitle: '',
-        customWidth: hasWaitingVisitGroup ? 'md' : '',
-        openConfirmContent: hasWaitingVisitGroup
-          ? [
-              `Confirm to remove waiting patients' visit group and`,
-              <br />,
-              `end current session (${sessionNo})?`,
-            ]
-          : `End current session (${sessionNo})?`,
+        customWidth: '',
+        openConfirmContent: `End current session (${sessionNo})?`,
         onConfirmSave: this.onConfirmEndSession,
       },
     })

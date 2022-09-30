@@ -263,21 +263,14 @@ class Grid extends React.Component {
     const queueListingData = this.computeQueueListingData()
 
     const showConsReady = Authorized.check('queue.modifyconsultationready')
-    const showVisitGroup = Authorized.check('queue.visitgroup')
 
     const queueConfig = {
       ...QueueTableConfig,
-      columns: QueueTableConfig.columns
-        .filter(col =>
-          showConsReady && showConsReady.rights === 'hidden'
-            ? col.name !== 'consReady'
-            : true,
-        )
-        .filter(col =>
-          showVisitGroup && showVisitGroup.rights === 'hidden'
-            ? col.name !== 'visitGroup'
-            : true,
-        ),
+      columns: QueueTableConfig.columns.filter(col =>
+        showConsReady && showConsReady.rights === 'hidden'
+          ? col.name !== 'consReady'
+          : true,
+      ),
     }
 
     const isLoading = showingVisitRegistration ? false : loading

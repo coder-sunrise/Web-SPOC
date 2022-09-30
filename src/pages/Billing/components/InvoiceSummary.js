@@ -19,7 +19,6 @@ import { INVOICE_REPORT_TYPES } from '@/utils/constants'
 import Payments from './Payments'
 import MenuItem from '@material-ui/core/MenuItem'
 import MenuList from '@material-ui/core/MenuList'
-import GroupInvoicesPopover from './GroupInvoicePopover'
 
 const styles = () => ({
   crossed: {
@@ -67,14 +66,7 @@ const InvoiceSummary = ({
   const [showAddPaymentMenu, setShowAddPaymentMenu] = useState(false)
   const [showPrintInvoiceMenu, setShowPrintInvoiceMenu] = useState(false)
 
-  const {
-    invoicePayment,
-    invoice,
-    visitGroup,
-    visitGroupStatusDetails,
-    patientID,
-    visitOrderTemplateFK,
-  } = values
+  const { invoicePayment, invoice, patientID, visitOrderTemplateFK } = values
   const {
     gstValue,
     gstAmount,
@@ -115,18 +107,9 @@ const InvoiceSummary = ({
       setShowError(false)
   }
 
-  const shouldDisableGroupPayment = !(
-    visitGroupStatusDetails?.length > 0 &&
-    _.sumBy(visitGroupStatusDetails, 'outstandingBalance') > 0 &&
-    !visitGroupStatusDetails.some(x => !x.isBillingSaved)
-  )
   const shouldDisableIndividualPayment =
-    (visitGroupStatusDetails?.length > 0 &&
-      _.find(visitGroupStatusDetails, x => x.visitFK == values.id)
-        .outstandingBalance <= 0) ||
-    (outstandingBalance !== undefined && outstandingBalance <= 0)
-  const shouldDisableAddPayment =
-    disabled || (shouldDisableIndividualPayment && shouldDisableGroupPayment)
+    outstandingBalance !== undefined && outstandingBalance <= 0
+  const shouldDisableAddPayment = disabled || shouldDisableIndividualPayment
 
   const handleCancelClick = useCallback(
     id => {
@@ -235,14 +218,6 @@ const InvoiceSummary = ({
                 }}
               />
             </GridItem>
-            {visitGroup && (
-              <GridItem md={1}>
-                <GroupInvoicesPopover
-                  visitGroup={visitGroup}
-                  patientID={patientID}
-                />
-              </GridItem>
-            )}
             <GridItem md={3}>
               <span>
                 <Popover
@@ -251,7 +226,7 @@ const InvoiceSummary = ({
                   placement='right'
                   visible={showPrintInvoiceMenu}
                   onVisibleChange={() => {
-                    if (visitGroup || visitOrderTemplateFK) {
+                    if (visitOrderTemplateFK) {
                       setShowPrintInvoiceMenu(!showPrintInvoiceMenu)
                     } else {
                       handlePrintInvoiceClick(
@@ -273,17 +248,6 @@ const InvoiceSummary = ({
                           }
                         >
                           Summary Invoice
-                        </MenuItem>
-                      )}
-                      {visitGroup && (
-                        <MenuItem
-                          onClick={() =>
-                            handlePrintInvoiceClick(
-                              INVOICE_REPORT_TYPES.GROUPINVOICE,
-                            )
-                          }
-                        >
-                          Group Invoice
                         </MenuItem>
                       )}
                       <MenuItem
@@ -336,23 +300,13 @@ const InvoiceSummary = ({
                   placement='right'
                   visible={showAddPaymentMenu}
                   onVisibleChange={() => {
-                    if (visitGroup) {
-                      setShowAddPaymentMenu(!showAddPaymentMenu)
-                    } else {
-                      handleAddPaymentClick()
-                    }
+                    handleAddPaymentClick()
                   }}
                   content={
                     <MenuList
                       role='menu'
                       onClick={() => setShowAddPaymentMenu(false)}
                     >
-                      <MenuItem
-                        disabled={shouldDisableGroupPayment}
-                        onClick={() => handleAddPaymentClick(true)}
-                      >
-                        Group Payment
-                      </MenuItem>
                       <MenuItem
                         disabled={shouldDisableIndividualPayment}
                         onClick={() => handleAddPaymentClick()}

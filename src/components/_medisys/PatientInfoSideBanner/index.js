@@ -66,29 +66,6 @@ class PatientInfoSideBanner extends PureComponent {
     let acuteVCBal = ''
     let chronicStatus = ''
 
-    if (!schemeData.isNew) {
-      // Scheme Balance
-      balance =
-        schemeData.patientSchemeBalance.length <= 0
-          ? undefined
-          : schemeData.patientSchemeBalance[0].balance
-      // Patient Acute Visit Patient Balance
-      acuteVPBal =
-        schemeData.patientSchemeBalance.length <= 0
-          ? undefined
-          : schemeData.patientSchemeBalance[0].acuteVisitPatientBalance
-      // Patient Acute Visit Clinic Balance
-      acuteVCBal =
-        schemeData.patientSchemeBalance.length <= 0
-          ? undefined
-          : schemeData.patientSchemeBalance[0].acuteVisitClinicBalance
-
-      chronicStatus =
-        schemeData.patientSchemeBalance.length <= 0
-          ? undefined
-          : schemeData.patientSchemeBalance[0].chronicBalanceStatusCode
-    }
-
     return {
       balance,
       patientCoPaymentSchemeFK: schemeData.id,
@@ -114,56 +91,7 @@ class PatientInfoSideBanner extends PureComponent {
           : '',
     }
   }
-
-  getSchemePayerDetails = schemePayer => {
-    const { patientScheme } = this.props.entity
-    const schemeData =
-      patientScheme.find(row => row.schemeTypeFK === schemePayer.schemeFK) || {}
-    const { patientSchemeBalance = [] } = schemeData
-    const balanceData = patientSchemeBalance.find(
-      row => row.schemePayerFK === schemePayer.id,
-    )
-
-    if (
-      !_.isEmpty(this.state.refreshedSchemePayerData.payerBalanceList) &&
-      this.state.refreshedSchemePayerData.isSuccessful === true
-    ) {
-      const refreshData = this.state.refreshedSchemePayerData.payerBalanceList.find(
-        row => row.schemePayerFK === schemePayer.id,
-      )
-
-      if (refreshData)
-        return {
-          payerName: schemePayer.payerName,
-          payerAccountNo: schemePayer.payerID,
-          balance:
-            refreshData.finalBalance >= 0 ? refreshData.finalBalance : '-',
-          patientCoPaymentSchemeFK: balanceData.patientCoPaymentSchemeFK,
-          schemeTypeFK: refreshData.schemeTypeFK,
-          schemeType: schemePayer.schemeType,
-          validFrom: schemeData.validFrom,
-          validTo: schemeData.validTo,
-          statusDescription: null,
-          isSuccessful:
-            refreshData.isSuccessful !== '' ? refreshData.isSuccessful : '',
-        }
-    }
-
-    const errorData = this.state.refreshedSchemePayerData
-    return {
-      payerName: schemePayer.payerName,
-      payerAccountNo: schemePayer.payerID,
-      balance: balanceData.balance >= 0 ? balanceData.balance : '-',
-      patientCoPaymentSchemeFK: balanceData.patientCopaymentSchemeFK,
-      schemeTypeFK: schemePayer.schemeFK,
-      schemeType: schemePayer.schemeType,
-      validFrom: schemeData.validFrom,
-      validTo: schemeData.validTo,
-      statusDescription: errorData.statusDescription,
-      isSuccessful: errorData.isSuccessful || '',
-    }
-  }
-
+ 
   render() {
     const {
       height,

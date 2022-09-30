@@ -192,11 +192,8 @@ export const getInvoiceItemsWithClaimAmount = (
   const totalInvoiceAmount = roundTo(
     originalInvoiceItems
       .map(item => {
-        return (
-          item.totalBeforeGst -
-          (allPayers ? item._chasAmount || 0 : item._claimedAmount || 0)
-        )
-      }) // fixed value if cdmp, based on chas claimed
+        return item.totalBeforeGst - (allPayers ? 0 : item._claimedAmount || 0)
+      })
       .reduce(sumAll, 0),
   )
 

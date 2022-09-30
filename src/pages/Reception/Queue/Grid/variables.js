@@ -163,7 +163,6 @@ export const QueueTableConfig = {
   columns: [
     { name: 'visitStatus', title: 'Status' },
     { name: 'queueNo', title: 'Q. No.' },
-    { name: 'visitGroup', title: 'Group No.' },
     {
       name: 'consReady',
       title: 'Cons. Ready',
@@ -231,10 +230,7 @@ export const QueueColumnExtensions = props => {
       },
     },
     { columnName: 'patientAccountNo', compare: compareString, width: 120 },
-    {
-      columnName: 'visitGroup',
-      align: 'center',
-    },
+
     {
       columnName: 'invoiceNo',
       width: 120,

@@ -121,7 +121,6 @@ const Scheme = ({
     id,
     _hasError = false,
     hasPayments = false,
-    chasClaimStatuses = [],
     payerDistributedAmt,
     payerDistributedAmtBeforeGST,
     gstAmount,
@@ -141,9 +140,6 @@ const Scheme = ({
     if (invoicePayment.find(o => o.isCancelled === false)) {
       return true
     }
-
-    const statuses = chasClaimStatuses.map(status => status.toLowerCase())
-    if (hasPayments || statuses.includes('approved')) return true
     return _isEditing
       ? false
       : hasOtherEditing || isUpdatedAppliedInvoicePayerInfo || showRefreshOrder
@@ -181,35 +177,6 @@ const Scheme = ({
     return _isEditing || hasOtherEditing
   }
 
-  const getPayerList = payerScheme => {
-    // copayment scheme get scheme type fk, use it to find schemefk in schemepayer
-    const scheme = ctcopaymentscheme.find(
-      a => a.id === payerScheme.copaymentSchemeFK,
-    )
-    if (!scheme || scheme === undefined) return []
-    const schemeType =
-      ctschemetype.find(c => c.name === scheme.schemeTypeName) || []
-    const addedSchemes =
-      tempInvoicePayer
-        .filter(r => r.copaymentSchemeFK !== scheme.id)
-        .map(a => {
-          return a.copaymentSchemeFK
-        }) || []
-    if (!schemeType) return []
-    return patient.schemePayer
-      .filter(
-        b =>
-          b.schemeFK === schemeType.id &&
-          addedSchemes.indexOf(payerScheme.copaymentSchemeFK) < 0,
-      )
-      .map(p => {
-        return {
-          name: p.payerName,
-          id: p.id,
-        }
-      })
-  }
-
   let payments = []
   payments = payments.concat(
     invoicePayment.map(o => {
@@ -227,17 +194,12 @@ const Scheme = ({
   }
   const { isEnableAddPaymentInBilling = false } = clinicSettings
 
-  const isCHAS = schemeConfig && schemeConfig.copayerFK === 1
-  const isMedisave = payerTypeFK === INVOICE_PAYER_TYPE.PAYERACCOUNT
-
-  const payerList = getPayerList(invoicePayer)
-  const payer = payerList.find(p => p.id === schemePayerFK)
+  const payer = []
 
   return (
     <Paper key={_key} elevation={4} className={classes.gridRow}>
       <GridContainer style={{ marginBottom: 16 }} alignItems='flex-start'>
         <GridItem md={6} style={{ marginTop: 8, marginBottom: 16 }}>
-          {/* Copayment Scheme [Only chas can select] */}
           <span
             style={{
               width: '100%',
@@ -278,11 +240,6 @@ const Scheme = ({
             )}
           </span>
         </GridItem>
-        {(isCHAS || isMedisave) && (
-          <GridItem md={2} style={{ marginTop: 8, marginBottom: 8 }}>
-            <BalanceLabel schemeConfig={schemeConfig} />
-          </GridItem>
-        )}
         {!disableEdit && (
           <GridItem md={2} style={{ marginTop: 8, marginBottom: 8 }}>
             <MaxCap
@@ -295,9 +252,7 @@ const Scheme = ({
         )}
         {disableEdit && <GridItem md={2} />}
         <GridItem
-          md={
-            (schemeConfig && schemeConfig.copayerFK === 1) || isMedisave ? 2 : 4
-          }
+          md={4}
           style={{
             textAlign: 'right',
             marginTop: 8,

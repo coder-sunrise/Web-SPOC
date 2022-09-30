@@ -56,72 +56,6 @@ const approvedStatus = [
     render: () => <span>Recovered</span>,
   },
 ]
-const claimStatus = [
-  {
-    value: 'SU',
-    name: 'Submitted',
-    render: () => <span>Submitted</span>,
-  },
-  ...approvedStatus,
-  {
-    value: 'RJ',
-    name: 'Rejected',
-    render: () => <span>Rejected</span>,
-  },
-  {
-    value: 'AE',
-    name: 'Appealed',
-    render: () => <span>Rejected</span>,
-  },
-  {
-    value: 'PR',
-    name: 'Pending for Screening Report',
-    render: () => <span>Pending for Screening Report</span>,
-  },
-  {
-    value: 'PBA',
-    name: 'Pending Batch Approval',
-    render: () => <span>Pending Batch Approval</span>,
-  },
-  {
-    value: 'DF',
-    name: 'Draft',
-    render: () => <span>Draft</span>,
-  },
-  {
-    value: 'OH',
-    name: 'OnHold',
-    render: () => <span>On-Hold</span>,
-  },
-  {
-    value: 'CA',
-    name: 'Cancellation Submitted',
-    render: () => <span>Cancellation Submitted</span>,
-  },
-  {
-    value: 'CA2',
-    name: 'Cancellation Extracted',
-    render: () => <span>Cancellation Extracted</span>,
-  },
-  {
-    value: 'CA3',
-    name: 'Cancelled',
-    render: () => <span>Cancelled</span>,
-  },
-]
-const chasSchemeTypes = [
-  { code: 'CHASGREEN', displayValue: 'CHAS Green' },
-  { code: 'CHASBLUE', displayValue: 'CHAS Blue' },
-  { code: 'CHASORANGE', displayValue: 'CHAS Orange' },
-  { code: 'CHASMG', displayValue: 'CHAS MG (Merdeka Generation)' },
-  { code: 'CHASPG', displayValue: 'CHAS PG (Pioneer Generation)' },
-  { code: 'CHASPA', displayValue: 'CHAS PA (Public Assistance)' },
-  { code: 'PHPCCHILD', displayValue: 'PHPC Child' },
-  { code: 'PGPCADULT', displayValue: 'PHPC Adult' },
-  { code: 'PHPCSELF', displayValue: 'PHPC Self' },
-  { code: 'PHPCMFAC', displayValue: 'PHPC MFAC' },
-  { code: 'PHPCMFEC', displayValue: 'PHPC MFEC' },
-]
 const statusString = [
   {
     value: 'Inactive',
@@ -1781,8 +1715,6 @@ export {
   appointmentStatus,
   status,
   approvedStatus,
-  chasSchemeTypes,
-  claimStatus,
   statusString,
   isAutoOrder,
   addressTypes,

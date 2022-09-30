@@ -57,9 +57,6 @@ export const setServingPerson = async visitFK => {
   return response
 }
 
-export const queryVisitGroup = params =>
-  commonServices.query(`${queueAPIUrl}/GetVisitGroup`, params.visitID)
-
 export const workItemDetailStatus = async params => {
   return await request(
     `${workitemAPIUrl}/workItemDetailStatus?${stringify(params)}`,

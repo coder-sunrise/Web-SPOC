@@ -977,15 +977,8 @@ class Banner extends PureComponent {
     const { isEnableJapaneseICD10Diagnosis } = clinicSettings
     const contentClass = this.state.isExpanded
       ? classes.contentWithoutWrap
-      : classes.contentWithWrap
-    const preOrderAccessRight = Authorized.check(
-      'patientdatabase.modifypreorder',
-    ) || { rights: 'hidden' }
-
-    const actualizePreOrderAccessRight = Authorized.check(
-      'patientdatabase.modifypreorder.actualizepreorder',
-    ) || { rights: 'hidden' }
-
+      : classes.contentWithWrap 
+ 
     const notesHistoryAccessRight = Authorized.check(
       'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
     ) || { rights: 'hidden' }
@@ -1017,26 +1010,7 @@ class Banner extends PureComponent {
     const year = Math.floor(moment.duration(moment().diff(info.dob)).asYears())
 
     // get scheme details based on scheme type
-    const schemeDataList = []
-    const notMedisaveSchemes =
-      entity.patientScheme && entity.patientScheme.length > 0
-        ? entity.patientScheme.filter(
-            o => !this.isMedisave(o.schemeTypeFK) && o.isSchemeActive,
-          )
-        : null
-    if (notMedisaveSchemes !== null)
-      notMedisaveSchemes.forEach(row => {
-        schemeDataList.push(this.getSchemeDetails(row))
-      })
-    const medisaveSchemePayers =
-      entity.schemePayer && entity.schemePayer.length > 0
-        ? entity.schemePayer
-        : null
-    if (medisaveSchemePayers !== null)
-      medisaveSchemePayers.forEach(row => {
-        schemeDataList.push(this.getSchemePayerDetails(row))
-      })
-
+    const schemeDataList = [] 
     const g6PD = null
 
     const pendingPreOrderItems =
@@ -1568,57 +1542,6 @@ class Banner extends PureComponent {
                           style={{ marginRight: 10 }}
                         >
                           {patientNotesLinkElm}
-                        </span>
-                      )}
-                      {preOrderAccessRight.rights === 'enable' && (
-                        <span className={classes.header}>
-                          <span
-                            style={{
-                              display: 'block',
-                              textDecoration: 'underline',
-                              cursor: 'pointer',
-                            }}
-                            onClick={e => {
-                              e.preventDefault()
-                              if (preOrderAccessRight.rights === 'disable') {
-                                notification.error({
-                                  message:
-                                    'Current user is not authorized to access',
-                                })
-                                return
-                              }
-
-                              if (
-                                disablePreOrder &&
-                                disablePreOrder.some(cond => {
-                                  if (cond.condition) {
-                                    dispatch({
-                                      type: 'global/updateAppState',
-                                      payload: {
-                                        openConfirm: true,
-                                        isInformType: true,
-                                        openConfirmText: 'OK',
-                                        openConfirmContent: cond.message,
-                                      },
-                                    })
-                                    return true
-                                  }
-                                  return false
-                                })
-                              )
-                                return
-
-                              this.openPreOrders()
-                            }}
-                          >
-                            {`Pre-Order (${
-                              activePreOrderItems
-                                ? activePreOrderItems.length
-                                : (pendingPreOrderItems &&
-                                    pendingPreOrderItems.length) ||
-                                  0
-                            })`}
-                          </span>
                         </span>
                       )}
                     </div>

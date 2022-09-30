@@ -153,44 +153,44 @@ const AddOrder = ({
           },
         })
       }
-    }
 
-    const activeRows = newRows
-      .filter(row => row.type !== ORDER_TYPE_TAB.SERVICE)
-      .map(row => {
-        return {
-          ...row,
-          uid: getUniqueId(),
-        }
+      const activeRows = (newRows || [])
+        .filter(row => row.type !== ORDER_TYPE_TAB.SERVICE)
+        .map(row => {
+          return {
+            ...row,
+            uid: getUniqueId(),
+          }
+        })
+      dispatch({
+        type: 'orders/updateState',
+        payload: {
+          rows: activeRows,
+          _originalRows: activeRows.map(r => ({ ...r })),
+          finalAdjustments: newRetailInvoiceAdjustment,
+          isGSTInclusive: r.isGSTInclusive,
+          gstValue: r.gstValue,
+        },
       })
-    dispatch({
-      type: 'orders/updateState',
-      payload: {
-        rows: activeRows,
-        _originalRows: activeRows.map(r => ({ ...r })),
-        finalAdjustments: newRetailInvoiceAdjustment,
-        isGSTInclusive: r.isGSTInclusive,
-        gstValue: r.gstValue,
-      },
-    })
 
-    dispatch({
-      type: 'orders/calculateAmount',
-      payload: {
-        isGSTInclusive: r.isGSTInclusive,
-        gstValue: r.gstValue,
-      },
-    })
-  }
-  if (dispense.ordersData) {
-    dispatch({
-      type: 'orders/upsertRows',
-      payload: dispense.ordersData,
-    })
-    dispatch({
-      type: 'dispense/updateState',
-      payload: { ordersData: undefined },
-    })
+      dispatch({
+        type: 'orders/calculateAmount',
+        payload: {
+          isGSTInclusive: r.isGSTInclusive,
+          gstValue: r.gstValue,
+        },
+      })
+    }
+    if (dispense.ordersData) {
+      dispatch({
+        type: 'orders/upsertRows',
+        payload: dispense.ordersData,
+      })
+      dispatch({
+        type: 'dispense/updateState',
+        payload: { ordersData: undefined },
+      })
+    }
   }
 
   useEffect(() => {
