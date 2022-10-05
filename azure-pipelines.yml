@@ -6,7 +6,7 @@
 trigger: none
 
 pool:
-  name: 'Medicloud'
+  name: 'SPOC'
   demands:
   - EnableBuild # Check if exists
   - EnableBuild -equals True
