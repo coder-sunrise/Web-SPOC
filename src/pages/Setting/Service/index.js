@@ -18,7 +18,6 @@ const styles = theme => ({
       marginTop: 0,
     },
   },
-  medisaveCheck: { position: 'absolute', zIndex: 1, top: 11, width: 20 },
 })
 
 @connect(({ settingClinicService, global }) => ({

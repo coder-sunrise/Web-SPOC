@@ -101,9 +101,6 @@ const styles = theme => ({
     visitRegistration,
     ctschemetype: codetable.ctschemetype || [],
     clinicSettings: clinicSettings.settings || clinicSettings.default,
-    refreshingBalance:
-      loading.effects['patient/refreshChasBalance'] ||
-      loading.effects['patient/refreshMedisaveBalance'],
     mainDivHeight: global.mainDivHeight,
   }),
 )
@@ -359,9 +356,6 @@ class Banner extends PureComponent {
   }
 
   getSchemeList = schemeDataList => {
-    const chasOrMedisave = (schemeDataList || []).filter(
-      o => o.schemeTypeFK <= 6 || this.isMedisave(o.schemeTypeFK),
-    )
     const { patient, clinicSettings } = this.props
     const { entity } = patient
     const { patientScheme } = entity
@@ -372,154 +366,7 @@ class Banner extends PureComponent {
         patientScheme.find(
           ps => ps.coPaymentSchemeFK === s.coPaymentSchemeFK,
         ) || {}
-      return (
-        <span style={{ paddingRight: 5 }}>
-          {chasOrMedisave &&
-          chasOrMedisave.find(list => s.schemeTypeFK === list.schemeTypeFK) ? (
-            <Popover
-              icon={null}
-              content={
-                <div>
-                  <div>
-                    {s.coPaymentSchemeFK ||
-                    schemeDataList.filter(p =>
-                      this.isMedisave(p.schemeTypeFK),
-                    )[0] === s
-                      ? s.copaymentSchemeName
-                      : s.schemeTypeName}
-                    <span style={{ bottom: -2 }}>
-                      {s.schemeTypeFK <= 6 && (
-                        <IconButton onClick={this.refreshChasBalance}>
-                          <Refresh />
-                        </IconButton>
-                      )}
-                      {this.isMedisave(s.schemeTypeFK) &&
-                        schemeDataList.filter(p =>
-                          this.isMedisave(p.schemeTypeFK),
-                        )[0] === s && (
-                          <IconButton onClick={this.refreshMedisaveBalance}>
-                            <Refresh />
-                          </IconButton>
-                        )}
-                    </span>
-                  </div>
-                  {s.schemeType && (
-                    <div style={{ marginTop: 15 }}>{s.schemeType}</div>
-                  )}
-                  {this.isMedisave(s.schemeTypeFK) && (
-                    <div>
-                      Payer: {s.payerName} ({s.payerAccountNo})
-                    </div>
-                  )}
-                  {s.validFrom && (
-                    <div>
-                      Validity:{' '}
-                      {s.validFrom ? (
-                        <DatePicker
-                          text
-                          format={dateFormatLong}
-                          value={s.validFrom}
-                        />
-                      ) : (
-                        ''
-                      )}
-                      &nbsp;-&nbsp;
-                      {s.validTo ? (
-                        <DatePicker
-                          text
-                          format={dateFormatLong}
-                          value={s.validTo}
-                        />
-                      ) : (
-                        ''
-                      )}
-                    </div>
-                  )}
-                  {s.schemeTypeFK !== 15 ? (
-                    <div>
-                      Balance: <NumberInput text currency value={s.balance} />
-                    </div>
-                  ) : (
-                    ''
-                  )}
-                  {s.schemeTypeFK <= 6 ? (
-                    <div>
-                      Patient Acute Visit Balance:{' '}
-                      <NumberInput
-                        text
-                        currency
-                        value={s.acuteVisitPatientBalance}
-                      />
-                    </div>
-                  ) : (
-                    ''
-                  )}
-                  {s.schemeTypeFK <= 6 ? (
-                    <div>
-                      Patient Acute Clinic Balance:{' '}
-                      <NumberInput
-                        text
-                        currency
-                        value={s.acuteVisitClinicBalance}
-                      />
-                    </div>
-                  ) : (
-                    ''
-                  )}
-                </div>
-              }
-              trigger='click'
-              placement='bottom'
-            >
-              <Link>
-                <span
-                  style={{
-                    color: scheme.isExpired ? 'red' : 'black',
-                    textDecoration: 'underline',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {s.copaymentSchemeName || s.schemeTypeName}
-                  {s.validTo
-                    ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`
-                    : ' (Exp: -)'}
-                  {i < arr.length - 1 ? ',' : ''}
-                </span>
-              </Link>
-            </Popover>
-          ) : (
-            <span
-              style={{
-                cursor: 'pointer',
-                color: scheme.isExpired
-                  ? 'red'
-                  : scheme.schemeTypeFK === SCHEME_TYPE.INSURANCE
-                  ? `#${schemeInsuranceDisplayColorCode}`
-                  : 'black',
-                textDecoration: 'underline',
-                wordBreak: 'break-word',
-              }}
-              onClick={e => {
-                const editDetailAccessRight = Authorized.check(
-                  'copayer.copayerdetails',
-                ) || {
-                  rights: 'hidden',
-                }
-                if (editDetailAccessRight.rights === 'hidden') return
-                if (scheme.copayerFK) {
-                  this.openScheme(scheme.copayerFK)
-                }
-              }}
-            >
-              {s.copaymentSchemeName || s.schemeTypeName}
-              {s.validTo
-                ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`
-                : ' (Exp: -)'}
-              {i < arr.length - 1 ? ',' : ''}
-            </span>
-          )}
-        </span>
-      )
+      return <span style={{ paddingRight: 5 }}></span>
     })
   }
   getTagData = () => {
@@ -538,171 +385,6 @@ class Banner extends PureComponent {
     }
     if (!!tagData) return tagData
     return '-'
-  }
-  refreshGovtBalance = () => {
-    this.refreshChasBalance()
-    this.refreshMedisaveBalance()
-  }
-
-  refreshChasBalance = () => {
-    const { dispatch, patient } = this.props
-    const { entity } = patient
-    const { currPatientCoPaymentSchemeFK, currentSchemeType } = this.state
-    let patientCoPaymentSchemeFK = currPatientCoPaymentSchemeFK
-    let oldSchemeTypeFK = currentSchemeType
-    let isSaveToDb = true
-    dispatch({
-      type: 'patient/refreshChasBalance',
-      payload: {
-        ...entity,
-        patientCoPaymentSchemeFK,
-        isSaveToDb,
-        patientProfileId: entity.id,
-      },
-    }).then(result => {
-      if (result) {
-        dispatch({
-          type: 'patient/query',
-          payload: {
-            id: entity.id,
-          },
-        })
-
-        const {
-          balance,
-          schemeTypeFk,
-          validFrom,
-          validTo,
-          acuteVisitPatientBalance,
-          acuteVisitClinicBalance,
-          isSuccessful,
-          statusDescription,
-          acuteBalanceStatusCode,
-          chronicBalanceStatusCode,
-        } = result
-        let isShowReplacementModal = false
-
-        if (!isSuccessful) {
-          this.setState({
-            refreshedSchemeData: {
-              statusDescription,
-              isSuccessful,
-            },
-          })
-        } else {
-          if (oldSchemeTypeFK !== schemeTypeFk) {
-            isShowReplacementModal = true
-          }
-
-          this.setState({
-            refreshedSchemeData: {
-              isShowReplacementModal,
-              oldSchemeTypeFK,
-              balance,
-              patientCoPaymentSchemeFK,
-              schemeTypeFK: schemeTypeFk,
-              validFrom,
-              validTo,
-              acuteVisitPatientBalance,
-              acuteVisitClinicBalance,
-              isSuccessful,
-              acuteBalanceStatusCode,
-              chronicBalanceStatusCode,
-            },
-          })
-        }
-      }
-    })
-  }
-
-  refreshMedisaveBalance = () => {
-    const { dispatch, patient } = this.props
-    const { entity } = patient
-    const { schemePayers } = entity
-    const isSaveToDb = true
-
-    if (!schemePayers || schemePayers.length === 0) return
-    dispatch({
-      type: 'patient/refreshMedisaveBalance',
-      payload: {
-        ...entity,
-        isSaveToDb,
-        patientProfileId: entity.id,
-        schemePayers,
-      },
-    }).then(result => {
-      if (result) {
-        dispatch({
-          type: 'patient/query',
-          payload: {
-            id: entity.id,
-          },
-        })
-
-        const {
-          // balance,
-          // schemeTypeFk,
-          validFrom,
-          validTo,
-          payerBalance,
-          isSuccessful,
-          status,
-          statusDescription,
-        } = result
-        let isShowReplacementModal = false
-        if (!isSuccessful) {
-          this.setState({
-            refreshedSchemePayerData: {
-              payerBalanceList: [],
-              statusDescription,
-              isSuccessful,
-            },
-          })
-        } else if (payerBalance) {
-          let payerBalanceList = []
-          payerBalance.forEach(pb => {
-            if (pb.enquiryType === 'MSVBAL') return
-            /* if (oldSchemeTypeFK !== pb.schemeTypeFK) {
-              isShowReplacementModal = true
-            } */
-            const { finalBalance } = pb
-            payerBalanceList.push({
-              isShowReplacementModal,
-              // oldSchemeTypeFK,
-              finalBalance,
-              schemeTypeFK: pb.schemeTypeFK,
-              schemePayerFK: pb.schemePayerFK,
-              validFrom,
-              validTo,
-              isSuccessful,
-            })
-          })
-          this.setState({
-            refreshedSchemePayerData: {
-              payerBalanceList,
-              statusDescription,
-              isSuccessful,
-            },
-          })
-        }
-      }
-    })
-  }
-
-  isMedisave = schemeTypeFK => {
-    /* const { ctschemetype } = this.props.codetable
-    const r = ctschemetype.find((o) => o.id === schemeTypeFK)
-    if(r)
-      return (
-        [
-          'FLEXIMEDI',
-          'OPSCAN',
-          'MEDIVISIT',
-        ].indexOf(r.code) >= 0
-      ) */
-    if (schemeTypeFK) return [12, 13, 14].indexOf(schemeTypeFK) >= 0
-
-    return false
   }
 
   getSchemeDetails = schemeData => {
@@ -809,7 +491,6 @@ class Banner extends PureComponent {
           isSuccessful:
             refreshData.isSuccessful !== '' ? refreshData.isSuccessful : '',
           schemeTypeName: '',
-          copaymentSchemeName: 'Medisave',
         }
     }
 
@@ -828,7 +509,6 @@ class Banner extends PureComponent {
         errorData.statusDescription || schemeData.statusDescription,
       isSuccessful: errorData.isSuccessful || schemeData.isSuccessful,
       schemeTypeName: '',
-      copaymentSchemeName: 'Medisave',
     }
   }
 
@@ -977,8 +657,8 @@ class Banner extends PureComponent {
     const { isEnableJapaneseICD10Diagnosis } = clinicSettings
     const contentClass = this.state.isExpanded
       ? classes.contentWithoutWrap
-      : classes.contentWithWrap 
- 
+      : classes.contentWithWrap
+
     const notesHistoryAccessRight = Authorized.check(
       'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
     ) || { rights: 'hidden' }
@@ -1010,7 +690,7 @@ class Banner extends PureComponent {
     const year = Math.floor(moment.duration(moment().diff(info.dob)).asYears())
 
     // get scheme details based on scheme type
-    const schemeDataList = [] 
+    const schemeDataList = []
     const g6PD = null
 
     const pendingPreOrderItems =
@@ -1242,14 +922,6 @@ class Banner extends PureComponent {
             interactive='true'
           >
             <span>
-              {entity.isActive &&
-                (entity.patientScheme || []).filter(
-                  o => o.schemeTypeFK <= 6 || this.isMedisave(o.schemeTypeFK),
-                ).length > 0 && (
-                  <IconButton onClick={this.refreshGovtBalance}>
-                    <Refresh />
-                  </IconButton>
-                )}
               {this.getSchemeList(
                 _.orderBy(
                   schemeDataList,

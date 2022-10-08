@@ -23,22 +23,6 @@ const filterOptions = [
     value: 'all',
     name: 'All',
   },
-  {
-    value: 'isChasChronicClaimable',
-    name: 'CHAS Chronic',
-  },
-  {
-    value: 'isChasAcuteClaimable',
-    name: 'CHAS Acute',
-  },
-  {
-    value: 'isHazeClaimable',
-    name: 'Haze',
-  },
-  {
-    value: 'isCdmpClaimable',
-    name: 'CDMP',
-  },
 ]
 
 const DiagnosisItem = ({
@@ -79,19 +63,10 @@ const DiagnosisItem = ({
       vals.corDiagnosis[index].diagnosisICD10AMCode = op.iCD10AMDiagnosisCode
       vals.corDiagnosis[index].diagnosisICD10AMName = op.iCD10AMDiagnosisName
       if (op.complication && op.complication.length) {
-        if (
-          currentSelectCategory.length === 1 &&
-          currentSelectCategory.find(df => df === 'isCdmpClaimable')
-        ) {
-          const complications = op.complication.filter(
-            c => c.cdmpComplicationCode,
-          )
-          setCtComplicationPairedWithDiag(complications || [])
-        } else setCtComplicationPairedWithDiag(op.complication)
+        setCtComplicationPairedWithDiag(op.complication)
       } else {
         vals.corDiagnosis[index].complication = []
         vals.corDiagnosis[index].corComplication = []
-
         setCtComplicationPairedWithDiag([])
       }
     } else {
@@ -117,15 +92,7 @@ const DiagnosisItem = ({
         item => parseInt(item.id, 10) === parseInt(diagnosisFK, 10),
       )
       if (diagnosis) {
-        if (
-          currentSelectCategory.length === 1 &&
-          currentSelectCategory.find(df => df === 'isCdmpClaimable')
-        ) {
-          const complications = diagnosis.complication.filter(
-            c => c.cdmpComplicationCode,
-          )
-          setCtComplicationPairedWithDiag(complications || [])
-        } else setCtComplicationPairedWithDiag(diagnosis.complication || [])
+        setCtComplicationPairedWithDiag(diagnosis.complication || [])
       }
     }
   }

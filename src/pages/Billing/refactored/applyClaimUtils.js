@@ -170,7 +170,7 @@ export const getApplicableClaimAmount = (
 
 export const getInvoiceItemsWithClaimAmount = (
   schemeConfig,
-  originalInvoiceItems = [], // for medisave it's not all items, only items within scheme type
+  originalInvoiceItems = [],
   currentInvoiceItems = [],
   shouldGenerateDummyID = false,
   allPayers,
@@ -401,12 +401,7 @@ const calculateTotalPaybable = (total, item) => {
 export const validateClaimAmount = (schemeRow, tempInvoicePayers) => {
   let invalidMessage = []
 
-  const {
-    schemeConfig,
-    invoicePayerItem,
-    payerTypeFK,
-    medisaveVisitType,
-  } = schemeRow
+  const { schemeConfig, invoicePayerItem, payerTypeFK } = schemeRow
   if (payerTypeFK === INVOICE_PAYER_TYPE.COMPANY || !schemeConfig) return []
 
   const {

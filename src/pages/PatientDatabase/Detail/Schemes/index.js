@@ -4,7 +4,6 @@ import { Button, CommonModal, GridContainer, GridItem } from '@/components'
 
 import { locationQueryParameters } from '@/utils/utils'
 import SchemesGrid from './SchemesGrid'
-import PayersGrid from './PayersGrid'
 
 const styles = () => ({})
 class Schemes extends PureComponent {
@@ -65,11 +64,6 @@ class Schemes extends PureComponent {
         },
       })
     }
-  }
-
-  isMedisave = schemeTypeFK => {
-    if (schemeTypeFK) return [12, 13, 14].indexOf(schemeTypeFK) >= 0
-    return false
   }
 
   createNewScheme = (result, values) => {

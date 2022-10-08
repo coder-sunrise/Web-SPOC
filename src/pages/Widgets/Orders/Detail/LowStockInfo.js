@@ -36,14 +36,7 @@ const LowStockInfo = ({
     reOrderThreshold = 0.0,
     excessThreshold,
     stock = 0.0,
-    isChasAcuteClaimable,
-    isChasChronicClaimable,
-    isMedisaveClaimable,
     sellingPrice = 0,
-    medicationInstructionRule = [],
-    prescribingUOM = {},
-    dispensingUOM = {},
-    medicationUsage = {},
   } = source
 
   let isLowStock
@@ -81,9 +74,6 @@ const LowStockInfo = ({
           Unit Price: {currencySymbol}
           {numeral(sellingPrice).format(currencyFormat)}
         </p>
-        <p>CHAS Acute Claimable: {isChasAcuteClaimable ? 'Yes' : 'No'}</p>
-        <p>CHAS Chronic Claimable: {isChasChronicClaimable ? 'Yes' : 'No'}</p>
-        <p>Medisave Claimable: {isMedisaveClaimable ? 'Yes' : 'No'}</p>
       </div>
     )
   }

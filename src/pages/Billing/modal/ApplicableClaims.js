@@ -3,8 +3,6 @@ import React from 'react'
 import { withStyles } from '@material-ui/core'
 // common component
 import { Button, GridContainer, GridItem } from '@/components'
-import { MEDISAVE_COPAYMENT_SCHEME } from '@/utils/constants'
-import { getMedisaveVisitClaimableAmount } from '../refactored/applyClaimUtils'
 
 const styles = theme => ({
   row: {
@@ -12,64 +10,6 @@ const styles = theme => ({
     // marginRight: theme.spacing(2),
   },
 })
-
-const isMedisave = schemeTypeFK => {
-  if (schemeTypeFK) return [12, 13, 14].indexOf(schemeTypeFK) >= 0
-  return false
-}
-
-const checkSchemeTypeCombination = (
-  claimedMedisaveSchemeTypes,
-  schemeTypeFK,
-) => {
-  switch (
-    schemeTypeFK // schemes cannot conflict on scheme type
-  ) {
-    // case 12: // Medisave 500/700 Visit
-    //   return claimedMedisaveSchemeTypes.includes(14)
-    //   || claimedMedisaveSchemeTypes.includes(12) // Only one visit type
-    case 14: // Outpatient Scan
-      return claimedMedisaveSchemeTypes.includes(12)
-    default:
-      return false
-  }
-}
-
-const checkMedisaveVisitCombination = (codesList, currentScheme) => {
-  // for any vacc or hs is applied cdmp is still not disabled
-  // for cdmp applied
-  console.log('currentMediSchemeCodes', codesList, currentScheme)
-  switch (currentScheme) {
-    case 'MEDISAVE500HS':
-    case 'MEDISAVE500VACC':
-      return true // cdmp will be enabled
-    case 'MEDISAVE500CDMP':
-    case 'MEDISAVE700CDMP':
-      return (
-        !codesList.includes('MEDISAVE500HS') ||
-        !codesList.includes('MEDISAVE500VACC')
-      ) // will be enabled, but hidden
-    default:
-      return false
-  }
-}
-
-const checkCombinationByPayer = (
-  currentMediSchemeTypes,
-  schemeTypeFK,
-  schemePayerFK,
-) => {
-  // payers cannot conflict on same scheme type
-  const payerSchemes = currentMediSchemeTypes.filter(
-    p => p.schemePayerFK === schemePayerFK,
-  )
-  if (payerSchemes.length > 0)
-    return checkSchemeTypeCombination(
-      payerSchemes.map(f => f.schemeTypeId),
-      schemeTypeFK,
-    )
-  return false
-}
 
 const constructSchemeList = (
   list,
@@ -126,7 +66,6 @@ const ApplicableClaims = ({
   ctschemetype,
   ctcopaymentscheme,
   invoiceItems,
-  medisaveItems,
 }) => {
   const schemesList = constructSchemeList(
     claimableSchemes,
@@ -135,7 +74,6 @@ const ApplicableClaims = ({
     ctschemetype,
     ctcopaymentscheme,
     invoiceItems,
-    medisaveItems,
   )
 
   const _handleSelectClick = scheme => {
