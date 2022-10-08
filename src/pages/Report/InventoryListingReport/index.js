@@ -11,7 +11,7 @@ const reportId = 39
 const fileName = 'Inventory Listing Report'
 
 class InventoryListingReport extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       ...this.state,
@@ -24,7 +24,7 @@ class InventoryListingReport extends ReportBase {
     return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
   }
 
-  renderContent = (reportDatas) => {
+  renderContent = reportDatas => {
     return <InventoryList reportDatas={reportDatas} />
   }
 }
@@ -33,6 +33,7 @@ const InventoryListingReportWithFormik = withFormik({
   validationSchema: Yup.object().shape({}),
   mapPropsToValues: () => ({
     IsActive: true,
+    inventoryType: 'CONSUMABLE',
   }),
 })(InventoryListingReport)
 

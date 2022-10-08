@@ -22,7 +22,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, values }) => {
           <GridItem md={3}>
             <FastField
               name='isActive'
-              render={(args) => {
+              render={args => {
                 return <Select label='Status' options={status} {...args} />
               }}
             />
@@ -30,7 +30,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, values }) => {
           <GridItem md={3}>
             <Field
               name='inventoryType'
-              render={(args) => {
+              render={args => {
                 return (
                   <Select
                     {...args}

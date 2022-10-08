@@ -3,7 +3,14 @@ import React from 'react'
 import { FastField, Field } from 'formik'
 import { status } from '@/utils/codes'
 // common components
-import { Button, GridContainer, GridItem, SizeContainer, CodeSelect, Select } from '@/components'
+import {
+  Button,
+  GridContainer,
+  GridItem,
+  SizeContainer,
+  CodeSelect,
+  Select,
+} from '@/components'
 
 const FilterBar = ({ handleSubmit, isSubmitting }) => {
   return (

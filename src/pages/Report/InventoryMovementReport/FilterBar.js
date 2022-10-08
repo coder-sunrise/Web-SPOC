@@ -2,24 +2,31 @@ import React from 'react'
 // formik
 import { Field } from 'formik'
 // common components
-import { Button, GridContainer, GridItem, SizeContainer, CodeSelect, Select } from '@/components'
+import {
+  Button,
+  GridContainer,
+  GridItem,
+  SizeContainer,
+  CodeSelect,
+  Select,
+} from '@/components'
 import ReportDateRangePicker from '../ReportDateRangePicker'
 
 const FilterBar = ({ handleSubmit, isSubmitting }) => {
   return (
-    <SizeContainer size="sm">
+    <SizeContainer size='sm'>
       <React.Fragment>
-        <GridContainer alignItems="flex-end">
+        <GridContainer alignItems='flex-end'>
           <ReportDateRangePicker />
           <GridItem md={2}>
             <Field
-              name="transactionType"
-              render={(args) => {
+              name='transactionType'
+              render={args => {
                 const { form: fm } = args
                 return (
                   <Select
                     {...args}
-                    label="Transaction"
+                    label='Transaction'
                     options={[
                       { name: 'All', value: 'ALL' },
                       { name: 'Dispense', value: 'DISPENSE' },
@@ -29,7 +36,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                       { name: 'Credit Note', value: 'CREDITNOTE' },
                     ]}
                     allowClear={false}
-                    onChange={(e) => {
+                    onChange={e => {
                       if (e) {
                         fm.setFieldValue('items', undefined)
                       }
@@ -42,8 +49,8 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={6} />
           <GridItem md={2}>
             <Field
-              name="inventoryType"
-              render={(args) => {
+              name='inventoryType'
+              render={args => {
                 const { form: fm } = args
                 return (
                   <Select
@@ -63,16 +70,16 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           </GridItem>
           <GridItem md={2}>
             <Field
-              name="items"
-              render={(args) => {
+              name='items'
+              render={args => {
                 const { form } = args
                 return (
                   <CodeSelect
                     {...args}
-                    label="Item List"
-                    mode="multiple"
+                    label='Item List'
+                    mode='multiple'
                     code={`Inventory${form.values.inventoryType}`}
-                    labelField="displayValue"
+                    labelField='displayValue'
                     temp
                   />
                 )
@@ -80,7 +87,11 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
             />
           </GridItem>
           <GridItem md={3}>
-            <Button color="primary" onClick={handleSubmit} disabled={isSubmitting}>
+            <Button
+              color='primary'
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
               Generate Report
             </Button>
           </GridItem>

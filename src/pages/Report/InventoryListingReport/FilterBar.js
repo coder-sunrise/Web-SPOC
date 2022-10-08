@@ -20,7 +20,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={3}>
             <Field
               name='inventoryType'
-              render={(args) => {
+              render={args => {
                 const { form: fm } = args
                 return (
                   <Select
@@ -41,7 +41,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={3}>
             <FastField
               name='Suppliers'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   label='Supplier'
                   code='ctSupplier'
@@ -56,7 +56,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={3}>
             <Field
               name='items'
-              render={(args) => {
+              render={args => {
                 const { form } = args
                 return (
                   <CodeSelect
@@ -74,7 +74,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={3}>
             <FastField
               name='IsActive'
-              render={(args) => {
+              render={args => {
                 return <Select label='Status' {...args} options={status} />
               }}
             />

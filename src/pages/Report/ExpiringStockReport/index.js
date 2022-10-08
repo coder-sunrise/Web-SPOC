@@ -12,7 +12,7 @@ const reportId = '76'
 const fileName = 'Expiring Stock Report'
 
 class ExpiringStockReport extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       ...this.state,
@@ -22,10 +22,16 @@ class ExpiringStockReport extends ReportBase {
   }
 
   renderFilterBar = (handleSubmit, isSubmitting) => {
-    return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} values={this.props.values} />
+    return (
+      <FilterBar
+        handleSubmit={handleSubmit}
+        isSubmitting={isSubmitting}
+        values={this.props.values}
+      />
+    )
   }
 
-  renderContent = (reportDatas) => {
+  renderContent = reportDatas => {
     return <ExpiringStockList reportDatas={reportDatas} />
   }
 }

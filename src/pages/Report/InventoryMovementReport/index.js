@@ -24,7 +24,7 @@ class InventoryMovementReport extends ReportBase {
     return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
   }
 
-  renderContent = (reportDatas) => {
+  renderContent = reportDatas => {
     return <MovementList reportDatas={reportDatas} />
   }
 }

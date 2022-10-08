@@ -24,7 +24,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={2}>
             <FastField
               name='viewBy'
-              render={(args) => (
+              render={args => (
                 <RadioGroup
                   {...args}
                   label='View By'
@@ -49,7 +49,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={2}>
             <Field
               name='inventoryType'
-              render={(args) => {
+              render={args => {
                 const { form: fm } = args
                 return (
                   <Select
@@ -71,7 +71,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={4}>
             <Field
               name='items'
-              render={(args) => {
+              render={args => {
                 const { form } = args
                 return (
                   <CodeSelect
@@ -89,7 +89,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={2}>
             <FastField
               name='showDetails'
-              render={(args) => (
+              render={args => (
                 <Checkbox {...args} label='Show Report Details' />
               )}
             />

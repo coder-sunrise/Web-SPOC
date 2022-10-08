@@ -13,7 +13,7 @@ const reportId = 40
 const fileName = 'Inventory Stock Count Report'
 
 class InventoryStockCountReport extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       ...this.state,
@@ -32,7 +32,7 @@ class InventoryStockCountReport extends ReportBase {
     )
   }
 
-  renderContent = (reportDatas) => {
+  renderContent = reportDatas => {
     return <InventoryStockCountList reportDatas={reportDatas} />
   }
 }
