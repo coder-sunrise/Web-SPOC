@@ -69,7 +69,7 @@ export default defineConfig({
     'process.env.client_secret':
       '20e392d2ea9bfa76f2a9cb26c31a34d675ad81281a31f89ed5d572de8da0b9e7',
     'process.env.url': 'http://localhost:55314',
-    // 'process.env.url': 'https://jgh-uat-api-211028.semr2.com',
+    // 'process.env.url': 'https://spoc-it-api-2022.semr2.com:8000',
     'process.env.signalrUrl':
       'https://semr2dev2010-websocket.emr.com.sg/notificationHub',
   },

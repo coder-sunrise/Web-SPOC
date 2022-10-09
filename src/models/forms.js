@@ -9,29 +9,6 @@ export default createFormViewModel({
   param: {
     service: {},
     state: {
-      defaultLCForm: {
-        type: '1',
-        typeName: 'Letter of Certification',
-        statusFK: 1,
-        formData: {
-          caseType: 'DaySurgery',
-          procuderes: [],
-          surgicalCharges: [],
-          nonSurgicalCharges: [],
-          others: null,
-          signatureThumbnail: null,
-          principalDiagnosisFK: null,
-          principalDiagnosisCode: null,
-          principalDiagnosisName: null,
-          secondDiagnosisAFK: null,
-          secondDiagnosisACode: null,
-          secondDiagnosisAName: null,
-          secondDiagnosisBFK: null,
-          secondDiagnosisBCode: null,
-          secondDiagnosisBName: null,
-          otherDiagnosis: [],
-        },
-      },
       defaultForm: {
         type: '2',
         typeName: 'From',

@@ -220,19 +220,6 @@ const convertToConsultation = (
       ? formRows
           .filter(o => o.type === p.value)
           .map(val => {
-            if (p.prop === 'corLetterOfCertification')
-              return {
-                ...val,
-                formData: JSON.stringify({
-                  ...val.formData,
-                  otherDiagnosis: val.formData.otherDiagnosis.map(d => {
-                    const { diagnosiss, ...retainData } = d
-                    return {
-                      ...retainData,
-                    }
-                  }),
-                }),
-              }
             return { ...val, formData: JSON.stringify(val.formData) }
           })
       : []

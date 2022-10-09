@@ -6,11 +6,6 @@ import { DOCUMENT_CATEGORY, FORM_CATEGORY } from '@/utils/constants'
 
 const formTypes = [
   {
-    value: '1',
-    name: 'Letter of Certification',
-    prop: 'corLetterOfCertification',
-  },
-  {
     value: '2',
     name: 'From',
     prop: 'corForm',
@@ -18,11 +13,6 @@ const formTypes = [
 ]
 
 const visitFormTypes = [
-  {
-    value: '1',
-    name: 'Letter of Certification',
-    prop: 'visitLetterOfCertification',
-  },
   {
     value: '2',
     name: 'From',
@@ -38,28 +28,6 @@ export default createListViewModel({
   param: {
     service,
     state: {
-      defaultLCForm: {
-        type: '1',
-        typeName: 'Letter of Certification',
-        statusFK: 1,
-        formData: {
-          caseType: 'DaySurgery',
-          procuderes: [],
-          nonSurgicalCharges: [],
-          others: null,
-          signatureThumbnail: null,
-          principalDiagnosisFK: null,
-          principalDiagnosisCode: null,
-          principalDiagnosisName: null,
-          secondDiagnosisAFK: null,
-          secondDiagnosisACode: null,
-          secondDiagnosisAName: null,
-          secondDiagnosisBFK: null,
-          secondDiagnosisBCode: null,
-          secondDiagnosisBName: null,
-          otherDiagnosis: [],
-        },
-      },
       defaultForm: {
         type: '2',
         typeName: 'From',
@@ -96,10 +64,8 @@ export default createListViewModel({
           value: '2',
           name: x.displayValue,
           prop:
-            formCategory === FORM_CATEGORY.CORFORM
-              ? 'corForm'
-              : 'visitForm',
-          documentTemplateTypeFK: x.documentTemplateTypeFK,    
+            formCategory === FORM_CATEGORY.CORFORM ? 'corForm' : 'visitForm',
+          documentTemplateTypeFK: x.documentTemplateTypeFK,
           formTemplateFK: x.id,
           templateContent: x.templateContent,
         }))
