@@ -61,7 +61,6 @@ const styles = theme => ({
       const {
         showConsultationVersioning,
         isVisitReferralSourceMandatory,
-        autoPrintDrugLabelOnFinalize,
         autoPrintOnSignOff,
         autoPrintOnCompletePayment,
         autoRefresh,
@@ -79,12 +78,6 @@ const styles = theme => ({
         autoRefresh: {
           ...autoRefresh,
           settingValue: autoRefresh.settingValue === 'true',
-        },
-        autoPrintDrugLabelOnFinalize: {
-          ...autoPrintDrugLabelOnFinalize,
-          settingValue:
-            autoPrintDrugLabelOnFinalize &&
-            autoPrintDrugLabelOnFinalize.settingValue === 'true',
         },
         showConsultationVersioning: {
           ...showConsultationVersioning,
@@ -441,24 +434,6 @@ class GeneralSetting extends PureComponent {
           <GridContainer style={{ display: 'none' }}>
             <GridItem md={3}>
               <h5> Finalize Order </h5>
-            </GridItem>
-          </GridContainer>
-          <GridContainer style={{ display: 'none' }}>
-            <GridItem md={3}>
-              <Field
-                name='autoPrintDrugLabelOnFinalize.settingValue'
-                render={args => {
-                  return (
-                    <Checkbox
-                      label='Drug Label'
-                      labelPlacement='end'
-                      mode='default'
-                      disabled={!!hasActiveSession}
-                      {...args}
-                    />
-                  )
-                }}
-              />
             </GridItem>
           </GridContainer>
           <GridContainer>

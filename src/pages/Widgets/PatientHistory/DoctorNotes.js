@@ -32,9 +32,7 @@ export default ({
       )
       .map(note => {
         const doctorScibble = scribbleNotes.filter(
-          s =>
-            visitPurposeFK !== VISIT_TYPE.MC ||
-            s.signedByUserFK === note.signedByUserFK,
+          s => s.signedByUserFK === note.signedByUserFK,
         )
         return {
           ...note,

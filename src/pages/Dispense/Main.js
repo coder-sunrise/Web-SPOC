@@ -19,6 +19,7 @@ import DispenseDetails from './DispenseDetails/WebSocketWrapper'
 import { DispenseItemsColumnExtensions } from './variables'
 import _ from 'lodash'
 import patient from '@/models/patient'
+import { orderTypes } from '../Consultation/utils'
 
 const calculateInvoiceAmounts = entity => {
   const obj = { ...entity }
@@ -353,28 +354,13 @@ class Main extends Component {
     }
   }
 
-  actualizeEditOrder = () => {
-    const { dispatch, values, dispense, orders } = this.props
-    this.setState(
-      prevState => {
-        return {
-          showOrderModal: !prevState.showOrderModal,
-          isFirstAddOrder: false,
-        }
-      },
-      () => {
-        this.openFirstTabAddOrder()
-      },
-    )
-  }
-
   openFirstTabAddOrder = () => {
     const { dispatch, values } = this.props
     if (this.state.showOrderModal) {
       dispatch({
         type: 'orders/updateState',
         payload: {
-          type: '1',
+          type: orderTypes[0].value,
           visitPurposeFK: values.visitPurposeFK,
         },
       })
@@ -449,10 +435,7 @@ class Main extends Component {
       newOrderRows.length > 0
     )
       this.showConfirmationBox()
-    else if (
-      visitPurposeFK === VISIT_TYPE.BF ||
-      visitPurposeFK === VISIT_TYPE.MC
-    ) {
+    else if (visitPurposeFK === VISIT_TYPE.BF) {
       dispatch({
         type: 'consultation/discard',
         payload: {
@@ -472,22 +455,6 @@ class Main extends Component {
       this.handleOrderModal()
     }
   }
-  // click Drug Label button to show drug label selection
-  handleDrugLabelClick = row => {
-    this.setState({ currentDrugToPrint: row })
-    this.setState(prevState => {
-      return {
-        showDrugLabelSelection: !prevState.showDrugLabelSelection,
-      }
-    })
-  }
-  handleDrugLabelSelectionClose = () => {
-    this.setState(prevState => {
-      return {
-        showDrugLabelSelection: !prevState.showDrugLabelSelection,
-      }
-    })
-  }
 
   showRefreshOrder = () => {
     const { dispense } = this.props
@@ -502,7 +469,6 @@ class Main extends Component {
         })
         this.setState({
           isShowOrderUpdated: true,
-          showDrugLabelSelection: false,
         })
       }
     }
@@ -621,10 +587,6 @@ class Main extends Component {
       testProps,
     } = this.props
 
-    if (dispense.openOrderPopUpAfterActualize) {
-      this.actualizeEditOrder()
-      dispense.openOrderPopUpAfterActualize = false
-    }
     return (
       <div className={classes.root}>
         <DispenseDetails
@@ -633,10 +595,7 @@ class Main extends Component {
           onEditOrderClick={this.editOrder}
           onFinalizeClick={this.makePayment}
           onReloadClick={this.handleReloadClick}
-          onDrugLabelClick={this.handleDrugLabelClick}
           onLabLabelClick={this.handleLabLabelClick}
-          showDrugLabelSelection={this.state.showDrugLabelSelection}
-          onDrugLabelSelectionClose={this.handleDrugLabelSelectionClose}
           currentDrugToPrint={this.state.currentDrugToPrint}
           isIncludeExpiredItem={this.checkExpiredItems()}
         />

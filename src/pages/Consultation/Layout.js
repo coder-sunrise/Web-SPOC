@@ -497,15 +497,6 @@ class Layout extends PureComponent {
   }
 
   isEnableEditOrder = () => {
-    const { user, visitRegistration } = this.props
-    const { entity: visit = {} } = visitRegistration
-    if (
-      visit.visit?.visitPurposeFK === VISIT_TYPE.MC &&
-      visit.visit?.doctorProfileFK !==
-        user.data.clinicianProfile.doctorProfile.id
-    ) {
-      return false
-    }
     return true
   }
 

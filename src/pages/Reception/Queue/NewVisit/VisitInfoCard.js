@@ -100,7 +100,7 @@ const VisitInfoCard = ({
   handleUpdateAttachments,
   existingQNo,
   visitType,
-  visitOrderTemplateOptions = [],
+  // visitOrderTemplateOptions = [],
   setFieldValue,
   ctinvoiceadjustment,
   copaymentScheme,
@@ -113,18 +113,6 @@ const VisitInfoCard = ({
   doctorProfiles,
   ...restProps
 }) => {
-  useEffect(() => {
-    if (currentVisitTemplate) {
-      let activeItemTotal = getVisitOrderTemplateTotal(
-        visitType,
-        currentVisitTemplate,
-      )
-      setFieldValue(FormField['visit.VisitOrderTemplateTotal'], activeItemTotal)
-    } else {
-      if (!restProps.values.visitOrderTemplateFK)
-        setFieldValue(FormField['visit.VisitOrderTemplateTotal'], undefined)
-    }
-  }, [currentVisitTemplate, visitType])
   const disableConsReady = Authorized.check('queue.modifyconsultationready')
 
   const validateQNo = value => {
@@ -139,50 +127,50 @@ const VisitInfoCard = ({
   const isPrimaryDoctorConsultated =
     restProps.values?.visitPrimaryDoctor &&
     restProps.values?.visitPrimaryDoctor?.consultationStatus !== 'Waiting'
-  const getVisitOrderTemplateTotal = (vType, template) => {
-    let activeItemTotal = 0
-    visitOrderTemplateItemTypes.forEach(type => {
-      // type.id === 3 means vaccination
-      if (vType === VISIT_TYPE.OTC && type.id === 3) return
-      const currentTypeItems = template.visitOrderTemplateItemDtos.filter(
-        itemType => itemType.inventoryItemTypeFK === type.id,
-      )
-      currentTypeItems.map(item => {
-        if (item[type.dtoName].isActive === true) {
-          activeItemTotal += item.totalAftAdj || 0
-        }
-      })
-    })
-    return activeItemTotal
-  }
+  // const getVisitOrderTemplateTotal = (vType, template) => {
+  //   let activeItemTotal = 0
+  //   visitOrderTemplateItemTypes.forEach(type => {
+  //     // type.id === 3 means vaccination
+  //     if (vType === VISIT_TYPE.OTC && type.id === 3) return
+  //     const currentTypeItems = template.visitOrderTemplateItemDtos.filter(
+  //       itemType => itemType.inventoryItemTypeFK === type.id,
+  //     )
+  //     currentTypeItems.map(item => {
+  //       if (item[type.dtoName].isActive === true) {
+  //         activeItemTotal += item.totalAftAdj || 0
+  //       }
+  //     })
+  //   })
+  //   return activeItemTotal
+  // }
 
-  const validateTotalCharges = async value => {
-    const { values, dispatch } = restProps
-    let totalTempCharge = 0
-    if ((values.visitOrderTemplateFK || 0) > 0) {
-      if (currentVisitTemplate) {
-        totalTempCharge = getVisitOrderTemplateTotal(
-          visitType,
-          currentVisitTemplate,
-        )
-      } else {
-        await dispatch({
-          type: 'settingVisitOrderTemplate/queryOne',
-          payload: {
-            id: values.visitOrderTemplateFK,
-          },
-        }).then(template => {
-          if (template) {
-            totalTempCharge = getVisitOrderTemplateTotal(visitType, template)
-          }
-        })
-      }
-    }
-    if ((value || 0) > totalTempCharge) {
-      return `Cannot more than default charges(${totalTempCharge}).`
-    }
-    return ''
-  }
+  // const validateTotalCharges = async value => {
+  //   const { values, dispatch } = restProps
+  //   let totalTempCharge = 0
+  //   if ((values.visitOrderTemplateFK || 0) > 0) {
+  //     if (currentVisitTemplate) {
+  //       totalTempCharge = getVisitOrderTemplateTotal(
+  //         visitType,
+  //         currentVisitTemplate,
+  //       )
+  //     } else {
+  //       await dispatch({
+  //         type: 'settingVisitOrderTemplate/queryOne',
+  //         payload: {
+  //           id: values.visitOrderTemplateFK,
+  //         },
+  //       }).then(template => {
+  //         if (template) {
+  //           totalTempCharge = getVisitOrderTemplateTotal(visitType, template)
+  //         }
+  //       })
+  //     }
+  //   }
+  //   if ((value || 0) > totalTempCharge) {
+  //     return `Cannot more than default charges(${totalTempCharge}).`
+  //   }
+  //   return ''
+  // }
 
   const handleDoctorChange = (v, op) => {
     if (op.clinicianProfile) {
@@ -196,15 +184,15 @@ const VisitInfoCard = ({
     }
   }
 
-  const handleVisitOrderTemplateChange = (vType, opts) => {
-    const { dispatch, getVisitOrderTemplateDetails } = restProps
-    if (opts) {
-      getVisitOrderTemplateDetails(opts.id)
-    } else {
-      getVisitOrderTemplateDetails(undefined)
-      setFieldValue(FormField['visit.VisitOrderTemplateTotal'], undefined)
-    }
-  }
+  // const handleVisitOrderTemplateChange = (vType, opts) => {
+  //   const { dispatch, getVisitOrderTemplateDetails } = restProps
+  //   if (opts) {
+  //     getVisitOrderTemplateDetails(opts.id)
+  //   } else {
+  //     getVisitOrderTemplateDetails(undefined)
+  //     setFieldValue(FormField['visit.VisitOrderTemplateTotal'], undefined)
+  //   }
+  // }
 
   const handleVisitTypeChange = (v, op) => {
     const { values, dispatch, getVisitOrderTemplateDetails } = restProps
@@ -224,91 +212,81 @@ const VisitInfoCard = ({
   }
 
   const { values, dispatch } = restProps
-  let totalTempCharge = 0
-  if ((values.visitOrderTemplateFK || 0) > 0 && currentVisitTemplate) {
-    totalTempCharge = getVisitOrderTemplateTotal(
-      visitType,
-      currentVisitTemplate,
-    )
-  }
-  let showNotApplyAdjustment =
-    totalTempCharge !== (values.visitOrderTemplateTotal || 0)
-  let showAdjusment =
-    values.visitStatus === VISIT_STATUS.WAITING ||
-    values.visitStatus === VISIT_STATUS.UPCOMING_APPT
+  // let totalTempCharge = 0
+  // if ((values.visitOrderTemplateFK || 0) > 0 && currentVisitTemplate) {
+  //   totalTempCharge = getVisitOrderTemplateTotal(
+  //     visitType,
+  //     currentVisitTemplate,
+  //   )
+  // }
+  const { visitTypeSetting, isQueueNoDecimal } = clinicSettings.settings
+  // let visitTypeSettingsObj = undefined
+  // let visitPurpose = undefined
+  // if (visitTypeSetting) {
+  //   try {
+  //     visitTypeSettingsObj = JSON.parse(visitTypeSetting)
+  //   } catch {}
+  // }
+  // if ((ctvisitpurpose || []).length > 0) {
+  //   visitPurpose = getMappedVisitType(
+  //     ctvisitpurpose,
+  //     visitTypeSettingsObj,
+  //   ).filter(vstType => vstType['isEnabled'] === 'true')
+  // }
 
-  const {
-    isEnablePackage = false,
-    visitTypeSetting,
-    isQueueNoDecimal,
-  } = clinicSettings.settings
-  let visitTypeSettingsObj = undefined
-  let visitPurpose = undefined
-  if (visitTypeSetting) {
-    try {
-      visitTypeSettingsObj = JSON.parse(visitTypeSetting)
-    } catch {}
-  }
-  if ((ctvisitpurpose || []).length > 0) {
-    visitPurpose = getMappedVisitType(
-      ctvisitpurpose,
-      visitTypeSettingsObj,
-    ).filter(vstType => vstType['isEnabled'] === 'true')
-  }
-
-  const getAvailableOrderTemplate = () => {
-    let availableVisitOrderTemplate = []
-    var patientCopayers = patientInfo?.patientScheme
-      ?.filter(x => !x.isExpired && x.isSchemeActive && x.isCopayerActive)
-      ?.map(x => x.copayerFK)
-    if (patientInfo) {
-      visitOrderTemplateOptions
-        .filter(x => x.isActive)
-        .forEach(template => {
-          if ((template.visitOrderTemplate_Copayers || []).length === 0) {
-            availableVisitOrderTemplate.push({
-              ...template,
-              type: 'general',
-              value: template.id,
-              name: template.displayValue,
-            })
-          } else {
-            if (
-              _.intersection(
-                template.visitOrderTemplate_Copayers.map(x => x.copayerFK),
-                patientCopayers,
-              ).length > 0
-            ) {
-              availableVisitOrderTemplate.push({
-                ...template,
-                type: 'copayer',
-                value: template.id,
-                name: template.displayValue,
-              })
-            }
-          }
-        })
-    } else {
-      visitOrderTemplateOptions
-        .fitler(x => x.isActive)
-        .forEach(template => {
-          // if haven't select patient profile, then only show general package
-          if ((template.visitOrderTemplate_Copayers || []).length === 0) {
-            availableVisitOrderTemplate.push({
-              ...template,
-              value: template.id,
-              name: template.displayValue,
-            })
-          }
-        })
-    }
-    availableVisitOrderTemplate = _.orderBy(
-      availableVisitOrderTemplate,
-      [data => data?.type?.toLowerCase(), data => data?.name?.toLowerCase()],
-      ['asc', 'asc'],
-    )
-    return availableVisitOrderTemplate
-  }
+  // const getAvailableOrderTemplate = () => {
+  //   let availableVisitOrderTemplate = []
+  //   var patientCopayers = patientInfo?.patientScheme
+  //     ?.filter(x => !x.isExpired && x.isSchemeActive && x.isCopayerActive)
+  //     ?.map(x => x.copayerFK)
+  //   if (patientInfo) {
+  //     visitOrderTemplateOptions
+  //       .filter(x => x.isActive)
+  //       .forEach(template => {
+  //         if ((template.visitOrderTemplate_Copayers || []).length === 0) {
+  //           availableVisitOrderTemplate.push({
+  //             ...template,
+  //             type: 'general',
+  //             value: template.id,
+  //             name: template.displayValue,
+  //           })
+  //         } else {
+  //           if (
+  //             _.intersection(
+  //               template.visitOrderTemplate_Copayers.map(x => x.copayerFK),
+  //               patientCopayers,
+  //             ).length > 0
+  //           ) {
+  //             availableVisitOrderTemplate.push({
+  //               ...template,
+  //               type: 'copayer',
+  //               value: template.id,
+  //               name: template.displayValue,
+  //             })
+  //           }
+  //         }
+  //       })
+  //   } else {
+  //     visitOrderTemplateOptions
+  //       .fitler(x => x.isActive)
+  //       .forEach(template => {
+  //         // if haven't select patient profile, then only show general package
+  //         if ((template.visitOrderTemplate_Copayers || []).length === 0) {
+  //           availableVisitOrderTemplate.push({
+  //             ...template,
+  //             value: template.id,
+  //             name: template.displayValue,
+  //           })
+  //         }
+  //       })
+  //   }
+  //   availableVisitOrderTemplate = _.orderBy(
+  //     availableVisitOrderTemplate,
+  //     [data => data?.type?.toLowerCase(), data => data?.name?.toLowerCase()],
+  //     ['asc', 'asc'],
+  //   )
+  //   return availableVisitOrderTemplate
+  // }
   const notWaiting =
     (values.visitStatus !== VISIT_STATUS.WAITING &&
       values.visitStatus !== VISIT_STATUS.UPCOMING_APPT) ||
@@ -316,121 +294,86 @@ const VisitInfoCard = ({
 
   const hasCOR = values.clinicalObjectRecordFK
   const activeCORCreatedBy = values.activeCORCreatedBy
-  const isSpecialtyDoctor = () => {
-    var primaryDoctor = doctorProfiles.find(
-      x => x.id === values?.doctorProfileFK,
-    )
-    if (primaryDoctor?.clinicianProfile?.specialtyFK) {
-      return true
-    }
-    return false
-  }
+  // const isSpecialtyDoctor = () => {
+  //   var primaryDoctor = doctorProfiles.find(
+  //     x => x.id === values?.doctorProfileFK,
+  //   )
+  //   if (primaryDoctor?.clinicianProfile?.specialtyFK) {
+  //     return true
+  //   }
+  //   return false
+  // }
   return (
     <CommonCard title='Visit Information'>
       <GridContainer alignItems='center'>
-        <GridContainer>
-          <GridItem xs md={3}>
+        <GridItem xs md={2}>
+          <Field
+            name={FormField['visit.visitType']}
+            render={args => (
+              <CodeSelect
+                disabled={notWaiting || isReadOnly || hasCOR}
+                label={formatMessage({
+                  id: 'reception.queue.visitRegistration.visitType',
+                })}
+                onChange={(v, op = {}) => handleVisitTypeChange(v, op)}
+                options={ctvisitpurpose || []}
+                allowClear={false}
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem xs md={2}>
+          <Field
+            name={FormField['visit.doctorProfileFk']}
+            render={args => (
+              <DoctorProfileSelect
+                disabled={isPrimaryDoctorConsultated || isReadOnly}
+                authority='none'
+                onChange={(v, op = {}) => handleDoctorChange(v, op)}
+                label={
+                  visitType === VISIT_TYPE.OTC
+                    ? formatMessage({
+                        id: 'reception.queue.visitRegistration.attendantDoctor',
+                      })
+                    : formatMessage({
+                        id: 'reception.queue.visitRegistration.doctor',
+                      })
+                }
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem xs md={2}>
+          <div
+            style={{
+              position: 'relative',
+            }}
+          >
             <Field
-              name={FormField['visit.visitType']}
+              name={FormField['visit.queueNo']}
+              validate={validateQNo}
               render={args => (
-                <CodeSelect
-                  disabled={notWaiting || isReadOnly || hasCOR}
+                <NumberInput
+                  {...args}
+                  precision={isQueueNoDecimal ? 1 : 0}
+                  disabled={notWaiting || isReadOnly}
                   label={formatMessage({
-                    id: 'reception.queue.visitRegistration.visitType',
+                    id: 'reception.queue.visitRegistration.queueNo',
                   })}
-                  onChange={(v, op = {}) => handleVisitTypeChange(v, op)}
-                  options={visitPurpose || []}
-                  allowClear={false}
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs md={3}>
-            <Field
-              name={FormField['visit.doctorProfileFk']}
-              render={args => (
-                <DoctorProfileSelect
-                  disabled={isPrimaryDoctorConsultated || isReadOnly}
-                  authority='none'
-                  onChange={(v, op = {}) => handleDoctorChange(v, op)}
-                  label={
-                    visitType === VISIT_TYPE.OTC
-                      ? formatMessage({
-                          id:
-                            'reception.queue.visitRegistration.attendantDoctor',
-                        })
-                      : formatMessage({
-                          id: 'reception.queue.visitRegistration.doctor',
-                        })
-                  }
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs md={3}>
-            <div
-              style={{
-                position: 'relative',
-                paddingLeft: values?.visitPurposeFK === VISIT_TYPE.MC ? 150 : 0,
-              }}
-            >
-              {values?.visitPurposeFK === VISIT_TYPE.MC && (
-                <Field
-                  name={FormField['visit.isDoctorInCharge']}
-                  render={args => {
-                    return (
-                      <Checkbox
-                        {...args}
-                        disabled={!isSpecialtyDoctor()}
-                        simple
-                        label='Doctor In Charge'
-                        style={{ position: 'absolute', top: 16, left: 0 }}
-                      />
-                    )
+                  formatter={value => {
+                    const isNaN = Number.isNaN(parseFloat(value))
+                    return isNaN
+                      ? value
+                      : parseFloat(value).toFixed(isQueueNoDecimal ? 1 : 0)
                   }}
                 />
               )}
-              <Field
-                name={FormField['visit.queueNo']}
-                validate={validateQNo}
-                render={args => (
-                  <NumberInput
-                    {...args}
-                    precision={isQueueNoDecimal ? 1 : 0}
-                    disabled={notWaiting || isReadOnly}
-                    label={formatMessage({
-                      id: 'reception.queue.visitRegistration.queueNo',
-                    })}
-                    formatter={value => {
-                      const isNaN = Number.isNaN(parseFloat(value))
-                      return isNaN
-                        ? value
-                        : parseFloat(value).toFixed(isQueueNoDecimal ? 1 : 0)
-                    }}
-                  />
-                )}
-              />
-            </div>
-          </GridItem>
-          <GridItem xs md={3}>
-            {isEnablePackage && (
-              <Field
-                name={FormField['visit.salesPersonUserFK']}
-                render={args => (
-                  <ClinicianSelect
-                    label={formatMessage({
-                      id: 'reception.queue.visitRegistration.salesPerson',
-                    })}
-                    disabled={isReadOnly}
-                    authority='none'
-                    {...args}
-                  />
-                )}
-              />
-            )}
-            <Field
+            />
+          </div>
+        </GridItem>
+        {/* <Field
               name='isForInvoiceReplacement'
               render={args => (
                 <Checkbox
@@ -443,10 +386,9 @@ const VisitInfoCard = ({
                 />
               )}
             />
-          </GridItem>
-        </GridContainer>
+          </GridItem> */}
 
-        <GridItem xs md={3}>
+        <GridItem xs md={2}>
           <Field
             name={FormField['visit.roomFK']}
             render={args => (
@@ -461,7 +403,7 @@ const VisitInfoCard = ({
             )}
           />
         </GridItem>
-        <GridItem xs md={3}>
+        {/* <GridItem xs md={3}>
           <Field
             name={FormField['visit.visitOrderTemplateFK']}
             render={args => {
@@ -576,8 +518,8 @@ const VisitInfoCard = ({
               )
             }}
           />
-        </GridItem>
-        <GridItem xs md={3}>
+        </GridItem> */}
+        <GridItem xs md={2}>
           <Authorized authority='queue.modifyconsultationready'>
             <Field
               name={FormField['visit.consReady']}
@@ -599,7 +541,7 @@ const VisitInfoCard = ({
             />
           </Authorized>
         </GridItem>
-        <GridItem xs md={6}>
+        <GridItem xs md={12}>
           <div style={{ position: 'relative' }}>
             <Field
               name={FormField['visit.visitRemarks']}
@@ -638,176 +580,7 @@ const VisitInfoCard = ({
         <GridItem xs md={3}>
           <Fragment></Fragment>
         </GridItem>
-        {showAdjusment &&
-        ((ctinvoiceadjustment || []).length > 0 ||
-          (copaymentScheme || []).length > 0) ? (
-          <GridItem xs md={12}>
-            <div style={{ marginTop: '5px' }}>
-              <p>
-                Below invoice adjustment(s) will{' '}
-                {showNotApplyAdjustment ? (
-                  <span style={{ fontWeight: 500, color: 'red' }}>NOT</span>
-                ) : (
-                  undefined
-                )}{' '}
-                be applied to the total bill:
-              </p>
-              {(ctinvoiceadjustment || []).map(t => {
-                if (t.adjType === 'ExactAmount') {
-                  return (
-                    <span
-                      style={{
-                        display: 'inline-block',
-                        marginRight: '20px',
-                      }}
-                    >
-                      <span style={{ fontWeight: '500' }}>
-                        {t.displayValue}:
-                      </span>{' '}
-                      <NumberInput
-                        text
-                        {...amountProps}
-                        style={{ display: 'inline-block' }}
-                        value={t.adjValue}
-                      />
-                      ;{' '}
-                    </span>
-                  )
-                }
-
-                if (t.adjValue > 0) {
-                  return (
-                    <span
-                      style={{
-                        display: 'inline-block',
-                        marginRight: '20px',
-                      }}
-                    >
-                      <span style={{ fontWeight: '500', fontSize: '14px' }}>
-                        {t.displayValue}:{' '}
-                        <span style={{ color: 'darkblue' }}>
-                          {numeral(t.adjValue).format('0.00')}%;
-                        </span>
-                      </span>
-                    </span>
-                  )
-                }
-
-                return (
-                  <span
-                    style={{
-                      display: 'inline-block',
-                      marginRight: '20px',
-                    }}
-                  >
-                    <span style={{ fontWeight: '500' }}>
-                      {t.displayValue}:{' '}
-                    </span>
-                    <span
-                      style={{
-                        color: 'red',
-                        display: 'inline-block',
-                        fontWeight: '500',
-                      }}
-                    >
-                      <span>
-                        ({numeral(Math.abs(t.adjValue)).format('0.00')}%)
-                      </span>
-                    </span>
-                    ;
-                  </span>
-                )
-              })}
-              {(copaymentScheme || []).filter(
-                t => t.copayerInvoiceAdjustmentValue !== 0,
-              ).length > 0 ? (
-                <p>
-                  {(copaymentScheme || [])
-                    .filter(t => t.copayerInvoiceAdjustmentValue !== 0)
-                    .map(t => {
-                      if (t.copayerInvoiceAdjustmentType === 'ExactAmount') {
-                        return (
-                          <span
-                            style={{
-                              display: 'inline-block',
-                              marginRight: '20px',
-                            }}
-                          >
-                            <span style={{ fontWeight: '500' }}>
-                              {t.coPayerName}
-                            </span>
-                            :{' '}
-                            <NumberInput
-                              text
-                              {...amountProps}
-                              style={{ display: 'inline-block' }}
-                              value={t.copayerInvoiceAdjustmentValue}
-                            />
-                            ;{' '}
-                          </span>
-                        )
-                      }
-
-                      if (t.copayerInvoiceAdjustmentValue > 0) {
-                        return (
-                          <span
-                            style={{
-                              display: 'inline-block',
-                              marginRight: '20px',
-                            }}
-                          >
-                            <span style={{ fontWeight: '500' }}>
-                              {t.coPayerName}:{' '}
-                              <span style={{ color: 'darkblue' }}>
-                                {numeral(
-                                  t.copayerInvoiceAdjustmentValue,
-                                ).format('0.00')}
-                                %;
-                              </span>
-                            </span>
-                          </span>
-                        )
-                      }
-
-                      return (
-                        <span
-                          style={{
-                            display: 'inline-block',
-                            marginRight: '20px',
-                          }}
-                        >
-                          <span style={{ fontWeight: '500' }}>
-                            {t.coPayerName}:{' '}
-                          </span>
-                          <span
-                            style={{
-                              color: 'red',
-                              display: 'inline-block',
-                              fontWeight: '500',
-                            }}
-                          >
-                            <span>
-                              (
-                              {numeral(
-                                Math.abs(t.copayerInvoiceAdjustmentValue),
-                              ).format('0.00')}
-                              %)
-                            </span>
-                          </span>
-                          ;
-                        </span>
-                      )
-                    })}
-                </p>
-              ) : (
-                undefined
-              )}
-            </div>
-          </GridItem>
-        ) : (
-          undefined
-        )}
-        <GridItem xs md={12}>
+        {/* <GridItem xs md={12}>
           <AttachmentWithThumbnail
             label='Attachment'
             attachmentType='Visit'
@@ -817,7 +590,7 @@ const VisitInfoCard = ({
             disableScanner={isReadOnly}
             fieldName='visitAttachment'
           />
-        </GridItem>
+        </GridItem> */}
         {values.visitStatus === VISIT_STATUS.WAITING && hasCOR && (
           <GridItem xs md={12}>
             <div style={{ color: 'red', padding: '10px 0' }}>

@@ -29,7 +29,7 @@ export default ({
     )
   }
 
-  const tableColumns = showDrugLabelRemark => [
+  const tableColumns = () => [
     {
       dataIndex: 'visitDate',
       title: 'Date',
@@ -158,15 +158,10 @@ export default ({
       dataIndex: 'remarks',
       title: 'Remarks',
       render: (text, row) => {
-        const existsDrugLabelRemarks =
-          showDrugLabelRemark &&
-          row.drugLabelRemarks &&
-          row.drugLabelRemarks.trim() !== ''
         return (
           <div style={{ position: 'relative' }}>
             <div
               style={{
-                paddingRight: existsDrugLabelRemarks ? 10 : 0,
                 minHeight: 20,
               }}
             >
@@ -174,38 +169,11 @@ export default ({
                 <span className='oneline_textblock'> {row.remarks || ' '}</span>
               </Tooltip>
             </div>
-            <div style={{ position: 'relative', top: 6 }}>
-              {existsDrugLabelRemarks && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: 2,
-                    right: -8,
-                  }}
-                >
-                  <Tooltip
-                    title={
-                      <div>
-                        <div style={{ fontWeight: 500 }}>
-                          Drug Label Remarks
-                        </div>
-                        <div>{row.drugLabelRemarks}</div>
-                      </div>
-                    }
-                  >
-                    <FileCopySharp style={{ color: '#4255bd' }} />
-                  </Tooltip>
-                </div>
-              )}
-            </div>
           </div>
         )
       },
     },
   ]
-
-  const { labelPrinterSize } = clinicSettings.settings
-  const showDrugLabelRemark = labelPrinterSize === '8.0cmx4.5cm_V2'
 
   return (
     <div style={{ padding: 8 }}>
@@ -213,7 +181,7 @@ export default ({
         size='small'
         bordered
         pagination={false}
-        columns={tableColumns(showDrugLabelRemark)}
+        columns={tableColumns}
         dataSource={current.prescription || []}
         rowClassName={(record, index) => {
           return index % 2 === 0 ? tablestyles.once : tablestyles.two

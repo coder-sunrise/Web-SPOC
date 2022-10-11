@@ -153,7 +153,7 @@ export const formikMapPropsToValues = ({
     let qNo = 0.0
     let doctorProfile
     let doctorProfileFK
-    let visitPurposeFK
+    let visitPurposeFK = clinicSettings.defaultVisitType
     let roomAssignmentFK
     let consReady
     let currentVisitOrderTemplateFK
@@ -229,11 +229,11 @@ export const formikMapPropsToValues = ({
     } else {
       currentVisitOrderTemplateFK = visitOrderTemplateFK
     }
-    const isVisitOrderTemplateActive = (
-      visitRegistration.visitOrderTemplateOptions || []
-    )
-      .map(option => option.id)
-      .includes(currentVisitOrderTemplateFK)
+    // const isVisitOrderTemplateActive = (
+    //   visitRegistration.visitOrderTemplateOptions || []
+    // )
+    //   .map(option => option.id)
+    //   .includes(currentVisitOrderTemplateFK)
 
     let newFormData
     if (visitEyeRefractionForm && visitEyeRefractionForm.formData) {
@@ -264,19 +264,19 @@ export const formikMapPropsToValues = ({
 
     return {
       queueNo: qNo,
-      visitPurposeFK,
+      visitPurposeFK: 2,
       consReady,
       roomFK: roomAssignmentFK || roomFK,
       visitStatus: VISIT_STATUS.WAITING,
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
       doctorProfileFK,
       ...visitEntries,
-      visitOrderTemplateFK: isVisitOrderTemplateActive
-        ? currentVisitOrderTemplateFK
-        : undefined,
-      visitOrderTemplateTotal: !visitEntries.id
-        ? undefined
-        : visitEntries.visitOrderTemplateTotal,
+      // visitOrderTemplateFK: isVisitOrderTemplateActive
+      //   ? currentVisitOrderTemplateFK
+      //   : undefined,
+      // visitOrderTemplateTotal: !visitEntries.id
+      //   ? undefined
+      //   : visitEntries.visitOrderTemplateTotal,
       visitEyeRefractionForm: {
         ...visitEyeRefractionForm,
         formData: newFormData,
@@ -298,10 +298,10 @@ export const formikMapPropsToValues = ({
         ...visitEntries.visitDoctor.filter(d => !d.isPrimaryDoctor),
       ],
       visitPrimaryDoctor: visitEntries.visitDoctor.find(d => d.isPrimaryDoctor),
-      visitBasicExaminations: visitEntries.visitBasicExaminations.map(be => ({
-        ...be,
-        visitPurposeFK: visitEntries.visitPurposeFK || visitPurposeFK,
-      })),
+      // visitBasicExaminations: visitEntries.visitBasicExaminations.map(be => ({
+      //   ...be,
+      //   visitPurposeFK: visitEntries.visitPurposeFK || visitPurposeFK,
+      // })),
     }
   } catch (error) {
     console.log({ error })

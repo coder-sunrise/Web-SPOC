@@ -676,8 +676,7 @@ export const showNote = (
     !scribbleNotes.find(
       s =>
         s.scribbleNoteTypeFK === scribbleType?.typeFK &&
-        (visitPurposeFK !== VISIT_TYPE.MC ||
-          s.signedByUserFK === note.signedByUserFK),
+        s.signedByUserFK === note.signedByUserFK,
     )
   ) {
     return false
@@ -741,4 +740,3 @@ export const showEyeExaminations = (corEyeExaminations = []) => {
     return true
   return false
 }
-

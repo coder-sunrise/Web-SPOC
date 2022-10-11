@@ -567,14 +567,7 @@ class Consumable extends PureComponent {
               <FastField
                 name='remark'
                 render={args => {
-                  return (
-                    <TextField
-                      rowsMax='5'
-                      label='Remarks'
-                      {...args}
-                      disabled={isStartedConsumable}
-                    />
-                  )
+                  return <TextField rowsMax='5' label='Remarks' {...args} />
                 }}
               />
             </GridItem>

@@ -1054,17 +1054,13 @@ export const corAttchementTypes = [
 ]
 
 export const ReportsOnSignOffOption = {
-  DrugLabel: 'Drug Label',
   MedicalCertificate: 'Medical Certificate',
   CertificateofAttendance: 'Certificate of Attendance',
   ReferralLetter: 'Referral Letter',
   Memo: 'Memo',
-  VaccinationCertificate: 'Vaccination Certificate',
   OtherDocuments: 'Other Documents',
-  PrescriptionSheet: 'Prescription Sheet',
 }
 export const ReportsOnSignOff = [
-  // { code: ReportsOnSignOffOption.DrugLabel, description: 'Drug Label' },
   {
     code: ReportsOnSignOffOption.MedicalCertificate,
     description: 'Medical Certificate',
@@ -1088,7 +1084,6 @@ export const ReportsOnCompletePaymentOption = {
   Receipt: 'Receipt',
 }
 export const ReportsOnCompletePayment = [
-  // { code: ReportsOnCompletePaymentOption.DrugLabel, description: 'Drug Label' },
   { code: ReportsOnCompletePaymentOption.Invoice, description: 'Invoice' },
   { code: ReportsOnCompletePaymentOption.Receipt, description: 'Receipt' },
 ]

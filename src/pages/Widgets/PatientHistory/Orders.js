@@ -48,12 +48,7 @@ const showCurrency = (value = 0) => {
     </div>
   )
 }
-export default ({
-  current,
-  classes,
-  showDrugLabelRemark,
-  isFullScreen = true,
-}) => {
+export default ({ current, classes, isFullScreen = true }) => {
   const { isFromEditOrder, editDispenseType, editDispenseReason } = current
   return (
     <div style={{ marginBottom: 8, marginTop: 8 }}>
@@ -175,15 +170,10 @@ export default ({
             dataIndex: 'remarks',
             title: 'Remarks',
             render: (text, row) => {
-              const existsDrugLabelRemarks =
-                showDrugLabelRemark &&
-                row.drugLabelRemarks &&
-                row.drugLabelRemarks.trim() !== ''
               return (
                 <div style={{ position: 'relative' }}>
                   <div
                     style={{
-                      paddingRight: existsDrugLabelRemarks ? 10 : 0,
                       minHeight: 20,
                     }}
                   >
@@ -192,30 +182,6 @@ export default ({
                         {row.remarks || ' '}
                       </span>
                     </Tooltip>
-                  </div>
-                  <div style={{ position: 'relative', top: 6 }}>
-                    {existsDrugLabelRemarks && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          bottom: 2,
-                          right: -8,
-                        }}
-                      >
-                        <Tooltip
-                          title={
-                            <div>
-                              <div style={{ fontWeight: 500 }}>
-                                Drug Label Remarks
-                              </div>
-                              <div>{row.drugLabelRemarks}</div>
-                            </div>
-                          }
-                        >
-                          <FileCopySharp style={{ color: '#4255bd' }} />
-                        </Tooltip>
-                      </div>
-                    )}
                   </div>
                 </div>
               )

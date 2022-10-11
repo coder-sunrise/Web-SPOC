@@ -2,8 +2,8 @@ import _ from 'lodash'
 import { consultationDocumentTypes, formTypes } from '@/utils/codes'
 import Service from '@/pages/Widgets/Orders/Detail/Service'
 import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
-import OrderSet from '@/pages/Widgets/Orders/Detail/OrderSet'
-import Treatment from '@/pages/Widgets/Orders/Detail/Treatment'
+// import OrderSet from '@/pages/Widgets/Orders/Detail/OrderSet'
+// import Treatment from '@/pages/Widgets/Orders/Detail/Treatment'
 import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
 
 import moment from 'moment'
@@ -13,14 +13,6 @@ import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
 
 const orderTypes = [
   {
-    name: 'Service',
-    value: ORDER_TYPES.SERVICE,
-    prop: 'corService',
-    accessRight: 'queue.consultation.order.service',
-    getSubject: r => r.serviceName,
-    component: props => <Service {...props} />,
-  },
-  {
     name: 'Consumable',
     value: ORDER_TYPES.CONSUMABLE,
     prop: 'corConsumable',
@@ -29,19 +21,27 @@ const orderTypes = [
     component: props => <Consumable {...props} />,
   },
   {
-    name: 'Order Set',
-    value: ORDER_TYPES.ORDER_SET,
-    accessRight: 'queue.consultation.order.orderset',
-    component: props => <OrderSet {...props} />,
+    name: 'Service',
+    value: ORDER_TYPES.SERVICE,
+    prop: 'corService',
+    accessRight: 'queue.consultation.order.service',
+    getSubject: r => r.serviceName,
+    component: props => <Service {...props} />,
   },
-  {
-    name: 'Treatment',
-    value: ORDER_TYPES.TREATMENT,
-    prop: 'corDentalTreatments',
-    accessRight: 'queue.consultation.order.treatment',
-    getSubject: r => r.itemName,
-    component: props => <Treatment {...props} />,
-  },
+  // {
+  //   name: 'Order Set',
+  //   value: ORDER_TYPES.ORDER_SET,
+  //   accessRight: 'queue.consultation.order.orderset',
+  //   component: props => <OrderSet {...props} />,
+  // },
+  // {
+  //   name: 'Treatment',
+  //   value: ORDER_TYPES.TREATMENT,
+  //   prop: 'corDentalTreatments',
+  //   accessRight: 'queue.consultation.order.treatment',
+  //   getSubject: r => r.itemName,
+  //   component: props => <Treatment {...props} />,
+  // },
 ]
 
 const cleanFields = (obj, dirtyFields = []) => {
@@ -182,35 +182,8 @@ const convertToConsultation = (
       values[p.prop] = (values[p.prop] || []).concat(
         orderRows.filter(o => o.type === p.value),
       )
-
-      if (p.value === ORDER_TYPES.VACCINATION) {
-        // merge auto generated certificate from document to orders
-
-        values[p.prop] = values[p.prop].map(o => {
-          return {
-            ...o,
-            corVaccinationCert: o.corVaccinationCert.map(vc => {
-              const certificate = rows.find(cvc => cvc.uid === vc.uid)
-              return { ...vc, ...certificate }
-            }),
-          }
-        })
-      }
     }
-  })
-  const { dentalChartComponent } = window.g_app._store.getState()
-
-  if (dentalChartComponent) {
-    const { isPedoChart, isSurfaceLabel, data } = dentalChartComponent
-    values.corDentalCharts = [
-      {
-        ...(values.corDentalCharts || [])[0],
-        isPedoChart,
-        isSurfaceLabel,
-        dentalChart: JSON.stringify(data),
-      },
-    ]
-  }
+  }) 
 
   values = convertEyeForms(values)
 
@@ -224,8 +197,7 @@ const convertToConsultation = (
           })
       : []
   })
-
-  values.corPackage = corPackage
+ 
   return {
     ...values,
     isGSTInclusive,

@@ -494,7 +494,7 @@ export default createFormViewModel({
         yield put({
           type: 'orders/updateState',
           payload: {
-            type: '1',
+            type: '4',
             rows: _.sortBy(oRows, 'sequence'),
             _originalRows: _.sortBy(
               oRows.map(r => ({ ...r })),

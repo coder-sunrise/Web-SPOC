@@ -23,7 +23,7 @@ import { locationQueryParameters } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import PatientInfoCard from './PatientInfoCard'
 import VisitInfoCard from './VisitInfoCard'
-import VitalSignCard from './VitalSignCard'
+// import VitalSignCard from './VitalSignCard'
 import ReferralCard from './ReferralCard'
 import EyeVisualAcuityCard from './EyeVisualAcuityCard'
 import RefractionFormCard from './RefractionFormCard'
@@ -124,33 +124,32 @@ class NewVisit extends PureComponent {
 
   componentDidMount = async () => {
     const { dispatch, patientInfo, values, visitRegistration } = this.props
-    const response = await dispatch({
-      type: 'visitRegistration/getVisitOrderTemplateListForDropdown',
-      payload: {
-        pagesize: 9999,
-      },
-    })
-    if (response) {
-      const { data } = response
-      const templateOptions = data
-        .filter(template => template.isActive)
-        .map(template => {
-          return {
-            ...template,
-            value: template.id,
-            name: template.displayValue,
-          }
-        })
+    // const response = await dispatch({
+    //   type: 'visitRegistration/getVisitOrderTemplateListForDropdown',
+    //   payload: {
+    //     pagesize: 9999,
+    //   },
+    // })
+    // if (response) {
+    //   const { data } = response
+    //   const templateOptions = data
+    //     .filter(template => template.isActive)
+    //     .map(template => {
+    //       return {
+    //         ...template,
+    //         value: template.id,
+    //         name: template.displayValue,
+    //       }
+    //     })
 
-      dispatch({
-        type: 'visitRegistration/updateState',
-        payload: {
-          visitOrderTemplateOptions: templateOptions,
-        },
-      })
-
-      this.setBannerHeight()
-    }
+    //   dispatch({
+    //     type: 'visitRegistration/updateState',
+    //     payload: {
+    //       visitOrderTemplateOptions: templateOptions,
+    //     },
+    //   })
+    // }
+    this.setBannerHeight()
 
     const bizSession = await dispatch({
       type: 'visitRegistration/getBizSession',
@@ -556,7 +555,7 @@ class NewVisit extends PureComponent {
                       </GridItem>
                     </Authorized.Context.Provider>
                     <React.Fragment>
-                      <GridItem xs={12} className={classes.row}>
+                      {/* <GridItem xs={12} className={classes.row}>
                         <Authorized.Context.Provider
                           value={{
                             rights: isBasicExaminationDisabled
@@ -573,7 +572,7 @@ class NewVisit extends PureComponent {
                             }
                           />
                         </Authorized.Context.Provider>
-                      </GridItem>
+                      </GridItem> */}
                       <GridItem xs={12} className={classes.row}>
                         <CommonCard title='Referral'>
                           <ReferralCard

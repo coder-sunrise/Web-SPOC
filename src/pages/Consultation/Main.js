@@ -235,7 +235,7 @@ const saveConsultation = ({
   } = props
   const { entity: vistEntity = {} } = visitRegistration
   const { visit = {} } = vistEntity
-  const { visitPurposeFK = VISIT_TYPE.CON } = visit
+  const { visitPurposeFK = VISIT_TYPE.BF } = visit
 
   let settings = JSON.parse(localStorage.getItem('clinicSettings'))
   const { diagnosisDataSource } = settings
@@ -362,7 +362,7 @@ const pauseConsultation = async ({
   } = rest
   const { entity: vistEntity = {} } = visitRegistration
   const { visit = {} } = vistEntity
-  const { visitPurposeFK = VISIT_TYPE.CON } = visit
+  const { visitPurposeFK = VISIT_TYPE.BF } = visit
   let settings = JSON.parse(localStorage.getItem('clinicSettings'))
   const { diagnosisDataSource, isEnablePharmacyModule } = settings
   const newValues = convertToConsultation(
@@ -859,7 +859,7 @@ class Main extends React.Component {
       const { entity: vistEntity = {} } = visitRegistration
       const { visit = {} } = vistEntity
       const {
-        visitPurposeFK = VISIT_TYPE.CON,
+        visitPurposeFK = VISIT_TYPE.BF,
         visitStatus = VISIT_STATUS.DISPENSE,
       } = visit
 
@@ -875,8 +875,7 @@ class Main extends React.Component {
       }
 
       if (
-        (visitPurposeFK === VISIT_TYPE.BF ||
-          visitPurposeFK === VISIT_TYPE.MC) &&
+        visitPurposeFK === VISIT_TYPE.BF &&
         visitStatus === VISIT_STATUS.BILLING &&
         isModifiedOrder
       ) {

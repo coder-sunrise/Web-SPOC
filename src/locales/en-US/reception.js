@@ -41,7 +41,6 @@ export default {
   'reception.queue.dispense.printInvoice': 'Print Invoice',
   'reception.queue.dispense.printInvoiceWithSummary':
     'Print Invoice with Summary',
-  'reception.queue.dispense.printDrugLabel': 'Print Drug Label',
 
   'reception.queue.dispense.patientInfo.visitRemarks': 'Visit Remarks',
   'reception.queue.dispense.patientInfo.invoiceRemarks': 'Invoice Remarks',

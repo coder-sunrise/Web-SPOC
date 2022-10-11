@@ -59,22 +59,6 @@ const fns = {
     return r
   },
 
-  queryDrugLabelDetails: async visitInvoiceDrugId => {
-    const r = await request(`${url}/DrugLabel/${visitInvoiceDrugId}`, {
-      method: 'GET',
-      keepNull: true,
-    })
-    return r
-  },
-
-  queryDrugLabelsDetails: async visitId => {
-    const r = await request(`${url}/DrugLabelByVisitID/${visitId}`, {
-      method: 'GET',
-      keepNull: true,
-    })
-    return r
-  },
-
   queryAddOrderDetails: async ({ invoiceId, isInitialLoading }) => {
     const r = await request(
       `${url}/retailOrder/${invoiceId}?isInitialLoading=${isInitialLoading ||
@@ -95,16 +79,5 @@ const fns = {
   removeAddOrderDetails: params => service.remove(`${url}/retailOrder`, params),
   removeBillFirstVisit: params =>
     service.remove(`${url}/billFirstOrder`, params),
-
-  getSeparatedDrugInstructions: async params =>
-    await request(
-      `/api/pharmacyWorklist/GetSeparatedDrugInstructions/${params.id}`,
-      {
-        method: 'GET',
-        data: {
-          ...params,
-        },
-      },
-    ),
 }
 export default fns

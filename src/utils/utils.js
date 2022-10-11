@@ -1504,6 +1504,7 @@ const getTranslationValue = (translationDatas = [], language, key) => {
 
 const getMappedVisitType = (visitpurpose, visitTypeSettingsObj) => {
   return visitpurpose
+  return visitpurpose
     .map((item, index) => {
       const { name, code, sortOrder, ...rest } = item
       const visitType = visitTypeSettingsObj

@@ -1115,7 +1115,7 @@ export default ({
           },
         ]}
       />
-      <CommonModal
+      {/* <CommonModal
         open={showRevertVisitPurposeItem}
         title='Revert Visit Purpose Item(s)'
         cancelText='Cancel'
@@ -1133,7 +1133,7 @@ export default ({
           open={showRevertVisitPurposeItem}
           confirmRevert={confirmRevert}
         ></VisitOrderTemplateRevert>
-      </CommonModal>
+      </CommonModal> */}
     </Fragment>
   )
 }

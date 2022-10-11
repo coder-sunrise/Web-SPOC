@@ -125,12 +125,12 @@ class Banner extends PureComponent {
   }
 
   componentWillMount() {
-    const { dispatch } = this.props
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: { code: 'ctg6pd' },
-    })
-  }
+                         const { dispatch } = this.props
+                         // dispatch({
+                         //   type: 'codetable/fetchCodes',
+                         //   payload: { code: 'ctg6pd' },
+                         // })
+                       }
 
   componentWillUnmount() {
     const { dispatch, isDisposePatientEntity = true } = this.props

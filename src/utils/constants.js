@@ -482,17 +482,11 @@ export const PharmacyWorkitemStatus = {
 }
 
 export const VISIT_TYPE = {
-  CON: 1,
   OTC: 2,
   BF: 3,
-  MC: 4,
 }
 
 export const VISIT_TYPE_NAME = [
-  {
-    visitPurposeFK: VISIT_TYPE.CON,
-    displayCode: 'CON',
-  },
   {
     visitPurposeFK: VISIT_TYPE.OTC,
     displayCode: 'OTC',
@@ -500,10 +494,6 @@ export const VISIT_TYPE_NAME = [
   {
     visitPurposeFK: VISIT_TYPE.BF,
     displayCode: 'BF',
-  },
-  {
-    visitPurposeFK: VISIT_TYPE.MC,
-    displayCode: 'MC',
   },
 ]
 
@@ -910,10 +900,10 @@ export const CALENDAR_RESOURCE = {
 }
 
 export const ORDER_TYPES = {
-  SERVICE: '3',
   CONSUMABLE: '4',
-  ORDER_SET: '6',
-  TREATMENT: '7',
+  SERVICE: '3',
+  // ORDER_SET: '6',
+  // TREATMENT: '7',
 }
 
 export const VISITDOCTOR_CONSULTATIONSTATUS = {

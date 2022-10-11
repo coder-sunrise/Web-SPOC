@@ -594,15 +594,10 @@ export const DispenseItemsColumns1 = (viewOnly = false, onValueChange) => {
         rowSpan: row.groupNumber === 1 ? row.groupRowSpan : 0,
       }),
       render: (_, row) => {
-        const existsDrugLabelRemarks =
-          showDrugLabelRemark &&
-          row.drugLabelRemarks &&
-          row.drugLabelRemarks.trim() !== ''
         return (
           <div style={{ position: 'relative' }}>
             <div
               style={{
-                paddingRight: existsDrugLabelRemarks ? 10 : 0,
                 minHeight: 20,
               }}
             >
@@ -610,27 +605,6 @@ export const DispenseItemsColumns1 = (viewOnly = false, onValueChange) => {
                 <span className='oneline_textblock'>{row.remarks || ' '}</span>
               </Tooltip>
             </div>
-
-            {existsDrugLabelRemarks && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 6,
-                  right: -8,
-                }}
-              >
-                <Tooltip
-                  title={
-                    <div>
-                      <div style={{ fontWeight: 500 }}>Drug Label Remarks</div>
-                      <div>{row.drugLabelRemarks}</div>
-                    </div>
-                  }
-                >
-                  <FileCopySharp style={{ color: '#4255bd' }} />
-                </Tooltip>
-              </div>
-            )}
           </div>
         )
       },

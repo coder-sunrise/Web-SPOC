@@ -660,7 +660,7 @@ class PatientHistory extends Component {
             top: 0,
           }}
         >
-          {isForInvoiceReplacement && (
+          {/* {isForInvoiceReplacement && (
             <Tooltip title='For Invoice Replacement'>
               <div
                 style={{
@@ -673,7 +673,7 @@ class PatientHistory extends Component {
                 <InvoiceReplacement />
               </div>
             </Tooltip>
-          )}
+          )} */}
           <div style={{ display: 'inline-block', width: 40, marginRight: 10 }}>
             {visitPurposeFK && <VisitTypeTag type={visitPurposeFK} />}
           </div>
@@ -801,9 +801,6 @@ class PatientHistory extends Component {
     })
 
     const { settings = {} } = clinicSettings
-    const { labelPrinterSize } = settings
-    const showDrugLabelRemark = labelPrinterSize === '8.0cmx4.5cm_V2'
-
     const isShowContent = currentTagWidgets.length > 0
 
     return (
@@ -850,7 +847,6 @@ class PatientHistory extends Component {
                       {...this.props}
                       setFieldValue={this.props.setFieldValue}
                       isFullScreen={isFullScreen}
-                      showDrugLabelRemark={showDrugLabelRemark}
                     />
                   ) : (
                     ''

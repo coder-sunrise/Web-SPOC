@@ -269,7 +269,6 @@ class Billing extends Component {
       patient: [],
       billing: [],
     },
-    showDrugLabelSelection: false,
     selectedDrugs: [],
     isUpdatedAppliedInvoicePayerInfo: false,
     isConsumedPackage: false,

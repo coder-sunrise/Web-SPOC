@@ -639,213 +639,205 @@ class Main extends React.Component {
   }
 
   render() {
-             const { classes, values, clinicSettings } = this.props
-             const { hasUser, hasActiveSession, isActive } = this.state
-             const {
-               id,
-               isUserMaintainable,
-               effectiveStartDate,
-               effectiveEndDate,
-             } = values
+    const { classes, values, clinicSettings } = this.props
+    const { hasUser, hasActiveSession, isActive } = this.state
+    const {
+      id,
+      isUserMaintainable,
+      effectiveStartDate,
+      effectiveEndDate,
+    } = values
 
-             const isEdit = !!id
-             return (
-               <React.Fragment>
-                 <GridContainer
-                   alignItems='center'
-                   justify='space-between'
-                   className={classes.container}
-                 >
-                   <GridItem md={12} className={classes.verticalSpacing}>
-                     <h4>User Group</h4>
-                   </GridItem>
-                   <GridContainer
-                     className={classes.indent}
-                     alignItems='center'
-                   >
-                     <GridItem md={3}>
-                       <Field
-                         name='code'
-                         render={args => {
-                           return (
-                             <TextField
-                               label='Code'
-                               disabled={isEdit}
-                               {...args}
-                             />
-                           )
-                         }}
-                       />
-                     </GridItem>
-                     <GridItem md={3}>
-                       <Field
-                         name='name'
-                         render={args => (
-                           <TextField
-                             label='Name'
-                             {...args}
-                             disabled={isEdit && !isUserMaintainable}
-                           />
-                         )}
-                       />
-                     </GridItem>
-                     <GridItem md={3}>
-                       <Field
-                         name='description'
-                         render={args => (
-                           <TextField
-                             label='Description'
-                             {...args}
-                             disabled={isEdit && !isUserMaintainable}
-                           />
-                         )}
-                       />
-                     </GridItem>
-                     <GridItem md={3} />
-                     <GridItem md={3}>
-                       <Field
-                         name='effectiveStartDate'
-                         render={args => (
-                           <DatePicker
-                             {...args}
-                             label='Effective Start Date'
-                             disabled={
-                               isEdit &&
-                               (!isUserMaintainable ||
-                                 (isActive && (hasUser || hasActiveSession)))
-                             }
-                             restrictFromTo={[
-                               moment('0000-01-01').formatUTC(),
-                               effectiveEndDate,
-                             ]}
-                           />
-                         )}
-                       />
-                     </GridItem>
-                     <GridItem md={3}>
-                       <Field
-                         name='effectiveEndDate'
-                         render={args => (
-                           <DatePicker
-                             {...args}
-                             label='Effective End Date'
-                             disabled={
-                               isEdit &&
-                               (!isUserMaintainable ||
-                                 (isActive && (hasUser || hasActiveSession)))
-                             }
-                             restrictFromTo={[
-                               effectiveStartDate,
-                               moment('2099-12-31').formatUTC(false),
-                             ]}
-                             endDay
-                           />
-                         )}
-                       />
-                     </GridItem>
-                     <GridItem md={3}>
-                       <Field
-                         name='clinicRoleFK'
-                         render={args => (
-                           <CodeSelect
-                             {...args}
-                             label='Clinical Role'
-                             code='ltclinicalrole'
-                             labelField='displayValue'
-                             disabled={isEdit}
-                             localFilter={item => {
-                               return filterArray.includes(item.id)
-                             }}
-                             onChange={this.handleSearch}
-                           />
-                         )}
-                       />
-                     </GridItem>
-                     <GridItem md={3}>
-                       <p className={classes.note}>
-                         You are not allowed to change clinical role after save.
-                       </p>
-                     </GridItem>
-                   </GridContainer>
-                   <GridItem md={9} className={classes.verticalSpacing}>
-                     <h4>Access Right</h4>
-                   </GridItem>
-                   <GridItem md={3} className={classes.verticalSpacing}>
-                     <TextField
-                       label='Filter Access Right'
-                       onChange={e => {
-                         this.debouncedAction(e)
-                       }}
-                     />
-                   </GridItem>
-                   <Tabs
-                     md={12}
-                     tabPosition='left'
-                     options={this.moduleList().map((m, index) => {
-                       return {
-                         id: index,
-                         name: m.name,
-                         content: (
-                           <div className={classes.tabContent}>
-                             <GridContainer style={{ padding: 0 }}>
-                               {this.renderItems(m.name, 'Module')}
-                               {this.renderItems(m.name, 'Action')}
-                               {this.renderItems(m.name, 'Field')}
-                             </GridContainer>
-                             <CommonTableGrid
-                               FuncProps={{
-                                 pager: false,
-                               }}
-                               style={{ height: 0 }}
-                             />
-                           </div>
-                         ),
-                       }
-                     })}
-                     tabStyle={{
-                       marginRight: 8,
-                       marginLeft: -24,
-                     }}
-                     tabBarStyle={{ marginLeft: 10 }}
-                     tabBarGutter={0}
-                   />
-                 </GridContainer>
-                 <GridItem
-                   container
-                   style={{
-                     marginTop: 10,
-                     marginBottom: 10,
-                     justifyContent: 'center',
-                   }}
-                 >
-                   <Button
-                     color='danger'
-                     onClick={navigateDirtyCheck({
-                       onProceed: this.goBackToPreviousPage,
-                     })}
-                   >
-                     Close
-                   </Button>
-                   <ProgressButton
-                     color='primary'
-                     onClick={() => {
-                       this.props.dispatch({
-                         type: 'global/updateAppState',
-                         payload: {
-                           openConfirm: true,
-                           openConfirmContent: `Save User Group ?`,
-                           onConfirmSave: this.props.handleSubmit,
-                         },
-                       })
-                     }}
-                     disabled={isEdit && !isUserMaintainable}
-                   >
-                     Save
-                   </ProgressButton>
-                 </GridItem>
-               </React.Fragment>
-             )
-           }
+    const isEdit = !!id
+    let filterArray = [CLINICAL_ROLE.DOCTOR, CLINICAL_ROLE.OTHERS]
+    return (
+      <React.Fragment>
+        <GridContainer
+          alignItems='center'
+          justify='space-between'
+          className={classes.container}
+        >
+          <GridItem md={12} className={classes.verticalSpacing}>
+            <h4>User Group</h4>
+          </GridItem>
+          <GridContainer className={classes.indent} alignItems='center'>
+            <GridItem md={3}>
+              <Field
+                name='code'
+                render={args => {
+                  return <TextField label='Code' disabled={isEdit} {...args} />
+                }}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='name'
+                render={args => (
+                  <TextField
+                    label='Name'
+                    {...args}
+                    disabled={isEdit && !isUserMaintainable}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='description'
+                render={args => (
+                  <TextField
+                    label='Description'
+                    {...args}
+                    disabled={isEdit && !isUserMaintainable}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={3} />
+            <GridItem md={3}>
+              <Field
+                name='effectiveStartDate'
+                render={args => (
+                  <DatePicker
+                    {...args}
+                    label='Effective Start Date'
+                    disabled={
+                      isEdit &&
+                      (!isUserMaintainable ||
+                        (isActive && (hasUser || hasActiveSession)))
+                    }
+                    restrictFromTo={[
+                      moment('0000-01-01').formatUTC(),
+                      effectiveEndDate,
+                    ]}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='effectiveEndDate'
+                render={args => (
+                  <DatePicker
+                    {...args}
+                    label='Effective End Date'
+                    disabled={
+                      isEdit &&
+                      (!isUserMaintainable ||
+                        (isActive && (hasUser || hasActiveSession)))
+                    }
+                    restrictFromTo={[
+                      effectiveStartDate,
+                      moment('2099-12-31').formatUTC(false),
+                    ]}
+                    endDay
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='clinicRoleFK'
+                render={args => (
+                  <CodeSelect
+                    {...args}
+                    label='Clinical Role'
+                    code='ltclinicalrole'
+                    labelField='displayValue'
+                    disabled={isEdit}
+                    localFilter={item => {
+                      return filterArray.includes(item.id)
+                    }}
+                    onChange={this.handleSearch}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={3}>
+              <p className={classes.note}>
+                You are not allowed to change clinical role after save.
+              </p>
+            </GridItem>
+          </GridContainer>
+          <GridItem md={9} className={classes.verticalSpacing}>
+            <h4>Access Right</h4>
+          </GridItem>
+          <GridItem md={3} className={classes.verticalSpacing}>
+            <TextField
+              label='Filter Access Right'
+              onChange={e => {
+                this.debouncedAction(e)
+              }}
+            />
+          </GridItem>
+          <Tabs
+            md={12}
+            tabPosition='left'
+            options={this.moduleList().map((m, index) => {
+              return {
+                id: index,
+                name: m.name,
+                content: (
+                  <div className={classes.tabContent}>
+                    <GridContainer style={{ padding: 0 }}>
+                      {this.renderItems(m.name, 'Module')}
+                      {this.renderItems(m.name, 'Action')}
+                      {this.renderItems(m.name, 'Field')}
+                    </GridContainer>
+                    <CommonTableGrid
+                      FuncProps={{
+                        pager: false,
+                      }}
+                      style={{ height: 0 }}
+                    />
+                  </div>
+                ),
+              }
+            })}
+            tabStyle={{
+              marginRight: 8,
+              marginLeft: -24,
+            }}
+            tabBarStyle={{ marginLeft: 10 }}
+            tabBarGutter={0}
+          />
+        </GridContainer>
+        <GridItem
+          container
+          style={{
+            marginTop: 10,
+            marginBottom: 10,
+            justifyContent: 'center',
+          }}
+        >
+          <Button
+            color='danger'
+            onClick={navigateDirtyCheck({
+              onProceed: this.goBackToPreviousPage,
+            })}
+          >
+            Close
+          </Button>
+          <ProgressButton
+            color='primary'
+            onClick={() => {
+              this.props.dispatch({
+                type: 'global/updateAppState',
+                payload: {
+                  openConfirm: true,
+                  openConfirmContent: `Save User Group ?`,
+                  onConfirmSave: this.props.handleSubmit,
+                },
+              })
+            }}
+            disabled={isEdit && !isUserMaintainable}
+          >
+            Save
+          </ProgressButton>
+        </GridItem>
+      </React.Fragment>
+    )
+  }
 }
 
 export default withRouter(withStyles(styles)(Main))
