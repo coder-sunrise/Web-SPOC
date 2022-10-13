@@ -147,14 +147,8 @@ class AddCrNote extends Component {
 
   componentDidMount = () => {
     const { values } = this.props
-    const { creditNoteItem } = values
-
-    const settings = JSON.parse(localStorage.getItem('clinicSettings'))
-    const { isEnablePackage = false } = settings
-    const packageItems = creditNoteItem.filter(item => item.isPackage)
-    const existPackage = isEnablePackage && packageItems.length > 0
     this.setState({
-      isExistPackage: existPackage,
+      isExistPackage: false,
     })
 
     this.expandAllPackages(values)

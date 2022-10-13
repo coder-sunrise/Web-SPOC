@@ -689,8 +689,6 @@ class Detail extends PureComponent {
       serviceSettings.filter(row => !row.isDeleted).length === 0 ||
       this.validationOfFormFields(settingsFiledArray)
     const { settings = [] } = clinicSettings
-    const labAndRadiologySetting =
-      settings.isEnableLabModule || settings.isEnableRadiologyModule
     const hiddenFields = this.computeHiddenFields(this.state.serviceSettings)
     return (
       <React.Fragment>

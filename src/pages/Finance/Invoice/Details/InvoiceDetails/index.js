@@ -39,31 +39,10 @@ class InvoiceDetails extends Component {
 
   componentWillReceiveProps(nextProps) {
     const { values } = nextProps
-    const settings = JSON.parse(localStorage.getItem('clinicSettings'))
-    const { isEnablePackage = false } = settings
-
     if (values.invoiceItem) {
-      const packageItems = values.invoiceItem.filter(
-        item => item.isPackage && !item.isDeleted,
-      )
-      const existPackage = isEnablePackage && packageItems.length > 0
       this.setState({
-        isExistPackage: existPackage,
+        isExistPackage: false,
       })
-
-      if (existPackage) {
-        const groups = values.invoiceItem.reduce(
-          (distinct, data) =>
-            distinct.includes(data.packageGlobalId)
-              ? [...distinct]
-              : [...distinct, data.packageGlobalId],
-          [],
-        )
-
-        this.setState({
-          expandedGroups: groups,
-        })
-      }
     }
   }
 

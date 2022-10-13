@@ -212,7 +212,6 @@ class EditOrder extends Component {
       from = 'Dispense',
       closeEditOrder,
     } = this.props
-    const { isEnablePharmacyModule } = clinicSettings
     const isFormValid = await validateForm()
     if (!_.isEmpty(isFormValid)) {
       handleSubmit()
