@@ -603,55 +603,6 @@ class Billing extends Component {
     return false
   }
 
-  checkPackageSignature = () => {
-    const { dispatch, values, clinicSettings } = this.props
-    const { packageRedeemAcknowledge } = values
-    const { isEnablePackage, isCheckPackageSignature } = clinicSettings
-    const isExistingPackageSignature =
-      packageRedeemAcknowledge &&
-      packageRedeemAcknowledge.signature !== '' &&
-      packageRedeemAcknowledge.signature !== undefined
-
-    if (!isEnablePackage || !this.state.isConsumedPackage)
-      return this.checkInvoiceOutstanding()
-
-    if (
-      isCheckPackageSignature.toLowerCase() ===
-        PACKAGE_SIGNATURE_CHECK_OPTION.IGNORE.toLowerCase() ||
-      isExistingPackageSignature
-    )
-      return this.checkInvoiceOutstanding()
-
-    if (
-      isCheckPackageSignature.toLowerCase() ===
-      PACKAGE_SIGNATURE_CHECK_OPTION.OPTIONAL.toLowerCase()
-    ) {
-      return dispatch({
-        type: 'global/updateState',
-        payload: {
-          openConfirm: true,
-          openConfirmTitle: '',
-          openConfirmText: 'Confirm',
-          openConfirmContent:
-            'Patient signature is not provided, confirm to complete billing?',
-          onConfirmSave: () => {
-            this.checkInvoiceOutstanding()
-          },
-        },
-      })
-    }
-    if (
-      isCheckPackageSignature.toLowerCase() ===
-      PACKAGE_SIGNATURE_CHECK_OPTION.MANDATORY.toLowerCase()
-    ) {
-      notification.error({
-        message: 'Patient signature is mandatory for package acknowledgement',
-      })
-      return false
-    }
-    return false
-  }
-
   checkInvoiceOutstanding = async () => {
     const { dispatch, values, setFieldValue } = this.props
     await setFieldValue('mode', 'save')
@@ -718,8 +669,7 @@ class Billing extends Component {
   }
 
   onCompletePaymentClick = async () => {
-    // check package acknowledge
-    this.checkPackageSignature()
+    this.checkInvoiceOutstanding()
   }
 
   onPrintReceiptClick = invoicePaymentID => {
@@ -1053,7 +1003,6 @@ class Billing extends Component {
     }
     const {
       isEnableAddPaymentInBilling = false,
-      isEnablePackage = false,
       isEnableVisitationInvoiceReport = false,
       autoPrintOnCompletePayment = false,
     } = clinicSettings
@@ -1173,9 +1122,7 @@ class Billing extends Component {
           </GridContainer>
         </Paper>
         <GridContainer>
-          <GridItem
-            md={isEnablePackage && this.state.isConsumedPackage ? 6 : 8}
-          >
+          <GridItem md={8}>
             <div
               style={{
                 display: 'flex',
@@ -1237,30 +1184,9 @@ class Billing extends Component {
               )}
             </div>
           </GridItem>
-          <GridItem
-            md={isEnablePackage && this.state.isConsumedPackage ? 6 : 4}
-            style={{ paddingRight: 0 }}
-          >
+          <GridItem md={4} style={{ paddingRight: 0 }}>
             <React.Fragment>
               <div className={classes.paymentButton}>
-                {isEnablePackage && this.state.isConsumedPackage && (
-                  <Button
-                    color={
-                      packageDrawdownSignatureSrc !== '' &&
-                      packageDrawdownSignatureSrc !== undefined
-                        ? 'success'
-                        : 'danger'
-                    }
-                    onClick={() => {
-                      this.setState({
-                        isShowAcknowledge: true,
-                      })
-                    }}
-                    disabled={this.state.isEditing || values.id === undefined}
-                  >
-                    Acknowledge
-                  </Button>
-                )}
                 <Button
                   size='sm'
                   color={

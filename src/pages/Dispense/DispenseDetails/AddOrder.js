@@ -263,7 +263,6 @@ export default compose(
       } = props
       const { rows, summary, finalAdjustments } = orders
       const { addOrderDetails } = dispense
-      const { isEnablePharmacyModule } = clinicSettings
       if (visitType === VISIT_TYPE.OTC) {
         const setIsDeletedIfWholeItemIsDeleted = (o, itemIsDeleted) => {
           if (o.isDeleted) return o

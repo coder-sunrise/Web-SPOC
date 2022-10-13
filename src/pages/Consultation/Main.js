@@ -364,7 +364,7 @@ const pauseConsultation = async ({
   const { visit = {} } = vistEntity
   const { visitPurposeFK = VISIT_TYPE.BF } = visit
   let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-  const { diagnosisDataSource, isEnablePharmacyModule } = settings
+  const { diagnosisDataSource } = settings
   const newValues = convertToConsultation(
     {
       ...values,
