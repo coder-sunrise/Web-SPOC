@@ -27,7 +27,7 @@ export default createBasicModel({
               ...x,
               type: Object.values(APPNOTIFICATION_SCHEMA).find(
                 y => y.name == x.source,
-              ).id,
+              )?.id,
               status: NOTIFICATION_STATUS.OK,
               read: false,
             })),
@@ -87,7 +87,7 @@ export default createBasicModel({
           ...x,
           type: Object.values(APPNOTIFICATION_SCHEMA).find(
             y => y.name === x.source,
-          ).id,
+          )?.id,
           read: x.isRead,
         }))
         yield put({
