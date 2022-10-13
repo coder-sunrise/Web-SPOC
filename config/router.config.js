@@ -858,18 +858,18 @@ const _routes = [
             component: './Setting/ReferralPerson',
             authority: ['settings.contact.referralperson'],
           },
-          {
-            path: '/setting/visitordertemplate',
-            name: 'visitordertemplate',
-            component: './Setting/VisitOrderTemplate',
-            authority: ['settings.templates.visitordertemplate'],
-          },
-          {
-            path: '/setting/invoiceadjustment',
-            name: 'invoiceadjustment',
-            component: './Setting/InvoiceAdjustment',
-            authority: ['settings.clinicsetting.invoiceadjustment'],
-          },
+          // {
+          //   path: '/setting/visitordertemplate',
+          //   name: 'visitordertemplate',
+          //   component: './Setting/VisitOrderTemplate',
+          //   authority: ['settings.templates.visitordertemplate'],
+          // },
+          // {
+          //   path: '/setting/invoiceadjustment',
+          //   name: 'invoiceadjustment',
+          //   component: './Setting/InvoiceAdjustment',
+          //   authority: ['settings.clinicsetting.invoiceadjustment'],
+          // },
           {
             path: '/setting/checklist',
             name: 'checklist',
