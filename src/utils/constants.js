@@ -207,7 +207,6 @@ export const REPORT_TYPE = {
   7: 'Medical Certificate',
   8: 'Certificate of Attendance',
   9: 'Referral Letter',
-  10: 'Vaccination Certificate',
   11: 'Memo',
   12: 'Other Documents',
   13: 'Credit Note Listing',
@@ -218,7 +217,6 @@ export const REPORT_TYPE = {
   18: 'Credit Note',
   20: 'Low Stock',
   21: 'Consumable Movement Report',
-  22: 'Medication Movement',
   23: 'Deposit Transaction',
   24: 'Drug Label',
   25: 'Statement',
@@ -569,23 +567,15 @@ export const CANNED_TEXT_TYPE = {
   HISTORY: 3,
   PLAN: 6,
   MEDICALCERTIFICATE: 7,
-  RADIOLOGYINSTRUCTION: 8,
-  MEDICATIONREMARKS: 9,
   APPOINTMENTREMARKS: 10,
   SERVICEINSTRUCTION: 11,
-  LABINSTRUCTION: 12,
-  RADIOGRAPHERCOMMENT: 13,
   NURSENOTES: 14,
 }
 
 export const CANNED_TEXT_TYPE_BASE_TEXT = [
   CANNED_TEXT_TYPE.MEDICALCERTIFICATE,
-  CANNED_TEXT_TYPE.RADIOLOGYINSTRUCTION,
-  CANNED_TEXT_TYPE.MEDICATIONREMARKS,
   CANNED_TEXT_TYPE.APPOINTMENTREMARKS,
   CANNED_TEXT_TYPE.SERVICEINSTRUCTION,
-  CANNED_TEXT_TYPE.LABINSTRUCTION,
-  CANNED_TEXT_TYPE.RADIOGRAPHERCOMMENT,
 ]
 
 export const DENTAL_CANNED_TEXT_TYPE_FIELD = {
@@ -702,12 +692,6 @@ export const DURATION_UNIT = {
   WEEK: 2,
   MONTH: 3,
   YEAR: 4,
-}
-
-export const PACKAGE_SIGNATURE_CHECK_OPTION = {
-  MANDATORY: 'Mandatory',
-  OPTIONAL: 'Optional',
-  IGNORE: 'Ignore',
 }
 
 export const DIAGNOSIS_TYPE = {

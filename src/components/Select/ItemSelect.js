@@ -6,7 +6,7 @@ import { Select } from '@/components'
 import { fetchCodeTable } from '@/utils/codetable'
 import { withStyles, Divider } from '@material-ui/core'
 import { set } from '@umijs/deps/compiled/lodash'
-import { preOrderItemCategory } from '@/utils/codes'
+import { orderItemCategory } from '@/utils/codes'
 const ItemSelect = ({ codetable, itemType, ...props }) => {
   const { inventoryconsumable, ctservice = [] } = codetable
   const dispatch = useDispatch()
@@ -45,9 +45,9 @@ const ItemSelect = ({ codetable, itemType, ...props }) => {
   }
 
   const optionsList =
-    itemType === preOrderItemCategory[0].value
+    itemType === orderItemCategory[0].value
       ? inventoryconsumable
-      : itemType === preOrderItemCategory[1].value
+      : itemType === orderItemCategory[1].value
       ? ctservice
       : []
   return (

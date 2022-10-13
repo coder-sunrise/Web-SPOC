@@ -122,7 +122,6 @@ class Form extends React.PureComponent {
     isDataGridValid: this.props.values.id !== undefined,
     editingRows: [],
     hasActiveSession: false,
-    showSelectPreOrder: false,
   }
 
   componentDidMount = async () => {
@@ -1129,80 +1128,9 @@ class Form extends React.PureComponent {
     )
   }
 
-  openSelectPreOrder = () => {
-    this.setState({ showSelectPreOrder: true })
-  }
-
-  updatePreOrderSequence = (appointmentPreOrderItem = []) => {
-    let sequence = 0
-    appointmentPreOrderItem.forEach(po => {
-      if (!po.isDeleted) {
-        po.sequence = sequence
-        sequence = sequence + 1
-      }
-    })
-  }
-
-  closeSelectPreOrder = () => {
-    this.setState({ showSelectPreOrder: false })
-  }
-
   checkedRecurrence = () => {
     const { dispatch, values, setFieldValue } = this.props
     const { currentAppointment = {} } = values
-    if ((currentAppointment.appointmentPreOrderItem || []).length) {
-      dispatch({
-        type: 'global/updateAppState',
-        payload: {
-          openConfirm: true,
-          openConfirmText: 'OK',
-          openConfirmContent: `Check Recurrence will remove all Pre-Order.`,
-          onConfirmSave: () => {
-            setFieldValue('currentAppointment.appointmentPreOrderItem', [])
-          },
-          onConfirmClose: () => {
-            setFieldValue('isEnableRecurrence', false)
-          },
-        },
-      })
-    }
-  }
-
-  showPreOrder = () => {
-    const { values, mode } = this.props
-    const { isEnableRecurrence, patientProfileFK, currentAppointment } = values
-    const { appointmentPreOrderItem = {} } = currentAppointment
-    if (!appointmentPreOrderItem.length) return false
-    if (values.id) {
-      return mode !== 'series'
-    }
-    return patientProfileFK && !isEnableRecurrence
-  }
-
-  deletePreOrderItem = actualizedPreOrderItemFK => {
-    const { values, setFieldValue } = this.props
-    const { currentAppointment = {} } = values
-    let { appointmentPreOrderItem = [] } = currentAppointment
-
-    var item = appointmentPreOrderItem.find(
-      poi => poi.actualizedPreOrderItemFK === actualizedPreOrderItemFK,
-    )
-    if (item) {
-      if (item.id) {
-        item.isDeleted = true
-      } else {
-        appointmentPreOrderItem = [
-          ...appointmentPreOrderItem.filter(
-            poi => poi.actualizedPreOrderItemFK !== actualizedPreOrderItemFK,
-          ),
-        ]
-      }
-    }
-    this.updatePreOrderSequence(appointmentPreOrderItem)
-    setFieldValue('currentAppointment.appointmentPreOrderItem', [
-      ...appointmentPreOrderItem,
-    ])
-    setFieldValue('currentAppointment.dirty', true)
   }
 
   setBannerHeight = () => {
@@ -1266,7 +1194,6 @@ class Form extends React.PureComponent {
       showRescheduleForm,
       datagrid,
       editingRows,
-      showSelectPreOrder,
     } = this.state
 
     const patientIsActive =
@@ -1275,25 +1202,10 @@ class Form extends React.PureComponent {
         : true
 
     const { currentAppointment = {}, isEnableRecurrence } = values
-    const { appointmentPreOrderItem = [] } = currentAppointment
     const disablePatientInfo = this.shouldDisablePatientInfo()
     const disableFooterButton = this.shouldDisableButtonAction()
     const disableCheckAvailabilityFooterButton = this.shouldDisableCheckAvailabilityButtonAction()
     const disableDataGrid = this.shouldDisableDatagrid()
-    const disablePreOrderConditions = [
-      {
-        condition: disableDataGrid,
-        message: `Pre-Order is not allowed for current appointment status.`,
-      },
-      {
-        condition: values.id && mode == 'series',
-        message: `Pre-Order is not allowed for entire series appointment.`,
-      },
-      {
-        condition: !values.id && isEnableRecurrence,
-        message: `Pre-Order is not allowed for recurring appointment.`,
-      },
-    ]
 
     const _datagrid =
       conflicts.length > 0
@@ -1310,8 +1222,6 @@ class Form extends React.PureComponent {
       loading.effects['patientSearch/query'] || loading.models.calendar
     const _disableAppointmentDate =
       this.shouldDisableAppointmentDate() || !patientIsActive
-
-    const { pendingPreOrderItem = [] } = patientProfile || {}
 
     return (
       <LoadingWrapper loading={show} text='Loading...'>

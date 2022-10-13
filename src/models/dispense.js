@@ -68,10 +68,7 @@ const getDispenseItems = (clinicSettings, entity = {}) => {
 
   const generateFromNormalConsumable = item => {
     const groupName = 'NormalDispense'
-    if (
-      (item.isPreOrder && !item.isChargeToday) ||
-      (!item.isPreOrder && item.hasPaid)
-    ) {
+    if (item.hasPaid) {
       orderItems.push({
         ...defaultItem(item, groupName),
         groupNumber: 1,
@@ -79,100 +76,75 @@ const getDispenseItems = (clinicSettings, entity = {}) => {
       })
       return
     }
-    if (item.isDispensedByPharmacy) {
-      if (item.dispenseItem.length) {
-        item.dispenseItem.forEach((di, index) => {
-          orderItems.push({
-            ...defaultItem(item, groupName),
-            ...transactionDetails(di),
-            stockBalance:
-              item.quantity - _.sumBy(item.dispenseItem, 'transactionQty'),
-            countNumber: index === 0 ? 1 : 0,
-            rowspan: index === 0 ? item.dispenseItem.length : 0,
-            uid: getUniqueId(),
-            consumableStock: item.consumable?.consumableStock,
-          })
+    if (item.tempDispenseItem.length) {
+      item.tempDispenseItem.forEach((di, index) => {
+        const currentStock = (item.consumable?.consumableStock || []).find(
+          s => s.id === di.inventoryStockFK,
+        )
+        orderItems.push({
+          ...defaultItem(item, groupName),
+          ...generateFromTempDispenseInfo(
+            di,
+            currentStock?.stock,
+            currentStock?.isDefault,
+            item.dispenseUOM,
+          ),
+          stockBalance:
+            item.quantity - _.sumBy(item.tempDispenseItem, 'transactionQty'),
+          countNumber: index === 0 ? 1 : 0,
+          rowspan: index === 0 ? item.tempDispenseItem.length : 0,
+          uid: getUniqueId(),
+          consumableStock: item.consumable?.consumableStock,
+        })
+      })
+    } else {
+      const inventoryItemStock = _.orderBy(
+        (item.consumable?.consumableStock || []).filter(
+          s => s.isDefault || s.stock > 0,
+        ),
+        ['isDefault', 'expiryDate'],
+        ['asc'],
+      )
+      let remainQty = item.quantity
+      if (remainQty > 0 && item.consumable && inventoryItemStock.length) {
+        inventoryItemStock.forEach((itemStock, index) => {
+          const { id, batchNo, expiryDate, stock, isDefault } = itemStock
+          if (remainQty > 0) {
+            let dispenseQuantity = 0
+            if (isDefault || remainQty <= stock) {
+              dispenseQuantity = remainQty
+              remainQty = -1
+            } else {
+              dispenseQuantity = stock
+              remainQty = remainQty - stock
+            }
+            orderItems.push({
+              ...defaultItem(item, groupName),
+              dispenseQuantity: dispenseQuantity,
+              batchNo,
+              expiryDate,
+              stock,
+              stockFK: id,
+              uomDisplayValue: item.dispenseUOM,
+              isDefault,
+              stockBalance: 0,
+              countNumber: index === 0 ? 1 : 0,
+              rowspan: 0,
+              uid: getUniqueId(),
+              allowToDispense: true,
+              consumableStock: item.consumable?.consumableStock,
+            })
+          }
+          const firstItem = orderItems.find(
+            i =>
+              i.type === item.type && i.id === item.id && i.countNumber === 1,
+          )
+          firstItem.rowspan = orderItems.filter(
+            i => i.type === item.type && i.id === item.id,
+          ).length
         })
       } else {
         orderItems.push(defaultItem(item, groupName))
-      }
-    } else {
-      if (item.tempDispenseItem.length) {
-        item.tempDispenseItem.forEach((di, index) => {
-          const currentStock = (item.consumable?.consumableStock || []).find(
-            s => s.id === di.inventoryStockFK,
-          )
-          orderItems.push({
-            ...defaultItem(item, groupName),
-            ...generateFromTempDispenseInfo(
-              di,
-              currentStock?.stock,
-              currentStock?.isDefault,
-              item.dispenseUOM,
-            ),
-            stockBalance:
-              item.quantity - _.sumBy(item.tempDispenseItem, 'transactionQty'),
-            countNumber: index === 0 ? 1 : 0,
-            rowspan: index === 0 ? item.tempDispenseItem.length : 0,
-            uid: getUniqueId(),
-            consumableStock: item.consumable?.consumableStock,
-          })
-        })
-      } else {
-        const inventoryItemStock = _.orderBy(
-          (item.consumable?.consumableStock || []).filter(
-            s => s.isDefault || s.stock > 0,
-          ),
-          ['isDefault', 'expiryDate'],
-          ['asc'],
-        )
-        let remainQty = item.quantity
-        if (remainQty > 0 && item.consumable && inventoryItemStock.length) {
-          inventoryItemStock.forEach((itemStock, index) => {
-            const { id, batchNo, expiryDate, stock, isDefault } = itemStock
-            if (remainQty > 0) {
-              let dispenseQuantity = 0
-              if (isDefault || remainQty <= stock) {
-                dispenseQuantity = remainQty
-                remainQty = -1
-              } else {
-                dispenseQuantity = stock
-                remainQty = remainQty - stock
-              }
-              orderItems.push({
-                ...defaultItem(item, groupName),
-                dispenseQuantity: dispenseQuantity,
-                batchNo,
-                expiryDate,
-                stock,
-                stockFK: id,
-                uomDisplayValue: item.dispenseUOM,
-                isDefault,
-                stockBalance: 0,
-                countNumber: index === 0 ? 1 : 0,
-                rowspan: 0,
-                uid: getUniqueId(),
-                allowToDispense: true,
-                consumableStock: item.consumable?.consumableStock,
-              })
-            }
-            const firstItem = orderItems.find(
-              i =>
-                i.type === item.type &&
-                i.isDrugMixture === item.isDrugMixture &&
-                i.id === item.id &&
-                i.countNumber === 1,
-            )
-            firstItem.rowspan = orderItems.filter(
-              i =>
-                i.type === item.type &&
-                i.isDrugMixture === item.isDrugMixture &&
-                i.id === item.id,
-            ).length
-          })
-        } else {
-          orderItems.push(defaultItem(item, groupName))
-        }
       }
     }
     const groupItems = orderItems.filter(

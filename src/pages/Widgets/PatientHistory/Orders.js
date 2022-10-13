@@ -63,20 +63,8 @@ export default ({ current, classes, isFullScreen = true }) => {
             width: 105,
             render: (text, row) => {
               let paddingRight = 0
-              if (
-                (row.isActualizedPreOrder || row.isPreOrder) &&
-                row.isExclusive
-              ) {
-                paddingRight = 54
-              } else if (
-                row.isActualizedPreOrder ||
-                row.isPreOrder ||
-                row.isExclusive
-              ) {
+              if (row.isExclusive) {
                 paddingRight = 24
-              }
-              if (row.isDrugMixture) {
-                paddingRight = 10
               }
               let urgentRight = 0
 
@@ -86,9 +74,6 @@ export default ({ current, classes, isFullScreen = true }) => {
               }
 
               let type = row.type
-              if (row.isDrugMixture) {
-                type = 'Drug Mixture'
-              }
               const itemType = orderItemTypes.find(
                 t => t.type.toUpperCase() === (type || '').toUpperCase(),
               )
@@ -232,11 +217,7 @@ export default ({ current, classes, isFullScreen = true }) => {
             width: 80,
             align: 'right',
             render: (text, row) =>
-              showCurrency(
-                (row.isPreOrder && !row.isChargeToday) || row.hasPaid
-                  ? 0
-                  : row.totalAfterItemAdjustment,
-              ),
+              showCurrency(row.hasPaid ? 0 : row.totalAfterItemAdjustment),
           },
         ]}
         dataSource={current.orders || []}

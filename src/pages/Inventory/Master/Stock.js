@@ -35,8 +35,6 @@ const styles = theme => ({
 let commitCount = 1000 // uniqueNumber
 const Stock = ({
   classes,
-  vaccinationDetail,
-  medicationDetail,
   consumableDetail,
   values,
   setFieldValue,
@@ -62,7 +60,7 @@ const Stock = ({
       totalQty += o.stock
     })
     setStockQty(totalQty)
-  }, [values.vaccinationStock, values.medicationStock, values.consumableStock])
+  }, [values.consumableStock])
 
   const changeIsDefault = async row => {
     const updatedStock = stock.map(batch => {

@@ -75,18 +75,6 @@ class Grid extends PureComponent {
               return (
                 <div style={{ marginTop: 1 }}>
                   <span>{documentTemplateType.name || ''}</span>
-                  {row.isDefaultTemplate && (
-                    <Badge
-                      count='Default'
-                      title='Default vaccination certificate template'
-                      style={{
-                        backgroundColor: 'Green',
-                        display: 'inline-Block',
-                        marginLeft: 2,
-                        fontSize: '0.75rem',
-                      }}
-                    />
-                  )}
                 </div>
               )
             },

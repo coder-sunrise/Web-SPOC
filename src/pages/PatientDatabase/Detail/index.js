@@ -302,22 +302,6 @@ class PatientDetail extends PureComponent {
           loading: Loading,
         }),
       },
-      {
-        id: '10',
-        name: 'Package Drawdown',
-        access: [
-          'patientdatabase.newpatient',
-          'patientdatabase.patientprofiledetails',
-        ],
-        component: Loadable({
-          loader: () => import('./PatientPackageDrawdown'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...p} />
-          },
-          loading: Loading,
-        }),
-      },
     ]
 
     const { dispatch } = props
@@ -364,17 +348,6 @@ class PatientDetail extends PureComponent {
       }
     }
 
-    const preOrderListAccessRight = Authorized.check(
-      'patientdatabase.modifypreorder',
-    )
-    if (preOrderListAccessRight) {
-      const hiddenPreOrderListAccessRight =
-        preOrderListAccessRight.rights !== 'enable'
-      if (hiddenPreOrderListAccessRight) {
-        this.widgets = this.widgets.filter(t => t.id !== '11')
-      }
-    }
-
     const emergencyContactAccessRight = Authorized.check(
       'patientdatabase.patientprofiledetails.emergencycontact',
     )
@@ -386,9 +359,6 @@ class PatientDetail extends PureComponent {
       }
     }
     const { clinicSettings } = this.props
-    if (!clinicSettings.isEnablePackage) {
-      this.widgets = this.widgets.filter(w => w.id !== '10')
-    }
 
     const viewClaimHistoryRight = Authorized.check(
       'patientdatabase.patientprofiledetails.claimhistory',
@@ -434,10 +404,10 @@ class PatientDetail extends PureComponent {
     const patientId = patient.entity.id
 
     if (global.showVisitRegistration) {
-                                        this.props.dispatch({
-                                          type: 'visitRegistration/closeModal',
-                                        })
-                                      }
+      this.props.dispatch({
+        type: 'visitRegistration/closeModal',
+      })
+    }
     navigateDirtyCheck({
       onProceed: () => {
         this.props

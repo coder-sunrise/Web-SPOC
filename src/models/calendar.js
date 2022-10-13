@@ -426,7 +426,6 @@ export default createListViewModel({
                 appointmentDate: appointmentDate,
                 appointmentStatusFk: APPOINTMENT_STATUS.DRAFT, //undefined is new, will updated to Darft
                 isEditedAsSingleAppointment: false,
-                appointmentPreOrderItem: [],
                 appointments_Resources: [
                   ...apptResources.map((res, index) => {
                     const { id, appointmentFK, ...restResourceData } = res

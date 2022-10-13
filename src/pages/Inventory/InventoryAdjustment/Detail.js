@@ -223,18 +223,13 @@ class Detail extends PureComponent {
   state = {
     type: undefined,
     ConsumableItemList: [],
-    MedicationItemList: [],
-    VaccinationItemList: [],
 
     filterConsumableItemList: [],
-    filterMedicationItemList: [],
-    filterVaccinationItemList: [],
 
     selectedItem: null,
     selectedBatch: null,
     inventoryAdjustmentItems: [],
 
-    stockVaccination: [], // vaccination
     stockConsumable: [], // consumable
 
     filterStockConsumable: [], // consumable

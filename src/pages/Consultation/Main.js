@@ -83,7 +83,6 @@ const generatePrintData = async (
       corMedicalCertificate,
       corOtherDocuments,
       corReferralLetter,
-      corVaccinationCert,
     } = documents
     let printData = []
 
@@ -677,13 +676,6 @@ class Main extends React.Component {
     )
       return true
 
-    if (
-      nextProps.consultation.haveMultiplePendingPackages !==
-      this.props.consultation.haveMultiplePendingPackages
-    ) {
-      return true
-    }
-
     if (nextState.patientBannerHeight !== this.state.patientBannerHeight) {
       return true
     }
@@ -1255,16 +1247,6 @@ class Main extends React.Component {
     this.props.dispatch({ type: `consultation/closeSignOffModal` })
   }
 
-  closePackageSelectModal = () => {
-    const { dispatch } = this.props
-    dispatch({
-      type: 'consultation/updateState',
-      payload: {
-        haveMultiplePendingPackages: false,
-      },
-    })
-  }
-
   render() {
     const {
       props,
@@ -1310,7 +1292,6 @@ class Main extends React.Component {
       <div className={classes.root} id='ConsultationMainContainer'>
         <PatientBanner
           from='Consultation'
-          onSelectPreOrder={this.onSelectPreOrder}
           setPatientBannerHeight={this.setPatientBannerHeight}
           extraCmt={this.getExtraComponent}
           {...this.props}

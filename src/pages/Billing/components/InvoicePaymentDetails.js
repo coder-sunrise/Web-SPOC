@@ -53,13 +53,6 @@ const InvoicePaymentDetails = ({ invoice = {}, classes }) => {
               title: 'Category ',
               width: 160,
               render: (_, row) => {
-                let paddingRight = 0
-                if (row.isPreOrder || row.isActualizedPreOrder) {
-                  paddingRight = 24
-                }
-                if (row.isDrugMixture) {
-                  paddingRight = 10
-                }
                 const itemType = orderItemTypes.find(
                   t =>
                     t.type.toUpperCase() === (row.itemType || '').toUpperCase(),
@@ -136,11 +129,7 @@ const InvoicePaymentDetails = ({ invoice = {}, classes }) => {
               align: 'right',
               width: 80,
               render: (_, row) => {
-                return showMoney(
-                  (row.isPreOrder && !row.isChargeToday) || row.hasPaid
-                    ? 0
-                    : row.gstAmount,
-                )
+                return showMoney(row.hasPaid ? 0 : row.gstAmount)
               },
             },
             {
@@ -149,11 +138,7 @@ const InvoicePaymentDetails = ({ invoice = {}, classes }) => {
               align: 'right',
               width: 110,
               render: (_, row) => {
-                return showMoney(
-                  (row.isPreOrder && !row.isChargeToday) || row.hasPaid
-                    ? 0
-                    : row.totalAfterGst,
-                )
+                return showMoney(row.hasPaid ? 0 : row.totalAfterGst)
               },
             },
             {

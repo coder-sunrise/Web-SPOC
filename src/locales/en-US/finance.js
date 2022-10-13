@@ -116,14 +116,10 @@ export default {
 
   'finance.scheme.setting.maximumCapAll': 'Maximum Cap (All)',
   'finance.scheme.setting.maximumCapConsumables': 'Max Cap (Consumables)',
-  'finance.scheme.setting.maximumCapMedications': 'Max Cap (Medications)',
-  'finance.scheme.setting.maximumCapVaccines': 'Max Cap (Vaccines)',
   'finance.scheme.setting.maximumCapServices': 'Max Cap (Services)',
   'finance.scheme.setting.maximumCapOrderSets': 'Max Cap (OrderSets)',
   'finance.scheme.setting.allItems': 'All Items',
   'finance.scheme.setting.consumables': 'Consumables',
-  'finance.scheme.setting.medications': 'Medications',
-  'finance.scheme.setting.vaccines': 'Vaccines',
   'finance.scheme.setting.services': 'Services',
   'finance.scheme.setting.ordersets': 'OrderSets',
 

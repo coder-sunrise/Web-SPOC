@@ -71,17 +71,8 @@ const baseColumns = (classes, isFullScreen) => {
       width: 105,
       render: (text, row) => {
         let paddingRight = 0
-        if ((row.isActualizedPreOrder || row.isPreOrder) && row.isExclusive) {
-          paddingRight = 54
-        } else if (
-          row.isActualizedPreOrder ||
-          row.isPreOrder ||
-          row.isExclusive
-        ) {
+        if (row.isExclusive) {
           paddingRight = 24
-        }
-        if (row.isDrugMixture) {
-          paddingRight = 10
         }
         let urgentRight = 0
 
@@ -193,11 +184,7 @@ const baseColumns = (classes, isFullScreen) => {
       width: 80,
       align: 'right',
       render: (text, row) =>
-        showCurrency(
-          (row.isPreOrder && !row.isChargeToday) || row.hasPaid
-            ? 0
-            : row.totalAfterItemAdjustment,
-        ),
+        showCurrency(row.hasPaid ? 0 : row.totalAfterItemAdjustment),
     },
   ]
 }
