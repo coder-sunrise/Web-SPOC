@@ -14,7 +14,7 @@ import Fullscreen from '@material-ui/icons/Fullscreen'
 import FullscreenExit from '@material-ui/icons/FullscreenExit'
 import CompareArrows from '@material-ui/icons/CompareArrows'
 import Accessibility from '@material-ui/icons/Accessibility'
-import { connect } from 'dva'
+import { connect } from 'dva' 
 import { headerHeight } from 'mui-pro-jss'
 // common components
 import {
@@ -497,15 +497,6 @@ class Layout extends PureComponent {
   }
 
   isEnableEditOrder = () => {
-    const { user, visitRegistration } = this.props
-    const { entity: visit = {} } = visitRegistration
-    if (
-      visit.visit?.visitPurposeFK === VISIT_TYPE.MC &&
-      visit.visit?.doctorProfileFK !==
-        user.data.clinicianProfile.doctorProfile.id
-    ) {
-      return false
-    }
     return true
   }
 

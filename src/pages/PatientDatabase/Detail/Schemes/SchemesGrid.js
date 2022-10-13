@@ -146,27 +146,6 @@ class SchemesGrid extends PureComponent {
     return false
   }
 
-  isMedisave = row => {
-    const { codetable } = this.props
-    const ctSchemeTypes = codetable[ctSchemeType.toLowerCase()] || []
-    const r = ctSchemeTypes.find(o => o.id === row.id)
-
-    if (!r) return false
-    return (
-      ['MEDIVISIT', 'FLEXIMEDI', 'OPSCAN'].indexOf(r.code) >= 0 // || r.code.startsWith('PHPC')
-    )
-  }
-
-  medisaveCheck = row => {
-    const { codetable } = this.props
-    const schemeTypes = codetable[ctSchemeType.toLowerCase()] || []
-
-    const r = schemeTypes.find(o => o.id === row.schemeTypeFK)
-
-    if (!r) return false
-    return ['MEDI500VISIT', 'OPSCAN', 'MEDI500VACCINATION'].indexOf(r.code) >= 0
-  }
-
   getSortedRows = rows => {
     return _.orderBy(rows, ['sequence', 'schemeTypeFK'])
   }
@@ -319,7 +298,6 @@ class SchemesGrid extends PureComponent {
       onCommitChanges: this.commitChanges,
     }
 
-    const isMedisaveEnable = clinicSettings.settings.isEnableMedisave
     const columnExtensions = [
       {
         columnName: 'validRange',
@@ -339,9 +317,6 @@ class SchemesGrid extends PureComponent {
         code: 'ctSchemeType',
         width: 250,
         sortingEnabled: false,
-        localFilter: opt => {
-          return isMedisaveEnable ? opt : !this.isMedisave(opt)
-        },
         onChange: ({ val, option, row, onValueChange }) => {
           let { rows } = this.props
           if (!row.id) {
@@ -387,20 +362,6 @@ class SchemesGrid extends PureComponent {
             notification.error({
               message: 'Patient already has a CHAS Scheme Added',
             })
-          }
-          if (
-            this.medisaveCheck(row) &&
-            rows.filter(
-              o => !o.isDeleted && this.medisaveCheck(o) && o.id !== row.id,
-            ).length > 0
-          ) {
-            row.schemeTypeFK = undefined
-
-            notification.error({
-              message:
-                'Patient can only either Medisave 500 Visit or Outpantient Scan at any point of time',
-            })
-            return
           }
         },
         isDisabled: row => {

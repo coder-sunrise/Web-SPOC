@@ -42,7 +42,6 @@ import Signature from '@/components/_medisys/Forms/Signature'
 import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 import SchemeValidationPrompt from './components/SchemeValidationPrompt'
-import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
 import InvoicePaymentDetails from './components/InvoicePaymentDetails'
 // page utils
 import {
@@ -87,12 +86,7 @@ const styles = theme => ({
 const base64Prefix = 'data:image/jpeg;base64,'
 
 const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
-  const {
-    inventorymedication = [],
-    inventoryconsumable = [],
-    inventoryvaccination = [],
-    ctmedicationunitofmeasurement = [],
-  } = codetable
+  const { inventoryconsumable = [] } = codetable
 
   const {
     primaryPrintoutLanguage = 'EN',
@@ -132,53 +126,6 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
     }
   }
 
-  const generateFromDrugmixture = item => {
-    const drugMixtures = _.orderBy(
-      item.prescriptionDrugMixture,
-      ['sequence'],
-      ['asc'],
-    )
-    drugMixtures.forEach(drugMixture => {
-      const detaultDrugMixture = {
-        ...defaultItem(item, `DrugMixture-${item.id}`),
-        drugMixtureFK: drugMixture.id,
-        inventoryMedicationFK: drugMixture.inventoryMedicationFK,
-        code: drugMixture.drugCode,
-        name: drugMixture.drugName,
-        quantity: drugMixture.quantity,
-        dispenseUOM: drugMixture.uomDisplayValue,
-        isDispensedByPharmacy: drugMixture.isDispensedByPharmacy,
-        drugMixtureName: item.name,
-        stockBalance: drugMixture.quantity,
-        uid: getUniqueId(),
-      }
-      if (drugMixture.dispenseItem.length) {
-        drugMixture.dispenseItem.forEach((di, index) => {
-          orderItems.push({
-            ...detaultDrugMixture,
-            ...transactionDetails(di),
-            stockBalance:
-              drugMixture.quantity -
-              _.sumBy(drugMixture.dispenseItem, 'transactionQty'),
-            countNumber: index === 0 ? 1 : 0,
-            rowspan: index === 0 ? drugMixture.dispenseItem.length : 0,
-            uid: getUniqueId(),
-          })
-        })
-      } else {
-        orderItems.push({
-          ...detaultDrugMixture,
-        })
-      }
-    })
-
-    const groupItems = orderItems.filter(
-      oi => oi.type === item.type && oi.id === item.id,
-    )
-    groupItems[0].groupNumber = 1
-    groupItems[0].groupRowSpan = groupItems.length
-  }
-
   const generateFromTransaction = item => {
     const groupName = 'NormalDispense'
     if (item.isPreOrder) {
@@ -212,46 +159,10 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
     groupItems[0].groupRowSpan = groupItems.length
   }
 
-  const sortOrderItems = [
-    ...(entity.prescription || [])
-      .filter(item => item.type === 'Medication' && !item.isDrugMixture)
-      .map(item => {
-        return { ...item, quantity: item.dispensedQuanity }
-      }),
-    ...(entity.vaccination || []),
-    ...(entity.consumable || []),
-    ...(entity.prescription || []).filter(
-      item => item.type === 'Medication' && item.isDrugMixture,
-    ),
-    ...(entity.prescription || [])
-      .filter(item => item.type === 'Open Prescription')
-      .map(item => {
-        return { ...item, quantity: item.dispensedQuanity }
-      }),
-    ...(entity.externalPrescription || []).map(item => {
-      return { ...item, quantity: item.dispensedQuanity }
-    }),
-  ]
+  const sortOrderItems = [...(entity.consumable || [])]
 
   sortOrderItems.forEach(item => {
-    if (item.type === 'Medication') {
-      if (item.isDrugMixture) {
-        generateFromDrugmixture(item)
-      } else {
-        generateFromTransaction(item)
-      }
-    } else if (
-      item.type === 'Open Prescription' ||
-      item.type === 'External Prescription'
-    ) {
-      orderItems.push({
-        ...defaultItem(item, 'NoNeedToDispense'),
-        groupNumber: 1,
-        groupRowSpan: 1,
-      })
-    } else {
-      generateFromTransaction(item)
-    }
+    generateFromTransaction(item)
   })
   const defaultExpandedGroups = _.uniqBy(orderItems, 'dispenseGroupId').map(
     o => o.dispenseGroupId,
@@ -285,8 +196,6 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
     ctcopaymentscheme: codetable.copaymentscheme || [],
     ctschemetype: codetable.ctschemetype || [],
     ctcopayer: codetable.ctcopayer || [],
-    inventorymedication: codetable.inventorymedication || [],
-    inventoryvaccination: codetable.inventoryvaccination || [],
     ctservice: codetable.ctservice || [],
     commitCount: global.commitCount,
     clinicSettings: clinicSettings.settings,
@@ -360,7 +269,6 @@ class Billing extends Component {
       patient: [],
       billing: [],
     },
-    showDrugLabelSelection: false,
     selectedDrugs: [],
     isUpdatedAppliedInvoicePayerInfo: false,
     isConsumedPackage: false,
@@ -373,7 +281,7 @@ class Billing extends Component {
         const { visitID, senderId, isBillingSaved } = response
         const {
           dispatch,
-          values: { id, visitGroup, visitGroupStatusDetails = [] },
+          values: { id },
           location: { pathname },
         } = this.props
         if (
@@ -381,25 +289,6 @@ class Billing extends Component {
           isBillingSaved !== undefined &&
           pathname == '/reception/queue/billing'
         ) {
-          if (visitGroupStatusDetails.some(x => x.visitFK === visitID)) {
-            dispatch({
-              type: 'groupInvoice/fetchVisitGroupStatusDetails',
-              payload: { visitGroup },
-            }).then((r = []) => {
-              const disabledPayment = !(
-                _.sumBy(r, 'outstandingBalance') > 0 &&
-                !r.some(x => !x.isBillingSaved)
-              )
-              if (disabledPayment != (this.state.disabledPayment ?? false)) {
-                notification.destroy()
-                notification.error({
-                  duration: 999,
-                  message: `The status for one of the invoices had been changed. Please check all invoices is in billing status and the billing is saved.`,
-                })
-                this.setState({ disabledPayment })
-              }
-            })
-          }
         }
       },
     })
@@ -449,18 +338,6 @@ class Billing extends Component {
         code: 'ctservice',
       },
     })
-    await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventoryvaccination',
-      },
-    })
-    await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventorymedication',
-      },
-    })
     if (query.vid) {
       const { invoice } = billing.entity || billing.default
       const { invoiceItems } = invoice
@@ -506,13 +383,7 @@ class Billing extends Component {
       await this.onExpandDispenseDetails()
 
       const { values, dispense } = this.props
-      const { prescription = [] } = dispense.entity
       const { invoice, invoicePayment } = values
-      this.setState({
-        selectedDrugs: prescription.map(x => {
-          return { ...x, no: 1, selected: true }
-        }),
-      })
       let reportsOnCompletePayment = autoPrintReportsOnCompletePayment
       let printData = []
       if (
@@ -554,14 +425,6 @@ class Billing extends Component {
         }
       }
 
-      const printDrugLabel =
-        reportsOnCompletePayment.indexOf(
-          ReportsOnCompletePaymentOption.DrugLabel,
-        ) > -1
-      if (!printDrugLabel) {
-        this.setState({ selectedDrugs: [] })
-      }
-
       if (printData && printData.length > 0) {
         const token = localStorage.getItem('token')
         printData = printData.map(item => ({
@@ -571,11 +434,10 @@ class Billing extends Component {
         }))
       }
 
-      if (printData.length > 0 || printDrugLabel) {
+      if (printData.length > 0) {
         await this.childOnPrintRef({
           type: 1,
           printData,
-          printAllDrugLabel: printDrugLabel,
         })
       }
     }
@@ -658,8 +520,6 @@ class Billing extends Component {
   }
   getInvoiceReportTitle = reportPayload => {
     switch (reportPayload?.reportParameters?.printType) {
-      case INVOICE_REPORT_TYPES.GROUPINVOICE:
-        return 'Invoice'
       case INVOICE_REPORT_TYPES.CLAIMABLEITEMCATEGORYINVOICE:
         return 'Claimable Item Category Invoice'
       case INVOICE_REPORT_TYPES.CLAIMABLEITEMINVOICE:
@@ -689,11 +549,10 @@ class Billing extends Component {
     }))
   }
 
-  onAddPaymentClick = async isGroupPayment => {
+  onAddPaymentClick = async => {
     const callBack = () => {
       this.setState(preState => ({
         submitCount: preState.submitCount + 1,
-        isGroupPayment,
         disabledPayment: undefined,
         showAddPaymentModal: !preState.showAddPaymentModal,
       }))
@@ -741,55 +600,6 @@ class Billing extends Component {
     if (invoice === null) return true
     if (invoicePayer.length === 0) return false
 
-    return false
-  }
-
-  checkPackageSignature = () => {
-    const { dispatch, values, clinicSettings } = this.props
-    const { packageRedeemAcknowledge } = values
-    const { isEnablePackage, isCheckPackageSignature } = clinicSettings
-    const isExistingPackageSignature =
-      packageRedeemAcknowledge &&
-      packageRedeemAcknowledge.signature !== '' &&
-      packageRedeemAcknowledge.signature !== undefined
-
-    if (!isEnablePackage || !this.state.isConsumedPackage)
-      return this.checkInvoiceOutstanding()
-
-    if (
-      isCheckPackageSignature.toLowerCase() ===
-        PACKAGE_SIGNATURE_CHECK_OPTION.IGNORE.toLowerCase() ||
-      isExistingPackageSignature
-    )
-      return this.checkInvoiceOutstanding()
-
-    if (
-      isCheckPackageSignature.toLowerCase() ===
-      PACKAGE_SIGNATURE_CHECK_OPTION.OPTIONAL.toLowerCase()
-    ) {
-      return dispatch({
-        type: 'global/updateState',
-        payload: {
-          openConfirm: true,
-          openConfirmTitle: '',
-          openConfirmText: 'Confirm',
-          openConfirmContent:
-            'Patient signature is not provided, confirm to complete billing?',
-          onConfirmSave: () => {
-            this.checkInvoiceOutstanding()
-          },
-        },
-      })
-    }
-    if (
-      isCheckPackageSignature.toLowerCase() ===
-      PACKAGE_SIGNATURE_CHECK_OPTION.MANDATORY.toLowerCase()
-    ) {
-      notification.error({
-        message: 'Patient signature is mandatory for package acknowledgement',
-      })
-      return false
-    }
     return false
   }
 
@@ -859,8 +669,7 @@ class Billing extends Component {
   }
 
   onCompletePaymentClick = async () => {
-    // check package acknowledge
-    this.checkPackageSignature()
+    this.checkInvoiceOutstanding()
   }
 
   onPrintReceiptClick = invoicePaymentID => {
@@ -909,10 +718,8 @@ class Billing extends Component {
     forceSave = false,
   ) => {
     const { values, dispatch } = this.props
-    const { invoicePayer, visitGroup } = values
-    const isGroup = invoiceReportType === INVOICE_REPORT_TYPES.GROUPINVOICE
-    const reportID = isGroup ? 89 : 15
-    this.setState({ isGroupPrint: isGroup })
+    const { invoicePayer } = values
+    const reportID = 15
     let parametrPayload
     if (copayerID) {
       parametrPayload = {
@@ -959,7 +766,6 @@ class Billing extends Component {
         }
 
         this.onShowReport(reportID, {
-          visitGroup,
           ...parametrPayload,
         })
       }
@@ -989,7 +795,7 @@ class Billing extends Component {
       } else if (!values.invoice.isBillingSaved) {
         saveAndPrint()
       } else {
-        this.onShowReport(reportID, { visitGroup, ...parametrPayload })
+        this.onShowReport(reportID, { ...parametrPayload })
       }
     }
   }
@@ -997,31 +803,9 @@ class Billing extends Component {
   onPrintInvoiceClick = invoiceReportType => {
     const {
       dispatch,
-      values: { visitGroupStatusDetails = [] },
+      values: {},
     } = this.props
-    if (
-      invoiceReportType === INVOICE_REPORT_TYPES.GROUPINVOICE &&
-      visitGroupStatusDetails.some(x => !x.isBillingSaved)
-    ) {
-      dispatch({
-        type: 'global/updateAppState',
-        payload: {
-          openConfirm: true,
-          openConfirmContent: `One or more invoice(s) are not in \'Billing\' status. Confirm to print?`,
-          onConfirmSave: () => {
-            this.onPrintInvoice(
-              undefined,
-              undefined,
-              undefined,
-              invoiceReportType,
-              true,
-            )
-          },
-        },
-      })
-    } else {
-      this.onPrintInvoice(undefined, undefined, undefined, invoiceReportType)
-    }
+    this.onPrintInvoice(undefined, undefined, undefined, invoiceReportType)
   }
 
   onPrintVisitInvoiceClick = () => {
@@ -1109,61 +893,6 @@ class Billing extends Component {
     }))
   }
 
-  handleDrugLabelClick = () => {
-    const { dispense } = this.props
-    const { prescription = [], packageItem = [] } = dispense.entity
-
-    let drugList = []
-
-    prescription.forEach(item => {
-      drugList.push(item)
-    })
-    packageItem.forEach(item => {
-      if (item.type === 'Medication') {
-        drugList.push({
-          ...item,
-          name: item.description,
-          dispensedQuanity: item.packageConsumeQuantity,
-        })
-      }
-    })
-
-    this.setState(prevState => {
-      return {
-        showDrugLabelSelection: !prevState.showDrugLabelSelection,
-        selectedDrugs: drugList.map(x => {
-          return { ...x, no: 1, selected: true }
-        }),
-      }
-    })
-  }
-
-  handleDrugLabelSelectionClose = () => {
-    this.setState(prevState => {
-      return {
-        showDrugLabelSelection: !prevState.showDrugLabelSelection,
-      }
-    })
-  }
-
-  handleDrugLabelSelected = (itemId, selected) => {
-    this.setState(prevState => ({
-      selectedDrugs: prevState.selectedDrugs.map(drug =>
-        drug.id === itemId ? { ...drug, selected } : { ...drug },
-      ),
-    }))
-    this.props.dispatch({ type: 'global/incrementCommitCount' })
-  }
-
-  handleDrugLabelNoChanged = (itemId, no) => {
-    this.setState(prevState => ({
-      selectedDrugs: prevState.selectedDrugs.map(drug =>
-        drug.id === itemId ? { ...drug, no } : { ...drug },
-      ),
-    }))
-    this.props.dispatch({ type: 'global/incrementCommitCount' })
-  }
-
   onShowReport = (reportID, reportParameters, printType) => {
     this.setState({
       showReport: true,
@@ -1230,7 +959,6 @@ class Billing extends Component {
       showSchemeValidationPrompt,
       schemeValidations,
       submitCount,
-      isGroupPayment,
       disabledPayment,
     } = this.state
     const {
@@ -1250,27 +978,11 @@ class Billing extends Component {
       ctcopaymentscheme,
       ctcopayer,
       ctservice,
-      inventoryvaccination,
-      inventorymedication,
       clinicSettings,
       codetable,
     } = this.props
     const setValues = v => {
       let newValues = v
-      if (v.visitGroupStatusDetails?.length > 0) {
-        newValues = {
-          ...v,
-          visitGroupStatusDetails: v.visitGroupStatusDetails.map(x => {
-            if (x.visitFK === v.id)
-              return {
-                ...x,
-                totalClaim: v.finalClaim,
-                outstandingBalance: v.invoice.outstandingBalance,
-              }
-            return x
-          }),
-        }
-      }
       setValuesHook(newValues)
     }
 
@@ -1286,14 +998,11 @@ class Billing extends Component {
       sessionInfo,
       user,
       clinicSettings,
-      inventoryvaccination,
-      inventorymedication,
       ctservice,
       ctcopayer,
     }
     const {
       isEnableAddPaymentInBilling = false,
-      isEnablePackage = false,
       isEnableVisitationInvoiceReport = false,
       autoPrintOnCompletePayment = false,
     } = clinicSettings
@@ -1343,17 +1052,6 @@ class Billing extends Component {
                         }
                         history={this.props.history}
                         dispatch={this.props.dispatch}
-                        onDrugLabelClick={this.handleDrugLabelClick}
-                        showDrugLabelSelection={
-                          this.state.showDrugLabelSelection
-                        }
-                        onDrugLabelSelectionClose={
-                          this.handleDrugLabelSelectionClose
-                        }
-                        onDrugLabelSelected={this.handleDrugLabelSelected}
-                        onDrugLabelNoChanged={this.handleDrugLabelNoChanged}
-                        selectedDrugs={this.state.selectedDrugs}
-                        onPrintRef={this.onPrintRef}
                       />
                     </div>
                   ),
@@ -1424,9 +1122,7 @@ class Billing extends Component {
           </GridContainer>
         </Paper>
         <GridContainer>
-          <GridItem
-            md={isEnablePackage && this.state.isConsumedPackage ? 6 : 8}
-          >
+          <GridItem md={8}>
             <div
               style={{
                 display: 'flex',
@@ -1488,30 +1184,9 @@ class Billing extends Component {
               )}
             </div>
           </GridItem>
-          <GridItem
-            md={isEnablePackage && this.state.isConsumedPackage ? 6 : 4}
-            style={{ paddingRight: 0 }}
-          >
+          <GridItem md={4} style={{ paddingRight: 0 }}>
             <React.Fragment>
               <div className={classes.paymentButton}>
-                {isEnablePackage && this.state.isConsumedPackage && (
-                  <Button
-                    color={
-                      packageDrawdownSignatureSrc !== '' &&
-                      packageDrawdownSignatureSrc !== undefined
-                        ? 'success'
-                        : 'danger'
-                    }
-                    onClick={() => {
-                      this.setState({
-                        isShowAcknowledge: true,
-                      })
-                    }}
-                    disabled={this.state.isEditing || values.id === undefined}
-                  >
-                    Acknowledge
-                  </Button>
-                )}
                 <Button
                   size='sm'
                   color={
@@ -1587,7 +1262,7 @@ class Billing extends Component {
         </CommonModal>
         <CommonModal
           open={showAddPaymentModal}
-          title={`Add ${isGroupPayment ? 'Group' : ''} Payment`}
+          title={`Add Payment`}
           onClose={this.toggleAddPaymentModal}
           observe='AddPaymentForm'
           maxWidth='lg'
@@ -1609,10 +1284,6 @@ class Billing extends Component {
               }}
               patientPayer={values.patientPayer}
               disabledPayment={disabledPayment}
-              isGroupPayment={isGroupPayment}
-              visitGroupStatusDetails={values.visitGroupStatusDetails?.filter(
-                x => x.outstandingBalance > 0,
-              )}
             />
           )}
         </CommonModal>

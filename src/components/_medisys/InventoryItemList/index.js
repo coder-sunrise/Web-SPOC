@@ -205,24 +205,7 @@ class InventoryItemList extends React.Component {
     let existingItem = []
     let newItem = []
     if (currentTab === ITEM_TYPE.ORDERSET) {
-      const {
-        medicationOrderSetItem,
-        consumableOrderSetItem,
-        vaccinationOrderSetItem,
-        serviceOrderSetItem,
-      } = tempSelectedItem
-
-      const [
-        existingMedicationItem,
-        newMedicationItem,
-      ] = this.checkOrderSetItemIsExisted(
-        medicationOrderSetItem,
-        rows,
-        ITEM_TYPE.MEDICATION,
-      )
-
-      existingItem.push(...existingMedicationItem)
-      newItem.push(...newMedicationItem.filter(item => item !== null))
+      const { consumableOrderSetItem, serviceOrderSetItem } = tempSelectedItem
 
       const [
         existingConsumableItem,
@@ -235,18 +218,6 @@ class InventoryItemList extends React.Component {
 
       existingItem.push(...existingConsumableItem)
       newItem.push(...newConsumableItem.filter(item => item !== null))
-
-      const [
-        existingVaccinationItem,
-        newVaccinationItem,
-      ] = this.checkOrderSetItemIsExisted(
-        vaccinationOrderSetItem,
-        rows,
-        ITEM_TYPE.VACCINATION,
-      )
-
-      existingItem.push(...existingVaccinationItem)
-      newItem.push(...newVaccinationItem.filter(item => item !== null))
 
       const [
         existingServiceItem,
@@ -277,9 +248,10 @@ class InventoryItemList extends React.Component {
       }
 
       itemFieldName = InventoryTypes.filter(x => x.ctName === type)[0]
-      const unitPrice = itemFieldName.value === ITEM_TYPE.SERVICE
-      ? tempSelectedItem.unitPrice
-      : tempSelectedItem.sellingPrice
+      const unitPrice =
+        itemFieldName.value === ITEM_TYPE.SERVICE
+          ? tempSelectedItem.unitPrice
+          : tempSelectedItem.sellingPrice
       let newItemRow = {
         uid: getUniqueId(),
         type: itemFieldName.value,
@@ -295,7 +267,7 @@ class InventoryItemList extends React.Component {
         totalAftAdj: unitPrice,
         adjValue: 0,
         adjAmt: 0,
-        adjType:'Percentage',
+        adjType: 'Percentage',
         isMinus: true,
         isExactAmount: false,
       }
@@ -431,14 +403,8 @@ class InventoryItemList extends React.Component {
   }
 
   getOptions = () => {
-    const medicationAccessRight = this.getAccessRight(
-      'settings.templates.visitordertemplate.medication',
-    )
     const consumableAccessRight = this.getAccessRight(
       'settings.templates.visitordertemplate.consumable',
-    )
-    const vaccinationAccessRight = this.getAccessRight(
-      'settings.templates.visitordertemplate.vaccination',
     )
     const serviceAccessRight = this.getAccessRight(
       'settings.templates.visitordertemplate.service',
@@ -448,25 +414,10 @@ class InventoryItemList extends React.Component {
     )
     const commonOptions = [
       {
-        id: ITEM_TYPE.MEDICATION,
-        name: 'Medication',
-        content: this.addContent('inventorymedication', medicationAccessRight),
-        accessRight: medicationAccessRight,
-      },
-      {
         id: ITEM_TYPE.CONSUMABLE,
         name: 'Consumable',
         content: this.addContent('inventoryconsumable', consumableAccessRight),
         accessRight: consumableAccessRight,
-      },
-      {
-        id: ITEM_TYPE.VACCINATION,
-        name: 'Vaccination',
-        content: this.addContent(
-          'inventoryvaccination',
-          vaccinationAccessRight,
-        ),
-        accessRight: vaccinationAccessRight,
       },
       {
         id: ITEM_TYPE.SERVICE,

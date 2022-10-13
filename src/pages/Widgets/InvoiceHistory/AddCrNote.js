@@ -27,7 +27,6 @@ import { orderItemTypes } from '@/utils/codes'
 import CrNoteForm from '@/pages/Finance/Invoice/components/modal/AddCrNote/CrNoteForm'
 import Summary from '@/pages/Finance/Invoice/components/modal/AddCrNote/Summary'
 import MiscCrNote from '@/pages/Finance/Invoice/components/modal/AddCrNote/MiscCrNote'
-import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import { mergeClasses } from '@material-ui/styles'
 import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 
@@ -300,14 +299,6 @@ class AddCrNote extends Component {
     setTimeout(() => this.handleCalcCrNoteItem(), 1)
   }
 
-  drugMixtureIndicator = (row, right) => {
-    if (!row.isDrugMixture) return null
-
-    return (
-      <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
-    )
-  }
-
   render() {
     const {
       handleSubmit,
@@ -447,44 +438,6 @@ class AddCrNote extends Component {
                       <Tooltip title={row.itemType}>
                         <span>{itemType?.displayValue}</span>
                       </Tooltip>
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '-1px',
-                          right: '-6px',
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: 'inline-block',
-                            position: 'relative',
-                          }}
-                        >
-                          {this.drugMixtureIndicator(row)}
-                        </div>
-                        {(row.isActualizedPreOrder || row.isPreOrder) && (
-                          <Tooltip
-                            title={
-                              row.isPreOrder
-                                ? 'New Pre-Order'
-                                : 'Actualized Pre-Order'
-                            }
-                          >
-                            <div
-                              className={classes.rightIcon}
-                              style={{
-                                borderRadius: 4,
-                                backgroundColor: row.isPreOrder
-                                  ? '#4255bd'
-                                  : 'green',
-                                display: 'inline-block',
-                              }}
-                            >
-                              Pre
-                            </div>
-                          </Tooltip>
-                        )}
-                      </div>
                     </div>
                   </div>
                 )

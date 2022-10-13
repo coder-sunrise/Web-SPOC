@@ -12,7 +12,6 @@ import { CallingQueueButton } from '@/components/_medisys'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { initRoomAssignment } from '@/utils/codes'
 import PlayArrow from '@material-ui/icons/PlayArrow'
-import { openCautionAlertOnStartConsultation } from '@/pages/Widgets/Orders/utils'
 import Banner from './Banner'
 
 const styles = theme => ({
@@ -122,7 +121,6 @@ class PatientDashboard extends PureComponent {
               o.id
             }&pid=${patientID}&v=${version}`,
           )
-          openCautionAlertOnStartConsultation(o)
         }
       })
   }
@@ -135,7 +133,7 @@ class PatientDashboard extends PureComponent {
     const { entity } = visitRegistration
     if (!entity) return null
     const { visit = {}, queueNo } = entity
-    const { visitPurposeFK = VISIT_TYPE.CON, roomFK, doctorProfileFK } = visit
+    const { visitPurposeFK = VISIT_TYPE.BF, roomFK, doctorProfileFK } = visit
 
     return (
       visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
@@ -169,8 +167,7 @@ class PatientDashboard extends PureComponent {
                       onClick={this.startConsultation}
                       disabled={
                         visitPurposeFK === VISIT_TYPE.OTC ||
-                        visitPurposeFK === VISIT_TYPE.BF ||
-                        visitPurposeFK === VISIT_TYPE.MC
+                        visitPurposeFK === VISIT_TYPE.BF
                       }
                       round
                       justIcon

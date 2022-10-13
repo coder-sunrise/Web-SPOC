@@ -4,40 +4,11 @@ import _ from 'lodash'
 import service from '@/pages/Inventory/InventoryAdjustment/services'
 
 import { getUniqueId, maxReducer, calculateAmount } from '@/utils/utils'
-
-const sharedMedicationValue = {
-  isMinus: true,
-  adjValue: 0,
-  isExactAmount: true,
-  corPrescriptionItemPrecaution: [
-    {
-      precaution: '',
-      sequence: 0,
-      uid: getUniqueId(),
-    },
-  ],
-  corPrescriptionItemInstruction: [
-    {
-      sequence: 0,
-      stepdose: 'AND',
-      unitPrice: 0,
-      uid: getUniqueId(),
-    },
-  ],
-  corPrescriptionItemDrugMixture: [],
-  isDrugMixture: false,
-  isClaimable: true,
-  isDispensedByPharmacy: false,
-  isNurseActualizeRequired: false,
-  isExclusive: false,
-}
+ 
 const initialState = {
   rows: [],
   finalAdjustments: [],
   summary: {},
-  defaultMedication: {
-    ...sharedMedicationValue,
-  },
   defaultService: {
     editServiceId: undefined,
     isEdit: false,
@@ -48,53 +19,23 @@ const initialState = {
     isMinus: true,
     isExactAmount: true,
   },
-  defaultVaccination: {
-    vaccinationGivenDate: moment(),
-    quantity: 1,
-    unitPrice: 0,
-    isMinus: true,
-    adjValue: 0,
-    isExactAmount: true,
-    corVaccinationCert: [],
-    isNurseActualizeRequired: false,
-  },
   defaultConsumable: {
     quantity: 1,
     unitPrice: 0,
     isMinus: true,
     adjValue: 0,
     isExactAmount: true,
-    isDispensedByPharmacy: false,
-    isNurseActualizeRequired: false,
+    // isDispensedByPharmacy: false,
+    // isNurseActualizeRequired: false,
   },
   defaultOrderSet: {
     orderSetItems: [],
   },
-  defaultTreatment: {},
-  corPackage: [],
-  defaultPackage: {
-    packageItems: [],
-  },
-  defaultRadiology: {
-    editServiceId: undefined,
-    isEdit: false,
-    radiologyItems: [],
-    selectCategory: 'All',
-    selectTag: 'All',
-    filterService: '',
-    isMinus: true,
-    isExactAmount: true,
-  },
-  defaultLab: {
-    editServiceId: undefined,
-    isEdit: false,
-    labItems: [],
-    selectCategory: 'All',
-    selectTag: 'All',
-    filterService: '',
-    isMinus: true,
-    isExactAmount: true,
-  },
+  // defaultTreatment: {},
+  // corPackage: [],
+  // defaultPackage: {
+  //   packageItems: [],
+  // },
 }
 export default createListViewModel({
   namespace: 'orders',
@@ -105,16 +46,7 @@ export default createListViewModel({
     service: {},
     state: { ...initialState },
     subscriptions: ({ dispatch, history }) => {
-      history.listen(async (loct, method) => {
-        const { pathname, search, query = {} } = loct
-        if (
-          (pathname.indexOf('/reception/queue/consultation') === 0 &&
-            Number(query.cid)) ||
-          pathname.indexOf('/reception/queue/dispense') === 0 ||
-          pathname.indexOf('/pharmacy/worklist') === 0
-        ) {
-        }
-      })
+      history.listen(async (loct, method) => {})
     },
     effects: {
       *upsertRow({ payload }, { select, call, put, delay }) {
@@ -339,20 +271,6 @@ export default createListViewModel({
         })
       },
 
-      *addPackage({ payload }, { select, call, put, delay }) {
-        yield put({
-          type: 'addPackageState',
-          payload,
-        })
-      },
-
-      *deletePackageItem({ payload }, { select, call, put, delay }) {
-        yield put({
-          type: 'deletePackageItemState',
-          payload,
-        })
-      },
-
       *updatePriority({ payload }, { put, select }) {
         const orders = yield select(st => st.orders)
         const { rows = [] } = orders
@@ -381,22 +299,6 @@ export default createListViewModel({
         if (payload.type) {
           type = payload.type
         }
-        const getCertificate = uid => {
-          const corVaccinationCert =
-            type === '2'
-              ? payload.corVaccinationCert.map(vc => {
-                  if (vc.uid) {
-                    return { ...vc, vaccinationUFK: uid }
-                  }
-                  return {
-                    ...vc,
-                    vaccinationUFK: uid,
-                    uid: getUniqueId(),
-                  }
-                })
-              : []
-          return corVaccinationCert
-        }
         if (payload.uid) {
           rows = rows.map(row => {
             const n =
@@ -404,7 +306,6 @@ export default createListViewModel({
                 ? {
                     ...row,
                     ...payload,
-                    corVaccinationCert: getCertificate(row.uid),
                   }
                 : row
             return n
@@ -415,7 +316,6 @@ export default createListViewModel({
             ...payload,
             type,
             uid,
-            corVaccinationCert: getCertificate(uid),
           }
           rows.push(newRow)
         }
@@ -515,44 +415,6 @@ export default createListViewModel({
             if (o.uid === payload.uid) o.isDeleted = true
             return o
           }),
-        }
-      },
-
-      addPackageState(state, { payload }) {
-        let { corPackage } = state
-        corPackage.push({
-          ...payload,
-          uid: getUniqueId(),
-        })
-        return {
-          ...state,
-          corPackage,
-        }
-      },
-
-      deletePackageItemState(state, { payload }) {
-        let { corPackage, rows } = state
-
-        const activePackageItems = rows.filter(
-          item =>
-            item.packageGlobalId === payload.packageGlobalId &&
-            item.isDeleted === false,
-        )
-        const toBeUpdatedPackage = corPackage.find(
-          p => p.packageGlobalId === payload.packageGlobalId,
-        )
-        if (toBeUpdatedPackage) {
-          if (activePackageItems.length === 0) {
-            toBeUpdatedPackage.isDeleted = true
-          } else {
-            toBeUpdatedPackage.totalPrice =
-              _.sumBy(activePackageItems, 'totalAfterItemAdjustment') || 0
-          }
-        }
-
-        return {
-          ...state,
-          corPackage,
         }
       },
     },

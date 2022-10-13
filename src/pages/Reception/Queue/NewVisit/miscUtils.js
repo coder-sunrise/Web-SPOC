@@ -2,11 +2,7 @@ import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import { bool } from 'prop-types'
 import _ from 'lodash'
 import { cleanFields } from '@/pages/Consultation/utils'
-import {
-  VISIT_TYPE,
-  VISITDOCTOR_CONSULTATIONSTATUS,
-  MEDICALCHECKUP_WORKITEM_STATUS,
-} from '@/utils/constants'
+import { VISIT_TYPE, VISITDOCTOR_CONSULTATIONSTATUS } from '@/utils/constants'
 import { visitOrderTemplateItemTypes } from '@/utils/codes'
 import { notification } from '@/components'
 import { VISIT_STATUS } from '../variables'
@@ -157,12 +153,10 @@ export const formikMapPropsToValues = ({
     let qNo = 0.0
     let doctorProfile
     let doctorProfileFK
-    let visitPurposeFK
+    let visitPurposeFK = clinicSettings.defaultVisitType
     let roomAssignmentFK
     let consReady
     let currentVisitOrderTemplateFK
-    let defaultVisitPreOrderItem = []
-    let medicalCheckupWorkitem
     if (clinicInfo) {
       // doctorProfile = doctorProfiles.find(
       //   (item) => item.doctorMCRNo === clinicInfo.primaryMCRNO,
@@ -211,22 +205,6 @@ export const formikMapPropsToValues = ({
       doctorProfileFK = doctorProfile ? doctorProfile.id : doctorProfileFK
     }
 
-    if (clinicSettings) {
-      visitPurposeFK = Number(clinicSettings.settings.defaultVisitType)
-      if (visitPurposeFK === VISIT_TYPE.MC) {
-        medicalCheckupWorkitem = [
-          {
-            reportPriority: 'Normal',
-            statusFK: MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS,
-            reportLanguage: getMCReportLanguage(
-              patientInfo,
-              clinicSettings.settings,
-            ),
-          },
-        ]
-      }
-    }
-
     const { visitOrderTemplateFK, visitEyeRefractionForm } = visitEntries
 
     if (!visitEntries.id) {
@@ -247,46 +225,15 @@ export const formikMapPropsToValues = ({
       if (appointment && appointment.appointments.length) {
         currentVisitOrderTemplateFK =
           appointment.appointments[0].visitOrderTemplateFK
-
-        defaultVisitPreOrderItem = appointment.appointments[0].appointmentPreOrderItem.map(
-          po => {
-            const {
-              actualizedPreOrderItemFK,
-              preOrderItemType,
-              itemName,
-              quantity,
-              orderByUser,
-              orderDate,
-              remarks,
-              amount,
-              hasPaid,
-              dispenseUOM,
-              code,
-            } = po
-            return {
-              actualizedPreOrderItemFK,
-              preOrderItemType,
-              itemName,
-              quantity,
-              orderByUser,
-              orderDate,
-              remarks,
-              amount,
-              hasPaid,
-              dispenseUOM,
-              code,
-            }
-          },
-        )
       }
     } else {
       currentVisitOrderTemplateFK = visitOrderTemplateFK
     }
-    const isVisitOrderTemplateActive = (
-      visitRegistration.visitOrderTemplateOptions || []
-    )
-      .map(option => option.id)
-      .includes(currentVisitOrderTemplateFK)
+    // const isVisitOrderTemplateActive = (
+    //   visitRegistration.visitOrderTemplateOptions || []
+    // )
+    //   .map(option => option.id)
+    //   .includes(currentVisitOrderTemplateFK)
 
     let newFormData
     if (visitEyeRefractionForm && visitEyeRefractionForm.formData) {
@@ -303,21 +250,6 @@ export const formikMapPropsToValues = ({
       } else if (visitEntries.referralPatientProfileFK) {
         referralType = 'Patient'
       }
-
-      if (
-        visitEntries.visitPurposeFK === VISIT_TYPE.MC &&
-        !visitEntries.isForInvoiceReplacement &&
-        visitEntries.medicalCheckupWorkitem.length > 0
-      ) {
-        medicalCheckupWorkitem = [
-          {
-            ...visitEntries.medicalCheckupWorkitem[0],
-            reportLanguage: visitEntries.medicalCheckupWorkitem[0].reportLanguage.split(
-              ', ',
-            ),
-          },
-        ]
-      }
     } else if (
       patientInfo &&
       (patientInfo.referredBy === 'Company' ||
@@ -332,23 +264,19 @@ export const formikMapPropsToValues = ({
 
     return {
       queueNo: qNo,
-      visitPurposeFK,
+      visitPurposeFK: 2,
       consReady,
       roomFK: roomAssignmentFK || roomFK,
       visitStatus: VISIT_STATUS.WAITING,
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
       doctorProfileFK,
       ...visitEntries,
-      medicalCheckupWorkitem,
-      visitOrderTemplateFK: isVisitOrderTemplateActive
-        ? currentVisitOrderTemplateFK
-        : undefined,
-      visitPreOrderItem: !visitEntries.id
-        ? defaultVisitPreOrderItem
-        : visitEntries.visitPreOrderItem,
-      visitOrderTemplateTotal: !visitEntries.id
-        ? undefined
-        : visitEntries.visitOrderTemplateTotal,
+      // visitOrderTemplateFK: isVisitOrderTemplateActive
+      //   ? currentVisitOrderTemplateFK
+      //   : undefined,
+      // visitOrderTemplateTotal: !visitEntries.id
+      //   ? undefined
+      //   : visitEntries.visitOrderTemplateTotal,
       visitEyeRefractionForm: {
         ...visitEyeRefractionForm,
         formData: newFormData,
@@ -370,65 +298,15 @@ export const formikMapPropsToValues = ({
         ...visitEntries.visitDoctor.filter(d => !d.isPrimaryDoctor),
       ],
       visitPrimaryDoctor: visitEntries.visitDoctor.find(d => d.isPrimaryDoctor),
-      visitBasicExaminations: visitEntries.visitBasicExaminations.map(be => ({
-        ...be,
-        visitPurposeFK: visitEntries.visitPurposeFK || visitPurposeFK,
-      })),
+      // visitBasicExaminations: visitEntries.visitBasicExaminations.map(be => ({
+      //   ...be,
+      //   visitPurposeFK: visitEntries.visitPurposeFK || visitPurposeFK,
+      // })),
     }
   } catch (error) {
     console.log({ error })
     return {}
   }
-}
-
-const getMedicalCheckupCWorkitemDoctor = (
-  medicalCheckupWorkitemDoctor = [],
-  visitDoctor = [],
-) => {
-  const removeDoctor = medicalCheckupWorkitemDoctor.filter(
-    item =>
-      !visitDoctor.find(
-        d => !d.isDeleted && item.doctorProfileFK === d.doctorProfileFK,
-      ),
-  )
-
-  const remainDoctor = medicalCheckupWorkitemDoctor.filter(item =>
-    visitDoctor.find(
-      d => !d.isDeleted && item.doctorProfileFK === d.doctorProfileFK,
-    ),
-  )
-
-  const newDoctor = visitDoctor.filter(
-    item =>
-      !item.isDeleted &&
-      !medicalCheckupWorkitemDoctor.find(
-        d => item.doctorProfileFK === d.doctorProfileFK,
-      ),
-  )
-
-  let newMCWorkitemDoctor = [
-    ...remainDoctor,
-    ...removeDoctor.map(item => ({
-      ...item,
-      isDeleted: true,
-    })),
-    ...newDoctor.map(item => ({
-      doctorProfileFK: item.doctorProfileFK,
-    })),
-  ]
-
-  newMCWorkitemDoctor.forEach(item => {
-    var doctor = visitDoctor.find(
-      d => !d.isDeleted && item.doctorProfileFK === d.doctorProfileFK,
-    )
-    if (doctor) {
-      item.isPrimaryDoctor = doctor.isPrimaryDoctor
-      item.sequence = doctor.sequence
-      item.specialtyFK = doctor.specialtyFK
-    }
-  })
-
-  return newMCWorkitemDoctor
 }
 
 export const formikHandleSubmit = (
@@ -526,38 +404,6 @@ export const formikHandleSubmit = (
     })
   }
 
-  if (
-    values.visitPurposeFK === VISIT_TYPE.MC &&
-    !values.isForInvoiceReplacement
-  ) {
-    restValues.medicalCheckupWorkitem = [
-      {
-        ...values.medicalCheckupWorkitem[0],
-        reportLanguage: values.medicalCheckupWorkitem[0].reportLanguage.join(
-          ', ',
-        ),
-        medicalCheckupWorkitemDoctor: getMedicalCheckupCWorkitemDoctor(
-          values.medicalCheckupWorkitem[0].medicalCheckupWorkitemDoctor,
-          newVisitDoctor,
-        ),
-        statusFK:
-          values.medicalCheckupWorkitem[0].statusFK ||
-          MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS,
-      },
-    ]
-  } else if (
-    values.medicalCheckupWorkitem &&
-    values.medicalCheckupWorkitem.length > 0
-  ) {
-    if (values.medicalCheckupWorkitem[0].id) {
-      restValues.medicalCheckupWorkitem[0].isDeleted = true
-      restValues.medicalCheckupWorkitem[0].medicalCheckupWorkitemDoctor.forEach(
-        item => (item.isDeleted = true),
-      )
-    } else {
-      restValues.medicalCheckupWorkitem = []
-    }
-  }
   const payload = {
     cfg: {
       message: id ? 'Visit updated' : 'Visit created',

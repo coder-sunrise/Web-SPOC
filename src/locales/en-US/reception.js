@@ -41,7 +41,6 @@ export default {
   'reception.queue.dispense.printInvoice': 'Print Invoice',
   'reception.queue.dispense.printInvoiceWithSummary':
     'Print Invoice with Summary',
-  'reception.queue.dispense.printDrugLabel': 'Print Drug Label',
 
   'reception.queue.dispense.patientInfo.visitRemarks': 'Visit Remarks',
   'reception.queue.dispense.patientInfo.invoiceRemarks': 'Invoice Remarks',
@@ -124,7 +123,6 @@ export default {
   'reception.queue.visitRegistration.visitInformation': 'Visit Information',
   'reception.queue.visitRegistration.visitType': 'Visit Type',
   'reception.queue.visitRegistration.queueNo': 'Queue Number',
-  'reception.queue.visitRegistration.visitGroup': 'Visit Group Number',
   'reception.queue.visitRegistration.consReady': 'Cons. Ready',
   'reception.queue.visitRegistration.doctor': 'Doctor',
   'reception.queue.visitRegistration.attendantDoctor': 'Attendant Doctor',
@@ -162,10 +160,6 @@ export default {
   'reception.queue.visitRegistration.waistCircumference.suffix': 'CM',
   'reception.queue.visitRegistration.isChild': 'Child',
   'reception.queue.visitRegistration.isPregnancy': 'Pregnancy',
-  'reception.queue.visitRegistration.hepetitisVaccinationA':
-    'Hepetitis A Vaccination',
-  'reception.queue.visitRegistration.hepetitisVaccinationB':
-    'Hepetitis B Vaccination',
   'reception.queue.visitRegistration.isFasting': 'Fasting',
   'reception.queue.visitRegistration.isSmoking': 'Smoking',
   'reception.queue.visitRegistration.isAlcohol': 'Alcohol',

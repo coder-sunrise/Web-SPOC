@@ -80,12 +80,12 @@ class Grid extends React.Component {
   }
 
   onRowDoubleClick = row => {
-    const { visitStatus, visitPurposeFK = VISIT_TYPE.CON } = row
+    const { visitStatus, visitPurposeFK = VISIT_TYPE.BF } = row
     const isWaiting = visitStatus === VISIT_STATUS.WAITING
     const {
       clinicianProfile: { doctorProfile },
     } = this.props.user.data
-    const retailVisits = [VISIT_TYPE.OTC, VISIT_TYPE.BF, VISIT_TYPE.MC]
+    const retailVisits = [VISIT_TYPE.OTC, VISIT_TYPE.BF]
     if (!doctorProfile || retailVisits.includes(visitPurposeFK)) return false
 
     if (isWaiting) this.props.onMenuItemClick(row, '5') // start consultation context menu id = 5
@@ -146,17 +146,11 @@ class Grid extends React.Component {
     let data = [...queueList]
 
     if (selfOnly) {
-      const servePatientRight = Authorized.check('queue.servepatient')
       const userRole = user.data.clinicianProfile.userProfile.role
       const userFK = user.data.clinicianProfile.userProfile.id
-      const isServePatientEnable =
-        userRole &&
-        userRole.clinicRoleFK === 2 &&
-        servePatientRight &&
-        servePatientRight.rights !== 'hidden'
 
       data = data.filter(item => {
-        if (!item.doctor && !isServePatientEnable) return false
+        if (!item.doctor) return false
         const {
           doctor: { id },
           visitDoctor = [],
@@ -165,8 +159,7 @@ class Grid extends React.Component {
           ? visitDoctor.filter(
               d => d.doctorProfileFK === clinicianProfile.doctorProfile.id,
             ).length > 0 || id === clinicianProfile.doctorProfile.id
-          : item.servingByList.filter(o => o.servingByUserFK === userFK)
-              .length > 0
+          : true
       })
     }
 
@@ -212,8 +205,7 @@ class Grid extends React.Component {
       case VISIT_STATUS.WAITING:
         if (
           visitPurposeFK === VISIT_TYPE.OTC ||
-          visitPurposeFK === VISIT_TYPE.BF ||
-          visitPurposeFK === VISIT_TYPE.MC
+          visitPurposeFK === VISIT_TYPE.BF
         )
           id = '1'
         else id = '5'
@@ -270,21 +262,14 @@ class Grid extends React.Component {
     const queueListingData = this.computeQueueListingData()
 
     const showConsReady = Authorized.check('queue.modifyconsultationready')
-    const showVisitGroup = Authorized.check('queue.visitgroup')
 
     const queueConfig = {
       ...QueueTableConfig,
-      columns: QueueTableConfig.columns
-        .filter(col =>
-          showConsReady && showConsReady.rights === 'hidden'
-            ? col.name !== 'consReady'
-            : true,
-        )
-        .filter(col =>
-          showVisitGroup && showVisitGroup.rights === 'hidden'
-            ? col.name !== 'visitGroup'
-            : true,
-        ),
+      columns: QueueTableConfig.columns.filter(col =>
+        showConsReady && showConsReady.rights === 'hidden'
+          ? col.name !== 'consReady'
+          : true,
+      ),
     }
 
     const isLoading = showingVisitRegistration ? false : loading

@@ -50,11 +50,7 @@ class Tag extends PureComponent {
     let height = mainDivHeight - 120 - ($('.filterTagBar').height() || 0)
     if (height < 300) height = 300
 
-    let tagCategoryOptions =
-      clinicSettings.settings.isEnableLabModule ||
-      clinicSettings.settings.isEnableRadiologyModule
-        ? tagCategory
-        : tagCategory.filter(c => c.value != 'Service')
+    let tagCategoryOptions = tagCategory.filter(c => c.value != 'Service')
 
     return (
       <CardContainer hideHeader>

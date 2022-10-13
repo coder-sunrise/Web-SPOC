@@ -206,29 +206,14 @@ const testPanelSchema = Yup.object().shape({
   },
   validate: values => {
     const errors = {}
-    if (
-      values.isMedisaveHealthScreening &&
-      values.medisaveHealthScreeningDiagnosisFK == null
-    ) {
-      errors.medisaveHealthScreeningDiagnosisFK = 'This is a required field'
-    }
-
-    if (values.isOutpatientScan && values.outPatientScanDiagnosisFK == null) {
-      errors.outPatientScanDiagnosisFK = 'This is a required field'
-    }
     return errors
   },
   displayName: 'ServiceModal',
 })
 class Detail extends PureComponent {
   state = {
-    ddlIsCdmpClaimable: this.props.initialValues.isCdmpClaimable,
-    ddlMedisaveHealthScreening: this.props.initialValues
-      .isMedisaveHealthScreening,
-    ddlOutpatientScan: this.props.initialValues.isOutpatientScan,
     serviceSettings: this.props.values.ctServiceCenter_ServiceNavigation,
     modalitySettings: this.props.values.ctService_Modality,
-    testPanels: this.props.values.ctService_TestPanel,
   }
 
   tableParas = {
@@ -318,30 +303,6 @@ class Detail extends PureComponent {
     ],
   }
 
-  testPanelTableParas = {
-    columns: [{ name: 'testPanelFK', title: 'Lab Test Panel' }],
-    columnExtensions: [
-      {
-        columnName: 'testPanelFK',
-        type: 'codeSelect',
-        code: 'ctTestPanel',
-        valueField: 'id',
-        labelField: 'displayValue',
-        onChange: ({ val, row }) => {
-          const { testPanels } = this.state
-          const rs = testPanels.filter(
-            o => !o.isDeleted && o.testPanelFK === val && o.id !== row.id,
-          )
-          if (rs.length > 0) {
-            notification.error({
-              message: 'The lab test panel already exist in the list',
-            })
-          }
-        },
-      },
-    ],
-  }
-
   componentDidMount() {
     this.checkHasActiveSession()
 
@@ -389,56 +350,6 @@ class Detail extends PureComponent {
         hasActiveSession: data.length > 0,
       }
     })
-  }
-
-  initMedisaveSetting = () => {
-    const { settingClinicService } = this.props
-    if (settingClinicService.entity) {
-      this.setState({
-        ddlMedisaveHealthScreening:
-          settingClinicService.entity.isMedisaveHealthScreening,
-        ddlOutpatientScan: settingClinicService.entity.isOutpatientScan,
-        ddlIsCdmpClaimable: settingClinicService.entity.isCdmpClaimable,
-      })
-    }
-  }
-
-  onChangeMedisaveHealthScreening = e => {
-    if (e) {
-      this.setState(() => ({
-        ddlMedisaveHealthScreening: e.target.value,
-      }))
-
-      const { values, setFieldValue } = this.props
-      setFieldValue('isMedisaveHealthScreening', e.target.value)
-      if (e.target.value === false)
-        values.medisaveHealthScreeningDiagnosisFK = null
-    }
-  }
-
-  onChangeOutpatientScan = e => {
-    if (e) {
-      this.setState(() => ({
-        ddlOutpatientScan: e.target.value,
-      }))
-
-      const { values, setFieldValue } = this.props
-      setFieldValue('isOutpatientScan', e.target.value)
-      if (e.target.value === false) values.outPatientScanDiagnosisFK = null
-    }
-  }
-
-  onChangeCdmpClaimable = e => {
-    if (e) {
-      this.setState(() => ({
-        ddlIsCdmpClaimable: e.target.value,
-      }))
-    }
-
-    if (!e.target.value) {
-      this.onChangeMedisaveHealthScreening(e)
-      this.onChangeOutpatientScan(e)
-    }
   }
 
   checkIsServiceCenterUnique = ({ rows, changed }) => {
@@ -771,21 +682,13 @@ class Detail extends PureComponent {
 
     const { ctService_TestPanel: originalTestPanels } = props.initialValues
 
-    const {
-      serviceSettings,
-      ddlMedisaveHealthScreening,
-      ddlOutpatientScan,
-      ddlIsCdmpClaimable,
-      isPanelItemRequired,
-    } = this.state
+    const { serviceSettings } = this.state
     const serviceSettingsErrMsg = errors.ctServiceCenter_ServiceNavigation
     const testPanelErrMsg = errors.ctService_TestPanel
     const shoudDisableSaveButton = () =>
       serviceSettings.filter(row => !row.isDeleted).length === 0 ||
       this.validationOfFormFields(settingsFiledArray)
     const { settings = [] } = clinicSettings
-    const labAndRadiologySetting =
-      settings.isEnableLabModule || settings.isEnableRadiologyModule
     const hiddenFields = this.computeHiddenFields(this.state.serviceSettings)
     return (
       <React.Fragment>
@@ -888,79 +791,28 @@ class Detail extends PureComponent {
                       }}
                     />
                   </GridItem>
-                  {settings.isEnableMedicalCheckupModule && (
-                    <GridItem xs={6}>
-                      <Tooltip
-                        title='When this service is ordered in Medical Checkup, comment for this service will be written in the selected examination'
-                        placement='right-start'
-                      >
-                        <div>
-                          <FastField
-                            name='examinationItems'
-                            render={args => {
-                              return (
-                                <CodeSelect
-                                  label='Medical Checkup Examination'
-                                  code='ctexaminationitem'
-                                  labelField='displayValueWithCategory'
-                                  allClear={true}
-                                  maxTagCount={0}
-                                  mode='multiple'
-                                  onChange={v => {
-                                    this.handleExaminationItemChange(v)
-                                  }}
-                                  {...args}
-                                />
-                              )
-                            }}
-                          />
-                        </div>
-                      </Tooltip>
-                    </GridItem>
-                  )}
-                  {settings.isEnableMedisave && (
+                  {!hiddenFields.includes('ctService_Tag') && (
                     <GridItem xs={12}>
-                      <FastField
-                        name='isCdmpClaimable'
-                        render={args => {
-                          return (
-                            <span>
-                              <Checkbox
-                                checked={ddlIsCdmpClaimable}
-                                // formControlProps={{ className: classes.medisaveCheck }}
-                                onChange={e => this.onChangeCdmpClaimable(e)}
-                                label='CDMP Claimable'
-                                {...args}
-                              />
-                            </span>
-                          )
-                        }}
+                      <Field
+                        name='ctService_Tag'
+                        render={args => (
+                          <TagPanel
+                            label='Tags:'
+                            tagCategory='Service'
+                            defaultTagNames={this.state.serviceTags}
+                            {...args}
+                            onChange={(value, tags) =>
+                              this.handleTagPanelChange(
+                                value,
+                                tags,
+                                args.form.setFieldValue,
+                              )
+                            }
+                          ></TagPanel>
+                        )}
                       />
                     </GridItem>
                   )}
-                  {labAndRadiologySetting &&
-                    !hiddenFields.includes('ctService_Tag') && (
-                      <GridItem xs={12}>
-                        <Field
-                          name='ctService_Tag'
-                          render={args => (
-                            <TagPanel
-                              label='Tags:'
-                              tagCategory='Service'
-                              defaultTagNames={this.state.serviceTags}
-                              {...args}
-                              onChange={(value, tags) =>
-                                this.handleTagPanelChange(
-                                  value,
-                                  tags,
-                                  args.form.setFieldValue,
-                                )
-                              }
-                            ></TagPanel>
-                          )}
-                        />
-                      </GridItem>
-                    )}
                   <GridItem xs={12}>
                     <GridContainer>
                       <GridItem xs={3}>
@@ -996,18 +848,6 @@ class Detail extends PureComponent {
                           }}
                         />
                       </GridItem>
-                      {!hiddenFields.includes('isNurseActualizable') && (
-                        <GridItem xs={3}>
-                          <Field
-                            name='isNurseActualizable'
-                            render={args => {
-                              return (
-                                <Switch label='Actualized by Nurse' {...args} />
-                              )
-                            }}
-                          />
-                        </GridItem>
-                      )}
                       <GridItem xs={3}>
                         <Field
                           name='isAutoDisplayInOrderCart'
@@ -1025,95 +865,6 @@ class Detail extends PureComponent {
                   </GridItem>
                 </GridContainer>
               </div>
-              {settings.isEnableMedisave && ddlIsCdmpClaimable && (
-                <div style={{ margin: theme.spacing(1, 2) }}>
-                  <h4 style={{ fontWeight: 400 }}>
-                    <b>Medisave Settings</b>
-                  </h4>
-                  <div>
-                    <GridContainer>
-                      <GridItem
-                        xs={1}
-                        className={classes.detailHeaderContainer}
-                        style={{
-                          paddingLeft: 20,
-                          paddingTop: 10,
-                        }}
-                      >
-                        <FastField
-                          name='isMedisaveHealthScreening'
-                          render={args => {
-                            return (
-                              <Checkbox
-                                style={{ verticalAlign: 'bottom' }}
-                                checked={ddlMedisaveHealthScreening}
-                                // formControlProps={{ className: classes.medisaveCheck }}
-                                onChange={e =>
-                                  this.onChangeMedisaveHealthScreening(e)
-                                }
-                                {...args}
-                              />
-                            )
-                          }}
-                        />
-                      </GridItem>
-                      <GridItem xs={8}>
-                        <FastField
-                          name='medisaveHealthScreeningDiagnosisFK'
-                          render={args => {
-                            return (
-                              <CodeSelect
-                                label='Medisave Health Screening'
-                                code='ctmedisavehealthscreeningdiagnosis'
-                                disabled={!ddlMedisaveHealthScreening}
-                                {...args}
-                              />
-                            )
-                          }}
-                        />
-                      </GridItem>
-                      <GridItem xs={3} />
-                      <GridItem
-                        xs={1}
-                        className={classes.detailHeaderContainer}
-                        style={{
-                          paddingLeft: 20,
-                          paddingTop: 10,
-                        }}
-                      >
-                        <FastField
-                          name='isOutpatientScan'
-                          render={args => {
-                            return (
-                              <Checkbox
-                                checked={ddlOutpatientScan}
-                                // formControlProps={{ className: classes.medisaveCheck }}
-                                onChange={e => this.onChangeOutpatientScan(e)}
-                              />
-                            )
-                          }}
-                        />
-                      </GridItem>
-                      <GridItem xs={8}>
-                        <FastField
-                          name='outPatientScanDiagnosisFK'
-                          render={args => {
-                            return (
-                              <CodeSelect
-                                label='Medisave Outpatient Scan'
-                                code='ctmedisaveoutpatientscandiagnosis'
-                                disabled={!ddlOutpatientScan}
-                                {...args}
-                              />
-                            )
-                          }}
-                        />
-                      </GridItem>
-                      <GridItem xs={3} />
-                    </GridContainer>
-                  </div>
-                </div>
-              )}
               <h4 style={{ fontWeight: 400 }}>
                 <b>Service Settings</b>
               </h4>
@@ -1171,49 +922,6 @@ class Detail extends PureComponent {
                   />
                 </React.Fragment>
               )}
-
-              {!hiddenFields.includes('ctService_TestPanel') &&
-                settings.isEnableLabModule && (
-                  <React.Fragment>
-                    <h4 style={{ fontWeight: 400 }}>
-                      <b>Lab Test Panel Settings</b>
-                    </h4>
-                    {testPanelErrMsg && (
-                      <p className={classes.serviceSettingStyle}>
-                        {testPanelErrMsg}
-                      </p>
-                    )}
-                    <EditableTableGrid
-                      forceRender
-                      style={{
-                        marginTop: theme.spacing(1),
-                        margin: theme.spacing(2),
-                      }}
-                      rows={this.state.testPanels}
-                      FuncProps={{
-                        pagerConfig: {
-                          containerExtraComponent: this.PagerContent,
-                        },
-                      }}
-                      EditingProps={{
-                        showAddCommand: true,
-                        onCommitChanges: this.commitTestPanelChanges,
-                        isDeletable: row => {
-                          if (row.id && row.id <= 0) return true //Newly added row can be deletable before saving.
-
-                          const isUsedByOthers =
-                            (serviceSettings ?? []).findIndex(
-                              s => s.isUsedByOthers,
-                            ) !== -1
-
-                          return !isUsedByOthers
-                        },
-                      }}
-                      schema={testPanelSchema}
-                      {...this.testPanelTableParas}
-                    />
-                  </React.Fragment>
-                )}
             </div>
           </div>
         </GridContainer>

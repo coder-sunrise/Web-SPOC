@@ -23,39 +23,11 @@ export const COLOR = {
 }
 
 export const TYPES = [
-  // {
-  //   id: 1,
-  //   name: 'Queue',
-  // },
-  // {
-  //   id: APPNOTIFICATION_SCHEMA.LAB.id,
-  //   name: APPNOTIFICATION_SCHEMA.LAB.name,
-  // },
-  // {
-  //   id: APPNOTIFICATION_SCHEMA.RADIOLOGY.id,
-  //   name: APPNOTIFICATION_SCHEMA.RADIOLOGY.name,
-  // },
-  // {
-  //   id: APPNOTIFICATION_SCHEMA.PHARMACY.id,
-  //   name: APPNOTIFICATION_SCHEMA.PHARMACY.name,
-  // },
-  {
-    id: APPNOTIFICATION_SCHEMA.MC.id,
-    name: APPNOTIFICATION_SCHEMA.MC.name,
-  },
-  // {
-  //   id: 2,
-  //   name: 'Setting',
-  // },
   {
     id: 3,
     name: 'Error',
     excludeBadgeCount: true,
   },
-  // {
-  //   id: 4,
-  //   name: 'System Info',
-  // },
 ]
 
 export const ICONS = {

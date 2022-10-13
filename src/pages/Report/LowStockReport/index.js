@@ -9,7 +9,7 @@ const reportId = 20
 const fileName = 'Inventory Threshold Report'
 
 class LowStockReport extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       ...this.state,
@@ -22,7 +22,7 @@ class LowStockReport extends ReportBase {
     return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
   }
 
-  renderContent = (reportDatas) => {
+  renderContent = reportDatas => {
     return <LowStockList reportDatas={reportDatas} />
   }
 }
@@ -30,7 +30,7 @@ class LowStockReport extends ReportBase {
 const LowStockReportWithFormik = withFormik({
   validationSchema: Yup.object().shape({}),
   mapPropsToValues: () => ({
-    inventoryType: 'MEDICATION',
+    inventoryType: 'CONSUMABLE',
     Status: 'active',
     ThresholdType: 'All',
   }),

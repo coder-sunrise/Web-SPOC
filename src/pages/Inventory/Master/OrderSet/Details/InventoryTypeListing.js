@@ -427,85 +427,6 @@ const InventoryTypeListing = ({
     row.subTotal = row.quantity * row.unitPrice
   }
 
-  const medicationProps = {
-    columns: [
-      { name: 'inventoryMedicationFK', title: 'Medication Name' },
-      { name: 'quantity', title: 'Quantity' },
-      { name: 'unitPrice', title: 'Unit Price' },
-      { name: 'subTotal', title: 'Amount' },
-    ],
-
-    columnExtensions: [
-      {
-        columnName: 'inventoryMedicationFK',
-        type: 'select',
-        labelField: 'displayValue', // name
-        options: medicationList,
-        onChange: handleItemOnChange,
-      },
-      {
-        columnName: 'quantity',
-        width: 150,
-        type: 'number',
-        format: '0.0',
-        onChange: calSubtotal,
-      },
-      {
-        columnName: 'unitPrice',
-        width: 150,
-        type: 'number',
-        currency: true,
-        onChange: calSubtotal,
-      },
-      {
-        columnName: 'subTotal',
-        width: 150,
-        type: 'number',
-        currency: true,
-        disabled: true,
-      },
-    ],
-  }
-
-  const vaccinationProps = {
-    columns: [
-      { name: 'inventoryVaccinationFK', title: 'Vaccination' },
-      { name: 'quantity', title: 'Quantity' },
-      { name: 'unitPrice', title: 'Unit Price' },
-      { name: 'subTotal', title: 'Amount' },
-    ],
-    columnExtensions: [
-      {
-        columnName: 'inventoryVaccinationFK',
-        type: 'select',
-        labelField: 'displayValue',
-        options: vaccinationList,
-        onChange: handleItemOnChange,
-      },
-      {
-        columnName: 'quantity',
-        width: 150,
-        type: 'number',
-        format: '0.0',
-        onChange: calSubtotal,
-      },
-      {
-        columnName: 'unitPrice',
-        width: 150,
-        type: 'number',
-        currency: true,
-        onChange: calSubtotal,
-      },
-      {
-        columnName: 'subTotal',
-        width: 150,
-        type: 'number',
-        currency: true,
-        disabled: true,
-      },
-    ],
-  }
-
   const consumableProps = {
     columns: [
       { name: 'inventoryConsumableFK', title: 'Consumable Name' },
@@ -663,15 +584,6 @@ const InventoryTypeListing = ({
     ],
   }
 
-  const medicationEditingProps = {
-    messages: {
-      deleteCommand: 'Delete medication',
-    },
-    showAddCommand: true,
-    onCommitChanges: onCommitChanges('medicationOrderSetItem'),
-    onAddedRowsChange: onAddedRowsChange('medication'),
-  }
-
   const consumableEditingProps = {
     messages: {
       deleteCommand: 'Delete consumable',
@@ -679,15 +591,6 @@ const InventoryTypeListing = ({
     showAddCommand: true,
     onAddedRowsChange: onAddedRowsChange('consumable'),
     onCommitChanges: onCommitChanges('consumableOrderSetItem'),
-  }
-
-  const vaccinationEditingProps = {
-    messages: {
-      deleteCommand: 'Delete vaccination',
-    },
-    showAddCommand: true,
-    onCommitChanges: onCommitChanges('vaccinationOrderSetItem'),
-    onAddedRowsChange: onAddedRowsChange('vaccination'),
   }
 
   const serviceEditingProps = {
@@ -725,16 +628,6 @@ const InventoryTypeListing = ({
             padding: 10,
           }}
         >
-          <Authorized authority='inventorymaster.orderset.medication'>
-            <InventoryType
-              title='Medication'
-              inventoryTypeProps={medicationProps}
-              schema={medicationSchema}
-              rows={medicationRows}
-              editingProps={medicationEditingProps}
-            />
-          </Authorized>
-
           <Authorized authority='inventorymaster.orderset.consumable'>
             <InventoryType
               title='Consumable'
@@ -746,16 +639,6 @@ const InventoryTypeListing = ({
             />
           </Authorized>
 
-          <Authorized authority='inventorymaster.orderset.vaccination'>
-            <InventoryType
-              title='Vaccination'
-              inventoryTypeProps={vaccinationProps}
-              schema={vaccinationSchema}
-              rows={vaccinationRows}
-              editingProps={vaccinationEditingProps}
-              style={{ marginTop: 15 }}
-            />
-          </Authorized>
           <Authorized authority='inventorymaster.orderset.service'>
             <InventoryType
               title='Service'

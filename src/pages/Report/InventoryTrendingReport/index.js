@@ -14,7 +14,7 @@ const reportId = 37
 const fileName = 'Inventory Trending Report'
 
 class InventoryTrendingReport extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       ...this.state,
@@ -33,7 +33,7 @@ class InventoryTrendingReport extends ReportBase {
     )
   }
 
-  renderContent = (reportDatas) => {
+  renderContent = reportDatas => {
     return (
       <GridContainer>
         <GridItem md={12}>
@@ -52,10 +52,14 @@ const InventoryTrendingReportWithFormik = withFormik({
     listingFrom: Yup.date().required(),
   }),
   mapPropsToValues: () => ({
-    listingFrom: moment(new Date()).startOf('month').toDate(),
-    listingTo: moment(new Date()).endOf('month').toDate(),
+    listingFrom: moment(new Date())
+      .startOf('month')
+      .toDate(),
+    listingTo: moment(new Date())
+      .endOf('month')
+      .toDate(),
     viewBy: 'Monthly',
-    inventoryType: 'MEDICATION',
+    inventoryType: 'CONSUMABLE',
   }),
 })(InventoryTrendingReport)
 

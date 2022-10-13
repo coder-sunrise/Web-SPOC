@@ -19,13 +19,12 @@ class BasicData extends Component {
     this.visitTypeSetting = JSON.parse(
       props.clinicSettings.settings.visitTypeSetting,
     )
-    const { genderFK, defaultSelectMedicalCheckup = false } = props
+    const { genderFK } = props
     this.state = {
       data: defaultData,
       columns: defaultColumns(genderFK),
       currentPage: 0,
       total: 0,
-      isOnlySearchMC: defaultSelectMedicalCheckup,
       loadedData: [],
     }
   }
@@ -231,18 +230,6 @@ class BasicData extends Component {
     return (
       <div>
         <div style={{ position: 'relative', height: 40 }}>
-          {clinicSettings.settings.isEnableMedicalCheckupModule && (
-            <Checkbox
-              checked={this.state.isOnlySearchMC}
-              label='Display Medical Check Up Only'
-              onChange={e => {
-                this.setState(
-                  { isOnlySearchMC: e.target.value },
-                  this.updateData,
-                )
-              }}
-            />
-          )}
           <div
             style={{
               position: 'absolute',

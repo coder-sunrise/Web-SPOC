@@ -22,52 +22,16 @@ export const ValidationSchema = Yup.object().shape({
     then: Yup.string().required(requiredMsg),
   }),
   paymentList: Yup.array().when(
-    ['totalAmtPaid', 'isGroupPayment', 'invoiceOSAmount', 'currentPayable'],
-    (totalAmtPaid, isGroupPayment, invoiceOSAmount, currentPayable, schema) => {
+    ['totalAmtPaid', 'invoiceOSAmount', 'currentPayable'],
+    (totalAmtPaid, invoiceOSAmount, currentPayable, schema) => {
       const min = 0.01
       const minMsg = 'Amount must be greater than $0.00'
-      const minMsg_FullyPaid =
-        'Outstanding balance of current visit group must to be fully paid.'
       const max = currentPayable
       const maxMsg = 'paid cannot exceed'
 
       const isOverpaid = totalAmtPaid > currentPayable
       const isOutstanding = totalAmtPaid < currentPayable
 
-      if (isGroupPayment) {
-        return schema.of(
-          Yup.object().shape({
-            id: Yup.number(),
-            paymentModeFK: Yup.number().required(),
-            amt: Yup.number().when(['isDeposit'], (isDeposit, schema) => {
-              const newMinMsg = isOutstanding ? minMsg_FullyPaid : minMsg
-              if (isDeposit) {
-                const newMin = isOutstanding ? invoiceOSAmount : min
-                const newMax = invoiceOSAmount
-                return schema
-                  .min(newMin, newMinMsg)
-                  .max(newMax, `Deposit ${maxMsg} $${roundTo(newMax)}`)
-                  .required()
-              }
-              const newMin = isOutstanding ? currentPayable : min
-              const newMax = isOverpaid ? min : currentPayable
-              return schema
-                .min(newMin, newMinMsg)
-                .max(
-                  newMax,
-                  `Total amount ${maxMsg} $${roundTo(currentPayable)}`,
-                )
-                .required()
-            }),
-            creditCardPayment: Yup.object().when('paymentModeFK', {
-              is: val => val === PAYMENT_MODE.CREDIT_CARD,
-              then: Yup.object().shape({
-                creditCardTypeFK: Yup.string().required(),
-              }),
-            }),
-          }),
-        )
-      }
       return schema.of(
         Yup.object().shape({
           id: Yup.number(),
@@ -96,7 +60,6 @@ export const ValidationSchema = Yup.object().shape({
       )
 
       if (cashPayment.length > 0) {
-        // const minAmount = cashPayment[0].amt
         return Yup.number()
           .min(
             _cashAfterRounding,
@@ -117,41 +80,6 @@ export const paymentTypes = {
   cheque: 'Cheque',
   giro: 'Giro',
 }
-
-// export const InitialValue = {
-//   [PAYMENT_MODE.CASH]: {
-//     amt: null,
-//     remarks: '',
-//   },
-//   [PAYMENT_MODE.NETS]: {
-//     amt: null,
-//     remarks: '',
-//     netsPayment: {
-//       refNo: null,
-//     },
-//   },
-//   [PAYMENT_MODE.CREDIT_CARD]: {
-//     amt: null,
-//     remarks: '',
-//     creditCardPayment: {
-//       creditCardTypeFK: undefined,
-//       creditCardNo: undefined,
-//     },
-//   },
-//   [PAYMENT_MODE.CHEQUE]: {
-//     amt: null,
-//     remarks: '',
-//     chequePayment: { chequeNo: null },
-//   },
-//   [PAYMENT_MODE.GIRO]: {
-//     amt: null,
-//     remarks: '',
-//     giroPayment: {
-//       refNo: null,
-//     },
-//   },
-// }
-
 export const getLargestID = list => {
   return list.reduce(
     (largestID, item) => (item.id > largestID ? item.id : largestID),

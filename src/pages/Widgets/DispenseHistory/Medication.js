@@ -1,6 +1,5 @@
 import React from 'react'
 import { CardContainer } from '@/components'
-import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import numeral from 'numeral'
 import { currencySymbol } from '@/utils/config'
 import moment from 'moment'
@@ -16,14 +15,6 @@ export default ({
   clinicSettings,
   isFullScreen = true,
 }) => {
-  const drugMixtureIndicator = (row, right) => {
-    if (!row.isDrugMixture) return null
-
-    return (
-      <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
-    )
-  }
-
   const showCurrency = (value = 0) => {
     if (value >= 0)
       return (
@@ -38,7 +29,7 @@ export default ({
     )
   }
 
-  const tableColumns = showDrugLabelRemark => [
+  const tableColumns = () => [
     {
       dataIndex: 'visitDate',
       title: 'Date',
@@ -83,32 +74,6 @@ export default ({
                 <div>{row.name}</div>
               </Tooltip>
               <div style={{ position: 'absolute', top: '-1px', right: '-4px' }}>
-                <div
-                  style={{
-                    display: 'inline-block',
-                    position: 'relative',
-                  }}
-                >
-                  {drugMixtureIndicator(row)}
-                </div>
-                {(row.isPreOrder || row.isActualizedPreOrder) && (
-                  <Tooltip
-                    title={
-                      row.isPreOrder ? 'New Pre-Order' : 'Actualized Pre-Order'
-                    }
-                  >
-                    <div
-                      className={classes.rightIcon}
-                      style={{
-                        borderRadius: 4,
-                        backgroundColor: row.isPreOrder ? '#4255bd' : 'green',
-                        display: 'inline-block',
-                      }}
-                    >
-                      Pre
-                    </div>
-                  </Tooltip>
-                )}
                 {row.isExclusive && (
                   <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                     <div
@@ -193,15 +158,10 @@ export default ({
       dataIndex: 'remarks',
       title: 'Remarks',
       render: (text, row) => {
-        const existsDrugLabelRemarks =
-          showDrugLabelRemark &&
-          row.drugLabelRemarks &&
-          row.drugLabelRemarks.trim() !== ''
         return (
           <div style={{ position: 'relative' }}>
             <div
               style={{
-                paddingRight: existsDrugLabelRemarks ? 10 : 0,
                 minHeight: 20,
               }}
             >
@@ -209,38 +169,11 @@ export default ({
                 <span className='oneline_textblock'> {row.remarks || ' '}</span>
               </Tooltip>
             </div>
-            <div style={{ position: 'relative', top: 6 }}>
-              {existsDrugLabelRemarks && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: 2,
-                    right: -8,
-                  }}
-                >
-                  <Tooltip
-                    title={
-                      <div>
-                        <div style={{ fontWeight: 500 }}>
-                          Drug Label Remarks
-                        </div>
-                        <div>{row.drugLabelRemarks}</div>
-                      </div>
-                    }
-                  >
-                    <FileCopySharp style={{ color: '#4255bd' }} />
-                  </Tooltip>
-                </div>
-              )}
-            </div>
           </div>
         )
       },
     },
   ]
-
-  const { labelPrinterSize } = clinicSettings.settings
-  const showDrugLabelRemark = labelPrinterSize === '8.0cmx4.5cm_V2'
 
   return (
     <div style={{ padding: 8 }}>
@@ -248,7 +181,7 @@ export default ({
         size='small'
         bordered
         pagination={false}
-        columns={tableColumns(showDrugLabelRemark)}
+        columns={tableColumns}
         dataSource={current.prescription || []}
         rowClassName={(record, index) => {
           return index % 2 === 0 ? tablestyles.once : tablestyles.two

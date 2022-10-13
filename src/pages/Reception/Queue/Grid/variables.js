@@ -2,11 +2,7 @@ import React, { Fragment } from 'react'
 import moment from 'moment'
 import { InvoiceReplacement } from '@/components/Icon/customIcons'
 // components
-import {
-  DoctorLabel,
-  CallingQueueButton,
-  ServePatientButton,
-} from '@/components/_medisys'
+import { DoctorLabel, CallingQueueButton } from '@/components/_medisys'
 import {
   CodeSelect,
   DateFormatter,
@@ -19,10 +15,7 @@ import { calculateAgeFromDOB } from '@/utils/dateUtils'
 // variables
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import Authorized from '@/utils/Authorized'
-import NurseWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/NurseWorkItemInfo'
-import RadioWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/RadioWorkItemInfo'
-import LabWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/LabWorkItemInfo'
-import { VISIT_TYPE, WORK_ITEM_TYPES } from '@/utils/constants'
+import { VISIT_TYPE } from '@/utils/constants'
 import DoctorConsultationStatus from './DoctorConsultationStatus'
 import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 
@@ -56,13 +49,6 @@ const compareQueueNo = (a, b) => {
   }
 
   return floatA < floatB ? -1 : 1
-}
-
-const mapServingPersonsString = servingByList =>
-  servingByList && servingByList.map(o => o.servingBy).join(', ')
-
-const compareServingPerson = (a, b) => {
-  return compareString(mapServingPersonsString(a), mapServingPersonsString(b))
 }
 
 export const FuncConfig = {
@@ -177,14 +163,11 @@ export const QueueTableConfig = {
   columns: [
     { name: 'visitStatus', title: 'Status' },
     { name: 'queueNo', title: 'Q. No.' },
-    { name: 'visitGroup', title: 'Group No.' },
     {
       name: 'consReady',
       title: 'Cons. Ready',
       fullTitle: 'Ready for Consultation',
     },
-    { name: 'workItemSummary', title: 'Work Item' },
-    { name: 'servingByList', title: 'Serving By' },
     { name: 'patientReferenceNo', title: 'Ref. No.' },
     { name: 'patientName', title: 'Patient Name' },
     { name: 'orderCreateTime', title: 'Order Created Time' },
@@ -247,10 +230,7 @@ export const QueueColumnExtensions = props => {
       },
     },
     { columnName: 'patientAccountNo', compare: compareString, width: 120 },
-    {
-      columnName: 'visitGroup',
-      align: 'center',
-    },
+
     {
       columnName: 'invoiceNo',
       width: 120,
@@ -419,15 +399,7 @@ export const QueueColumnExtensions = props => {
     {
       columnName: 'doctor',
       render: row => {
-        if (row.visitPurposeFK !== VISIT_TYPE.MC) {
-          return <DoctorLabel type='shortName' doctor={row.doctor} hideMCR />
-        }
-        return (
-          <DoctorConsultationStatus
-            type='shortName'
-            visitDoctor={row.visitDoctor}
-          />
-        )
+        return <DoctorLabel type='shortName' doctor={row.doctor} hideMCR />
       },
       sortingEnabled: false,
       width: 280,
@@ -443,94 +415,6 @@ export const QueueColumnExtensions = props => {
           ></VisitOrderTemplateIndicateString>
         ) : (
           <span>-</span>
-        )
-      },
-    },
-    {
-      columnName: 'workItemSummary',
-      width: 140,
-      render: row => {
-        const labWorkItems = row.workItemSummary.find(
-          t => t.type === WORK_ITEM_TYPES.LAB,
-        )
-        const radioWorkItems = row.workItemSummary.find(
-          t => t.type === WORK_ITEM_TYPES.RADIOLOGY,
-        )
-        const nurseWorkItems = row.workItemSummary.find(
-          t => t.type === WORK_ITEM_TYPES.NURSEACTUALIZE,
-        )
-        const labWorkItemsAccessRight = Authorized.check(
-          'queue.workitem.labworkitem',
-        ) || { rights: 'hidden' }
-        const radiologyWorkItemsAccessRight = Authorized.check(
-          'queue.workitem.radiologyworkitem',
-        ) || { rights: 'hidden' }
-        const nurseWorkItemsAccessRight = Authorized.check(
-          'queue.workitem.nurseworkitem',
-        ) || { rights: 'hidden' }
-        return (
-          <div style={{ justifyContent: 'space-between' }}>
-            {labWorkItemsAccessRight.rights === 'enable' &&
-              labWorkItems &&
-              labWorkItems.totalWorkItem > 0 && (
-                <LabWorkItemInfo
-                  visitFK={row.visitFK}
-                  workItemSummary={labWorkItems}
-                />
-              )}
-            {radiologyWorkItemsAccessRight.rights === 'enable' &&
-              radioWorkItems &&
-              radioWorkItems.totalWorkItem > 0 && (
-                <RadioWorkItemInfo
-                  visitFK={row.visitFK}
-                  workItemSummary={radioWorkItems}
-                />
-              )}
-            {nurseWorkItemsAccessRight.rights === 'enable' &&
-              nurseWorkItems &&
-              nurseWorkItems.totalWorkItem > 0 && (
-                <NurseWorkItemInfo
-                  visitFK={row.visitFK}
-                  workItemSummary={nurseWorkItems}
-                />
-              )}
-          </div>
-        )
-      },
-    },
-    {
-      columnName: 'servingByList',
-      compare: compareServingPerson,
-      width: 130,
-      render: row => {
-        const servingPersons = mapServingPersonsString(row.servingByList)
-        return (
-          <Fragment>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'left',
-              }}
-            >
-              <Tooltip title={servingPersons}>
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {servingPersons}
-                </span>
-              </Tooltip>
-              <div>
-                {row.visitFK && (
-                  <Authorized authority='queue.servepatient'>
-                    <ServePatientButton
-                      visitFK={row.visitFK}
-                      servingPersons={row.servingByList}
-                      patientName={row.patientName}
-                    />
-                  </Authorized>
-                )}
-              </div>
-            </div>
-          </Fragment>
         )
       },
     },

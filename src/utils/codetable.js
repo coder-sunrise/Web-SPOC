@@ -40,12 +40,6 @@ const customCodetablePath = new Map([
     },
   ],
   [
-    'inventorymedication',
-    {
-      path: '/fororder',
-    },
-  ],
-  [
     'clinicianprofile',
     {
       path: '/codetable',
@@ -100,19 +94,6 @@ const tenantCodesMap = new Map([
     },
   ],
   [
-    'ctdrugallergy',
-    {
-      ...defaultParams,
-    },
-  ],
-  [
-    'inventorymedication',
-    {
-      ...defaultParams,
-      sorting: [{ columnName: 'displayValue', direction: 'asc' }],
-    },
-  ],
-  [
     'inventoryconsumable',
     {
       ...defaultParams,
@@ -120,21 +101,7 @@ const tenantCodesMap = new Map([
     },
   ],
   [
-    'inventoryvaccination',
-    {
-      ...defaultParams,
-      sorting: [{ columnName: 'displayValue', direction: 'asc' }],
-    },
-  ],
-  [
     'inventoryorderset',
-    {
-      ...defaultParams,
-      sorting: [{ columnName: 'displayValue', direction: 'asc' }],
-    },
-  ],
-  [
-    'package',
     {
       ...defaultParams,
       sorting: [{ columnName: 'displayValue', direction: 'asc' }],
@@ -185,30 +152,6 @@ const tenantCodesMap = new Map([
     },
   ],
   [
-    'ctmedicationfrequency',
-    {
-      ...defaultParams,
-    },
-  ],
-  [
-    'ctmedicationdosage',
-    {
-      ...defaultParams,
-    },
-  ],
-  [
-    'ctmedicationunitofmeasurement',
-    {
-      ...defaultParams,
-    },
-  ],
-  [
-    'ctmedicationusage',
-    {
-      ...defaultParams,
-    },
-  ],
-  [
     'copaymentscheme',
     {
       ...defaultParams,
@@ -219,12 +162,6 @@ const tenantCodesMap = new Map([
     {
       ...defaultParams,
       sorting: [{ columnName: 'displayValue', direction: 'asc' }],
-    },
-  ],
-  [
-    'ctmedicationprecaution',
-    {
-      ...defaultParams,
     },
   ],
   [
@@ -242,12 +179,6 @@ const tenantCodesMap = new Map([
   ],
   [
     'ctcasedescription',
-    {
-      ...defaultParams,
-    },
-  ],
-  [
-    'cttestpanelitemresultoption',
     {
       ...defaultParams,
     },
@@ -285,43 +216,7 @@ const tenantCodesMap = new Map([
     },
   ],
   [
-    'ctmedicationcontraindication',
-    {
-      ...defaultParams,
-    },
-  ],
-  [
-    'ctmedicationinteraction',
-    {
-      ...defaultParams,
-    },
-  ],
-  [
-    'ctmedicationsideeffect',
-    {
-      ...defaultParams,
-    },
-  ],
-  [
-    'ctgenericmedication',
-    {
-      ...defaultParams,
-    },
-  ],
-  [
-    'ctadministrationroute',
-    {
-      ...defaultParams,
-    },
-  ],
-  [
     'ctchecklist',
-    {
-      ...defaultParams,
-    },
-  ],
-  [
-    'cttestpanelitem',
     {
       ...defaultParams,
     },
@@ -336,24 +231,6 @@ const tenantCodesMap = new Map([
     'ctcalendarresource',
     {
       pagesize: 99999,
-    },
-  ],
-  [
-    'ctexaminationitem',
-    {
-      ...defaultParams,
-    },
-  ],
-  [
-    'ctindividualcomment',
-    {
-      ...defaultParams,
-    },
-  ],
-  [
-    'ctsummarycomment',
-    {
-      ...defaultParams,
     },
   ],
   [

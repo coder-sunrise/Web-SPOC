@@ -49,18 +49,13 @@ import {
   consultationDocumentTypes,
   ReportsOnSignOffOption,
 } from '@/utils/codes'
-import ConsumePackage from '@/pages/Widgets/Orders/Detail/ConsumePackage'
 import service from '@/services/consultation'
 import AutoPrintSelection from './autoPrintSelection'
 
-// import PatientSearch from '@/pages/PatientDatabase/Search'
-// import PatientDetail from '@/pages/PatientDatabase/Detail'
-// import Test from './Test'
 import Layout from './Layout'
 
 import schema from './schema'
 import styles from './style'
-import { getDrugLabelPrintData } from '../Shared/Print/DrugLabelPrint'
 import { getRawData } from '@/services/report'
 import * as config from '@/utils/config'
 import './Main.css'
@@ -128,25 +123,6 @@ const generatePrintData = async (
       }
       return []
     }
-    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.DrugLabel) > -1) {
-      // const { versionNumber } = values
-      // versionNumber === 1 &&
-      if (orders && orders.rows) {
-        const { rows = [] } = orders
-        // prescriptionItems
-        const prescriptionItems = rows.filter(
-          f => f.type === '1' && !f.isDeleted,
-        )
-        let drugLabelData = await getDrugLabelPrintData(
-          settings,
-          patient.entity,
-          visitEntity.id,
-          prescriptionItems,
-        )
-        if (drugLabelData && drugLabelData.length > 0)
-          printData = printData.concat(drugLabelData)
-      }
-    }
     if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.Memo) > -1)
       printData = printData.concat(getPrintData('Memo', corMemo))
     if (
@@ -168,40 +144,6 @@ const generatePrintData = async (
       printData = printData.concat(
         getPrintData('Referral Letter', corReferralLetter),
       )
-    if (
-      reportsOnSignOff.indexOf(ReportsOnSignOffOption.VaccinationCertificate) >
-      -1
-    )
-      printData = printData.concat(
-        getPrintData('Vaccination Certificate', corVaccinationCert),
-      )
-    if (
-      reportsOnSignOff.indexOf(ReportsOnSignOffOption.PrescriptionSheet) > -1
-    ) {
-      const { rows = [] } = orders || {}
-      if (rows.length > 0) {
-        // drug & consumable (pharmacy item)
-        const anyPharmacyItem = rows.some(
-          f =>
-            !f.isDeleted &&
-            !f.isPreOrder &&
-            !f.isExternalPrescription &&
-            f.isDispensedByPharmacy &&
-            ['1', '2', '4'].some(x => x === f.type),
-        )
-        if (anyPharmacyItem)
-          printData = printData.concat([
-            {
-              item: ReportsOnSignOffOption.PrescriptionSheet,
-              description: ReportsOnSignOffOption.PrescriptionSheet,
-              Copies: 1,
-              print: true,
-              ReportId: REPORT_ID.PRESCRIPTIONA4,
-              ReportDate: null,
-            },
-          ])
-      }
-    }
     return printData
   }
   return []
@@ -248,79 +190,16 @@ const autoPrintSelection = async (action, props) => {
               if (result && result.length > 0) {
                 let printedData = result
                 const token = localStorage.getItem('token')
-                if (
-                  printedData.some(x => x.ReportId === REPORT_ID.PRESCRIPTIONA4)
-                ) {
-                  const {
-                    visitRegistration: {
-                      entity: {
-                        visit: { id: visitFK, patientProfileFK },
-                      },
-                    },
-                  } = props
-                  getRawData(REPORT_ID.PRESCRIPTIONA4, {
-                    visitFK,
-                    patientProfileFK,
-                  }).then(r => {
-                    const { getClinic } = config
-                    const { systemTimeZoneInt = 0 } = getClinic() || {}
-                    printedData = printedData.map(item => {
-                      return {
-                        ReportId: item.ReportId,
-                        DocumentName:
-                          item.ReportId === REPORT_ID.PRESCRIPTIONA4
-                            ? item.description
-                            : `${item.item}(${item.description})`,
-                        ReportData:
-                          item.ReportId === REPORT_ID.PRESCRIPTIONA4
-                            ? JSON.stringify(
-                                (delete r.ReportSettingParameter,
-                                delete r.ReportContext,
-                                {
-                                  ...r,
-                                  PatientInfo: r.PatientInfo.map(x => ({
-                                    ...x,
-                                    dob: moment(x.dob)
-                                      .add(-systemTimeZoneInt, 'hour')
-                                      .formatUTC(false),
-                                    orderDate: moment(x.orderDate)
-                                      .add(-systemTimeZoneInt, 'hour')
-                                      .formatUTC(false),
-                                    _dobIn: false,
-                                    _orderDateIn: false,
-                                  })),
-                                  PrescriptionInfo: r.PrescriptionInfo.map(
-                                    x => ({
-                                      ...x,
-                                      updateDate: moment(x.updateDate)
-                                        .add(-systemTimeZoneInt, 'hour')
-                                        .formatUTC(false),
-                                      _updateDateIn: false,
-                                    }),
-                                  ),
-                                }),
-                              )
-                            : item.ReportData,
-                        Copies: item.Copies,
-                        Token: token,
-                        BaseUrl: process.env.url,
-                      }
-                    })
-                    handlePrint(JSON.stringify(printedData))
-                    dispatch({ type: 'consultation/closeModal' })
-                  })
-                } else {
-                  printedData = printedData.map(item => ({
-                    ReportId: item.ReportId,
-                    DocumentName: `${item.item}(${item.description})`,
-                    ReportData: item.ReportData,
-                    Copies: item.Copies,
-                    Token: token,
-                    BaseUrl: process.env.url,
-                  }))
-                  handlePrint(JSON.stringify(printedData))
-                  dispatch({ type: 'consultation/closeModal' })
-                }
+                printedData = printedData.map(item => ({
+                  ReportId: item.ReportId,
+                  DocumentName: `${item.item}(${item.description})`,
+                  ReportData: item.ReportData,
+                  Copies: item.Copies,
+                  Token: token,
+                  BaseUrl: process.env.url,
+                }))
+                handlePrint(JSON.stringify(printedData))
+                dispatch({ type: 'consultation/closeModal' })
               } else {
                 dispatch({ type: 'consultation/closeModal' })
               }
@@ -356,16 +235,10 @@ const saveConsultation = ({
   } = props
   const { entity: vistEntity = {} } = visitRegistration
   const { visit = {} } = vistEntity
-  const { visitPurposeFK = VISIT_TYPE.CON } = visit
+  const { visitPurposeFK = VISIT_TYPE.BF } = visit
 
   let settings = JSON.parse(localStorage.getItem('clinicSettings'))
   const { diagnosisDataSource } = settings
-
-  const { isEnablePharmacyModule } = clinicSettings
-  if (isEnablePharmacyModule) {
-    values.isPrescriptionSheetUpdated = isPharmacyOrderUpdated(orders,true)
-    values.isPharmacyOrderUpdated = isPharmacyOrderUpdated(orders)
-  }
 
   const onConfirmSave = () => {
     const newValues = convertToConsultation(
@@ -435,24 +308,6 @@ const saveConsultation = ({
             visitID: id,
           })
         }
-        if (values.isPharmacyOrderUpdated) {
-          const userProfile = user.data.clinicianProfile
-          const userName = `${
-            userProfile.title && userProfile.title.trim().length
-              ? `${userProfile.title}. ${userProfile.name || ''}`
-              : `${userProfile.name || ''}`
-          }`
-          const message = `${userName} amended prescription at ${moment().format(
-            'HH:mm',
-          )}`
-          sendNotification('PharmacyOrderUpdate', {
-            type: NOTIFICATION_TYPE.CONSULTAION,
-            status: NOTIFICATION_STATUS.OK,
-            message,
-            visitID: id,
-          })
-        }
-
         sessionStorage.removeItem(`${values.id}_consultationTimer`)
         if (successCallback) {
           successCallback()
@@ -480,26 +335,6 @@ const discardConsultation = ({ dispatch, values, user, visitRegistration }) => {
     dispatch({
       type: `consultation/discard`,
       payload: cleanConsultation(values),
-    }).then(r => {
-      if (r && values.versionNumber === 1) {
-        const { entity: visit = {} } = visitRegistration
-        const { id } = visit
-        const userProfile = user.data.clinicianProfile
-        const userName = `${
-          userProfile.title && userProfile.title.trim().length
-            ? `${userProfile.title}. ${userProfile.name || ''}`
-            : `${userProfile.name || ''}`
-        }`
-        const message = `${userName} discard prescription at ${moment().format(
-          'HH:mm',
-        )}`
-        sendNotification('PharmacyOrderDiscard', {
-          type: NOTIFICATION_TYPE.CONSULTAION,
-          status: NOTIFICATION_STATUS.OK,
-          message,
-          visitID: id,
-        })
-      }
     })
   } else {
     dispatch({
@@ -527,13 +362,9 @@ const pauseConsultation = async ({
   } = rest
   const { entity: vistEntity = {} } = visitRegistration
   const { visit = {} } = vistEntity
-  const { visitPurposeFK = VISIT_TYPE.CON } = visit
+  const { visitPurposeFK = VISIT_TYPE.BF } = visit
   let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-  const { diagnosisDataSource, isEnablePharmacyModule } = settings
-  if (isEnablePharmacyModule) {
-    values.isPrescriptionSheetUpdated = isPharmacyOrderUpdated(orders,true)
-    values.isPharmacyOrderUpdated = isPharmacyOrderUpdated(orders)
-  }
+  const { diagnosisDataSource } = settings
   const newValues = convertToConsultation(
     {
       ...values,
@@ -598,25 +429,6 @@ const pauseConsultation = async ({
         notification.success({
           message: 'Consultation paused.',
         })
-        if (values.isPharmacyOrderUpdated) {
-          const { entity: visit = {} } = visitRegistration
-          const { id } = visit
-          const userProfile = user.data.clinicianProfile
-          const userName = `${
-            userProfile.title && userProfile.title.trim().length
-              ? `${userProfile.title}. ${userProfile.name || ''}`
-              : `${userProfile.name || ''}`
-          }`
-          const message = `${userName} amended prescription at ${moment().format(
-            'HH:mm',
-          )}`
-          sendNotification('PharmacyOrderUpdate', {
-            type: NOTIFICATION_TYPE.CONSULTAION,
-            status: NOTIFICATION_STATUS.OK,
-            message,
-            visitID: id,
-          })
-        }
         dispatch({ type: 'consultation/closeModal' })
       }
     })
@@ -714,11 +526,6 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
   handleSubmit: async (values, { props }) => {
     const { dispatch, handlePrint, orders = {}, clinicSettings } = props
     const { summary } = orders
-    const { isEnablePharmacyModule } = clinicSettings
-    if (isEnablePharmacyModule) {
-    values.isPrescriptionSheetUpdated = isPharmacyOrderUpdated(orders,true)
-    values.isPharmacyOrderUpdated = isPharmacyOrderUpdated(orders)
-    }
     if (!(await autoPrintSelection('sign', { values, ...props }))) {
       saveConsultation({
         props: {
@@ -1052,7 +859,7 @@ class Main extends React.Component {
       const { entity: vistEntity = {} } = visitRegistration
       const { visit = {} } = vistEntity
       const {
-        visitPurposeFK = VISIT_TYPE.CON,
+        visitPurposeFK = VISIT_TYPE.BF,
         visitStatus = VISIT_STATUS.DISPENSE,
       } = visit
 
@@ -1068,8 +875,7 @@ class Main extends React.Component {
       }
 
       if (
-        (visitPurposeFK === VISIT_TYPE.BF ||
-          visitPurposeFK === VISIT_TYPE.MC) &&
+        visitPurposeFK === VISIT_TYPE.BF &&
         visitStatus === VISIT_STATUS.BILLING &&
         isModifiedOrder
       ) {
@@ -1377,11 +1183,8 @@ class Main extends React.Component {
       'corMemo',
       'corOrderAdjustment',
       'corOtherDocuments',
-      'corPrescriptionItem',
       'corReferralLetter',
       'corService',
-      'corVaccinationCert',
-      'corVaccinationItem',
     ]
     const currentValue = convertToConsultation(exist, {
       orders,
@@ -1462,31 +1265,6 @@ class Main extends React.Component {
     })
   }
 
-  onSelectPreOrder = (selectPreOrder = []) => {
-    const {
-      orders,
-      dispatch,
-      codetable,
-      visitRegistration,
-      patient,
-      user,
-      clinicSettings,
-    } = this.props
-
-    dispatch({
-      type: 'orders/upsertRows',
-      payload: getOrdersData({
-        selectPreOrder,
-        orders,
-        codetable,
-        visitRegistration,
-        patient,
-        user,
-        clinicSettings,
-      }),
-    })
-  }
-
   render() {
     const {
       props,
@@ -1527,18 +1305,6 @@ class Main extends React.Component {
           : rights,
     }
     const { rows } = orders
-    const draftPreOrderItem = patient?.entity?.pendingPreOrderItem?.map(po => {
-      const selectPreOrder = rows.find(
-        apo => apo.actualizedPreOrderItemFK === po.id,
-      )
-      if (selectPreOrder) {
-        return {
-          ...po,
-          preOrderItemStatus: selectPreOrder.isDeleted ? 'New' : 'Actualizing',
-        }
-      }
-      return { ...po }
-    })
 
     return (
       <div className={classes.root} id='ConsultationMainContainer'>
@@ -1546,7 +1312,6 @@ class Main extends React.Component {
           from='Consultation'
           onSelectPreOrder={this.onSelectPreOrder}
           setPatientBannerHeight={this.setPatientBannerHeight}
-          activePreOrderItems={draftPreOrderItem}
           extraCmt={this.getExtraComponent}
           {...this.props}
         />
@@ -1577,18 +1342,6 @@ class Main extends React.Component {
             handleSubmit={onSignOffConfirm}
             triggerBy={autoPrintTriggerBy}
           />
-        </CommonModal>
-
-        <CommonModal
-          cancelText='Cancel'
-          maxWidth='lg'
-          title='Package Details'
-          onClose={this.closePackageSelectModal}
-          onConfirm={this.closePackageSelectModal}
-          open={consultation.haveMultiplePendingPackages || false}
-          overrideLoading
-        >
-          <ConsumePackage {...this.props} />
         </CommonModal>
       </div>
     )

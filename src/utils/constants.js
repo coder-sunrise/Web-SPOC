@@ -65,7 +65,6 @@ export const PATIENT_LAB = {
   PATIENT_PROFILE: 1,
   CONSULTATION: 2,
   LAB_TRACKING: 3,
-  MEDICAL_CHECKUP: 4,
 }
 
 export const CANCELLATION_REASON_TYPE = {
@@ -108,9 +107,6 @@ export const INVOICE_PAYER_TYPE = {
 export const CLINICAL_ROLE = {
   DOCTOR: 1,
   OTHERS: 2,
-  RADIOGRAPHER: 3,
-  PHARMACIST: 4,
-  LABTECH: 5,
   NURSE: 6,
   PRO: 7,
 }
@@ -165,9 +161,7 @@ export const PDPA_CONSENT_TYPE = {
 
 export const INVOICE_ITEM_TYPE = {
   0: 'Corrupted data',
-  1: 'Medication',
   2: 'Consumable',
-  3: 'Vaccination',
   4: 'Service',
   5: 'OrderSet',
   6: 'Misc',
@@ -175,31 +169,24 @@ export const INVOICE_ITEM_TYPE = {
 }
 
 export const INVOICE_ITEM_TYPE_BY_TEXT = {
-  Medication: 1,
   Consumable: 2,
   Service: 3,
   OrderSet: 4,
 }
 
 export const INVOICE_ITEM_TYPE_BY_NAME = {
-  MEDICATION: 1,
   CONSUMABLE: 2,
-  VACCINATION: 3,
   SERVICE: 4,
   ORDERSET: 5,
   MISC: 6,
 }
 
 export const INVENTORY_TYPE = {
-  MEDICATION: 1,
   CONSUMABLE: 2,
-  VACCINATION: 3,
 }
 
 export const ITEM_TYPE = {
-  MEDICATION: 1,
   CONSUMABLE: 2,
-  VACCINATION: 3,
   SERVICE: 4,
   ORDERSET: 5,
 }
@@ -288,7 +275,6 @@ export const REPORT_FILE_NAME = {
   7: 'Medical Certificate',
   8: 'Certificate Of Attendance',
   9: 'Referral Letter',
-  10: 'Vaccination Certificate',
   11: 'Memo',
   12: 'Other Documents',
   13: 'Credit Note Listing Report',
@@ -309,10 +295,7 @@ export const REPORT_FILE_NAME = {
   28: 'Gst Details Report',
   29: 'Payment Receipt',
   30: 'Chas Claim Report',
-  31: 'Drug Label Report 89mmx36mm',
   32: 'Patient Label 89mmx36mm',
-  33: 'Patient Lab Label',
-  34: 'Patient Lab Label 89mmx36mm',
   35: 'Post Card',
   36: 'Post Card 89mmx36mm',
   37: 'Inventory Trending Report',
@@ -324,9 +307,7 @@ export const REPORT_FILE_NAME = {
   43: 'Copayer Address Label',
   44: 'Copayer Address Label 89mmx36mm',
   45: 'Patient Label 76mmx38mm',
-  46: 'Patient Lab Label 76mmx38mm',
   47: 'Patient Address Label 76mmx38mm',
-  48: 'Drug Label Report 76mmx38mm',
   49: 'Copayer Address Label 76mmx38mm',
   50: 'Supplier Address Label',
   51: 'Supplier Address Label 89mmx36mm',
@@ -344,7 +325,6 @@ export const REPORT_FILE_NAME = {
   63: 'Visit Listing Report',
   64: 'Purchase & Receiving Listing Report',
   65: 'Receiving Goods',
-  66: 'Patient Package Drawdown Report',
   67: 'WIP Revenue Report',
   68: 'Patient History Report',
   69: 'Referral Person Label',
@@ -356,23 +336,15 @@ export const REPORT_FILE_NAME = {
   75: 'Referral Source Label 76mmx38mm',
   76: 'Expiring Stock Report',
   77: 'Sales Listing By Performer Report',
-  78: 'Package Expiry Report',
   79: 'Xero Invoices Report',
   80: 'Visitation Invoice Report',
   81: 'Daily Appointment Listing Report',
-  82: 'Radiology Examination Finding Report',
-  83: 'Radiology Statistic Report',
-  84: 'Prescription Sheet Report',
   85: 'Dispensary Report',
-  86: 'Pre-Order Listing Report',
   87: 'Patient Info Leaflet',
-  88: 'Drug Label Report 80mmx45mm',
   89: 'Tax Invoice (Group)',
   90: 'Drug Summary Label Report 80mmx45mm',
   91: 'Purchase Request',
-  92: 'Lab Specimen Label',
   93: 'Medical Report',
-  94: 'Laboratory Test Report',
 }
 export const REPORT_ID = {
   DRUG_LABEL_80MM_45MM: 24,
@@ -401,13 +373,11 @@ export const REPORT_ID = {
   REFERRAL_SOURCE_LABEL_80MM_45MM: 73,
   REFERRAL_SOURCE_LABEL_89MM_36MM: 74,
   REFERRAL_SOURCE_LABEL_76MM_38MM: 75,
-  PRESCRIPTION: 84,
   PATIENT_INFO_LEAFLET: 87,
   DRUG_LABEL_80MM_45MM_V2: 88,
   DRUG_SUMMARY_LABEL_80MM_45MM: 90,
   LAB_SPECIMEN_LABEL_50MM_34MM: 92,
   MAILING_COVER_PAGE: 95,
-  PRESCRIPTIONA4: 96,
 }
 
 export const INVOICE_STATUS = {
@@ -512,17 +482,11 @@ export const PharmacyWorkitemStatus = {
 }
 
 export const VISIT_TYPE = {
-  CON: 1,
   OTC: 2,
   BF: 3,
-  MC: 4,
 }
 
 export const VISIT_TYPE_NAME = [
-  {
-    visitPurposeFK: VISIT_TYPE.CON,
-    displayCode: 'CON',
-  },
   {
     visitPurposeFK: VISIT_TYPE.OTC,
     displayCode: 'OTC',
@@ -530,10 +494,6 @@ export const VISIT_TYPE_NAME = [
   {
     visitPurposeFK: VISIT_TYPE.BF,
     displayCode: 'BF',
-  },
-  {
-    visitPurposeFK: VISIT_TYPE.MC,
-    displayCode: 'MC',
   },
 ]
 
@@ -543,11 +503,8 @@ export const DEFAULT_PAYMENT_MODE_GIRO = {
 }
 
 export const ORDER_TYPE_TAB = {
-  MEDICATION: '1',
-  VACCINATION: '2',
   SERVICE: '3',
   CONSUMABLE: '4',
-  OPENPRESCRIPTION: '5',
   ORDERSET: '6',
 }
 
@@ -575,7 +532,6 @@ export const SCRIBBLE_NOTE_TYPE = {
   CHIEFCOMPLAINTS: 2,
   PLAN: 6,
   HISTORY: 3,
-  RADIOLOGY: 9,
 }
 
 export const SMS_STATUS = {
@@ -677,22 +633,13 @@ export const NUMBER_TYPE = {
   FAX: 4,
 }
 
-export const APPNOTIFICATION_SCHEMA = {
-  LAB: { id: 5, name: 'Lab' },
-  RADIOLOGY: { id: 6, name: 'Radiology' },
-  PHARMACY: { id: 7, name: 'Pharmacy' },
-  MC: { id: 8, name: 'MC' },
-}
+export const APPNOTIFICATION_SCHEMA = {}
 
 export const NOTIFICATION_TYPE = {
   QUEUE: 1,
   CODETABLE: 2,
   ERROR: 3,
   CONSULTAION: 4,
-  LAB: APPNOTIFICATION_SCHEMA.LAB.id,
-  RADIOLOGY: APPNOTIFICATION_SCHEMA.RADIOLOGY.id,
-  PHARMACY: APPNOTIFICATION_SCHEMA.PHARMACY.id,
-  MC: APPNOTIFICATION_SCHEMA.MC.id,
 }
 
 export const NOTIFICATION_STATUS = {
@@ -750,15 +697,6 @@ export const REVENUE_CATEGORY = {
   OTHER: 7,
 }
 
-export const MEDISAVE_COPAYMENT_SCHEME = {
-  MEDISAVE700CDMP: 'MEDISAVE700CDMP',
-  MEDISAVE500VACC: 'MEDISAVE500VACC',
-  MEDISAVE500HS: 'MEDISAVE500HS',
-  MEDISAVE500CDMP: 'MEDISAVE500CDMP',
-  MEDISAVEOPSCAN: 'MEDISAVEOPSCAN',
-  MEDISAVEFLEXI: 'MEDISAVEFLEXI',
-}
-
 export const DURATION_UNIT = {
   DAY: 1,
   WEEK: 2,
@@ -784,28 +722,6 @@ export const SERVICE_CENTER_CATEGORY = {
   INTERNALLABSERVICECENTER: 4,
   EXTERNALRADIOLOGYSERVICECENTRE: 5,
   EXTERNALLABSERVICECENTRE: 6,
-}
-
-export const RADIOLOGY_CATEGORY = [
-  SERVICE_CENTER_CATEGORY.INTERNALRADIOLOGYSERVICECENTER,
-  SERVICE_CENTER_CATEGORY.EXTERNALRADIOLOGYSERVICECENTRE,
-]
-
-export const LAB_CATEGORY = [
-  SERVICE_CENTER_CATEGORY.INTERNALLABSERVICECENTER,
-  SERVICE_CENTER_CATEGORY.EXTERNALLABSERVICECENTRE,
-]
-
-export const DOSAGE_RULE_OPERATOR = {
-  to: 'to',
-  lessThan: 'less than',
-  moreThan: 'more than',
-}
-
-export const DOSAGE_RULE = {
-  age: 'age',
-  weight: 'weight',
-  default: 'default',
 }
 
 export const RADIOLOGY_WORKITEM_STATUS_TITLE = {
@@ -855,25 +771,6 @@ export const RADIOLOGY_WORKITEM_BUTTON = [
     authority: 'radiologyworklist.completereporting',
   },
 ]
-
-export const NURSE_WORKITEM_STATUS = {
-  NEW: 1,
-  ACTUALIZED: 2,
-  CANCELLED: 3,
-}
-
-export const ALLERGY_TYPE = {
-  DRUGALLERGY: 'Drug',
-  DRUGINGREDIENTALLERGY: 'Ingredient',
-}
-
-export const PATIENT_ALLERGY_TYPE = {
-  ALLERGY: 'Allergy',
-  INGREDIENT: 'Ingredient',
-  NONALLERGY: 'NonAllergy',
-}
-
-export const ENABLE_PRESCRIPTION_SET_CLINIC_ROLE = [1, 8]
 
 export const mapApptStatus = statusFK => {
   let status = ''
@@ -927,7 +824,6 @@ export const PHARMACY_ACTION = {
 }
 
 export const CHECKLIST_CATEGORY = {
-  RADIOLOGY: 1,
   DOCTORCONSULTATION: 2,
 }
 
@@ -1004,95 +900,10 @@ export const CALENDAR_RESOURCE = {
 }
 
 export const ORDER_TYPES = {
-  MEDICATION: '1',
-  VACCINATION: '2',
-  SERVICE: '3',
   CONSUMABLE: '4',
-  OPEN_PRESCRIPTION: '5',
-  ORDER_SET: '6',
-  TREATMENT: '7',
-  PACKAGE: '8',
-  RADIOLOGY: '10',
-  LAB: '11',
-}
-
-export const LAB_WORKITEM_STATUS = {
-  NEW: 1,
-  SPECIMENCOLLECTED: 2,
-  SPECIMENRECEIVED: 3,
-  INPROGRESS: 4,
-  FORRETEST: 5,
-  PENDINGFIRSTVERIFIER: 6,
-  PENDINGSECONDVERIFIER: 7,
-  COMPLETED: 8,
-}
-
-export const LAB_SPECIMEN_STATUS = {
-  NEW: 1,
-  INPROGRESS: 2,
-  FORRETEST: 3,
-  PENDINGFIRSTVERIFIER: 4,
-  PENDINGSECONDVERIFIER: 5,
-  COMPLETED: 6,
-  DISCARDED: 7,
-}
-
-export const LAB_SPECIMEN_TIMELINE_STATUS = {
-  FIRSTORDERED: 'First Ordered',
-  SPECIMENCOLLECTED: 'Specimen Collected',
-  SPECIMENRECEIVED: 'Specimen Received',
-  TESTSTARTED: 'Test Started',
-  FIRSTVERIFIED: 'First Verified',
-  COMPLETED: 'Completed',
-}
-
-export const LAB_SPECIMEN_ALL_COLOR = '#5a9cde'
-export const LAB_SPECIMEN_STATUS_COLORS = {
-  1: '#999900',
-  2: '#009999',
-  3: '#DA6300',
-  4: '#993333',
-  5: '#0000ff',
-  6: '#009933',
-  7: '#777777',
-}
-
-export const LAB_SPECIMEN_ALL_LABEL = 'All'
-export const LAB_SPECIMEN_STATUS_LABELS = {
-  1: 'New',
-  2: 'In Progress',
-  3: 'P. Retest',
-  4: 'P. 1st Verify',
-  5: 'P. 2nd Verify',
-  6: 'Completed',
-  7: 'Discarded',
-}
-
-export const LAB_SPECIMEN_ALL_DESCRIPTION = 'All'
-export const LAB_SPECIMEN_STATUS_DESCRIPTION = {
-  1: 'New',
-  2: 'In Progress',
-  3: 'Pending for Retest',
-  4: 'Pending First Verification',
-  5: 'Pending Second Verification',
-  6: 'Completed',
-  7: 'Discarded',
-}
-
-export const LAB_SPECIMEN_DETAILS_STEP = {
-  1: 'New',
-  2: 'In Progress',
-  3: 'P. Retest',
-  4: 'P. 1st Verify',
-  5: 'P. 2nd Verify',
-  6: 'Completed',
-  7: 'Discarded',
-}
-
-export const LAB_RESULT_TYPE = {
-  NUMERIC: 1,
-  STRING: 2,
-  ATTACHMENT: 3,
+  SERVICE: '3',
+  // ORDER_SET: '6',
+  // TREATMENT: '7',
 }
 
 export const VISITDOCTOR_CONSULTATIONSTATUS = {
@@ -1100,11 +911,6 @@ export const VISITDOCTOR_CONSULTATIONSTATUS = {
   INPROGRESS: 'In Progress',
   PAUSED: 'Paused',
   COMPLETED: 'Completed',
-}
-
-export const LANGUAGES = {
-  2: 'EN',
-  5: 'JP',
 }
 
 export const YESNOOPTIUONS = [
@@ -1120,7 +926,6 @@ export const AGETYPE = {
 
 export const INVOICE_REPORT_TYPES = {
   SUMMARYINVOICE: 'Summary Invoice',
-  GROUPINVOICE: 'Group Invoice',
   INDIVIDUALINVOICE: 'Individual Invoice',
   CLAIMABLEITEMCATEGORYINVOICE: 'Claimable Item Category Invoice',
   ITEMCATEGORYINVOICE: 'Item Category Invoice',
@@ -1139,7 +944,6 @@ export const TESTTYPES = {
   KAUP: 'kaup',
   WAIST: 'Waist',
   IOP: 'IOP',
-  AUDIOMETRY: 'Audiometry',
   COLORVISIONTEST: 'ColorVisionTest',
   PREGNANCY: 'Pregnancy',
   MENSES: 'Menses',
@@ -1149,76 +953,8 @@ export const TESTTYPES = {
   L50CMCORRECTED: 'Left50cmCorrected',
 }
 
-export const WORK_ITEM_TYPES = {
-  LAB: 'Lab',
-  RADIOLOGY: 'Radiology',
-  NURSEACTUALIZE: 'NurseActualize',
-  PHARMACY: 'Pharmacy',
-  LAB_TRACKING: 'LabTracking',
-}
-export const WORK_ITEM_TYPES_ENUM = {
-  LAB: 0,
-  RADIOLOGY: 1,
-  NURSEACTUALIZE: 2,
-  PHARMACY: 3,
-}
-
-export const MEDICALCHECKUP_WORKITEM_STATUS = {
-  INPROGRESS: 1,
-  REPORTING: 2,
-  PENDINGVERIFICATION: 3,
-  COMPLETED: 4,
-}
-
-export const MEDICALCHECKUP_WORKITEM_STATUS_ALL_COLOR = '#5a9cde'
-export const MEDICALCHECKUP_WORKITEM_STATUSES = [
-  {
-    id: MEDICALCHECKUP_WORKITEM_STATUS.INPROGRESS,
-    label: 'In Progress',
-    color: '#009999',
-    description: 'In Progress',
-  },
-  {
-    id: MEDICALCHECKUP_WORKITEM_STATUS.REPORTING,
-    label: 'Reporting',
-    color: '#CC6633',
-    description: 'Reporting',
-  },
-  {
-    id: MEDICALCHECKUP_WORKITEM_STATUS.PENDINGVERIFICATION,
-    label: 'P. Verification',
-    color: '#44A2FF',
-    description: 'Pending Verification',
-  },
-  {
-    id: MEDICALCHECKUP_WORKITEM_STATUS.COMPLETED,
-    label: 'Completed',
-    color: '#007D00',
-    description: 'Completed',
-  },
-]
 export const DISPENSE_FROM = {
   QUEUE: 1,
-  MEDICALCHECKUP: 2,
-}
-
-export const REPORTINGDOCTOR_STATUS = {
-  NEW: 'New',
-  COMMENTVERIFYING: 'Comment Verifying',
-  VERIFIED: 'Verified',
-}
-
-export const MEDICALCHECKUP_REPORTTYPE = {
-  TEMPORARY: 'Temporary Report',
-  FINAL: 'Final Report',
-}
-
-export const MEDICALCHECKUP_REPORTSTATUS = {
-  PENDINGVERIFY: 'Pending Verify',
-  VERIFIED: 'Verified',
-  REJECT: 'Rejected',
-  DISCARD: 'Discarded',
-  ABANDONED: 'Abandoned',
 }
 
 export const EXAMINATION_STATUS = {

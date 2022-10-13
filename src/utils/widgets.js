@@ -132,18 +132,8 @@ const widgets = [
         let Cmpnet = loaded.default
         return <Cmpnet {...p} widget />
       },
-      // render (loaded, props) {
-      //   let Component = loaded.default
-      //   return <Component {...props} />
-      // },
     }),
     model: 'orders',
-    // associatedProps: [
-    //   'corOrderAdjustment',
-    //   'corService',
-    //   'corPrescriptionItem',
-    //   'corVaccinationItem',
-    // ],
     onRemove: () => {
       window.g_app._store.dispatch({
         type: 'orders/deleteRow',
@@ -189,24 +179,6 @@ const widgets = [
       minH: 10,
       style: {
         padding: '0 5px',
-      },
-    },
-  },
-  {
-    id: '24',
-    name: 'Audiometry Test',
-    shortName: 'Audiometry',
-    accessRight: 'queue.consultation.widgets.audiometrytest',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/AudiometryTest'),
-      loading: Loading,
-    }),
-    associatedProps: ['corAudiometryTest'],
-    layoutConfig: {
-      minW: 12,
-      minH: 10,
-      style: {
-        padding: '5px',
       },
     },
   },

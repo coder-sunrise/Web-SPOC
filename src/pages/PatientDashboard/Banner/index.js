@@ -16,7 +16,6 @@ import classnames from 'classnames'
 import { withStyles } from '@material-ui/core/styles'
 import PatientNurseNotes from '@/pages/PatientDatabase/Detail/PatientNurseNotes'
 import PatientStickyNotesBtn from '@/components/_medisys/PatientInfoSideBanner/PatientStickyNotesBtn'
-import SelectPreOrder from '@/pages/Reception/Appointment/components/form/SelectPreOrder'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import { MoreButton, LoadingWrapper } from '@/components/_medisys'
 import PatientLabelBtn from '@/components/_medisys/PatientInfoSideBanner/PatientLabelBtn'
@@ -102,9 +101,6 @@ const styles = theme => ({
     visitRegistration,
     ctschemetype: codetable.ctschemetype || [],
     clinicSettings: clinicSettings.settings || clinicSettings.default,
-    refreshingBalance:
-      loading.effects['patient/refreshChasBalance'] ||
-      loading.effects['patient/refreshMedisaveBalance'],
     mainDivHeight: global.mainDivHeight,
   }),
 )
@@ -129,12 +125,12 @@ class Banner extends PureComponent {
   }
 
   componentWillMount() {
-    const { dispatch } = this.props
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: { code: 'ctg6pd' },
-    })
-  }
+                         const { dispatch } = this.props
+                         // dispatch({
+                         //   type: 'codetable/fetchCodes',
+                         //   payload: { code: 'ctg6pd' },
+                         // })
+                       }
 
   componentWillUnmount() {
     const { dispatch, isDisposePatientEntity = true } = this.props
@@ -272,12 +268,6 @@ class Banner extends PureComponent {
     await dispatch({
       type: 'codetable/fetchCodes',
       payload: {
-        code: 'ctdrugallergy',
-      },
-    })
-    await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
         code: 'ctsalutation',
       },
     })
@@ -366,9 +356,6 @@ class Banner extends PureComponent {
   }
 
   getSchemeList = schemeDataList => {
-    const chasOrMedisave = (schemeDataList || []).filter(
-      o => o.schemeTypeFK <= 6 || this.isMedisave(o.schemeTypeFK),
-    )
     const { patient, clinicSettings } = this.props
     const { entity } = patient
     const { patientScheme } = entity
@@ -379,154 +366,7 @@ class Banner extends PureComponent {
         patientScheme.find(
           ps => ps.coPaymentSchemeFK === s.coPaymentSchemeFK,
         ) || {}
-      return (
-        <span style={{ paddingRight: 5 }}>
-          {chasOrMedisave &&
-          chasOrMedisave.find(list => s.schemeTypeFK === list.schemeTypeFK) ? (
-            <Popover
-              icon={null}
-              content={
-                <div>
-                  <div>
-                    {s.coPaymentSchemeFK ||
-                    schemeDataList.filter(p =>
-                      this.isMedisave(p.schemeTypeFK),
-                    )[0] === s
-                      ? s.copaymentSchemeName
-                      : s.schemeTypeName}
-                    <span style={{ bottom: -2 }}>
-                      {s.schemeTypeFK <= 6 && (
-                        <IconButton onClick={this.refreshChasBalance}>
-                          <Refresh />
-                        </IconButton>
-                      )}
-                      {this.isMedisave(s.schemeTypeFK) &&
-                        schemeDataList.filter(p =>
-                          this.isMedisave(p.schemeTypeFK),
-                        )[0] === s && (
-                          <IconButton onClick={this.refreshMedisaveBalance}>
-                            <Refresh />
-                          </IconButton>
-                        )}
-                    </span>
-                  </div>
-                  {s.schemeType && (
-                    <div style={{ marginTop: 15 }}>{s.schemeType}</div>
-                  )}
-                  {this.isMedisave(s.schemeTypeFK) && (
-                    <div>
-                      Payer: {s.payerName} ({s.payerAccountNo})
-                    </div>
-                  )}
-                  {s.validFrom && (
-                    <div>
-                      Validity:{' '}
-                      {s.validFrom ? (
-                        <DatePicker
-                          text
-                          format={dateFormatLong}
-                          value={s.validFrom}
-                        />
-                      ) : (
-                        ''
-                      )}
-                      &nbsp;-&nbsp;
-                      {s.validTo ? (
-                        <DatePicker
-                          text
-                          format={dateFormatLong}
-                          value={s.validTo}
-                        />
-                      ) : (
-                        ''
-                      )}
-                    </div>
-                  )}
-                  {s.schemeTypeFK !== 15 ? (
-                    <div>
-                      Balance: <NumberInput text currency value={s.balance} />
-                    </div>
-                  ) : (
-                    ''
-                  )}
-                  {s.schemeTypeFK <= 6 ? (
-                    <div>
-                      Patient Acute Visit Balance:{' '}
-                      <NumberInput
-                        text
-                        currency
-                        value={s.acuteVisitPatientBalance}
-                      />
-                    </div>
-                  ) : (
-                    ''
-                  )}
-                  {s.schemeTypeFK <= 6 ? (
-                    <div>
-                      Patient Acute Clinic Balance:{' '}
-                      <NumberInput
-                        text
-                        currency
-                        value={s.acuteVisitClinicBalance}
-                      />
-                    </div>
-                  ) : (
-                    ''
-                  )}
-                </div>
-              }
-              trigger='click'
-              placement='bottom'
-            >
-              <Link>
-                <span
-                  style={{
-                    color: scheme.isExpired ? 'red' : 'black',
-                    textDecoration: 'underline',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {s.copaymentSchemeName || s.schemeTypeName}
-                  {s.validTo
-                    ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`
-                    : ' (Exp: -)'}
-                  {i < arr.length - 1 ? ',' : ''}
-                </span>
-              </Link>
-            </Popover>
-          ) : (
-            <span
-              style={{
-                cursor: 'pointer',
-                color: scheme.isExpired
-                  ? 'red'
-                  : scheme.schemeTypeFK === SCHEME_TYPE.INSURANCE
-                  ? `#${schemeInsuranceDisplayColorCode}`
-                  : 'black',
-                textDecoration: 'underline',
-                wordBreak: 'break-word',
-              }}
-              onClick={e => {
-                const editDetailAccessRight = Authorized.check(
-                  'copayer.copayerdetails',
-                ) || {
-                  rights: 'hidden',
-                }
-                if (editDetailAccessRight.rights === 'hidden') return
-                if (scheme.copayerFK) {
-                  this.openScheme(scheme.copayerFK)
-                }
-              }}
-            >
-              {s.copaymentSchemeName || s.schemeTypeName}
-              {s.validTo
-                ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`
-                : ' (Exp: -)'}
-              {i < arr.length - 1 ? ',' : ''}
-            </span>
-          )}
-        </span>
-      )
+      return <span style={{ paddingRight: 5 }}></span>
     })
   }
   getTagData = () => {
@@ -545,171 +385,6 @@ class Banner extends PureComponent {
     }
     if (!!tagData) return tagData
     return '-'
-  }
-  refreshGovtBalance = () => {
-    this.refreshChasBalance()
-    this.refreshMedisaveBalance()
-  }
-
-  refreshChasBalance = () => {
-    const { dispatch, patient } = this.props
-    const { entity } = patient
-    const { currPatientCoPaymentSchemeFK, currentSchemeType } = this.state
-    let patientCoPaymentSchemeFK = currPatientCoPaymentSchemeFK
-    let oldSchemeTypeFK = currentSchemeType
-    let isSaveToDb = true
-    dispatch({
-      type: 'patient/refreshChasBalance',
-      payload: {
-        ...entity,
-        patientCoPaymentSchemeFK,
-        isSaveToDb,
-        patientProfileId: entity.id,
-      },
-    }).then(result => {
-      if (result) {
-        dispatch({
-          type: 'patient/query',
-          payload: {
-            id: entity.id,
-          },
-        })
-
-        const {
-          balance,
-          schemeTypeFk,
-          validFrom,
-          validTo,
-          acuteVisitPatientBalance,
-          acuteVisitClinicBalance,
-          isSuccessful,
-          statusDescription,
-          acuteBalanceStatusCode,
-          chronicBalanceStatusCode,
-        } = result
-        let isShowReplacementModal = false
-
-        if (!isSuccessful) {
-          this.setState({
-            refreshedSchemeData: {
-              statusDescription,
-              isSuccessful,
-            },
-          })
-        } else {
-          if (oldSchemeTypeFK !== schemeTypeFk) {
-            isShowReplacementModal = true
-          }
-
-          this.setState({
-            refreshedSchemeData: {
-              isShowReplacementModal,
-              oldSchemeTypeFK,
-              balance,
-              patientCoPaymentSchemeFK,
-              schemeTypeFK: schemeTypeFk,
-              validFrom,
-              validTo,
-              acuteVisitPatientBalance,
-              acuteVisitClinicBalance,
-              isSuccessful,
-              acuteBalanceStatusCode,
-              chronicBalanceStatusCode,
-            },
-          })
-        }
-      }
-    })
-  }
-
-  refreshMedisaveBalance = () => {
-    const { dispatch, patient } = this.props
-    const { entity } = patient
-    const { schemePayers } = entity
-    const isSaveToDb = true
-
-    if (!schemePayers || schemePayers.length === 0) return
-    dispatch({
-      type: 'patient/refreshMedisaveBalance',
-      payload: {
-        ...entity,
-        isSaveToDb,
-        patientProfileId: entity.id,
-        schemePayers,
-      },
-    }).then(result => {
-      if (result) {
-        dispatch({
-          type: 'patient/query',
-          payload: {
-            id: entity.id,
-          },
-        })
-
-        const {
-          // balance,
-          // schemeTypeFk,
-          validFrom,
-          validTo,
-          payerBalance,
-          isSuccessful,
-          status,
-          statusDescription,
-        } = result
-        let isShowReplacementModal = false
-        if (!isSuccessful) {
-          this.setState({
-            refreshedSchemePayerData: {
-              payerBalanceList: [],
-              statusDescription,
-              isSuccessful,
-            },
-          })
-        } else if (payerBalance) {
-          let payerBalanceList = []
-          payerBalance.forEach(pb => {
-            if (pb.enquiryType === 'MSVBAL') return
-            /* if (oldSchemeTypeFK !== pb.schemeTypeFK) {
-              isShowReplacementModal = true
-            } */
-            const { finalBalance } = pb
-            payerBalanceList.push({
-              isShowReplacementModal,
-              // oldSchemeTypeFK,
-              finalBalance,
-              schemeTypeFK: pb.schemeTypeFK,
-              schemePayerFK: pb.schemePayerFK,
-              validFrom,
-              validTo,
-              isSuccessful,
-            })
-          })
-          this.setState({
-            refreshedSchemePayerData: {
-              payerBalanceList,
-              statusDescription,
-              isSuccessful,
-            },
-          })
-        }
-      }
-    })
-  }
-
-  isMedisave = schemeTypeFK => {
-    /* const { ctschemetype } = this.props.codetable
-    const r = ctschemetype.find((o) => o.id === schemeTypeFK)
-    if(r)
-      return (
-        [
-          'FLEXIMEDI',
-          'OPSCAN',
-          'MEDIVISIT',
-        ].indexOf(r.code) >= 0
-      ) */
-    if (schemeTypeFK) return [12, 13, 14].indexOf(schemeTypeFK) >= 0
-
-    return false
   }
 
   getSchemeDetails = schemeData => {
@@ -816,7 +491,6 @@ class Banner extends PureComponent {
           isSuccessful:
             refreshData.isSuccessful !== '' ? refreshData.isSuccessful : '',
           schemeTypeName: '',
-          copaymentSchemeName: 'Medisave',
         }
     }
 
@@ -835,7 +509,6 @@ class Banner extends PureComponent {
         errorData.statusDescription || schemeData.statusDescription,
       isSuccessful: errorData.isSuccessful || schemeData.isSuccessful,
       schemeTypeName: '',
-      copaymentSchemeName: 'Medisave',
     }
   }
 
@@ -985,13 +658,6 @@ class Banner extends PureComponent {
     const contentClass = this.state.isExpanded
       ? classes.contentWithoutWrap
       : classes.contentWithWrap
-    const preOrderAccessRight = Authorized.check(
-      'patientdatabase.modifypreorder',
-    ) || { rights: 'hidden' }
-
-    const actualizePreOrderAccessRight = Authorized.check(
-      'patientdatabase.modifypreorder.actualizepreorder',
-    ) || { rights: 'hidden' }
 
     const notesHistoryAccessRight = Authorized.check(
       'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
@@ -1025,33 +691,7 @@ class Banner extends PureComponent {
 
     // get scheme details based on scheme type
     const schemeDataList = []
-    const notMedisaveSchemes =
-      entity.patientScheme && entity.patientScheme.length > 0
-        ? entity.patientScheme.filter(
-            o => !this.isMedisave(o.schemeTypeFK) && o.isSchemeActive,
-          )
-        : null
-    if (notMedisaveSchemes !== null)
-      notMedisaveSchemes.forEach(row => {
-        schemeDataList.push(this.getSchemeDetails(row))
-      })
-    const medisaveSchemePayers =
-      entity.schemePayer && entity.schemePayer.length > 0
-        ? entity.schemePayer
-        : null
-    if (medisaveSchemePayers !== null)
-      medisaveSchemePayers.forEach(row => {
-        schemeDataList.push(this.getSchemePayerDetails(row))
-      })
-
-    const g6PD =
-      codetable.ctg6pd &&
-      codetable.ctg6pd.length > 0 &&
-      entity.patientAllergyMetaData.length > 0
-        ? codetable.ctg6pd.find(
-            o => o.id === entity.patientAllergyMetaData[0].g6PDFK,
-          )
-        : null
+    const g6PD = null
 
     const pendingPreOrderItems =
       entity.pendingPreOrderItem?.filter(item => !item.isDeleted) || []
@@ -1282,14 +922,6 @@ class Banner extends PureComponent {
             interactive='true'
           >
             <span>
-              {entity.isActive &&
-                (entity.patientScheme || []).filter(
-                  o => o.schemeTypeFK <= 6 || this.isMedisave(o.schemeTypeFK),
-                ).length > 0 && (
-                  <IconButton onClick={this.refreshGovtBalance}>
-                    <Refresh />
-                  </IconButton>
-                )}
               {this.getSchemeList(
                 _.orderBy(
                   schemeDataList,
@@ -1460,50 +1092,6 @@ class Banner extends PureComponent {
         </Col>
       </Row>
     )
-    const mcWorkItem =
-      visitRegistration?.entity?.visit?.medicalCheckupWorkitem &&
-      visitRegistration?.entity?.visit?.medicalCheckupWorkitem[0]
-    const visitPriorityElm = (
-      <Row wrap={false}>
-        <Col flex='none'>
-          <span
-            className={classes.header}
-            style={{
-              color:
-                mcWorkItem?.reportPriority === 'Urgent' ? 'red' : 'darkblue',
-            }}
-          >
-            Report Priority:
-          </span>
-        </Col>
-        <Col flex='auto' className={contentClass}>
-          <Tooltip
-            enterDelay={100}
-            title={mcWorkItem?.urgentReportRemarks}
-            interactive='true'
-          >
-            <span>
-              {mcWorkItem?.reportPriority}
-              {mcWorkItem?.urgentReportRemarks
-                ? ' (' + mcWorkItem?.urgentReportRemarks + ')'
-                : ''}
-            </span>
-          </Tooltip>
-        </Col>
-      </Row>
-    )
-    const visitLanguageElm = (
-      <Row wrap={false}>
-        <Col flex='none'>
-          <span className={classes.header}>Report Language:</span>
-        </Col>
-        <Col flex='auto' className={contentClass}>
-          {visitRegistration?.entity?.visit?.medicalCheckupWorkitem &&
-            visitRegistration?.entity?.visit?.medicalCheckupWorkitem[0]
-              ?.reportLanguage}
-        </Col>
-      </Row>
-    )
     const patientNotesLinkElm = (
       <span
         className={classes.header}
@@ -1543,210 +1131,125 @@ class Banner extends PureComponent {
 
     return (
       <Paper id='patientBanner' style={style}>
-        {/* Please do not change the height below (By default is 100) */}
-        {from != 'MedicalCheckup' && (
-          <GridContainer
-            style={{ minHeight: 100, width: '100%', padding: '5px 0' }}
+        <GridContainer
+          style={{ minHeight: 100, width: '100%', padding: '5px 0' }}
+        >
+          <GridItem
+            style={{ padding: 0 }}
+            xs={this.getBannerMd()}
+            md={this.getBannerMd()}
           >
-            <GridItem
-              style={{ padding: 0 }}
-              xs={this.getBannerMd()}
-              md={this.getBannerMd()}
-            >
-              <GridContainer>
-                <GridItem xs={10} md={10}>
-                  <GridContainer>
-                    <GridItem md={12}>{patientTitle}</GridItem>
-                    <GridItem xs={6} md={4}>
-                      {patientTag}
-                    </GridItem>
-                    <GridItem xs={6} md={4}>
-                      {patientG6PD}
-                    </GridItem>
-                    <GridItem xs={6} md={4}>
-                      {patientOS}
-                    </GridItem>
-                    <GridItem xs={6} md={4}>
-                      {patientSchemeDetails}
-                    </GridItem>
-                    <GridItem xs={6} md={4}>
-                      {patientRequest}
-                    </GridItem>
-                    <GridItem xs={6} md={4}>
-                      {patientHRP}
-                    </GridItem>
-                    <GridItem xs={6} md={4}>
-                      {patientPersistDiagnosis}
-                    </GridItem>
-                    <GridItem xs={6} md={4}>
-                      {longTermMedication}
-                    </GridItem>
-                    <GridItem xs={6} md={4}>
-                      {patientAllergy}
-                    </GridItem>
-                  </GridContainer>
-                </GridItem>
-                <GridItem xs={2} md={2}>
-                  {/* right half */}
-                  <GridContainer>
-                    {entity?.lastVisitDate ? (
-                      <GridItem
-                        xs={12}
-                        md={12}
-                        style={{ height: 26, paddingTop: 5 }}
-                      >
-                        <span className={classes.header}>Last Visit: </span>
-                        <span style={{ paddingLeft: 5 }}>
-                          {moment(entity.lastVisitDate).format('DD MMM YYYY')}
-                        </span>
-                      </GridItem>
-                    ) : (
-                      <GridItem xs={12} md={12}></GridItem>
-                    )}
-                    <GridItem xs={12} md={12}>
-                      {viewNonClaimableHistoryRight.rights === 'enable' && (
-                        <span className={classes.header}>
-                          <span
-                            style={{
-                              display: 'block',
-                              textDecoration: 'underline',
-                              cursor: 'pointer',
-                            }}
-                            onClick={e => {
-                              this.openNonClaimableHistory()
-                            }}
-                          >
-                            {`Non Claimable History (${info.nonClaimableHistoryCount ||
-                              0})`}
-                          </span>
-                        </span>
-                      )}
-                      <div>
-                        {notesHistoryAccessRight.rights !== 'hidden' && (
-                          <span
-                            className={classes.header}
-                            style={{ marginRight: 10 }}
-                          >
-                            {patientNotesLinkElm}
-                          </span>
-                        )}
-                        {preOrderAccessRight.rights === 'enable' && (
-                          <span className={classes.header}>
-                            <span
-                              style={{
-                                display: 'block',
-                                textDecoration: 'underline',
-                                cursor: 'pointer',
-                              }}
-                              onClick={e => {
-                                e.preventDefault()
-                                if (preOrderAccessRight.rights === 'disable') {
-                                  notification.error({
-                                    message:
-                                      'Current user is not authorized to access',
-                                  })
-                                  return
-                                }
-
-                                if (
-                                  disablePreOrder &&
-                                  disablePreOrder.some(cond => {
-                                    if (cond.condition) {
-                                      dispatch({
-                                        type: 'global/updateAppState',
-                                        payload: {
-                                          openConfirm: true,
-                                          isInformType: true,
-                                          openConfirmText: 'OK',
-                                          openConfirmContent: cond.message,
-                                        },
-                                      })
-                                      return true
-                                    }
-                                    return false
-                                  })
-                                )
-                                  return
-
-                                this.openPreOrders()
-                              }}
-                            >
-                              {`Pre-Order (${
-                                activePreOrderItems
-                                  ? activePreOrderItems.length
-                                  : (pendingPreOrderItems &&
-                                      pendingPreOrderItems.length) ||
-                                    0
-                              })`}
-                            </span>
-                          </span>
-                        )}
-                      </div>
-                      <span
-                        className={classes.header}
-                        style={{
-                          display: 'block',
-                          paddingRight: 10,
-                          textDecoration: 'underline',
-                          cursor: 'pointer',
-                        }}
-                        to={getAppendUrl({
-                          md: 'pt',
-                          cmt: 1,
-                          pid: info.id,
-                        })}
-                        onClick={e => {
-                          this.openExaminationResults()
-                        }}
-                        // disabled={}
-                        tabIndex='-1'
-                      >
-                        Examination Results
+            <GridContainer>
+              <GridItem xs={10} md={10}>
+                <GridContainer>
+                  <GridItem md={12}>{patientTitle}</GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientTag}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientG6PD}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientOS}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientSchemeDetails}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientRequest}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientHRP}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientPersistDiagnosis}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {longTermMedication}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientAllergy}
+                  </GridItem>
+                </GridContainer>
+              </GridItem>
+              <GridItem xs={2} md={2}>
+                {/* right half */}
+                <GridContainer>
+                  {entity?.lastVisitDate ? (
+                    <GridItem
+                      xs={12}
+                      md={12}
+                      style={{ height: 26, paddingTop: 5 }}
+                    >
+                      <span className={classes.header}>Last Visit: </span>
+                      <span style={{ paddingLeft: 5 }}>
+                        {moment(entity.lastVisitDate).format('DD MMM YYYY')}
                       </span>
                     </GridItem>
-                  </GridContainer>
-                </GridItem>
-              </GridContainer>
-            </GridItem>
-
-            {extraCmt && (
-              <GridItem xs={3} md={12 - this.getBannerMd()}>
-                {extraCmt()}
+                  ) : (
+                    <GridItem xs={12} md={12}></GridItem>
+                  )}
+                  <GridItem xs={12} md={12}>
+                    {viewNonClaimableHistoryRight.rights === 'enable' && (
+                      <span className={classes.header}>
+                        <span
+                          style={{
+                            display: 'block',
+                            textDecoration: 'underline',
+                            cursor: 'pointer',
+                          }}
+                          onClick={e => {
+                            this.openNonClaimableHistory()
+                          }}
+                        >
+                          {`Non Claimable History (${info.nonClaimableHistoryCount ||
+                            0})`}
+                        </span>
+                      </span>
+                    )}
+                    <div>
+                      {notesHistoryAccessRight.rights !== 'hidden' && (
+                        <span
+                          className={classes.header}
+                          style={{ marginRight: 10 }}
+                        >
+                          {patientNotesLinkElm}
+                        </span>
+                      )}
+                    </div>
+                    <span
+                      className={classes.header}
+                      style={{
+                        display: 'block',
+                        paddingRight: 10,
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                      }}
+                      to={getAppendUrl({
+                        md: 'pt',
+                        cmt: 1,
+                        pid: info.id,
+                      })}
+                      onClick={e => {
+                        this.openExaminationResults()
+                      }}
+                      // disabled={}
+                      tabIndex='-1'
+                    >
+                      Examination Results
+                    </span>
+                  </GridItem>
+                </GridContainer>
               </GridItem>
-            )}
-          </GridContainer>
-        )}
-        {from === 'MedicalCheckup' && (
-          <GridContainer
-            style={{ minHeight: 100, width: '100%', padding: '5px' }}
-          >
-            <GridItem md={12}>{patientTitle}</GridItem>
-            <GridItem md={3}>{patientG6PD}</GridItem>
-            <GridItem md={3}>{patientHRP}</GridItem>
-            <GridItem md={3}>{visitDateElm}</GridItem>
-            <GridItem md={3}>{visitPriorityElm}</GridItem>
-            <GridItem md={3}>{patientSchemeDetails}</GridItem>
-            <GridItem md={3}>{patientAllergy}</GridItem>
-            <GridItem md={3}>{visitPurposeElm}</GridItem>
-            <GridItem md={3}>{visitLanguageElm}</GridItem>
-            <GridItem md={3}>{patientPersistDiagnosis}</GridItem>
-            <GridItem md={3}>{longTermMedication}</GridItem>
-            <GridItem md={3}>{visitRemarksElm}</GridItem>
-            <GridItem md={3}>
-              <div>
-                <span style={{ display: 'inline-block', marginRight: 10 }}>
-                  {patientNotesLinkElm}
-                </span>
-                {isEditVisitEnable && (
-                  <span style={{ display: 'inline-block' }}>
-                    {patientEditVisitElm}
-                  </span>
-                )}
-              </div>
-            </GridItem>
-          </GridContainer>
-        )}
+            </GridContainer>
+          </GridItem>
 
+          {extraCmt && (
+            <GridItem xs={3} md={12 - this.getBannerMd()}>
+              {extraCmt()}
+            </GridItem>
+          )}
+        </GridContainer>
         <span
           style={{
             top: 5,
@@ -1792,32 +1295,6 @@ class Banner extends PureComponent {
           maxWidth='lg'
         >
           <PatientNurseNotes {...this.props} />
-        </CommonModal>
-        <CommonModal
-          open={this.state.showPreOrderModal}
-          title='Pre-Orders'
-          onClose={this.closePreOrders}
-          maxWidth='lg'
-        >
-          <SelectPreOrder
-            {...this.props}
-            disabled={
-              !(
-                from === 'Appointment' ||
-                (from === 'VisitReg' && !isReadOnly) ||
-                from === 'Consultation' ||
-                (from === 'Dispense' && editingOrder) ||
-                (from === 'Pharmacy' && editingOrder)
-              ) || actualizePreOrderAccessRight.rights !== 'enable'
-            }
-            onSelectPreOrder={select => {
-              if (onSelectPreOrder) onSelectPreOrder(select)
-              this.closePreOrders()
-            }}
-            isRetail={isRetail}
-            activePreOrderItem={activePreOrderItems || pendingPreOrderItems}
-            actualizePreOrderAccessRight={actualizePreOrderAccessRight}
-          />
         </CommonModal>
         <CommonModal
           open={this.state.showSchemeModal}

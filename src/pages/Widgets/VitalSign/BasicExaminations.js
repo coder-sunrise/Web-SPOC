@@ -207,15 +207,6 @@ class BasicExaminations extends PureComponent {
                   />
                 )}
               />
-              <div style={{ position: 'absolute', top: 42, zIndex: 1 }}>
-                {this.state.showWarningMessage && (
-                  <Alert
-                    message={`Weight changes will only take effect on new medication's instruction setting.`}
-                    banner
-                    className={classes.alertStyle}
-                  />
-                )}
-              </div>
             </GridItem>
             <GridItem xs={12} sm={4} md={3}>
               <Field

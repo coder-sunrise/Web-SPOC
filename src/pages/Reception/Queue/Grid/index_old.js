@@ -387,7 +387,7 @@ const Grid = ({
 
   const onRowDoubleClick = useCallback(
     row => {
-      const { visitStatus, visitPurposeFK = VISIT_TYPE.CON } = row
+      const { visitStatus, visitPurposeFK = VISIT_TYPE.BF } = row
       const isWaiting = visitStatus === VISIT_STATUS.WAITING
       const {
         clinicianProfile: { doctorProfile },

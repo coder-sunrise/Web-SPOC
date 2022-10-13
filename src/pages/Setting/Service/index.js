@@ -18,7 +18,6 @@ const styles = theme => ({
       marginTop: 0,
     },
   },
-  medisaveCheck: { position: 'absolute', zIndex: 1, top: 11, width: 20 },
 })
 
 @connect(({ settingClinicService, global }) => ({
@@ -40,13 +39,6 @@ class Service extends PureComponent {
     this.props.dispatch({
       type: 'settingClinicService/getServiceCenter',
       payload: { pagesize: 9999 },
-    })
-    this.props.dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctexaminationitem',
-        pagesize: 9999,
-      },
     })
   }
 

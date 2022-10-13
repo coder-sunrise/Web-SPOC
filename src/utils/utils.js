@@ -930,59 +930,7 @@ const htmlDecodeByRegExp = (str = '') => {
   s = s.replace(/&quot;/g, '"')
   return s
 }
-
-const getRefreshChasBalanceStatus = (status = []) => {
-  let defaultResponse = { isSuccessful: false, statusDescription: '' }
-  if (_.isEmpty(status)) {
-    return { ...defaultResponse }
-  }
-
-  const successCode = 'SC100'
-  const fullBalanceSuccessCode = 'SC105'
-  const { statusCode, statusDescription } = status[0]
-
-  if (
-    statusCode.trim().toLowerCase() ===
-    fullBalanceSuccessCode.trim().toLowerCase()
-  ) {
-    return {
-      ...defaultResponse,
-      isSuccessful: true,
-    }
-  }
-
-  if (statusCode.trim().toLowerCase() !== successCode.trim().toLowerCase()) {
-    return {
-      ...defaultResponse,
-      statusDescription,
-    }
-  }
-
-  return { ...defaultResponse, isSuccessful: true }
-}
-
-const getRefreshMedisaveBalanceStatus = (response = []) => {
-  let defaultResponse = { isSuccessful: false, statusDescription: '' }
-  if (_.isEmpty(response)) {
-    return { ...defaultResponse }
-  }
-
-  const successCode = 'WN800'
-  const { status, statusDescription } = response
-
-  if (
-    status &&
-    status.trim().toLowerCase() !== successCode.trim().toLowerCase()
-  ) {
-    return {
-      ...defaultResponse,
-      statusDescription,
-    }
-  }
-
-  return { ...defaultResponse, isSuccessful: true }
-}
-
+ 
 const sortAdjustment = (a, b) => {
   const { sequence: aSequence } = a
   const { sequence: bSequence } = b
@@ -1556,6 +1504,7 @@ const getTranslationValue = (translationDatas = [], language, key) => {
 
 const getMappedVisitType = (visitpurpose, visitTypeSettingsObj) => {
   return visitpurpose
+  return visitpurpose
     .map((item, index) => {
       const { name, code, sortOrder, ...rest } = item
       const visitType = visitTypeSettingsObj
@@ -1673,8 +1622,6 @@ export {
   htmlDecode,
   htmlEncodeByRegExp,
   htmlDecodeByRegExp,
-  getRefreshChasBalanceStatus,
-  getRefreshMedisaveBalanceStatus,
   calculateAmount,
   removeFields,
   commonDataReaderTransform,

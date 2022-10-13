@@ -2,10 +2,8 @@ import React, { PureComponent } from 'react'
 import { withStyles } from '@material-ui/core'
 import { Button, CommonModal, GridContainer, GridItem } from '@/components'
 
-import CHASCardReplacement from '@/components/_medisys/SchemePopover/CHASCardReplacement'
 import { locationQueryParameters } from '@/utils/utils'
 import SchemesGrid from './SchemesGrid'
-import PayersGrid from './PayersGrid'
 
 const styles = () => ({})
 class Schemes extends PureComponent {
@@ -66,11 +64,6 @@ class Schemes extends PureComponent {
         },
       })
     }
-  }
-
-  isMedisave = schemeTypeFK => {
-    if (schemeTypeFK) return [12, 13, 14].indexOf(schemeTypeFK) >= 0
-    return false
   }
 
   createNewScheme = (result, values) => {
@@ -202,7 +195,6 @@ class Schemes extends PureComponent {
       tempSchemeTypeFK = schemeTypeFK
     }
 
-    const { isEnableCHAS } = this.props.clinicSettings
     return (
       <div>
         <div>
@@ -216,25 +208,7 @@ class Schemes extends PureComponent {
                 ? this.state.refreshedSchemeData.statusDescription
                 : ''}
             </GridItem>
-            <GridItem md={2}>
-              {isEnableCHAS && (
-                <Button
-                  color='primary'
-                  size='sm'
-                  style={{ float: 'right' }}
-                  onClick={() =>
-                    this.refreshChasBalance(
-                      tempPatientCoPaymentSchemeFK,
-                      tempSchemeTypeFK,
-                      isSaveToDb,
-                    )
-                  }
-                  disabled={disableSave}
-                >
-                  Get CHAS
-                </Button>
-              )}
-            </GridItem>
+            <GridItem md={2}></GridItem>
           </GridContainer>
         </div>
         <SchemesGrid
@@ -246,51 +220,6 @@ class Schemes extends PureComponent {
           entity={entity}
           {...restProps}
         />
-        <CommonModal
-          open={this.state.showReplacementModal}
-          title='CHAS Card Replacement'
-          maxWidth='sm'
-          onConfirm={() => this.handleReplacementModalVisibility(false)}
-          onClose={() => this.handleReplacementModalVisibility(false)}
-        >
-          <CHASCardReplacement
-            entity={values}
-            refreshedSchemeData={this.state.refreshedSchemeData}
-            handleOnClose={() => this.handleReplacementModalVisibility(false)}
-          />
-        </CommonModal>
-        <div
-          style={{
-            display:
-              values.patientScheme.filter(
-                o => this.isMedisave(o.schemeTypeFK) && !o.isDeleted,
-              ).length > 0
-                ? ''
-                : 'none',
-          }}
-        >
-          <h4
-            style={{
-              marginTop: theme.spacing(2),
-              marginLeft: theme.spacing(1),
-            }}
-          >
-            Medisave Payer
-          </h4>
-          <PayersGrid
-            enableAdd={
-              values.patientScheme
-                ? values.patientScheme.find(
-                    o => this.isMedisave(o.schemeTypeFK) && !o.isDeleted,
-                  )
-                : false
-            }
-            rows={values.schemePayer}
-            schema={schema.schemePayer._subType}
-            values={values}
-            {...restProps}
-          />
-        </div>
       </div>
     )
   }

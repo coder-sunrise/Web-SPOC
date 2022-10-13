@@ -70,8 +70,7 @@ const ActionButton = ({ row, onClick }) => {
       : true
 
   const isRetailVisit = row.visitPurposeFK === VISIT_TYPE.OTC
-  const isBillFirstVisit =
-    row.visitPurposeFK === VISIT_TYPE.BF || row.visitPurposeFK === VISIT_TYPE.MC
+  const isBillFirstVisit = row.visitPurposeFK === VISIT_TYPE.BF 
 
   const enableDispense = () => {
     const consDispense = [

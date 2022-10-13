@@ -59,12 +59,7 @@ const TestResultLabel = ({
         if (value < 8 || value > 20) {
           showWarnning = true
         }
-        break
-      case TESTTYPES.AUDIOMETRY:
-        if (value > 30) {
-          showWarnning = true
-        }
-        break
+        break 
       case TESTTYPES.COLORVISIONTEST:
         if (value === 'Abnormal') {
           showWarnning = true

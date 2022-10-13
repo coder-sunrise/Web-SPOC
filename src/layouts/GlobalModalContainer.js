@@ -18,7 +18,6 @@ import VisitRegistration from '@/pages/Reception/Queue/NewVisit'
 import UserProfileForm from '@/pages/Setting/UserProfile/UserProfileForm'
 import Adjustment from '@/pages/Shared/Adjustment'
 import ReportModal from '@/pages/Widgets/ConsultationDocument/ReportModal'
-import ReportingDetails from '@/pages/MedicalCheckup/Worklist/components/ReportingDetails'
 
 const styles = () => ({
   patientModal: {
@@ -90,12 +89,6 @@ class GlobalModalContainer extends PureComponent {
     dispatch({
       type: 'visitRegistration/closeModal',
     })
-    if (!global.showMedicalCheckupReportingDetails) {
-      dispatch({
-        type: 'patient/updateState',
-        payload: { entity: null },
-      })
-    }
   }
 
   closeConfirmationPrompt = () => {
@@ -179,33 +172,6 @@ class GlobalModalContainer extends PureComponent {
           observe='PatientDetail'
         >
           {global.showPatientInfoPanel && <PatientDetail {...this.props} />}
-        </CommonModal>
-
-        <CommonModal
-          // zIndex={1390}
-          fullScreen
-          // height='100%'
-          title='Reporting Details'
-          // placement='top'
-          headerStyle={{
-            textAlign: 'center',
-          }}
-          overrideLoading
-          onClose={() => {
-            dispatch({
-              type:
-                'medicalCheckupReportingDetails/closeMedicalCheckupReportingDetailsModal',
-              payload: {
-                history: this.props.history,
-              },
-            })
-          }}
-          open={global.showMedicalCheckupReportingDetails}
-          observe='PatientProfile'
-        >
-          {global.showMedicalCheckupReportingDetails && (
-            <ReportingDetails {...this.props} />
-          )}
         </CommonModal>
 
         <CommonModal

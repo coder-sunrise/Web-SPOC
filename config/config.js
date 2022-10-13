@@ -13,15 +13,7 @@ const plugins = {
     hmr: true,
     skipModelValidate: true,
   },
-  // layout: {
-  //   // https://umijs.org/zh-CN/plugins/plugin-layout
-  //   locale: true,
-  //   siderWidth: 208,
-  //   ...defaultSettings,
-  // },
-  // https://umijs.org/zh-CN/plugins/plugin-locale
   locale: {
-    // default zh-CN
     default: 'en-US',
     antd: true,
     // default true, when it is true, will use `navigator.language` overwrite default
@@ -64,12 +56,12 @@ export default defineConfig({
   hash: true,
   define: {
     APP_TYPE: process.env.APP_TYPE || '',
-    'process.env.default_cliniccode': 'jgh',
+    'process.env.default_cliniccode': 'spoc',
     'process.env.client_env': 'development',
     'process.env.client_secret':
       '20e392d2ea9bfa76f2a9cb26c31a34d675ad81281a31f89ed5d572de8da0b9e7',
     'process.env.url': 'http://localhost:55314',
-    // 'process.env.url': 'https://jgh-uat-api-211028.semr2.com',
+    // 'process.env.url': 'https://spoc-it-api-2022.semr2.com:8000',
     'process.env.signalrUrl':
       'https://semr2dev2010-websocket.emr.com.sg/notificationHub',
   },

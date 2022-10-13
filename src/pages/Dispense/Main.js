@@ -13,13 +13,13 @@ import { calculateAmount, navigateDirtyCheck } from '@/utils/utils'
 import Yup from '@/utils/yup'
 import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
-import { openCautionAlertOnStartConsultation } from '@/pages/Widgets/Orders/utils'
 import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 import AddOrder from './DispenseDetails/AddOrder'
 import DispenseDetails from './DispenseDetails/WebSocketWrapper'
 import { DispenseItemsColumnExtensions } from './variables'
 import _ from 'lodash'
 import patient from '@/models/patient'
+import { orderTypes } from '../Consultation/utils'
 
 const calculateInvoiceAmounts = entity => {
   const obj = { ...entity }
@@ -115,14 +115,6 @@ const constructPayload = values => {
 
   const _values = {
     ...values,
-    prescription: updateTempDispenseItem(
-      values.prescription,
-      'inventoryMedicationFK',
-    ),
-    vaccination: updateTempDispenseItem(
-      values.vaccination,
-      'inventoryVaccinationFK',
-    ),
     consumable: updateTempDispenseItem(
       values.consumable,
       'inventoryConsumableFK',
@@ -217,14 +209,7 @@ const validDispense = (dispenseItems = []) => {
     const result = calculateInvoiceAmounts(obj)
     return result
   },
-  validationSchema: Yup.object().shape({
-    prescription: Yup.array().of(
-      Yup.object().shape({
-        batchNo: Yup.string(),
-        expiryDate: Yup.date(),
-      }),
-    ),
-  }),
+  validationSchema: Yup.object().shape({}),
   handleSubmit: (values, { props, ...restProps }) => {
     const { dispatch, dispense } = props
     if (!validDispense(values.dispenseItems)) return
@@ -262,41 +247,12 @@ class Main extends Component {
   state = {
     showOrderModal: false,
     hasShowOrderModal: false,
-    showDrugLabelSelection: false,
-    showCautionAlert: false,
     isShowOrderUpdated: false,
     currentDrugToPrint: {},
-    packageItem: [],
-    dispenseItems: [],
-    packageItem: [],
     dispenseItems: [],
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const { prescription = [], packageItem = [] } = nextProps.values
-
-    let drugList = []
-    prescription.forEach(item => {
-      drugList.push(item)
-    })
-    packageItem.forEach(item => {
-      if (item.type === 'Medication') {
-        drugList.push({
-          ...item,
-          name: item.description,
-          dispensedQuanity: item.packageConsumeQuantity,
-        })
-      }
-    })
-
-    this.setState(() => {
-      return {
-        selectedDrugs: drugList.map(x => {
-          return { ...x, no: 1, selected: true }
-        }),
-      }
-    })
-  }
+  UNSAFE_componentWillReceiveProps(nextProps) {}
 
   componentWillUnmount = () => {
     this.props.dispatch({
@@ -320,8 +276,8 @@ class Main extends Component {
     dispatch({
       type: 'dispense/incrementLoadCount',
     })
-    const { otherOrder = [], prescription = [], packageItem = [] } = values
-    const isEmptyDispense = otherOrder.length === 0 && prescription.length === 0
+    const { otherOrder = [] } = values
+    const isEmptyDispense = otherOrder.length === 0
 
     // set default language based on patient tranlsation and clinic setting.
     const preferLanguage =
@@ -380,11 +336,6 @@ class Main extends Component {
             },
           })
           reloadDispense(this.props)
-
-          if (this.state.showCautionAlert) {
-            this.setState({ showCautionAlert: false })
-            openCautionAlertOnStartConsultation(o)
-          }
         }
       })
     }
@@ -403,28 +354,13 @@ class Main extends Component {
     }
   }
 
-  actualizeEditOrder = () => {
-    const { dispatch, values, dispense, orders } = this.props
-    this.setState(
-      prevState => {
-        return {
-          showOrderModal: !prevState.showOrderModal,
-          isFirstAddOrder: false,
-        }
-      },
-      () => {
-        this.openFirstTabAddOrder()
-      },
-    )
-  }
-
   openFirstTabAddOrder = () => {
     const { dispatch, values } = this.props
     if (this.state.showOrderModal) {
       dispatch({
         type: 'orders/updateState',
         payload: {
-          type: '1',
+          type: orderTypes[0].value,
           visitPurposeFK: values.visitPurposeFK,
         },
       })
@@ -499,10 +435,7 @@ class Main extends Component {
       newOrderRows.length > 0
     )
       this.showConfirmationBox()
-    else if (
-      visitPurposeFK === VISIT_TYPE.BF ||
-      visitPurposeFK === VISIT_TYPE.MC
-    ) {
+    else if (visitPurposeFK === VISIT_TYPE.BF) {
       dispatch({
         type: 'consultation/discard',
         payload: {
@@ -522,22 +455,6 @@ class Main extends Component {
       this.handleOrderModal()
     }
   }
-  // click Drug Label button to show drug label selection
-  handleDrugLabelClick = row => {
-    this.setState({ currentDrugToPrint: row })
-    this.setState(prevState => {
-      return {
-        showDrugLabelSelection: !prevState.showDrugLabelSelection,
-      }
-    })
-  }
-  handleDrugLabelSelectionClose = () => {
-    this.setState(prevState => {
-      return {
-        showDrugLabelSelection: !prevState.showDrugLabelSelection,
-      }
-    })
-  }
 
   showRefreshOrder = () => {
     const { dispense } = this.props
@@ -552,7 +469,6 @@ class Main extends Component {
         })
         this.setState({
           isShowOrderUpdated: true,
-          showDrugLabelSelection: false,
         })
       }
     }
@@ -584,11 +500,8 @@ class Main extends Component {
     }
     const { entity = {} } = visitRegistration
     const { visit = {} } = entity
-    const { service = [], prescription = [], consumable = [] } = values
-    const isEmptyDispense =
-      service.length === 0 &&
-      prescription.length === 0 &&
-      consumable.length === 0
+    const { service = [], consumable = [] } = values
+    const isEmptyDispense = service.length === 0 && consumable.length === 0
     const noClinicalObjectRecord = !values.clinicalObjectRecordFK
     if (visit.visitPurposeFK === VISIT_TYPE.OTC && isEmptyDispense) {
       this.setState(
@@ -606,7 +519,7 @@ class Main extends Component {
     }
   }
 
-  checkBillFirstAndMC = () => {
+  checkBillFirst = () => {
     const {
       dispatch,
       values,
@@ -626,26 +539,15 @@ class Main extends Component {
     }
     const { entity = {} } = visitRegistration
     const { visit = {} } = entity
-    const {
-      service = [],
-      prescription = [],
-      consumable = [],
-      vaccination = [],
-      packageItem = [],
-    } = values
-    const isEmptyDispense =
-      service.length === 0 &&
-      prescription.length === 0 &&
-      consumable.length === 0 &&
-      vaccination.length === 0
+    const { service = [], consumable = [] } = values
+    const isEmptyDispense = service.length === 0 && consumable.length === 0
     const accessRights = Authorized.check('queue.dispense.editorder')
     const noClinicalObjectRecord = !values.clinicalObjectRecordFK
 
     if (
       accessRights &&
       accessRights.rights !== 'hidden' &&
-      (visit.visitPurposeFK === VISIT_TYPE.BF ||
-        visit.visitPurposeFK === VISIT_TYPE.MC) &&
+      visit.visitPurposeFK === VISIT_TYPE.BF &&
       isEmptyDispense &&
       noClinicalObjectRecord &&
       !query.backToDispense
@@ -666,27 +568,7 @@ class Main extends Component {
       )
     }
 
-    let drugList = []
-    prescription.forEach(item => {
-      drugList.push(item)
-    })
-    packageItem.forEach(item => {
-      if (item.type === 'Medication') {
-        drugList.push({
-          ...item,
-          name: item.description,
-          dispensedQuanity: item.packageConsumeQuantity,
-        })
-      }
-    })
     if (dispense.loadCount === 0) {
-      this.setState(() => {
-        return {
-          selectedDrugs: drugList.map(x => {
-            return { ...x, no: 1, selected: true }
-          }),
-        }
-      })
       dispatch({
         type: 'dispense/incrementLoadCount',
       })
@@ -694,7 +576,7 @@ class Main extends Component {
   }
   render() {
     this.checkOTCAddOrder()
-    this.checkBillFirstAndMC()
+    this.checkBillFirst()
     const {
       classes,
       handleSubmit,
@@ -705,10 +587,6 @@ class Main extends Component {
       testProps,
     } = this.props
 
-    if (dispense.openOrderPopUpAfterActualize) {
-      this.actualizeEditOrder()
-      dispense.openOrderPopUpAfterActualize = false
-    }
     return (
       <div className={classes.root}>
         <DispenseDetails
@@ -717,10 +595,7 @@ class Main extends Component {
           onEditOrderClick={this.editOrder}
           onFinalizeClick={this.makePayment}
           onReloadClick={this.handleReloadClick}
-          onDrugLabelClick={this.handleDrugLabelClick}
           onLabLabelClick={this.handleLabLabelClick}
-          showDrugLabelSelection={this.state.showDrugLabelSelection}
-          onDrugLabelSelectionClose={this.handleDrugLabelSelectionClose}
           currentDrugToPrint={this.state.currentDrugToPrint}
           isIncludeExpiredItem={this.checkExpiredItems()}
         />

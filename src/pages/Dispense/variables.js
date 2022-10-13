@@ -16,26 +16,16 @@ import {
   CodeSelect,
 } from '@/components'
 import LowStockInfo from '@/pages/Widgets/Orders/Detail/LowStockInfo'
-import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
-import PackageDrawdownInfo from '@/pages/Widgets/Orders/Detail/PackageDrawdownInfo'
 import { InventoryTypes, orderItemTypes } from '@/utils/codes'
 import CONSTANTS from './DispenseDetails/constants'
 import Cross from '@material-ui/icons/HighlightOff'
 import { UnorderedListOutlined, CheckOutlined } from '@ant-design/icons'
-import {
-  LAB_WORKITEM_STATUS,
-  NURSE_WORKITEM_STATUS,
-  RADIOLOGY_WORKITEM_STATUS,
-  RADIOLOGY_WORKITEM_STATUS_TITLE,
-  WORK_ITEM_TYPES,
-} from '@/utils/constants'
-import LabWorkItemInfo from '@/pages/Reception/Queue/Grid/WorkItemPopover/LabWorkItemInfo'
 import Authorized from '@/utils/Authorized'
 export const tableConfig = {
   FuncProps: { pager: false },
 }
 
-const ServiceTypes = ['Service', 'Consumable', 'Treatment', 'Radiology', 'Lab']
+const ServiceTypes = ['Service', 'Consumable', 'Treatment']
 
 const iconStyle = {
   position: 'relative',
@@ -66,27 +56,11 @@ const showMoney = (v = 0) => {
 
 const getBatchOptions = row => {
   let stockList = []
-  if (row.type === 'Medication') {
-    stockList = (row.medicationStock || []).filter(
-      s =>
-        s.isDefault ||
-        (s.stock > 0 &&
-          (!s.expiryDate ||
-            moment(s.expiryDate).startOf('day') >= moment().startOf('day'))),
-    )
-  } else if (row.type === 'Consumable') {
+  if (row.type === 'Consumable') {
     stockList = (row.consumableStock || []).filter(
       s =>
         s.isDefault ||
         (s.stock > 0 &&
-          (!s.expiryDate ||
-            moment(s.expiryDate).startOf('day') >= moment().startOf('day'))),
-    )
-  } else if (row.type === 'Vaccination') {
-    stockList = (row.vaccinationStock || []).filter(
-      s =>
-        s.isDefault ||
-        (s.stock >= row.quantity &&
           (!s.expiryDate ||
             moment(s.expiryDate).startOf('day') >= moment().startOf('day'))),
     )
@@ -116,33 +90,6 @@ const getBatchOptions = row => {
   return stockList
 }
 
-export const actualizeTableConfig = selectable => {
-  return {
-    FuncProps: {
-      pager: false,
-      selectable: selectable,
-      selectConfig: {
-        showSelectAll: true,
-        rowSelectionEnabled: row => {
-          const {
-            isNurseActualizeRequired = false,
-            workitem: { nurseWorkitem: { statusFK } = {} } = {},
-            isPreOrder,
-            isExternalPrescription,
-          } = row
-
-          return (
-            !isPreOrder &&
-            !isExternalPrescription &&
-            isNurseActualizeRequired &&
-            statusFK !== NURSE_WORKITEM_STATUS.ACTUALIZED
-          )
-        },
-      },
-    },
-  }
-}
-
 export const getRowId = (r, idPrefix) => {
   const suffix = r.type
   if (idPrefix === 'OtherOrders') {
@@ -161,13 +108,7 @@ const lowStockIndicator = (row, itemIdFieldName, right) => {
   const values = {
     [currentType.itemFKName]: row[itemIdFieldName],
   }
-
-  // If is drug mixture, show drug mixture indicator
-  const isDrugMixture = currentType.name === 'Medication' && row.isDrugMixture
-
-  return isDrugMixture ? (
-    <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
-  ) : (
+  return (
     <LowStockInfo
       sourceType={currentType.name.toLowerCase()}
       values={values}
@@ -175,122 +116,6 @@ const lowStockIndicator = (row, itemIdFieldName, right) => {
       style={{}}
     />
   )
-}
-
-const packageDrawdownIndicator = row => {
-  if (!row.isPackage) return null
-
-  return (
-    <div style={{ position: 'relative' }}>
-      <PackageDrawdownInfo
-        drawdownData={row}
-        asAtDate={row.packageDrawdownAsAtDate}
-      />
-    </div>
-  )
-}
-
-const checkActualizable = row => {
-  const {
-    isNurseActualizeRequired = false,
-    workitem: { nurseWorkitem: { statusFK } = {} } = {},
-  } = row
-  return { isNurseActualizeRequired, statusFK }
-}
-
-export const isActualizable = row => {
-  const {
-    isNurseActualizeRequired = false,
-    workitem: { nurseWorkitem: { statusFK } = {} } = {},
-    isPreOrder,
-    isExternalPrescription,
-  } = row
-  if (
-    !isPreOrder &&
-    !isExternalPrescription &&
-    isNurseActualizeRequired &&
-    [NURSE_WORKITEM_STATUS.NEW, NURSE_WORKITEM_STATUS.CANCELLED].includes(
-      statusFK,
-    )
-  ) {
-    return true
-  }
-  return false
-}
-const actualizationButton = (row, buttonClickCallback) => {
-  let actualizationBtn = null
-  const { isNurseActualizeRequired, statusFK } = checkActualizable(row)
-  const cancelActualizeRight = Authorized.check(
-    'dispense.cancelactualizeorderitems',
-  )
-  const isHiddenCancelActualize =
-    cancelActualizeRight && cancelActualizeRight.rights === 'hidden'
-
-  if (isNurseActualizeRequired) {
-    if (
-      [NURSE_WORKITEM_STATUS.NEW, NURSE_WORKITEM_STATUS.CANCELLED].includes(
-        statusFK,
-      )
-    ) {
-      actualizationBtn = (
-        <Authorized authority='dispense.actualizeorderitems'>
-          <Tooltip title='To do'>
-            <Button
-              color='primary'
-              justIcon
-              onClick={() =>
-                buttonClickCallback(row, NURSE_WORKITEM_STATUS.NEW)
-              }
-            >
-              <span style={{ fontSize: 12, lineHeight: '17px' }}>TD</span>
-            </Button>
-          </Tooltip>
-        </Authorized>
-      )
-    } else if (statusFK === NURSE_WORKITEM_STATUS.ACTUALIZED) {
-      actualizationBtn = !isHiddenCancelActualize && (
-        <Tooltip title='Actualized'>
-          <Button
-            color='success'
-            justIcon
-            onClick={() =>
-              buttonClickCallback(row, NURSE_WORKITEM_STATUS.ACTUALIZED)
-            }
-          >
-            <CheckOutlined />
-          </Button>
-        </Tooltip>
-      )
-    }
-  }
-  return actualizationBtn
-}
-
-const radiologyDetailsButton = (row, buttonClickCallback) => {
-  let radiologyDetailsBtn = null
-  const {
-    type,
-    workitem: { radiologyWorkitem: { id: radiologyWorkitemID } = {} } = {},
-  } = row
-
-  if (
-    type === 'Radiology' &&
-    radiologyWorkitemID &&
-    Authorized.check('queue.radiologyexaminationdetails')?.rights !== 'hidden'
-  ) {
-    radiologyDetailsBtn = (
-      <Tooltip title='Radiology Details'>
-        <Button
-          color='primary'
-          justIcon
-          onClick={() => buttonClickCallback(radiologyWorkitemID)}
-        >
-          <UnorderedListOutlined />
-        </Button>
-      </Tooltip>
-    )
-  }
-  return radiologyDetailsBtn
 }
 
 export const DispenseItemsColumns = [
@@ -369,66 +194,8 @@ export const DispenseItemsColumns = [
   },
 ]
 
-export const DispenseItemsColumns1 = (
-  viewOnly = false,
-  onDrugLabelClick,
-  onActualizeBtnClick,
-  showDrugLabelRemark,
-  onValueChange,
-  isShowDispenseActualie,
-  isFromMedicalCheckup = false,
-) => {
+export const DispenseItemsColumns1 = (viewOnly = false, onValueChange) => {
   let columns = [
-    {
-      dataIndex: 'isCheckActualize',
-      key: 'isCheckActualize',
-      width: 50,
-      onCell: row => {
-        const mergeCell = viewOnly ? 14 : 16
-        if (row.isGroup)
-          return {
-            colSpan: mergeCell,
-            style: { backgroundColor: 'rgb(240, 248, 255)' },
-          }
-        return {
-          rowSpan: row.groupNumber === 1 ? row.groupRowSpan : 0,
-        }
-      },
-      render: (_, row) => {
-        if (row.isGroup) {
-          if (row.groupName === 'NormalDispense')
-            return (
-              <div style={{ padding: '3px 0px' }}>
-                <span style={{ fontWeight: 600 }}>Normal Dispense Items</span>
-              </div>
-            )
-          if (row.groupName === 'NoNeedToDispense')
-            return (
-              <div style={{ padding: '3px 0px' }}>
-                <span style={{ fontWeight: 600 }}>
-                  No Need To Dispense Items
-                </span>
-              </div>
-            )
-          return (
-            <div style={{ padding: '3px 0px' }}>
-              <span style={{ fontWeight: 600 }}>{'Drug Mixture: '}</span>
-              {row.groupName}
-            </div>
-          )
-        }
-        if (!isActualizable(row)) return ''
-        return (
-          <Checkbox
-            style={{ marginLeft: 12 }}
-            checked={row.isCheckActualize}
-            onClick={e => {
-              onValueChange(row.uid, 'isCheckActualize', !row.isCheckActualize)
-            }}
-          />
-        )
-      },
-    },
     {
       dataIndex: 'type',
       key: 'type',
@@ -437,8 +204,7 @@ export const DispenseItemsColumns1 = (
       onCell: row => {
         if (row.isGroup) {
           let mergeCell = 0
-          if (!isShowDispenseActualie || viewOnly)
-            mergeCell = viewOnly ? 14 : 15
+          if (viewOnly) mergeCell = viewOnly ? 14 : 15
           return {
             colSpan: mergeCell,
             style: { backgroundColor: 'rgb(240, 248, 255)' },
@@ -449,7 +215,7 @@ export const DispenseItemsColumns1 = (
         }
       },
       render: (_, row) => {
-        if (row.isGroup && (!isShowDispenseActualie || viewOnly)) {
+        if (row.isGroup && viewOnly) {
           if (row.groupName === 'NormalDispense')
             return (
               <div style={{ padding: '3px 0px' }}>
@@ -473,13 +239,7 @@ export const DispenseItemsColumns1 = (
         }
 
         let paddingRight = 0
-        if ((row.isActualizedPreOrder || row.isPreOrder) && row.isExclusive) {
-          paddingRight = 52
-        } else if (
-          row.isActualizedPreOrder ||
-          row.isPreOrder ||
-          row.isExclusive
-        ) {
+        if (row.isExclusive) {
           paddingRight = 24
         }
         const itemType = orderItemTypes.find(
@@ -497,23 +257,13 @@ export const DispenseItemsColumns1 = (
             <Tooltip title={row.type}>
               <span>{itemType?.displayValue}</span>
             </Tooltip>
-            <div style={{ position: 'absolute', top: '-1px', right: '-6px' }}>
-              {(row.isPreOrder || row.isActualizedPreOrder) && (
-                <Tooltip
-                  title={
-                    row.isPreOrder ? 'New Pre-Order' : 'Actualized Pre-Order'
-                  }
-                >
-                  <div
-                    style={{
-                      ...iconStyle,
-                      backgroundColor: row.isPreOrder ? '#4255bd' : 'green',
-                    }}
-                  >
-                    Pre
-                  </div>
-                </Tooltip>
-              )}
+            <div
+              style={{
+                position: 'absolute',
+                top: '-1px',
+                right: '-6px',
+              }}
+            >
               {row.isExclusive && (
                 <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                   <div
@@ -550,20 +300,11 @@ export const DispenseItemsColumns1 = (
         rowSpan: row.countNumber === 1 ? row.rowspan : 0,
       }),
       render: (_, row) => {
-        const isShowStockIndicator =
-          ['Medication', 'External Prescription', 'Vaccination'].indexOf(
-            row.type,
-          ) > -1
-        let paddingRight = 0
-        if (isShowStockIndicator) {
-          paddingRight = 10
-        }
         return (
           <div
             style={{
               wordWrap: 'break-word',
               whiteSpace: 'pre-wrap',
-              paddingRight,
               position: 'relative',
               top: 2,
             }}
@@ -583,15 +324,9 @@ export const DispenseItemsColumns1 = (
               {lowStockIndicator(
                 {
                   ...row,
-                  isDrugMixture: false,
-                  type:
-                    row.type === 'External Prescription'
-                      ? 'Medication'
-                      : row.type,
+                  type: row.type,
                 },
-                ['Medication', 'External Prescription'].indexOf(row.type) > -1
-                  ? 'inventoryMedicationFK'
-                  : 'inventoryVaccinationFK',
+                'itemFK',
                 -20,
               )}
             </div>
@@ -636,7 +371,7 @@ export const DispenseItemsColumns1 = (
       onCell: row => ({ colSpan: row.isGroup ? 0 : 1 }),
       align: 'right',
       render: (_, row) => {
-        if (isFromMedicalCheckup || viewOnly || !row.allowToDispense) {
+        if (viewOnly || !row.allowToDispense) {
           const qty = !row.stockFK
             ? '-'
             : numeral(row.dispenseQuantity).format('0.0')
@@ -647,7 +382,7 @@ export const DispenseItemsColumns1 = (
           )
         }
         let maxQuantity
-        if (row.isDefault || row.isDispensedByPharmacy) {
+        if (row.isDefault) {
           maxQuantity = row.quantity
         } else {
           maxQuantity = row.quantity > row.stock ? row.stock : row.quantity
@@ -660,7 +395,6 @@ export const DispenseItemsColumns1 = (
               format='0.0'
               //max={maxQuantity}
               min={0}
-              disabled={row.isDispensedByPharmacy}
               precision={1}
               value={row.dispenseQuantity}
               onChange={e => {
@@ -722,7 +456,7 @@ export const DispenseItemsColumns1 = (
           !viewOnly &&
           row.expiryDate &&
           moment(row.expiryDate).startOf('day') < moment().startOf('day')
-        if (isFromMedicalCheckup || viewOnly || !row.allowToDispense) {
+        if (viewOnly || !row.allowToDispense) {
           return (
             <div>
               <Tooltip title={row.batchNo}>
@@ -779,7 +513,7 @@ export const DispenseItemsColumns1 = (
       width: 110,
       onCell: row => ({ colSpan: row.isGroup ? 0 : 1 }),
       render: (_, row) => {
-        if (isFromMedicalCheckup || viewOnly || !row.isDefault) {
+        if (viewOnly || !row.isDefault) {
           const expiryDate = row.expiryDate
             ? moment(row.expiryDate).format('DD MMM YYYY')
             : '-'
@@ -860,15 +594,10 @@ export const DispenseItemsColumns1 = (
         rowSpan: row.groupNumber === 1 ? row.groupRowSpan : 0,
       }),
       render: (_, row) => {
-        const existsDrugLabelRemarks =
-          showDrugLabelRemark &&
-          row.drugLabelRemarks &&
-          row.drugLabelRemarks.trim() !== ''
         return (
           <div style={{ position: 'relative' }}>
             <div
               style={{
-                paddingRight: existsDrugLabelRemarks ? 10 : 0,
                 minHeight: 20,
               }}
             >
@@ -876,27 +605,6 @@ export const DispenseItemsColumns1 = (
                 <span className='oneline_textblock'>{row.remarks || ' '}</span>
               </Tooltip>
             </div>
-
-            {existsDrugLabelRemarks && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 6,
-                  right: -8,
-                }}
-              >
-                <Tooltip
-                  title={
-                    <div>
-                      <div style={{ fontWeight: 500 }}>Drug Label Remarks</div>
-                      <div>{row.drugLabelRemarks}</div>
-                    </div>
-                  }
-                >
-                  <FileCopySharp style={{ color: '#4255bd' }} />
-                </Tooltip>
-              </div>
-            )}
           </div>
         )
       },
@@ -926,11 +634,7 @@ export const DispenseItemsColumns1 = (
       align: 'right',
       width: 100,
       render: (_, row) => {
-        return showMoney(
-          (row.isPreOrder && !row.isChargeToday) || row.hasPaid
-            ? 0
-            : row.adjAmt,
-        )
+        return showMoney(row.hasPaid ? 0 : row.adjAmt)
       },
     },
     {
@@ -944,11 +648,7 @@ export const DispenseItemsColumns1 = (
       align: 'right',
       width: 100,
       render: (_, row) => {
-        return showMoney(
-          (row.isPreOrder && !row.isChargeToday) || row.hasPaid
-            ? 0
-            : row.totalAfterItemAdjustment,
-        )
+        return showMoney(row.hasPaid ? 0 : row.totalAfterItemAdjustment)
       },
     },
     {
@@ -961,35 +661,11 @@ export const DispenseItemsColumns1 = (
       }),
       width: 75,
       render: (_, row) => {
-        return (
-          <div>
-            {!viewOnly && actualizationButton(row, onActualizeBtnClick)}
-            {(row.type === 'Medication' ||
-              row.type === 'Open Prescription') && (
-              <Tooltip
-                title={
-                  <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
-                }
-              >
-                <Button
-                  color='primary'
-                  onClick={() => {
-                    onDrugLabelClick(row)
-                  }}
-                  justIcon
-                >
-                  <Print />
-                </Button>
-              </Tooltip>
-            )}
-          </div>
-        )
+        return <div></div>
       },
     },
   ]
 
-  if (!isShowDispenseActualie || viewOnly)
-    columns = columns.filter(c => c.dataIndex !== 'isCheckActualize')
   if (viewOnly) {
     columns = columns.filter(c => c.dataIndex !== 'stock')
   }
@@ -997,25 +673,12 @@ export const DispenseItemsColumns1 = (
   return columns
 }
 
-export const DispenseItemsColumnExtensions = (
-  viewOnly = false,
-  onDrugLabelClick,
-  onActualizeBtnClick,
-  showDrugLabelRemark,
-  isFromMedicalCheckup = false,
-) => {
+export const DispenseItemsColumnExtensions = (viewOnly = false) => {
   return [
     {
       columnName: 'dispenseGroupId',
       width: 0,
       sortingEnabled: false,
-    },
-    {
-      columnName: 'isCheckActualize',
-      width: 50,
-      sortingEnabled: false,
-      type: 'checkbox',
-      isVisible: row => isActualizable(row),
     },
     {
       columnName: 'type',
@@ -1025,9 +688,9 @@ export const DispenseItemsColumnExtensions = (
       disabled: true,
       render: row => {
         let paddingRight = 0
-        if (row.isPreOrder && row.isExclusive) {
+        if (row.isExclusive) {
           paddingRight = 52
-        } else if (row.isPreOrder || row.isExclusive) {
+        } else if (row.isExclusive) {
           paddingRight = 24
         }
         return (
@@ -1043,27 +706,6 @@ export const DispenseItemsColumnExtensions = (
               <span>{row.type}</span>
             </Tooltip>
             <div style={{ position: 'absolute', top: '-1px', right: '-6px' }}>
-              {row.isPreOrder && (
-                <Tooltip title='New Pre-Order'>
-                  <div
-                    style={{
-                      position: 'relative',
-                      borderRadius: 4,
-                      backgroundColor: '#4255bd',
-                      fontWeight: 500,
-                      color: 'white',
-                      fontSize: '0.7rem',
-                      padding: '2px 3px',
-                      height: 20,
-                      display: 'inline-block',
-                      margin: '0px 1px',
-                      lineHeight: '16px',
-                    }}
-                  >
-                    Pre
-                  </div>
-                </Tooltip>
-              )}
               {row.isExclusive && (
                 <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                   <div
@@ -1110,20 +752,11 @@ export const DispenseItemsColumnExtensions = (
       disabled: true,
       sortingEnabled: false,
       render: row => {
-        const isShowStockIndicator =
-          ['Medication', 'External Prescription', 'Vaccination'].indexOf(
-            row.type,
-          ) > -1
-        let paddingRight = 0
-        if (isShowStockIndicator) {
-          paddingRight = 10
-        }
         return (
           <div
             style={{
               wordWrap: 'break-word',
               whiteSpace: 'pre-wrap',
-              paddingRight,
             }}
           >
             <Tooltip title={row.name}>
@@ -1133,15 +766,9 @@ export const DispenseItemsColumnExtensions = (
               {lowStockIndicator(
                 {
                   ...row,
-                  isDrugMixture: false,
-                  type:
-                    row.type === 'External Prescription'
-                      ? 'Medication'
-                      : row.type,
+                  type: row.type,
                 },
-                ['Medication', 'External Prescription'].indexOf(row.type) > -1
-                  ? 'inventoryMedicationFK'
-                  : 'inventoryVaccinationFK',
+                'itemFK',
                 -20,
               )}
             </div>
@@ -1175,10 +802,6 @@ export const DispenseItemsColumnExtensions = (
       disabled: true,
       sortingEnabled: false,
       render: row => {
-        const existsDrugLabelRemarks =
-          showDrugLabelRemark &&
-          row.drugLabelRemarks &&
-          row.drugLabelRemarks.trim() !== ''
         return (
           <div style={{ position: 'relative' }}>
             <div
@@ -1186,37 +809,13 @@ export const DispenseItemsColumnExtensions = (
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
-                paddingRight: existsDrugLabelRemarks ? 10 : 0,
+                paddingRight: 0,
                 minHeight: 20,
               }}
             >
               <Tooltip title={row.remarks || ''}>
                 <span>{row.remarks || ' '}</span>
               </Tooltip>
-            </div>
-            <div style={{ position: 'relative', top: 6 }}>
-              {existsDrugLabelRemarks && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: 2,
-                    right: -8,
-                  }}
-                >
-                  <Tooltip
-                    title={
-                      <div>
-                        <div style={{ fontWeight: 500 }}>
-                          Drug Label Remarks
-                        </div>
-                        <div>{row.drugLabelRemarks}</div>
-                      </div>
-                    }
-                  >
-                    <FileCopySharp style={{ color: '#4255bd' }} />
-                  </Tooltip>
-                </div>
-              )}
             </div>
           </div>
         )
@@ -1230,11 +829,7 @@ export const DispenseItemsColumnExtensions = (
       type: 'currency',
       sortingEnabled: false,
       render: row => {
-        return showMoney(
-          (row.isPreOrder && !row.isChargeToday) || row.hasPaid
-            ? 0
-            : row.totalAfterItemAdjustment,
-        )
+        return showMoney(row.hasPaid ? 0 : row.totalAfterItemAdjustment)
       },
     },
     {
@@ -1260,15 +855,10 @@ export const DispenseItemsColumnExtensions = (
       sortingEnabled: false,
       type: 'number',
       isDisabled: row => {
-        return (
-          isFromMedicalCheckup ||
-          viewOnly ||
-          !row.allowToDispense ||
-          row.isDispensedByPharmacy
-        )
+        return viewOnly || !row.allowToDispense || row.isDispensedByPharmacy
       },
       render: row => {
-        if (isFromMedicalCheckup || viewOnly || !row.allowToDispense) {
+        if (viewOnly || !row.allowToDispense) {
           const qty = !row.stockFK
             ? '-'
             : numeral(row.dispenseQuantity).format('0.0')
@@ -1377,29 +967,11 @@ export const DispenseItemsColumnExtensions = (
       valueField: 'id',
       options: row => {
         let stockList = []
-        if (row.type === 'Medication') {
-          stockList = (row.medicationStock || []).filter(
-            s =>
-              s.isDefault ||
-              (s.stock > 0 &&
-                (!s.expiryDate ||
-                  moment(s.expiryDate).startOf('day') >=
-                    moment().startOf('day'))),
-          )
-        } else if (row.type === 'Consumable') {
+        if (row.type === 'Consumable') {
           stockList = (row.consumableStock || []).filter(
             s =>
               s.isDefault ||
               (s.stock > 0 &&
-                (!s.expiryDate ||
-                  moment(s.expiryDate).startOf('day') >=
-                    moment().startOf('day'))),
-          )
-        } else if (row.type === 'Vaccination') {
-          stockList = (row.vaccinationStock || []).filter(
-            s =>
-              s.isDefault ||
-              (s.stock >= row.quantity &&
                 (!s.expiryDate ||
                   moment(s.expiryDate).startOf('day') >=
                     moment().startOf('day'))),
@@ -1456,7 +1028,7 @@ export const DispenseItemsColumnExtensions = (
         )
       },
       isDisabled: row => {
-        return isFromMedicalCheckup || viewOnly || !row.allowToDispense
+        return viewOnly || !row.allowToDispense
       },
       onChange: ({ option, row }) => {
         if (option) {
@@ -1503,7 +1075,7 @@ export const DispenseItemsColumnExtensions = (
       sortingEnabled: false,
       type: 'date',
       isDisabled: row => {
-        return isFromMedicalCheckup || viewOnly || !row.isDefault
+        return viewOnly || !row.isDefault
       },
       render: row => {
         const expiryDate = row.expiryDate
@@ -1528,29 +1100,7 @@ export const DispenseItemsColumnExtensions = (
       disabled: true,
       align: 'left',
       render: row => {
-        return (
-          <div>
-            {!viewOnly && actualizationButton(row, onActualizeBtnClick)}
-            {(row.type === 'Medication' ||
-              row.type === 'Open Prescription') && (
-              <Tooltip
-                title={
-                  <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
-                }
-              >
-                <Button
-                  color='primary'
-                  onClick={() => {
-                    onDrugLabelClick(row)
-                  }}
-                  justIcon
-                >
-                  <Print />
-                </Button>
-              </Tooltip>
-            )}
-          </div>
-        )
+        return <div></div>
       },
     },
   ]
@@ -1598,64 +1148,19 @@ export const ServiceColumns = [
 export const ServiceColumns1 = (
   viewOnly = false,
   onPrint,
-  onActualizeBtnClick,
-  onRadiologyBtnClick,
   dispatch,
   visitFK,
   onValueChange,
-  isShowServiceActualie,
 ) => {
   let columns = [
-    {
-      dataIndex: 'isCheckActualize',
-      key: 'isCheckActualize',
-      align: 'center',
-      width: 50,
-      render: (_, row) => {
-        if (!isActualizable(row)) return ''
-        return (
-          <Checkbox
-            checked={row.isCheckActualize}
-            onClick={e => {
-              onValueChange(row.id, 'isCheckActualize', !row.isCheckActualize)
-            }}
-          />
-        )
-      },
-    },
     {
       dataIndex: 'type',
       key: 'type',
       title: 'Type',
       width: 180,
       render: (_, row) => {
-        let radiologyWorkitemStatusFK
-        if (row.type === 'Radiology' && !row.isPreOrder) {
-          const {
-            workitem: { radiologyWorkitem: { statusFK } = {} } = {},
-          } = row
-          radiologyWorkitemStatusFK = statusFK
-        }
-
-        let labWorkItems = {}
-        let labItemStyle = {}
-        if (row.type === 'Lab' && !row.isPreOrder) {
-          const { workitem } = row
-          labWorkItems = {
-            type: WORK_ITEM_TYPES.LAB,
-            totalWorkItem: workitem?.labWorkitems?.length,
-            completedWorkItemCount: workitem?.labWorkitems?.filter(
-              t => t.statusFK === LAB_WORKITEM_STATUS.COMPLETED,
-            ).length,
-          }
-        }
-
-        let paddingRight = row.isActualizedPreOrder || row.isPreOrder ? 24 : 0
+        let paddingRight = 0
         let urgentRight = 0
-
-        if (radiologyWorkitemStatusFK) {
-          paddingRight += 24
-        }
 
         if (row.priority === 'Urgent') {
           paddingRight += 34
@@ -1684,29 +1189,6 @@ export const ServiceColumns1 = (
                 alignItems: 'start',
               }}
             >
-              {(row.isPreOrder || row.isActualizedPreOrder) && (
-                <Tooltip title={row.isPreOrder ? 'Actualized Pre-Order' : ''}>
-                  <div
-                    style={{
-                      ...iconStyle,
-                      backgroundColor: row.isPreOrder ? '#4255bd' : 'green',
-                    }}
-                  >
-                    Pre
-                  </div>
-                </Tooltip>
-              )}
-              {radiologyWorkitemStatusFK &&
-                radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
-              {row.workitem?.labWorkitems &&
-                row.workitem?.labWorkitems?.length > 0 && (
-                  <LabWorkItemInfo
-                    dispatch={dispatch}
-                    visitFK={visitFK}
-                    workItemFK={row.workitem?.id}
-                    workItemSummary={labWorkItems}
-                  />
-                )}
               {urgentIndicator(row, urgentRight)}
             </Space>
           </div>
@@ -1815,11 +1297,7 @@ export const ServiceColumns1 = (
       render: (_, row) => {
         const { type } = row
         if (!ServiceTypes.includes(type)) return 'N/A'
-        return showMoney(
-          (row.isPreOrder && !row.isChargeToday) || row.hasPaid
-            ? 0
-            : row.totalAfterItemAdjustment,
-        )
+        return showMoney(row.hasPaid ? 0 : row.totalAfterItemAdjustment)
       },
     },
     {
@@ -1831,12 +1309,7 @@ export const ServiceColumns1 = (
         const { type } = r
 
         if (!viewOnly && ServiceTypes.includes(type)) {
-          return (
-            <div>
-              {actualizationButton(r, onActualizeBtnClick)}
-              {radiologyDetailsButton(r, onRadiologyBtnClick)}
-            </div>
-          )
+          return <div></div>
         }
         return (
           <Tooltip title='Print'>
@@ -1854,9 +1327,6 @@ export const ServiceColumns1 = (
       },
     },
   ]
-  if (!isShowServiceActualie || viewOnly) {
-    columns = columns.filter(c => c.dataIndex !== 'isCheckActualize')
-  }
   return columns
 }
 
@@ -1941,109 +1411,14 @@ const urgentIndicator = (row, right) => {
   )
 }
 
-const radiologyWorkitemStatus = radiologyWorkitemStatusFK => {
-  if (radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.NEW)
-    return (
-      <Tooltip title='New'>
-        <div
-          style={{
-            borderRadius: 8,
-            height: 16,
-            width: 16,
-            border: '2px solid #4876FF',
-            cursor: 'pointer',
-          }}
-        />
-      </Tooltip>
-    )
-
-  if (
-    radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED ||
-    radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.COMPLETED ||
-    radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
-  )
-    return (
-      <Tooltip
-        title={
-          radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
-            ? 'In Progress'
-            : radiologyWorkitemStatusFK ===
-              RADIOLOGY_WORKITEM_STATUS.MODALITYCOMPLETED
-            ? 'Modality Completed'
-            : 'Completed'
-        }
-      >
-        <div
-          style={{
-            borderRadius: 8,
-            height: 16,
-            width: 16,
-            backgroundColor:
-              radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.INPROGRESS
-                ? '#1890FF'
-                : '#009900',
-            cursor: 'pointer',
-          }}
-        />
-      </Tooltip>
-    )
-  if (radiologyWorkitemStatusFK === RADIOLOGY_WORKITEM_STATUS.CANCELLED)
-    return (
-      <Tooltip title='Cancelled'>
-        <div
-          style={{
-            cursor: 'pointer',
-          }}
-        >
-          <Cross
-            style={{ color: 'black', height: 20, width: 20 }}
-            color='black'
-          />
-        </div>
-      </Tooltip>
-    )
-  return ''
-}
-
-export const OtherOrdersColumnExtensions = (
-  viewOnly = false,
-  onPrint,
-  onActualizeBtnClick,
-  onRadiologyBtnClick,
-  dispatch,
-  visitFK,
-) => [
+export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
   {
     columnName: 'type',
     compare: compareString,
     width: 180,
     render: row => {
-      let radiologyWorkitemStatusFK
-      if (row.type === 'Radiology' && !row.isPreOrder) {
-        const { workitem: { radiologyWorkitem: { statusFK } = {} } = {} } = row
-        // const { radiologyWorkitem = {} } = workitem
-        radiologyWorkitemStatusFK = statusFK
-      }
-
-      let labWorkItems = {}
-      let labItemStyle = {}
-      if (row.type === 'Lab' && !row.isPreOrder) {
-        const { workitem } = row
-        labWorkItems = {
-          type: WORK_ITEM_TYPES.LAB,
-          totalWorkItem: workitem?.labWorkitems?.length,
-          completedWorkItemCount: workitem?.labWorkitems?.filter(
-            t => t.statusFK === LAB_WORKITEM_STATUS.COMPLETED,
-          ).length,
-        }
-      }
-
-      let paddingRight = row.isPreOrder ? 24 : 0
+      let paddingRight = 0
       let urgentRight = 0
-
-      if (radiologyWorkitemStatusFK) {
-        paddingRight += 24
-      }
 
       if (row.priority === 'Urgent') {
         paddingRight += 34
@@ -2067,35 +1442,6 @@ export const OtherOrdersColumnExtensions = (
               alignItems: 'start',
             }}
           >
-            {row.isPreOrder && (
-              <Tooltip title='New Pre-Order'>
-                <div
-                  style={{
-                    borderRadius: 4,
-                    backgroundColor: '#4255bd',
-                    fontWeight: 500,
-                    color: 'white',
-                    fontSize: '0.7rem',
-                    padding: '2px 3px',
-                    height: 20,
-                    lineHeight: '16px',
-                  }}
-                >
-                  Pre
-                </div>
-              </Tooltip>
-            )}
-            {radiologyWorkitemStatusFK &&
-              radiologyWorkitemStatus(radiologyWorkitemStatusFK)}
-            {row.workitem?.labWorkitems &&
-              row.workitem?.labWorkitems?.length > 0 && (
-                <LabWorkItemInfo
-                  dispatch={dispatch}
-                  visitFK={visitFK}
-                  workItemFK={row.workitem?.id}
-                  workItemSummary={labWorkItems}
-                />
-              )}
             {urgentIndicator(row, urgentRight)}
           </Space>
         </div>
@@ -2189,11 +1535,7 @@ export const OtherOrdersColumnExtensions = (
     render: row => {
       const { type } = row
       if (!ServiceTypes.includes(type)) return 'N/A'
-      return showMoney(
-        (row.isPreOrder && !row.isChargeToday) || row.hasPaid
-          ? 0
-          : row.totalAfterItemAdjustment,
-      )
+      return showMoney(row.hasPaid ? 0 : row.totalAfterItemAdjustment)
     },
   },
   {
@@ -2204,12 +1546,7 @@ export const OtherOrdersColumnExtensions = (
       const { type } = r
 
       if (!viewOnly && ServiceTypes.includes(type)) {
-        return (
-          <div>
-            {actualizationButton(r, onActualizeBtnClick)}
-            {radiologyDetailsButton(r, onRadiologyBtnClick)}
-          </div>
-        )
+        return <div></div>
       }
       return (
         <Tooltip title='Print'>
@@ -2218,351 +1555,6 @@ export const OtherOrdersColumnExtensions = (
             justIcon
             onClick={() => {
               onPrint({ type: CONSTANTS.DOCUMENTS, row: r })
-            }}
-          >
-            <Print />
-          </Button>
-        </Tooltip>
-      )
-    },
-  },
-]
-
-export const DrugLabelSelectionColumns = [
-  {
-    name: 'displayName',
-    title: 'Item',
-  },
-  {
-    name: 'no',
-    title: 'Copies',
-  },
-]
-
-export const DrugLabelSelectionColumnExtensions = (
-  handleDrugLabelSelected,
-  handleDrugLabelNoChanged,
-) => [
-  {
-    disabled: true,
-    columnName: 'displayName',
-    sortingEnabled: false,
-    render: row => {
-      return (
-        <div style={{ position: 'relative' }}>
-          <div
-            style={{
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
-            }}
-          >
-            {row.displayName}
-          </div>
-        </div>
-      )
-    },
-  },
-  {
-    columnName: 'no',
-    type: 'number',
-    width: 80,
-    sortingEnabled: false,
-    render: row => {
-      return (
-        <p>
-          <NumberInput
-            max={99}
-            precision={0}
-            min={1}
-            value={row.no}
-            defaultValue={1}
-            onChange={obj => {
-              handleDrugLabelNoChanged(row.id, obj.target.value)
-            }}
-          />
-        </p>
-      )
-    },
-  },
-]
-
-export const PackageColumns = [
-  {
-    name: 'type',
-    title: 'Type',
-  },
-  {
-    name: 'description',
-    title: 'Description',
-  },
-  {
-    name: 'remarks',
-    title: 'Remarks',
-  },
-  {
-    name: 'packageConsumeQuantity',
-    title: 'Consumed',
-  },
-  {
-    name: 'packageRemainingQuantity',
-    title: 'Balance',
-  },
-  {
-    name: 'totalAfterItemAdjustment',
-    title: 'Total ($)',
-  },
-  {
-    name: 'action',
-    title: 'Action',
-  },
-  {
-    name: 'packageGlobalId',
-    title: 'Package',
-  },
-]
-
-export const PackageColumnExtensions = (onPrint, showDrugLabelRemark) => [
-  {
-    columnName: 'type',
-    compare: compareString,
-    width: 120,
-    sortingEnabled: false,
-    render: row => {
-      return (
-        <div
-          style={{
-            wordWrap: 'break-word',
-            whiteSpace: 'pre-wrap',
-            paddingRight: 24,
-            position: 'relative',
-          }}
-        >
-          {row.type}
-          <div style={{ position: 'absolute', top: '-1px', right: '-6px' }}>
-            {row.isExclusive && (
-              <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
-                <div
-                  style={{
-                    position: 'relative',
-                    borderRadius: 4,
-                    backgroundColor: 'green',
-                    fontWeight: 500,
-                    color: 'white',
-                    fontSize: '0.7rem',
-                    padding: '2px 3px',
-                    height: 20,
-                    display: 'inline-block',
-                    margin: '0px 1px',
-                    lineHeight: '16px',
-                  }}
-                >
-                  Excl.
-                </div>
-              </Tooltip>
-            )}
-          </div>
-        </div>
-      )
-    },
-  },
-  {
-    columnName: 'description',
-    compare: compareString,
-    sortingEnabled: false,
-    width: '60%',
-    render: row => {
-      const { code = '', description = '', unitPrice = 0 } = row
-      return (
-        <Tooltip
-          title={
-            <div>
-              {`Code: ${code}`}
-              <br />
-              {`Name: ${description}`}
-            </div>
-          }
-        >
-          <div
-            style={{
-              wordWrap: 'break-word',
-              whiteSpace: 'pre-wrap',
-            }}
-          >
-            {packageDrawdownIndicator(row)}
-            <div
-              style={{
-                position: 'relative',
-                left: 22,
-              }}
-            >
-              {row.description}
-            </div>
-            <div style={{ position: 'relative', top: 2 }}>
-              {lowStockIndicator(row, 'itemFK')}
-            </div>
-          </div>
-        </Tooltip>
-      )
-    },
-  },
-  {
-    columnName: 'remarks',
-    width: '40%',
-    render: row => {
-      const existsDrugLabelRemarks =
-        showDrugLabelRemark &&
-        row.drugLabelRemarks &&
-        row.drugLabelRemarks.trim() !== ''
-      return (
-        <div style={{ position: 'relative' }}>
-          <div
-            style={{
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              paddingRight: existsDrugLabelRemarks ? 10 : 0,
-              minHeight: 20,
-            }}
-          >
-            <Tooltip title={row.remarks || ''}>
-              <span> {row.remarks || ' '}</span>
-            </Tooltip>
-          </div>
-          <div style={{ position: 'relative', top: 6 }}>
-            {existsDrugLabelRemarks && (
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: 2,
-                  right: -8,
-                }}
-              >
-                <Tooltip
-                  title={
-                    <div>
-                      <div style={{ fontWeight: 500 }}>Drug Label Remarks</div>
-                      <div>{row.drugLabelRemarks}</div>
-                    </div>
-                  }
-                >
-                  <FileCopySharp style={{ color: '#4255bd' }} />
-                </Tooltip>
-              </div>
-            )}
-          </div>
-        </div>
-      )
-    },
-  },
-  {
-    columnName: 'packageConsumeQuantity',
-    align: 'right',
-    width: 130,
-    sortingEnabled: false,
-    render: row => {
-      let qty = `${numeral(row.packageConsumeQuantity || 0).format(
-        '0,0.0',
-      )} ${row.dispenseUOM || ''}`
-      return (
-        <Tooltip title={qty}>
-          <span>{qty}</span>
-        </Tooltip>
-      )
-    },
-  },
-  {
-    columnName: 'packageRemainingQuantity',
-    align: 'right',
-    width: 130,
-    sortingEnabled: false,
-    render: row => {
-      const { packageDrawdown } = row
-      let drawdownTransaction = []
-      let balanceQty = row.quantity
-      const todayQuantity = row.packageConsumeQuantity
-
-      if (packageDrawdown) {
-        if (
-          packageDrawdown.packageDrawdownTransaction &&
-          packageDrawdown.packageDrawdownTransaction.length > 0
-        ) {
-          drawdownTransaction = packageDrawdown.packageDrawdownTransaction.filter(
-            t => t.consumeDate < row.packageDrawdownAsAtDate,
-          )
-        }
-
-        // Transferred quantity
-        let transferredQty = 0
-        const { packageDrawdownTransfer } = packageDrawdown
-        if (packageDrawdownTransfer && packageDrawdownTransfer.length > 0) {
-          const drawdownTransfer = packageDrawdownTransfer.filter(
-            t => t.transferDate < row.packageDrawdownAsAtDate,
-          )
-          drawdownTransfer.forEach(transfer => {
-            transferredQty += transfer.quantity
-          })
-        }
-
-        // Received (Transfer back) quantity
-        let receivedQty = 0
-        const { packageDrawdownReceive } = packageDrawdown
-        if (packageDrawdownReceive && packageDrawdownReceive.length > 0) {
-          const drawdownReceive = packageDrawdownReceive.filter(
-            t => t.transferDate < row.packageDrawdownAsAtDate,
-          )
-          drawdownReceive.forEach(receive => {
-            receivedQty += receive.quantity
-          })
-        }
-
-        const totalQty =
-          packageDrawdown.totalQuantity - transferredQty + receivedQty
-        let totalDrawdown = 0
-        drawdownTransaction.forEach(txn => {
-          totalDrawdown += txn.consumeQuantity
-        })
-        balanceQty = totalQty - totalDrawdown
-      }
-
-      let qty = `${numeral((balanceQty || 0) - (todayQuantity || 0)).format(
-        '0,0.0',
-      )} ${row.dispenseUOM || ''}`
-      return (
-        <Tooltip title={qty}>
-          <span>{qty}</span>
-        </Tooltip>
-      )
-    },
-  },
-  {
-    columnName: 'totalAfterItemAdjustment',
-    align: 'right',
-    width: 110,
-    sortingEnabled: false,
-    render: row => {
-      return showMoney(row.totalAfterItemAdjustment)
-    },
-  },
-  {
-    columnName: 'action',
-    align: 'left',
-    width: 70,
-    sortingEnabled: false,
-    render: r => {
-      const { type } = r
-
-      if (ServiceTypes.includes(type)) return null
-      return (
-        <Tooltip
-          title={
-            <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
-          }
-        >
-          <Button
-            color='primary'
-            justIcon
-            onClick={() => {
-              onPrint({ type: CONSTANTS.DRUG_LABEL, row: r })
             }}
           >
             <Print />

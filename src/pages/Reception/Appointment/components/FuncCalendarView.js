@@ -405,7 +405,6 @@ const CalendarView = ({
         isEditedAsSingleAppointment,
         updateByUser,
         updateDate,
-        preOrder,
         visitPurposeValue,
       } = appointment
       const apptEvents = apptResources.map(item => ({
@@ -449,7 +448,6 @@ const CalendarView = ({
             : `Resource-${item.resourceFK}`,
         IsReadonly: isReadonly(appointment),
         appointmentDate: appointmentDate,
-        preOrder,
         visitPurposeValue: visitPurposeValue,
       }))
       return [...events, ...apptEvents]

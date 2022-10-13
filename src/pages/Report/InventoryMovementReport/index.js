@@ -24,7 +24,7 @@ class InventoryMovementReport extends ReportBase {
     return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
   }
 
-  renderContent = (reportDatas) => {
+  renderContent = reportDatas => {
     return <MovementList reportDatas={reportDatas} />
   }
 }
@@ -34,10 +34,14 @@ const InventoryMovementReportWithFormik = withFormik({
     dateFrom: Yup.date().required(),
   }),
   mapPropsToValues: () => ({
-    dateFrom: moment(new Date()).startOf('month').toDate(),
-    dateTo: moment(new Date()).endOf('month').toDate(),
-    inventoryType: 'MEDICATION',
-    transactionType: 'ALL'
+    dateFrom: moment(new Date())
+      .startOf('month')
+      .toDate(),
+    dateTo: moment(new Date())
+      .endOf('month')
+      .toDate(),
+    inventoryType: 'CONSUMABLE',
+    transactionType: 'ALL',
   }),
 })(InventoryMovementReport)
 

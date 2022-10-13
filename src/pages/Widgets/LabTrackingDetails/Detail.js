@@ -300,21 +300,30 @@ class Detail extends PureComponent {
   }
 
   toggleAccordionByResultType = resultType => {
-    const { activedKeys } = this.myRef.current.state
-    let newActivedKeys = activedKeys || []
+                                                const {
+                                                  activedKeys,
+                                                } = this.myRef.current.state
+                                                let newActivedKeys =
+                                                  activedKeys || []
 
-    if (resultType === PATIENT_LAB.MEDICAL_CHECKUP) {
-      newActivedKeys.push(0)
-      newActivedKeys.push(1)
-    }
-    if (resultType === PATIENT_LAB.LAB_TRACKING) {
-      if (newActivedKeys.indexOf(0) === -1) {
-        newActivedKeys.push(0)
-      }
-    } else if (newActivedKeys.indexOf(1) === -1) {
-      newActivedKeys.push(1)
-    }
-  }
+                                                if (
+                                                  resultType ===
+                                                  PATIENT_LAB.LAB_TRACKING
+                                                ) {
+                                                  if (
+                                                    newActivedKeys.indexOf(
+                                                      0,
+                                                    ) === -1
+                                                  ) {
+                                                    newActivedKeys.push(0)
+                                                  }
+                                                } else if (
+                                                  newActivedKeys.indexOf(1) ===
+                                                  -1
+                                                ) {
+                                                  newActivedKeys.push(1)
+                                                }
+                                              }
 
   getContent = data => {
     const Widget = data.component

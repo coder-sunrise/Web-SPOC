@@ -2,8 +2,6 @@ import * as service from '@/services/common'
 import request from '@/utils/request'
 
 const url = '/api/patient'
-const chasBalanceUrl = '/api/PatientCoPaymentScheme/ChasBalance'
-const medisaveBalanceUrl = '/api/PatientCoPaymentScheme/MedisaveBalance'
 const stickyNotesUrl = '/api/PatientStickyNotes'
 import { stringify } from 'qs'
 // const { api } = config
@@ -17,8 +15,6 @@ const fns = {
   // create: params => service.create(url, params),
   // update: (params) => service.update(url, params),
   upsert: params => service.upsert(url, params),
-  requestChasBalance: params => service.upsert(chasBalanceUrl, params),
-  requestMedisaveBalance: params => service.upsert(medisaveBalanceUrl, params),
   queryDeposit: params => service.query(`${url}/Deposit`, params),
   duplicateCheck: async params => {
     const r = await request(`${url}/DuplicateCheck`, {

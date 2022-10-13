@@ -54,7 +54,7 @@ class Details extends PureComponent {
 
   autoFocuseItem = type => {
     setTimeout(() => {
-      if (type === '5') {
+      if (type === '4') {
         $(`#autofocus_${type} input`).focus()
       } else $(`#autofocus_${type} .ant-select`).click()
 
@@ -66,7 +66,7 @@ class Details extends PureComponent {
 
   footerBtns = ({ onSave, onReset }) => {
     const { classes, orders } = this.props
-    const { entity, type } = orders
+    const { entity } = orders
     return (
       <React.Fragment>
         <Divider />
@@ -172,11 +172,11 @@ class Details extends PureComponent {
       orders,
       dispatch,
       fromDispense,
-      singleMode,
       from,
       clinicSettings,
     } = props
     const { type } = orders
+    console.log(orders)
     const cfg = {
       disableEdit: this.state.disableEdit,
       setDisable: this.setDisable,
@@ -188,61 +188,19 @@ class Details extends PureComponent {
     }
 
     let orderTypeArray = orderTypes
-    if (fromDispense) {
-      orderTypeArray = orderTypes.filter(
-        o =>
-          o.value !== ORDER_TYPES.VACCINATION &&
-          o.value !== ORDER_TYPES.ORDER_SET &&
-          o.value !== ORDER_TYPES.PACKAGE &&
-          o.value !== ORDER_TYPES.RADIOLOGY &&
-          o.value !== ORDER_TYPES.LAB,
-      )
-    } else {
-      const { settings = [] } = clinicSettings
-
-      orderTypeArray = orderTypes.filter(o => {
-        if (!settings.isEnablePackage && o.value === ORDER_TYPES.PACKAGE)
-          return false
-
-        if (
-          !settings.isEnableRadiologyModule &&
-          o.value === ORDER_TYPES.RADIOLOGY
-        ) {
-          return false
-        }
-
-        if (!settings.isEnableLabModule && o.value === ORDER_TYPES.LAB) {
-          return false
-        }
-
-        return true
-      })
-    }
-
-    if (singleMode)
-      return orderTypeArray
-        .find(o => o.value === '7')
-        .component({
-          ...cfg,
-          type: '7',
-        })
-    const tabOptions = orderTypeArray
-      .filter(o => o.value !== '7' || (o.value === '7' && from === 'EditOrder'))
-      .filter(o => {
-        const accessRight = Authorized.check(o.accessRight)
-
-        if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
-          return false
-        return true
-      })
-
+    const tabOptions = orderTypeArray.filter(o => {
+      const accessRight = Authorized.check(o.accessRight)
+      if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
+        return false
+      return true
+    })
     return (
       <div>
         <div className={classes.detail}>
           <GridContainer>
             <GridItem xs={12}>
               <Tabs
-                activeKey={type}
+                activeKey={tabOptions[0].id}
                 options={tabOptions.map(o => {
                   return {
                     id: o.value,

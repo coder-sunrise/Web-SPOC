@@ -30,71 +30,7 @@ const OrderText = ({ orders, classes, onSelectItem }) => {
   const getOrderList = () => {
     let newOrderList = []
     const activeRows = (orders.rows || []).filter(row => !row.isDeleted)
-    const drugMixture = activeRows.filter(
-      row => row.type === ORDER_TYPES.MEDICATION && row.isDrugMixture,
-    )
-    const externalPrescription = activeRows.filter(
-      row =>
-        row.type === ORDER_TYPES.MEDICATION &&
-        !row.isDrugMixture &&
-        row.isExternalPrescription,
-    )
-    const medication = activeRows.filter(
-      row =>
-        row.type === ORDER_TYPES.MEDICATION &&
-        !row.isDrugMixture &&
-        !row.isExternalPrescription,
-    )
-    const openPrescription = activeRows.filter(
-      row => row.type === ORDER_TYPES.OPEN_PRESCRIPTION,
-    )
     const service = activeRows.filter(row => row.type === ORDER_TYPES.SERVICE)
-    const vaccination = activeRows.filter(
-      row => row.type === ORDER_TYPES.VACCINATION,
-    )
-    const consumable = activeRows.filter(
-      row => row.type === ORDER_TYPES.CONSUMABLE,
-    )
-    const radiology = activeRows.filter(
-      row => row.type === ORDER_TYPES.RADIOLOGY,
-    )
-    const lab = activeRows.filter(row => row.type === ORDER_TYPES.LAB)
-
-    if (medication.length) {
-      newOrderList.push({
-        type: 'Medication',
-        items: medication.map(row => row.subject),
-      })
-    }
-
-    if (drugMixture.length) {
-      newOrderList.push({
-        type: 'Drug Mixture',
-        items: drugMixture.map(row => row.subject),
-      })
-    }
-
-    if (openPrescription.length) {
-      newOrderList.push({
-        type: 'Open Prescription',
-        items: openPrescription.map(row => row.subject),
-      })
-    }
-
-    if (externalPrescription.length) {
-      newOrderList.push({
-        type: 'External Prescription',
-        items: externalPrescription.map(row => row.subject),
-      })
-    }
-
-    if (vaccination.length) {
-      newOrderList.push({
-        type: 'Vaccination',
-        items: vaccination.map(row => row.subject),
-      })
-    }
-
     if (consumable.length) {
       newOrderList.push({
         type: 'Consumable',
@@ -112,28 +48,7 @@ const OrderText = ({ orders, classes, onSelectItem }) => {
         ),
       })
     }
-
-    if (radiology.length) {
-      newOrderList.push({
-        type: 'Radiology',
-        items: radiology.map(row =>
-          hasValue(row.newServiceName) && row.newServiceName.trim() !== ''
-            ? row.newServiceName
-            : row.subject,
-        ),
-      })
-    }
-
-    if (lab.length) {
-      newOrderList.push({
-        type: 'Lab',
-        items: lab.map(row =>
-          hasValue(row.newServiceName) && row.newServiceName.trim() !== ''
-            ? row.newServiceName
-            : row.subject,
-        ),
-      })
-    }
+ 
     setOrderList(newOrderList)
   }
   return (

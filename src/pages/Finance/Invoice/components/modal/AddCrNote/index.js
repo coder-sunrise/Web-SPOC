@@ -28,7 +28,6 @@ import { orderItemTypes } from '@/utils/codes'
 import CrNoteForm from './CrNoteForm'
 import Summary from './Summary'
 import MiscCrNote from './MiscCrNote'
-import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 
 const styles = theme => ({
@@ -148,14 +147,8 @@ class AddCrNote extends Component {
 
   componentDidMount = () => {
     const { values } = this.props
-    const { creditNoteItem } = values
-
-    const settings = JSON.parse(localStorage.getItem('clinicSettings'))
-    const { isEnablePackage = false } = settings
-    const packageItems = creditNoteItem.filter(item => item.isPackage)
-    const existPackage = isEnablePackage && packageItems.length > 0
     this.setState({
-      isExistPackage: existPackage,
+      isExistPackage: false,
     })
 
     this.expandAllPackages(values)
@@ -325,14 +318,6 @@ class AddCrNote extends Component {
     setTimeout(() => this.handleCalcCrNoteItem(), 1)
   }
 
-  drugMixtureIndicator = (row, right) => {
-    if (!row.isDrugMixture) return null
-
-    return (
-      <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
-    )
-  }
-
   render() {
     const {
       handleSubmit,
@@ -473,44 +458,6 @@ class AddCrNote extends Component {
                       <Tooltip title={row.itemType}>
                         <span>{itemType?.displayValue}</span>
                       </Tooltip>
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '-1px',
-                          right: '-6px',
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: 'inline-block',
-                            position: 'relative',
-                          }}
-                        >
-                          {this.drugMixtureIndicator(row)}
-                        </div>
-                        {(row.isActualizedPreOrder || row.isPreOrder) && (
-                          <Tooltip
-                            title={
-                              row.isPreOrder
-                                ? 'New Pre-Order'
-                                : 'Actualized Pre-Order'
-                            }
-                          >
-                            <div
-                              className={classes.rightIcon}
-                              style={{
-                                borderRadius: 4,
-                                backgroundColor: row.isPreOrder
-                                  ? '#4255bd'
-                                  : 'green',
-                                display: 'inline-block',
-                              }}
-                            >
-                              Pre
-                            </div>
-                          </Tooltip>
-                        )}
-                      </div>
                     </div>
                   </div>
                 )

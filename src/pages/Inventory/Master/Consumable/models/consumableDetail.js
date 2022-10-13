@@ -28,8 +28,6 @@ export default createFormViewModel({
         sellingPrice: 0,
         maxDiscount: 0,
         consumableStock: [],
-        isChasAcuteClaimable: true,
-        isChasChronicClaimable: true,
       },
     },
     subscriptions: ({ dispatch, history }) => {
@@ -52,7 +50,7 @@ export default createFormViewModel({
     },
     reducers: {
       queryDone(st, { payload }) {
-        let { data } = payload 
+        let { data } = payload
         return {
           ...st,
           entity: {

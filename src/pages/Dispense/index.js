@@ -100,22 +100,6 @@ class Dispense extends PureComponent {
       dispatch({
         type: 'codetable/fetchCodes',
         payload: {
-          code: 'inventorymedication',
-          force: true,
-          temp: true,
-        },
-      }),
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'inventoryvaccination',
-          force: true,
-          temp: true,
-        },
-      }),
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
           code: 'inventoryconsumable',
           force: true,
           temp: true,
@@ -139,53 +123,6 @@ class Dispense extends PureComponent {
     })
   }
 
-  onSelectPreOrder = (selectPreOrder = []) => {
-    const {
-      orders,
-      dispatch,
-      codetable,
-      visitRegistration,
-      patient,
-      user,
-      clinicSettings,
-      dispense,
-    } = this.props
-    const { entity } = visitRegistration
-    const { visit = {} } = entity
-    const { editingOrder } = dispense
-
-    if (!editingOrder && visit.visitPurposeFK === VISIT_TYPE.OTC) {
-      dispatch({
-        type: 'dispense/updateState',
-        payload: {
-          openOrderPopUpAfterActualize: true,
-          ordersData: getOrdersData({
-            selectPreOrder,
-            orders,
-            codetable,
-            visitRegistration,
-            patient,
-            user,
-            clinicSettings,
-          }),
-        },
-      })
-    } else {
-      dispatch({
-        type: 'orders/upsertRows',
-        payload: getOrdersData({
-          selectPreOrder,
-          orders,
-          codetable,
-          visitRegistration,
-          patient,
-          user,
-          clinicSettings,
-        }),
-      })
-    }
-  }
-
   render() {
     const {
       classes,
@@ -200,19 +137,6 @@ class Dispense extends PureComponent {
     const { entity = {} } = visitRegistration
     const { visit = {} } = entity
 
-    const draftPreOrderItem = patient?.pendingPreOrderItem?.map(po => {
-      const selectPreOrder = rows.find(
-        apo => apo.actualizedPreOrderItemFK === po.id,
-      )
-      if (selectPreOrder) {
-        return {
-          ...po,
-          preOrderItemStatus: selectPreOrder.isDeleted ? 'New' : 'Actualizing',
-        }
-      }
-      return { ...po }
-    })
-
     return (
       <div className={classes.root}>
         <LoadingWrapper loading={loading.models.dispense}>
@@ -222,7 +146,6 @@ class Dispense extends PureComponent {
               editingOrder || visit.visitPurposeFK === VISIT_TYPE.OTC
             }
             onSelectPreOrder={this.onSelectPreOrder}
-            activePreOrderItems={draftPreOrderItem}
             extraCmt={this.getExtraComponent}
             isRetail={visit.visitPurposeFK === VISIT_TYPE.OTC}
           />

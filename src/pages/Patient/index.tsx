@@ -9,7 +9,6 @@ import {
   ableToViewByAuthority,
   menuViewableByAuthoritys,
 } from '@/utils/utils'
-import Authorized from '@/utils/Authorized'
 
 import { TextField, DatePicker, CodeSelect } from '@/components'
 import { useRef } from 'react'
@@ -79,15 +78,6 @@ const menus = [
     access: ['patientdatabase.patientprofiledetails.patientdocument'],
     Icon: ArrowForwardIosOutlinedIcon,
     cmt: 7,
-    style: iconStyle,
-  },
-  {
-    id: 6,
-    label: 'Pre-Order List',
-    authority: 'patientdatabase.modifypreorder',
-    access: ['patientdatabase.modifypreorder'],
-    Icon: ArrowForwardIosOutlinedIcon,
-    cmt: 11,
     style: iconStyle,
   },
 ]

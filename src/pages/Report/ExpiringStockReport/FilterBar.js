@@ -18,27 +18,26 @@ import ReportDateRangePicker from '../ReportDateRangePicker'
 
 const FilterBar = ({ handleSubmit, isSubmitting }) => {
   return (
-    <SizeContainer size="sm">
+    <SizeContainer size='sm'>
       <React.Fragment>
-        <GridContainer alignItems="flex-end">
+        <GridContainer alignItems='flex-end'>
           {/* 1st row */}
-          <ReportDateRangePicker fromDateLabel="Expiry Date From" toDateLabel="Expiry Date To" />
+          <ReportDateRangePicker
+            fromDateLabel='Expiry Date From'
+            toDateLabel='Expiry Date To'
+          />
           <GridItem md={3}>
             <Field
-              name="stockType"
-              render={(args) => {
+              name='stockType'
+              render={args => {
                 const { form: fm } = args
                 return (
                   <Select
                     {...args}
-                    label="Inventory Type"
-                    options={[
-                      { name: 'Medication', value: 'MEDICATION' },
-                      { name: 'Consumable', value: 'CONSUMABLE' },
-                      { name: 'Vaccination', value: 'VACCINATION' },
-                    ]}
+                    label='Inventory Type'
+                    options={[{ name: 'Consumable', value: 'CONSUMABLE' }]}
                     allowClear={false}
-                    onChange={(e) => {
+                    onChange={e => {
                       if (e) {
                         fm.setFieldValue('items', undefined)
                       }
@@ -51,16 +50,16 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={5} />
           <GridItem md={2}>
             <Field
-              name="items"
-              render={(args) => {
+              name='items'
+              render={args => {
                 const { form } = args
                 return (
                   <CodeSelect
                     {...args}
-                    label="Item List"
-                    mode="multiple"
+                    label='Item List'
+                    mode='multiple'
                     code={`Inventory${form.values.stockType}`}
-                    labelField="displayValue"
+                    labelField='displayValue'
                     temp
                   />
                 )
@@ -69,12 +68,15 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           </GridItem>
           <GridItem md={2}>
             <FastField
-              name="IsDefault"
-              render={(args) => {
+              name='IsDefault'
+              render={args => {
                 return (
                   <Select
-                    label="IsDefault"
-                    options={[ { name: 'Yes', value: true }, { name: 'No', value: false } ]}
+                    label='IsDefault'
+                    options={[
+                      { name: 'Yes', value: true },
+                      { name: 'No', value: false },
+                    ]}
                     {...args}
                   />
                 )
@@ -82,10 +84,17 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
             />
           </GridItem>
           <GridItem md={1}>
-            <FastField name="GroupByItem" render={(args) => <Checkbox {...args} label="Group By Item" />} />
+            <FastField
+              name='GroupByItem'
+              render={args => <Checkbox {...args} label='Group By Item' />}
+            />
           </GridItem>
           <GridItem md={2}>
-            <Button color="primary" onClick={handleSubmit} disabled={isSubmitting}>
+            <Button
+              color='primary'
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
               Generate Report
             </Button>
           </GridItem>

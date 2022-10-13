@@ -22,7 +22,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, values }) => {
           <GridItem md={3}>
             <FastField
               name='isActive'
-              render={(args) => {
+              render={args => {
                 return <Select label='Status' options={status} {...args} />
               }}
             />
@@ -30,17 +30,13 @@ const FilterBar = ({ handleSubmit, isSubmitting, values }) => {
           <GridItem md={3}>
             <Field
               name='inventoryType'
-              render={(args) => {
+              render={args => {
                 return (
                   <Select
                     {...args}
                     label='Inventory Type'
                     mode='multiple'
-                    options={[
-                      { name: 'Medication', value: 'MEDICATION' },
-                      { name: 'Consumable', value: 'CONSUMABLE' },
-                      { name: 'Vaccination', value: 'VACCINATION' },
-                    ]}
+                    options={[{ name: 'Consumable', value: 'CONSUMABLE' }]}
                     all={-99}
                     maxTagCount={maxinventorytypeCount}
                     maxTagPlaceholder='inventory types'

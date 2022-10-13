@@ -7,14 +7,8 @@ import { fetchCodeTable } from '@/utils/codetable'
 import { withStyles, Divider } from '@material-ui/core'
 import { set } from '@umijs/deps/compiled/lodash'
 import { preOrderItemCategory } from '@/utils/codes'
-import { RADIOLOGY_CATEGORY, LAB_CATEGORY } from '@/utils/constants'
 const ItemSelect = ({ codetable, itemType, ...props }) => {
-  const {
-    inventorymedication,
-    inventoryconsumable,
-    inventoryvaccination,
-    ctservice = [],
-  } = codetable
+  const { inventoryconsumable, ctservice = [] } = codetable
   const dispatch = useDispatch()
   let selectProps = props
   const initMaxTagCount =
@@ -45,59 +39,16 @@ const ItemSelect = ({ codetable, itemType, ...props }) => {
     await dispatch({
       type: 'codetable/fetchCodes',
       payload: {
-        code: 'inventorymedication',
-      },
-    })
-    await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
         code: 'inventoryconsumable',
-      },
-    })
-    await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventoryvaccination',
       },
     })
   }
 
-  const labsFilter =
-    ctservice.length > 0
-      ? ctservice.filter(
-          c => LAB_CATEGORY.indexOf(c.serviceCenterCategoryFK) >= 0,
-        )
-      : []
-
-  const radiologysFilter =
-    ctservice.length > 0
-      ? ctservice.filter(
-          c => RADIOLOGY_CATEGORY.indexOf(c.serviceCenterCategoryFK) >= 0,
-        )
-      : []
-
-  const servicesFilter =
-    ctservice.length > 0
-      ? ctservice.filter(
-          c =>
-            LAB_CATEGORY.indexOf(c.serviceCenterCategoryFK) < 0 &&
-            RADIOLOGY_CATEGORY.indexOf(c.serviceCenterCategoryFK) < 0,
-        )
-      : []
-
   const optionsList =
     itemType === preOrderItemCategory[0].value
-      ? inventorymedication
-      : itemType === preOrderItemCategory[1].value
       ? inventoryconsumable
-      : itemType === preOrderItemCategory[2].value
-      ? inventoryvaccination
-      : itemType === preOrderItemCategory[3].value
-      ? servicesFilter
-      : itemType === preOrderItemCategory[4].value
-      ? labsFilter
-      : itemType === preOrderItemCategory[5].value
-      ? radiologysFilter
+      : itemType === preOrderItemCategory[1].value
+      ? ctservice
       : []
   return (
     <Select

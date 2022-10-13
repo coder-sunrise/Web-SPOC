@@ -4,10 +4,9 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import _ from 'lodash'
 
 import { SizeContainer } from '@/components'
-import LCForm from './LCForm/index'
 import Form from './Form/index'
 
-const styles = (theme) => ({
+const styles = theme => ({
   editor: {
     position: 'relative',
   },
@@ -28,8 +27,10 @@ const styles = (theme) => ({
 }))
 class AddForm extends PureComponent {
   getNextSequence = () => {
-    const { formListing: { list, type } } = this.props
-    const allForms = list.filter((s) => !s.isDeleted)
+    const {
+      formListing: { list, type },
+    } = this.props
+    const allForms = list.filter(s => !s.isDeleted)
     let nextSequence = 1
     if (allForms && allForms.length > 0) {
       const { sequence } = _.maxBy(allForms, 'sequence')
@@ -38,13 +39,13 @@ class AddForm extends PureComponent {
     return nextSequence
   }
 
-  render () {
+  render() {
     const { props } = this
     const { theme, formListing, types } = props
     const { type } = formListing
     const cfg = {
       ...props,
-      currentType: types.find((o) => o.value === type),
+      currentType: types.find(o => o.value === type),
       templateLoader: this.getLoader,
       getNextSequence: this.getNextSequence,
     }
@@ -55,7 +56,6 @@ class AddForm extends PureComponent {
           marginRight: theme.spacing(1),
         }}
       >
-        {type === '1' && <LCForm {...cfg} />}
         {type === '2' && <Form {...cfg} />}
       </div>
     )

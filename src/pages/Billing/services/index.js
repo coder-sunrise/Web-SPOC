@@ -28,9 +28,4 @@ export const savePackageAcknowledge = (payload) => {
   const { invoiceFK } = payload
   return request(`${url}/savePackageAcknowledge/${invoiceFK}`, { method: 'PUT', body: payload })
 }
-
-export const fetchVisitGroupStatusDetails = payload => {
-  const { visitGroup } = payload
-  return request(`${url}/visitGroupStatusDetails/${visitGroup}`, {method: 'GET'})
-}
-
+ 

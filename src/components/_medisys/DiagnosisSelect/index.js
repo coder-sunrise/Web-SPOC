@@ -9,7 +9,7 @@ import Star from '@material-ui/icons/Star'
 import { Select, ButtonSelect, Tooltip } from '@/components'
 import { queryList } from '@/services/common'
 
-const styles = (theme) => ({
+const styles = theme => ({
   money: {
     width: 16,
     height: 16,
@@ -18,25 +18,6 @@ const styles = (theme) => ({
     color: 'green',
   },
 })
-
-const filterOptions = [
-  {
-    value: 'isChasChronicClaimable',
-    name: 'CHAS Chronic',
-  },
-  {
-    value: 'isChasAcuteClaimable',
-    name: 'CHAS Acute',
-  },
-  {
-    value: 'isHazeClaimable',
-    name: 'Haze',
-  },
-  {
-    value: 'isCdmpClaimable',
-    name: 'CDMP',
-  },
-]
 
 const DiagnosisSelect = ({
   dispatch,
@@ -57,10 +38,7 @@ const DiagnosisSelect = ({
   let selectProps = props
   const initMaxTagCount =
     props.field && props.field.value && props.field.value.length === 1 ? 1 : 0
-  const [
-    maxTagCount,
-    setMaxTagCount,
-  ] = useState(
+  const [maxTagCount, setMaxTagCount] = useState(
     props.maxTagCount !== undefined ? props.maxTagCount : initMaxTagCount,
   )
   if (
@@ -71,23 +49,17 @@ const DiagnosisSelect = ({
     selectProps = { ...props, maxTagCount }
   }
 
-  const [
-    ctDiagnosis,
-    setCtDiagnosis,
-  ] = useState([])
+  const [ctDiagnosis, setCtDiagnosis] = useState([])
 
-  const [
-    diagnosisFilter,
-    setDiagnosisFilter,
-  ] = useState(filterOptions.map((o) => o.value))
+  const [diagnosisFilter, setDiagnosisFilter] = useState(
+    filterOptions.map(o => o.value),
+  )
 
-  const onDiagnosisSearch = async (v) => {
+  const onDiagnosisSearch = async v => {
     const search = {
       props:
-        'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable,isCdmpClaimable,iCD10AMFK,iCD10AMDiagnosisCode,iCD10AMDiagnosisName',
-      sorting: [
-        { columnName: 'displayvalue', direction: 'asc' },
-      ],
+        'id,displayvalue,code,complication,iCD10AMFK,iCD10AMDiagnosisCode,iCD10AMDiagnosisName',
+      sorting: [{ columnName: 'displayvalue', direction: 'asc' }],
       pagesize: 30,
     }
 
@@ -98,17 +70,10 @@ const DiagnosisSelect = ({
       isOrderByFavourite = true
     }
 
-    if (from === 'report') {
-      categoryFilter = diagnosisFilter
-    }
-
     search.apiCriteria = {
       searchValue: v || undefined,
       diagnosisCategories:
-        categoryFilter.length === 0 ||
-        categoryFilter.length === filterOptions.length
-          ? undefined
-          : categoryFilter.join(),
+        categoryFilter.length === 0 ? undefined : categoryFilter.join(),
       id: typeof v === 'string' ? undefined : Number(v),
       isOrderByFavourite,
     }
@@ -127,35 +92,19 @@ const DiagnosisSelect = ({
     return response
   }
   const selected = ctDiagnosis.find(
-    (diagnosis) => diagnosis.id === props.field.value,
+    diagnosis => diagnosis.id === props.field.value,
   )
-
-  let showPrefix = false
-  if (selected) {
-    showPrefix =
-      selected.isChasAcuteClaimable ||
-      selected.isChasChronicClaimable ||
-      selected.isHazeClaimable ||
-      selected.isCdmpClaimable
-  }
 
   return (
     <div style={{ position: 'relative' }}>
       <Select
         label={label || 'Diagnosis'}
-        prefix={showPrefix ? <AttachMoney className={classes.money} /> : null}
         options={ctDiagnosis}
         valueField='id'
         labelField='displayvalue'
         handleFilter={(input, opt) => true}
-        renderDropdown={(option) => {
-          const {
-            isChasAcuteClaimable,
-            isChasChronicClaimable,
-            isHazeClaimable,
-            isCdmpClaimable,
-            code,
-          } = option
+        renderDropdown={option => {
+          const { code } = option
           return (
             <div style={{ display: 'flex' }}>
               <div
@@ -166,17 +115,13 @@ const DiagnosisSelect = ({
                   overflow: 'hidden',
                 }}
               >
-                {(isChasAcuteClaimable ||
-                  isChasChronicClaimable ||
-                  isHazeClaimable ||
-                  isCdmpClaimable) && <AttachMoney className={classes.money} />}
                 {option.displayvalue}
               </div>
               {from === 'Consultaion' && (
                 <div
                   style={{ marginLeft: 'auto', marginRight: -5, height: 20 }}
                 >
-                  {favouriteDiagnosis.find((d) => d === code) ? (
+                  {favouriteDiagnosis.find(d => d === code) ? (
                     <Star
                       style={{
                         color: '#FFCC00',
@@ -193,7 +138,7 @@ const DiagnosisSelect = ({
           )
         }}
         query={onDiagnosisSearch}
-        onDataSouceChange={(data) => {
+        onDataSouceChange={data => {
           setCtDiagnosis(data)
           if (onDataSouceChange) onDataSouceChange(data)
         }}
@@ -211,10 +156,9 @@ const DiagnosisSelect = ({
         }}
         {...selectProps}
       />
-      {from === 'Consultaion' &&
-      selectDiagnosisCode && (
+      {from === 'Consultaion' && selectDiagnosisCode && (
         <div style={{ ...filterStyle, height: 28, bottom: 0 }}>
-          {favouriteDiagnosis.find((d) => d === selectDiagnosisCode) ? (
+          {favouriteDiagnosis.find(d => d === selectDiagnosisCode) ? (
             <Tooltip title='Click to remove favourite'>
               <Star
                 style={{
@@ -235,22 +179,6 @@ const DiagnosisSelect = ({
             </Tooltip>
           )}
         </div>
-      )}
-      {from === 'report' && (
-        <ButtonSelect
-          options={filterOptions}
-          mode='multiple'
-          textField='name'
-          valueField='value'
-          value={diagnosisFilter}
-          justIcon
-          style={filterStyle}
-          onChange={(v) => {
-            if (v !== diagnosisFilter) setDiagnosisFilter(v)
-          }}
-        >
-          <FilterList />
-        </ButtonSelect>
       )}
     </div>
   )

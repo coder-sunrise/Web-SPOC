@@ -148,32 +148,14 @@ export default compose(
         : consumableDetail.default
 
       let optionGrp = []
-      const {
-        isChasAcuteClaimable,
-        isChasChronicClaimable,
-        orderable,
-        isDispensedByPharmacy,
-        isNurseActualizable,
-      } = returnValue
-      if (isChasAcuteClaimable) {
-        optionGrp.push('isChasAcuteClaimable')
-      }
-      if (isChasChronicClaimable) {
-        optionGrp.push('isChasChronicClaimable')
-      }
+      const { orderable } = returnValue
       if (orderable) {
         optionGrp.push('orderable')
-      }
-      if (isDispensedByPharmacy) {
-        optionGrp.push('isDispensedByPharmacy')
-      }
-      if (isNurseActualizable) {
-        optionGrp.push('isNurseActualizable')
       }
 
       return {
         ...returnValue,
-        chas: optionGrp,
+        availableOpts: optionGrp,
       }
     },
     validationSchema: Yup.object().shape({
@@ -242,22 +224,10 @@ export default compose(
         ]
       }
       let optionGrp = {
-        isChasAcuteClaimable: false,
-        isChasChronicClaimable: false,
-        isDispensedByPharmacy: false,
-        isNurseActualizable: false,
         orderable: false,
       }
-      values.chas.forEach(o => {
-        if (o === 'isChasAcuteClaimable') {
-          optionGrp[o] = true
-        } else if (o === 'isChasChronicClaimable') {
-          optionGrp[o] = true
-        } else if (o === 'isDispensedByPharmacy') {
-          optionGrp[o] = true
-        } else if (o === 'isNurseActualizable') {
-          optionGrp[o] = true
-        } else if (o === 'orderable') {
+      values.availableOpts.forEach(o => {
+        if (o === 'orderable') {
           optionGrp[o] = true
         }
       })

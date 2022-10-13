@@ -2,7 +2,6 @@ import { Table } from 'antd'
 import numeral from 'numeral'
 import { currencySymbol, currencyFormat } from '@/utils/config'
 import tablestyles from './PatientHistoryStyle.less'
-import DrugMixtureInfo from '@/pages/Widgets/Orders/Detail/DrugMixtureInfo'
 import { Tooltip } from '@/components'
 import { FileCopySharp } from '@material-ui/icons'
 import { orderItemTypes } from '@/utils/codes'
@@ -11,12 +10,6 @@ import * as WidgetConfig from './config'
 const wrapCellTextStyle = {
   wordWrap: 'break-word',
   whiteSpace: 'pre-wrap',
-}
-
-const drugMixtureIndicator = (row, right) => {
-  if (!row.isDrugMixture) return null
-
-  return <DrugMixtureInfo values={row.prescriptionDrugMixture} right={right} />
 }
 
 const urgentIndicator = (row, right) => {
@@ -55,12 +48,7 @@ const showCurrency = (value = 0) => {
     </div>
   )
 }
-export default ({
-  current,
-  classes,
-  showDrugLabelRemark,
-  isFullScreen = true,
-}) => {
+export default ({ current, classes, isFullScreen = true }) => {
   const { isFromEditOrder, editDispenseType, editDispenseReason } = current
   return (
     <div style={{ marginBottom: 8, marginTop: 8 }}>
@@ -123,36 +111,6 @@ export default ({
                         right: '-4px',
                       }}
                     >
-                      <div
-                        style={{
-                          display: 'inline-block',
-                          position: 'relative',
-                        }}
-                      >
-                        {drugMixtureIndicator(row)}
-                      </div>
-                      {(row.isPreOrder || row.isActualizedPreOrder) && (
-                        <Tooltip
-                          title={
-                            row.isPreOrder
-                              ? 'New Pre-Order'
-                              : 'Actualized Pre-Order'
-                          }
-                        >
-                          <div
-                            className={classes.rightIcon}
-                            style={{
-                              borderRadius: 4,
-                              backgroundColor: row.isPreOrder
-                                ? '#4255bd'
-                                : 'green',
-                              display: 'inline-block',
-                            }}
-                          >
-                            Pre
-                          </div>
-                        </Tooltip>
-                      )}
                       {row.isExclusive && (
                         <Tooltip title='The item has no local stock, we will purchase on behalf and charge to patient in invoice'>
                           <div
@@ -212,15 +170,10 @@ export default ({
             dataIndex: 'remarks',
             title: 'Remarks',
             render: (text, row) => {
-              const existsDrugLabelRemarks =
-                showDrugLabelRemark &&
-                row.drugLabelRemarks &&
-                row.drugLabelRemarks.trim() !== ''
               return (
                 <div style={{ position: 'relative' }}>
                   <div
                     style={{
-                      paddingRight: existsDrugLabelRemarks ? 10 : 0,
                       minHeight: 20,
                     }}
                   >
@@ -229,30 +182,6 @@ export default ({
                         {row.remarks || ' '}
                       </span>
                     </Tooltip>
-                  </div>
-                  <div style={{ position: 'relative', top: 6 }}>
-                    {existsDrugLabelRemarks && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          bottom: 2,
-                          right: -8,
-                        }}
-                      >
-                        <Tooltip
-                          title={
-                            <div>
-                              <div style={{ fontWeight: 500 }}>
-                                Drug Label Remarks
-                              </div>
-                              <div>{row.drugLabelRemarks}</div>
-                            </div>
-                          }
-                        >
-                          <FileCopySharp style={{ color: '#4255bd' }} />
-                        </Tooltip>
-                      </div>
-                    )}
                   </div>
                 </div>
               )

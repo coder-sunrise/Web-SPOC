@@ -3,7 +3,14 @@ import React from 'react'
 import { FastField, Field } from 'formik'
 import { status } from '@/utils/codes'
 // common components
-import { Button, GridContainer, GridItem, SizeContainer, CodeSelect, Select } from '@/components'
+import {
+  Button,
+  GridContainer,
+  GridItem,
+  SizeContainer,
+  CodeSelect,
+  Select,
+} from '@/components'
 
 const FilterBar = ({ handleSubmit, isSubmitting }) => {
   return (
@@ -19,11 +26,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                   <Select
                     {...args}
                     label='Inventory Type'
-                    options={[
-                      { name: 'Medication', value: 'MEDICATION' },
-                      { name: 'Consumable', value: 'CONSUMABLE' },
-                      { name: 'Vaccination', value: 'VACCINATION' },
-                    ]}
+                    options={[{ name: 'Consumable', value: 'CONSUMABLE' }]}
                     allowClear={false}
                     onChange={e => {
                       if (e) {

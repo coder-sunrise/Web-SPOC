@@ -16,7 +16,6 @@ export const constructPayload = values => {
     invoicePayment = [],
     mode,
     visitOrderTemplateFK,
-    visitGroup,
     signatureName,
     signature,
   } = values
@@ -156,7 +155,6 @@ export const constructPayload = values => {
       })),
     invoice: restInvoice,
     invoicePayer: _invoicePayer,
-    visitGroup,
   }
   return payload
 }

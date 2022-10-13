@@ -13,101 +13,15 @@ import CONSTANTS from './constants'
 import DispenseDetails from './index'
 import _ from 'lodash'
 
-const { queryDrugLabelDetails, queryDrugLabelsDetails } = service
 const WebSocketWrapper = ({
   handlePrint,
   selectedDrugs,
   selectedLanguage,
-  currentDrugToPrint,
   sendingJob,
   onPrintRef,
-  onDrugLabelSelectionClose,
   ...restProps
 }) => {
-  const withoutPrintPreview = [
-    CONSTANTS.ALL_DRUG_LABEL,
-    CONSTANTS.DRUG_LABEL,
-    CONSTANTS.PATIENT_LABEL,
-    CONSTANTS.LAB_LABEL,
-  ]
-
-  const getDrugLabelDetails = (drugLabel, prescripationItem) => {
-    const expiryDate = prescripationItem
-      ? prescripationItem.expiryDate
-      : undefined
-    const batchNo =
-      prescripationItem && Array.isArray(prescripationItem.batchNo)
-        ? prescripationItem.batchNo[0]
-        : prescripationItem.batchNo
-    return {
-      PatientName: drugLabel.patientName,
-      PatientReferenceNo: drugLabel.patientReferenceNo,
-      PatientAccountNo: drugLabel.patientAccountNo,
-      DrugName: drugLabel.name,
-      ConsumptionMethod: drugLabel.instruction,
-      Precaution: drugLabel.precaution,
-      IssuedDate: drugLabel.issueDate,
-      ExpiryDate: expiryDate,
-      UOM: drugLabel.dispenseUOM,
-      Quantity: drugLabel.dispensedQuanity,
-      BatchNo: batchNo,
-      CurrentPage: drugLabel.currentPage.toString(),
-      TotalPage: drugLabel.totalPage.toString(),
-    }
-  }
-
-  const generateDrugLablePrintSource = async row => {
-    const drugLabelDetails1 = await queryDrugLabelDetails(row.id)
-    const { data } = drugLabelDetails1
-    if (data && data.length > 0) {
-      let drugLabelDetail = []
-      drugLabelDetail = drugLabelDetail.concat(
-        data.map(o => {
-          return getDrugLabelDetails(o, row)
-        }),
-      )
-      return drugLabelDetail
-    }
-    notification.warn({
-      message: `No prescription found. Add prescription to print drug label.`,
-    })
-    return null
-  }
-
-  const generateDrugLablesPrintSource = async (
-    visitID,
-    prescriptions = [],
-    packageItem = [],
-    printAllDrugLabel = false,
-  ) => {
-    const drugLabelsDetails1 = await queryDrugLabelsDetails(visitID)
-    const { data } = drugLabelsDetails1
-
-    if (data && data.length > 0) {
-      let drugLabelDetail = []
-      const newdata = data.filter(
-        x =>
-          selectedDrugs.findIndex(
-            value => value.id === x.id && (printAllDrugLabel || value.selected),
-          ) > -1,
-      )
-      newdata.map(o => {
-        let copy = selectedDrugs.find(x => x.id === o.id).no
-        for (let no = 0; no < copy; no++) {
-          let prescriptionItem = prescriptions.find(p => p.id === o.id)
-          if (prescriptionItem === undefined)
-            prescriptionItem = packageItem.find(p => p.id === o.id)
-          drugLabelDetail.push(getDrugLabelDetails(o, prescriptionItem))
-        }
-      })
-
-      return drugLabelDetail
-    }
-    notification.warn({
-      message: `No prescription found. Add prescription to print drug label.`,
-    })
-    return null
-  }
+  const withoutPrintPreview = [CONSTANTS.PATIENT_LABEL]
 
   const getPrintResult = async (type, copies = 1) => {
     if (!Number.isInteger(copies)) return
@@ -155,19 +69,9 @@ const WebSocketWrapper = ({
     return null
   }
   // Click Confirm in drug lable selector will trigger this
-  const handleOnPrint = async ({
-    type,
-    row,
-    printAllDrugLabel,
-    printData,
-    copies,
-  }) => {
+  const handleOnPrint = async ({ type, row, printData, copies }) => {
     if (withoutPrintPreview.includes(type)) {
-      var filter = [
-        CONSTANTS.PATIENT_LABEL,
-        CONSTANTS.LAB_LABEL,
-        CONSTANTS.ALL_DRUG_LABEL,
-      ]
+      var filter = [CONSTANTS.PATIENT_LABEL]
       if (filter.includes(type)) {
         let printResult = await getPrintResult(type, copies)
         if (printData && printData.length > 0)
@@ -207,13 +111,6 @@ const WebSocketWrapper = ({
     const { onFinalizeClick } = restProps
     const finalized = await onFinalizeClick(voidPayment, voidReason)
     if (finalized) {
-      let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-      const { autoPrintDrugLabelOnFinalize = false } = settings
-      if (autoPrintDrugLabelOnFinalize === true)
-        await handleOnPrint({
-          type: CONSTANTS.ALL_DRUG_LABEL,
-          printAllDrugLabel: true,
-        })
       history.push(getAppendUrl({}, '/reception/queue/billing'))
     }
   }
@@ -223,12 +120,10 @@ const WebSocketWrapper = ({
     <DispenseDetails
       {...restProps}
       onFinalizeClick={handleFinalize}
-      onDrugLabelSelectionClose={onDrugLabelSelectionClose}
       onPrint={handleOnPrint}
       sendingJob={sendingJob}
       selectedDrugs={selectedDrugs}
       selectedLanguage={selectedLanguage}
-      currentDrugToPrint={currentDrugToPrint}
     />
   )
 }

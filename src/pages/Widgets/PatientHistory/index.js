@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import React, { Component } from 'react'
 import { Collapse } from 'antd'
 import _ from 'lodash'
@@ -12,10 +11,8 @@ import { Field } from 'formik'
 import numeral from 'numeral'
 import Search from '@material-ui/icons/Search'
 import { VisitTypeTag } from '@/components/_medisys'
-// material ui
 import { withStyles, Link } from '@material-ui/core'
 import { Tooltip } from '@/components'
-// common components
 import {
   CardContainer,
   withFormikExtend,
@@ -35,7 +32,7 @@ import Authorized from '@/utils/Authorized'
 import { findGetParameter, commonDataReaderTransform } from '@/utils/utils'
 import { VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
 import { scribbleTypes } from '@/utils/codes'
-import { DoctorProfileSelect, ServePatientButton } from '@/components/_medisys'
+import { DoctorProfileSelect } from '@/components/_medisys'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 import { getReportContext } from '@/services/report'
 import { getFileContentByFileID } from '@/services/file'
@@ -43,9 +40,7 @@ import * as WidgetConfig from './config'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import HistoryDetails from './HistoryDetails'
 import customtyles from './PatientHistoryStyle.less'
-import NurseActualization from '@/pages/Dispense/DispenseDetails/NurseActualization'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
-import { getMedicalCheckupReportPayload } from '@/pages/MedicalCheckup/Worklist/components/Util'
 
 const defaultValue = {
   visitDate: [
@@ -73,7 +68,6 @@ const styles = theme => ({
   note: {
     fontSize: '0.85em',
     fontWeight: 400,
-    // marginTop: -3,
     lineHeight: '10px',
   },
   listRoot: {
@@ -450,7 +444,6 @@ class PatientHistory extends Component {
       coHistory = [],
       isNurseNote,
       visitStatus,
-      medicalCheckupWorkitemFK,
       isExistsVerifiedReport,
     } = row
     const { settings = [] } = clinicSettings
@@ -504,10 +497,7 @@ class PatientHistory extends Component {
             {fromModule !== 'Consultation' && (
               <div
                 style={{
-                  marginTop:
-                    fromModule === 'History' || fromModule === 'MedicalCheckup'
-                      ? -12
-                      : -16,
+                  marginTop: fromModule === 'History' ? -12 : -16,
                   height: 24,
                   width: 30,
                 }}
@@ -564,13 +554,6 @@ class PatientHistory extends Component {
                     signOffDate,
                   ).format(dateFormatLongWithTimeNoSec)}`}
                 </span>
-                <span style={{ marginLeft: 5 }}>
-                  {row.servingByList?.length > 0
-                    ? `Served by ${row.servingByList
-                        .map(x => x.servingBy)
-                        .join(', ')}.`
-                    : null}
-                </span>
               </div>
             </div>
           )}
@@ -586,8 +569,7 @@ class PatientHistory extends Component {
                 visitStatus != VISIT_STATUS.PAUSED &&
                 fromModule !== 'Consultation' &&
                 fromModule !== 'History' &&
-                ableToEditConsultation &&
-                fromModule !== 'MedicalCheckup' && (
+                ableToEditConsultation && (
                   <Authorized authority='patientdashboard.editconsultation'>
                     <Tooltip title='Edit Consultation'>
                       <Button
@@ -605,12 +587,6 @@ class PatientHistory extends Component {
                             if (global.showVisitRegistration) {
                               dispatch({
                                 type: 'visitRegistration/closeModal',
-                              })
-                            }
-                            if (global.showMedicalCheckupReportingDetails) {
-                              dispatch({
-                                type:
-                                  'medicalCheckupReportingDetails/closeMedicalCheckupReportingDetailsModal',
                               })
                             }
                             dispatch({
@@ -684,25 +660,7 @@ class PatientHistory extends Component {
             top: 0,
           }}
         >
-          {isExistsVerifiedReport && (
-            <div style={{ display: 'inline-block' }}>
-              <Tooltip title='Medical Checkup Report'>
-                <Button
-                  color='primary'
-                  icon={null}
-                  size='sm'
-                  onClick={event => {
-                    event.stopPropagation()
-                    this.handelPrintMedicalCheckup(medicalCheckupWorkitemFK)
-                  }}
-                >
-                  <Print />
-                  MC Report
-                </Button>
-              </Tooltip>
-            </div>
-          )}
-          {isForInvoiceReplacement && (
+          {/* {isForInvoiceReplacement && (
             <Tooltip title='For Invoice Replacement'>
               <div
                 style={{
@@ -715,7 +673,7 @@ class PatientHistory extends Component {
                 <InvoiceReplacement />
               </div>
             </Tooltip>
-          )}
+          )} */}
           <div style={{ display: 'inline-block', width: 40, marginRight: 10 }}>
             {visitPurposeFK && <VisitTypeTag type={visitPurposeFK} />}
           </div>
@@ -843,9 +801,6 @@ class PatientHistory extends Component {
     })
 
     const { settings = {} } = clinicSettings
-    const { labelPrinterSize } = settings
-    const showDrugLabelRemark = labelPrinterSize === '8.0cmx4.5cm_V2'
-
     const isShowContent = currentTagWidgets.length > 0
 
     return (
@@ -892,7 +847,6 @@ class PatientHistory extends Component {
                       {...this.props}
                       setFieldValue={this.props.setFieldValue}
                       isFullScreen={isFullScreen}
-                      showDrugLabelRemark={showDrugLabelRemark}
                     />
                   ) : (
                     ''
@@ -1376,7 +1330,6 @@ class PatientHistory extends Component {
     let consultationDocument = []
     let doctorNote = []
     let corEyeExaminations = []
-    let corAudiometryTest = []
 
     var printVisit = loadVisits.filter(visit =>
       selectItems.find(item => item === visit.currentId),
@@ -1481,12 +1434,6 @@ class PatientHistory extends Component {
         visitPurposeFK,
         isNurseNote,
       )
-      const isShowAudiometryTest = this.checkShowData(
-        WidgetConfig.WIDGETS_ID.AUDIOMETRYTEST,
-        current,
-        visitPurposeFK,
-        isNurseNote,
-      )
       if (
         isNurseNote ||
         isShowDoctorNote ||
@@ -1500,8 +1447,7 @@ class PatientHistory extends Component {
         isShowBasicExaminations ||
         isShowOrders ||
         isShowConsultationDocument ||
-        isShowJGHEyeExaminations ||
-        isShowAudiometryTest
+        isShowJGHEyeExaminations
       ) {
         let referral = { isShowReferral: false }
         if (isShowReferral) {
@@ -1760,29 +1706,6 @@ class PatientHistory extends Component {
           )
         }
 
-        //  Audiometry Test
-        if (isShowAudiometryTest) {
-          corAudiometryTest = corAudiometryTest.concat(
-            current.corAudiometryTest.map(o => {
-              return {
-                visitFK: current.currentId,
-                rightResult1000Hz: WidgetConfig.hasValue(o.rightResult1000Hz)
-                  ? `${o.rightResult1000Hz} dB`
-                  : '-',
-                rightResult4000Hz: WidgetConfig.hasValue(o.rightResult4000Hz)
-                  ? `${o.rightResult4000Hz} dB`
-                  : '-',
-                leftResult1000Hz: WidgetConfig.hasValue(o.leftResult1000Hz)
-                  ? `${o.leftResult1000Hz} dB`
-                  : '-',
-                leftResult4000Hz: WidgetConfig.hasValue(o.leftResult4000Hz)
-                  ? `${o.leftResult4000Hz} dB`
-                  : '-',
-              }
-            }),
-          )
-        }
-
         // orders
         if (isShowOrders) {
           orders = orders.concat(
@@ -1839,7 +1762,6 @@ class PatientHistory extends Component {
       ConsultationDocument: consultationDocument,
       DoctorNote: doctorNote,
       COREyeExaminations: corEyeExaminations,
-      CORAudiometryTest: corAudiometryTest,
       ReportContext: reportContext,
     }
     const payload1 = [
@@ -1871,7 +1793,7 @@ class PatientHistory extends Component {
                   mode='multiple'
                   maxTagPlaceholder='Visit Types'
                   style={{
-                    width: fromModule === 'MedicalCheckup' ? 170 : 200,
+                    width: 200,
                     display: 'inline-Block',
                     marginBottom: -12,
                   }}
@@ -1893,7 +1815,7 @@ class PatientHistory extends Component {
                 render={args => (
                   <DateRangePicker
                     style={{
-                      width: fromModule === 'MedicalCheckup' ? 210 : 300,
+                      width: 300,
                     }}
                     label='Visit Date From'
                     label2='To'
@@ -1929,7 +1851,7 @@ class PatientHistory extends Component {
                   mode='multiple'
                   maxTagCount={0}
                   style={{
-                    width: fromModule === 'MedicalCheckup' ? 168 : 240,
+                    width: 240,
                     display: 'inline-Block',
                     marginBottom: -12,
                     marginLeft: 10,
@@ -1944,7 +1866,7 @@ class PatientHistory extends Component {
               render={args => (
                 <DoctorProfileSelect
                   style={{
-                    width: fromModule === 'MedicalCheckup' ? 180 : 240,
+                    width: 240,
                     display: 'inline-Block',
                     marginLeft: 10,
                     marginBottom: -12,
@@ -2410,20 +2332,6 @@ class PatientHistory extends Component {
     this.queryVisitHistory()
   }
 
-  handelPrintMedicalCheckup = medicalCheckupWorkitemFK => {
-    const { dispatch, handlePreviewReport } = this.props
-    dispatch({
-      type: 'medicalCheckupWorklist/queryLastReportData',
-      payload: {
-        id: medicalCheckupWorkitemFK,
-      },
-    }).then(response => {
-      if (response && response.status === '200') {
-        const payload = getMedicalCheckupReportPayload(response.data)
-        handlePreviewReport(JSON.stringify(payload))
-      }
-    })
-  }
   render() {
     const { clinicSettings, scriblenotes, fromModule, height } = this.props
     const cfg = {}
@@ -2451,9 +2359,7 @@ class PatientHistory extends Component {
       otherHeight = 390
     }
     let visitContentHeight = currentHeight - otherHeight
-    if (fromModule === 'MedicalCheckup') {
-      visitContentHeight = height - 165
-    }
+
     return (
       <div {...cfg}>
         <CardContainer hideHeader size='sm'>
@@ -2538,22 +2444,6 @@ class PatientHistory extends Component {
             selectHistory={selectHistory}
             scribbleNoteUpdateState={this.scribbleNoteUpdateState}
             getCategoriesOptions={this.getCategoriesOptions}
-          />
-        </CommonModal>
-        <CommonModal
-          maxWidth='xl'
-          title='Actualization History'
-          className={customtyles.deepCommomModel}
-          open={this.state.showActualizationHistory}
-          onClose={this.closeActualizationHistory}
-        >
-          <NurseActualization
-            nurseWorkitemIds={this.state.currentOrders
-              .map(x => x.nurseWorkitemFK)
-              .filter(x => x)
-              .join(',')}
-            dispatch={this.props.dispatch}
-            onClose={this.closeActualizationHistory}
           />
         </CommonModal>
       </div>

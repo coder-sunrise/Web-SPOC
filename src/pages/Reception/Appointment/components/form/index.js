@@ -44,8 +44,6 @@ import AppointmentDateInput from './AppointmentDate'
 import FormFooter from './FormFooter'
 import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
 import RescheduleForm from './RescheduleForm'
-import PreOrder from './PreOrder'
-import SelectPreOrder from './SelectPreOrder'
 import CannedTextButton from '@/pages/Widgets/Orders/Detail/CannedTextButton'
 // utils
 import {
@@ -290,24 +288,7 @@ class Form extends React.PureComponent {
         // currentId: undefined,
       },
     })
-
-    // this.setState(
-    //   (preState) => ({
-    //     ...preState,
-    //     showPatientProfile: !preState.showPatientProfile,
-    //   }),
-    //   () => {
-    //     dispatch({
-    //       type: 'patient/updateState',
-    //       payload: {
-    //         entity,
-    //         currentId: undefined,
-    //       },
-    //     })
-    //   },
-    // )
   }
-
   checkShouldPopulate = patientSearchResult => patientSearchResult.length === 1
 
   onSearchPatient = async () => {
@@ -316,16 +297,6 @@ class Form extends React.PureComponent {
     await dispatch({
       type: 'patientSearch/query',
       payload: {
-        // group: [
-        //   {
-        //     [`${prefix}name`]: values.patientName,
-        //     [`${prefix}patientAccountNo`]: values.patientName,
-        //     [`${prefix}patientReferenceNo`]: values.patientName,
-        //     [`${prefix}contactFkNavigation.contactNumber.number`]: `${values.patientContactNo ||
-        //       ''}`,
-        //     combineCondition: 'or',
-        //   },
-        // ],
         apiCriteria: {
           searchValue: values.search,
           dob: values.dob,
@@ -408,11 +379,7 @@ class Form extends React.PureComponent {
     dispatch({
       type: 'patient/closePatientModal',
     })
-    // const doneUpdateFields = await this.onSelectPatientClick(payload, true)
     this.onSelectPatientClick(payload, true)
-    // if (doneUpdateFields && values.id) {
-    //   this._submit(false, true)
-    // }
   }
 
   onConfirmCancelAppointment = ({
@@ -476,9 +443,6 @@ class Form extends React.PureComponent {
     setFieldValue('_fakeField', 'fakeValue')
     if (deleted) {
       const { datagrid } = this.state
-      // const newDatagrid = datagrid.filter(
-      //   (event) => !deleted.includes(event.id),
-      // )
       const afterDelete = datagrid.map(item => ({
         ...item,
         isDeleted: item.isDeleted || deleted.includes(item.id),
@@ -1179,32 +1143,6 @@ class Form extends React.PureComponent {
     })
   }
 
-  onSelectPreOrder = (selectPreOrder = []) => {
-    const { values, setFieldValue } = this.props
-    const { currentAppointment = {} } = values
-    let { appointmentPreOrderItem = [] } = currentAppointment
-    selectPreOrder.forEach(po => {
-      let currentPreOrder = appointmentPreOrderItem.find(
-        apo => apo.actualizedPreOrderItemFK === po.id,
-      )
-      if (currentPreOrder) {
-        currentPreOrder.isDeleted = false
-      } else {
-        const { id, ...resetPreOrderItem } = po
-        appointmentPreOrderItem = [
-          ...appointmentPreOrderItem,
-          { ...resetPreOrderItem, actualizedPreOrderItemFK: id },
-        ]
-      }
-    })
-    this.updatePreOrderSequence(appointmentPreOrderItem)
-    setFieldValue('currentAppointment.appointmentPreOrderItem', [
-      ...appointmentPreOrderItem,
-    ])
-    setFieldValue('currentAppointment.dirty', true)
-    this.setState({ showSelectPreOrder: false })
-  }
-
   closeSelectPreOrder = () => {
     this.setState({ showSelectPreOrder: false })
   }
@@ -1375,31 +1313,13 @@ class Form extends React.PureComponent {
 
     const { pendingPreOrderItem = [] } = patientProfile || {}
 
-    const draftPreOrderItem = pendingPreOrderItem.map(po => {
-      const selectPreOrder = appointmentPreOrderItem.find(
-        apo => apo.actualizedPreOrderItemFK === po.id,
-      )
-      if (selectPreOrder) {
-        return {
-          ...po,
-          preOrderItemStatus: selectPreOrder.isDeleted ? 'New' : 'Actualizing',
-        }
-      }
-      return { ...po }
-    })
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer size='sm'>
           <React.Fragment>
             {values.patientProfileFK && (
               <div style={{ marginTop: -20 }}>
-                <PatientBanner
-                  from='Appointment'
-                  onSelectPreOrder={this.onSelectPreOrder}
-                  disablePreOrder={disablePreOrderConditions}
-                  activePreOrderItems={draftPreOrderItem}
-                  {...this.props}
-                />
+                <PatientBanner from='Appointment' {...this.props} />
               </div>
             )}
             <GridContainer
@@ -1510,15 +1430,6 @@ class Form extends React.PureComponent {
                     checkedRecurrence={this.checkedRecurrence}
                   />
                 </GridItem>
-                <GridItem xs md={12}>
-                  {this.showPreOrder() && (
-                    <PreOrder
-                      {...this.props}
-                      deletePreOrderItem={this.deletePreOrderItem}
-                      disabled={disableDataGrid}
-                    ></PreOrder>
-                  )}
-                </GridItem>
                 <GridItem xs md={12} className={classes.footerGrid}>
                   <FormFooter
                     // isNew={slotInfo.type === 'add'}
@@ -1615,14 +1526,6 @@ class Form extends React.PureComponent {
             >
               <RescheduleForm onConfirmReschedule={this.onConfirmReschedule} />
             </CommonModal>
-            {/*<CommonModal
-              open={showSelectPreOrder}
-              title='Select Pre-Order'
-              onClose={this.closeSelectPreOrder}
-              maxWidth='lg'
-            >
-              <SelectPreOrder onSelectPreOrder={this.onSelectPreOrder} activePreOrderItem={draftPreOrderItem} />
-            </CommonModal>*/}
           </React.Fragment>
         </SizeContainer>
       </LoadingWrapper>

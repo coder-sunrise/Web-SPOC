@@ -20,19 +20,15 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={3}>
             <Field
               name='inventoryType'
-              render={(args) => {
+              render={args => {
                 const { form: fm } = args
                 return (
                   <Select
                     {...args}
                     label='Inventory Type'
-                    options={[
-                      { name: 'Medication', value: 'MEDICATION' },
-                      { name: 'Consumable', value: 'CONSUMABLE' },
-                      { name: 'Vaccination', value: 'VACCINATION' },
-                    ]}
+                    options={[{ name: 'Consumable', value: 'CONSUMABLE' }]}
                     allowClear={false}
-                    onChange={(e) => {
+                    onChange={e => {
                       if (e) {
                         fm.setFieldValue('items', undefined)
                       }
@@ -45,7 +41,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={3}>
             <FastField
               name='Suppliers'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   label='Supplier'
                   code='ctSupplier'
@@ -60,7 +56,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={3}>
             <Field
               name='items'
-              render={(args) => {
+              render={args => {
                 const { form } = args
                 return (
                   <CodeSelect
@@ -78,7 +74,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={3}>
             <FastField
               name='IsActive'
-              render={(args) => {
+              render={args => {
                 return <Select label='Status' {...args} options={status} />
               }}
             />

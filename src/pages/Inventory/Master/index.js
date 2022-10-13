@@ -4,10 +4,6 @@ import { withStyles } from '@material-ui/core/styles'
 // import { getAppendUrl } from '@/utils/utils'
 import { compose } from 'redux'
 import { Tabs } from '@/components'
-// import Consumable from './Consumable'
-// import Medication from './Medication'
-// import Vaccination from './Vaccination'
-// import Package from './Package'
 import { InventoryMasterOption } from './variables'
 
 const styles = () => ({})
@@ -42,24 +38,6 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
       dispatch({
         type: 'codetable/fetchCodes',
         payload: {
-          code: 'ctmedicationgroup',
-        },
-      }),
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'ctgenericmedication',
-        },
-      }),
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'ctmedicationunitofmeasurement',
-        },
-      }),
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
           code: 'ctConsumableUnitOfMeasurement',
         },
       }),
@@ -69,7 +47,7 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
     if (!tabIndex) {
       if (itemTabs.length > 0) tabIndex = itemTabs[0].id
     }
-    setActiveTab(tabIndex)
+    setActiveTab(tabIndex) 
   }
 
   useEffect(() => {
