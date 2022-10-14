@@ -85,27 +85,6 @@ class Filter extends PureComponent {
                 <Add />
                 Add New
               </Button>
-
-              <Button color='primary' onClick={this.onExportClick}>
-                <ImportExport />
-                Export
-              </Button>
-
-              <input
-                style={{ display: 'none' }}
-                type='file'
-                accept={allowedFiles}
-                id='importServiceFile'
-                ref={this.uploadInput}
-                multiple={false}
-                onChange={this.onFileChange}
-                onClick={clearValue}
-              />
-
-              <Button color='primary' onClick={this.onImportClick}>
-                <AttachFile />
-                Import
-              </Button>
             </div>
           </GridItem>
         </GridContainer>

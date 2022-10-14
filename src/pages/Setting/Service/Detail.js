@@ -42,32 +42,6 @@ const styles = theme => ({
   },
 })
 
-const RadioAndLabCategories = {
-  internalRadiology: 3,
-  internalLab: 4,
-  externalRadiology: 5,
-  externalLab: 6,
-}
-
-const checkAnyInternalLabServiceCenter = (
-  currentServiceCenters = [],
-  allServiceCenters = [],
-) => {
-  const internalLabServiceCenterIds = allServiceCenters
-    .filter(
-      sc => RadioAndLabCategories.internalLab === sc.serviceCenterCategoryFK,
-    )
-    .map(sc => sc.id)
-
-  const hasInternalLabServiceCenter =
-    _.intersection(
-      internalLabServiceCenterIds,
-      currentServiceCenters.map(x => x.serviceCenterFK),
-    ).length > 0
-
-  return hasInternalLabServiceCenter
-}
-
 const itemSchema = Yup.object().shape({
   serviceCenterFK: Yup.string().required(),
   costPrice: Yup.number()
@@ -81,10 +55,6 @@ const modalityItemSchema = Yup.object().shape({
   modalityFK: Yup.string().required(),
 })
 
-const testPanelSchema = Yup.object().shape({
-  testPanelFK: Yup.string().required(),
-})
-
 @connect(({ clinicSettings }) => ({
   clinicSettings,
 }))
@@ -94,10 +64,7 @@ const testPanelSchema = Yup.object().shape({
       serviceCenterList: allServiceCenters,
       entity = {},
     } = settingClinicService
-    const {
-      ctServiceCenter_ServiceNavigation: currentServiceCenters,
-      ctService_ExaminationItem,
-    } = entity
+    const { ctServiceCenter_ServiceNavigation: currentServiceCenters } = entity
 
     const returnValue =
       settingClinicService.entity || settingClinicService.default
@@ -112,13 +79,6 @@ const testPanelSchema = Yup.object().shape({
     }
     return {
       ...returnValue,
-      hasInternalLabServiceCenter: checkAnyInternalLabServiceCenter(
-        currentServiceCenters,
-        allServiceCenters,
-      ),
-      examinationItems: (ctService_ExaminationItem || []).map(
-        x => x.examinationItemFK,
-      ),
     }
   },
 
@@ -143,22 +103,9 @@ const testPanelSchema = Yup.object().shape({
     ctServiceCenter_ServiceNavigation: Yup.array()
       .compact(v => v.isDeleted)
       .required('At least one service setting is required.'),
-    modalitySettingItem: Yup.array()
-      .compact(v => v.isDeleted)
-      .of(modalityItemSchema),
-    ctService_TestPanel: Yup.array().when('hasInternalLabServiceCenter', {
-      is: true,
-      then: Yup.array()
-        .compact(v => v.isDeleted)
-        .required('At least one lab test panel is required.'),
-    }),
   }),
   handleSubmit: (values, { props, resetForm }) => {
-    const {
-      effectiveDates,
-      hasInternalLabServiceCenter,
-      ...restValues
-    } = values
+    const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
     const selectedOptions = {}
     dispatch({
@@ -180,7 +127,6 @@ const testPanelSchema = Yup.object().shape({
         ),
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
-        examinationItems: restValues.examinationItems.filter(v => v !== -99),
       },
     }).then(r => {
       if (r) {
@@ -213,7 +159,6 @@ const testPanelSchema = Yup.object().shape({
 class Detail extends PureComponent {
   state = {
     serviceSettings: this.props.values.ctServiceCenter_ServiceNavigation,
-    modalitySettings: this.props.values.ctService_Modality,
   }
 
   tableParas = {
@@ -275,28 +220,6 @@ class Detail extends PureComponent {
               serviceSettingItem,
             )
             setFieldTouched('ctServiceCenter_ServiceNavigation', true)
-          }
-        },
-      },
-    ],
-  }
-
-  modalityTableParas = {
-    columns: [{ name: 'modalityFK', title: 'Modality' }],
-    columnExtensions: [
-      {
-        columnName: 'modalityFK',
-        type: 'codeSelect',
-        code: 'ctModality',
-        onChange: ({ val, row }) => {
-          const { modalitySettings } = this.state
-          const rs = modalitySettings.filter(
-            o => !o.isDeleted && o.modalityFK === val && o.id !== row.id,
-          )
-          if (rs.length > 0) {
-            notification.error({
-              message: 'The modality already exist in the list',
-            })
           }
         },
       },
@@ -375,7 +298,6 @@ class Detail extends PureComponent {
     const { rows, changed } = temp
     const _rows = this.checkIsServiceCenterUnique({ rows, changed })
     const { setFieldValue, values } = this.props
-    const { ctService_TestPanel = [] } = values
 
     _rows.forEach((val, i) => {
       val.serviceFK = values.id
@@ -397,30 +319,6 @@ class Detail extends PureComponent {
       }
     }
 
-    const hiddenFields = this.computeHiddenFields(_rows)
-
-    //Reset the field if the fields are being hidden
-    if (hiddenFields.includes('ctService_Tag'))
-      setFieldValue('ctService_Tag', [])
-
-    if (hiddenFields.includes('ctService_TestPanel')) {
-      //To use in the validation of test panel is required or not. Test Panel is required only if any lab service center for the service.
-      setFieldValue('hasInternalLabServiceCenter', false)
-      const testPanels = ctService_TestPanel.map(i => ({
-        ...i,
-        isDeleted: true,
-      }))
-
-      setFieldValue('ctService_TestPanel', testPanels)
-      this.setState(() => {
-        return {
-          testPanels: testPanels,
-        }
-      })
-    } else {
-      setFieldValue('hasInternalLabServiceCenter', true)
-    }
-
     setFieldValue('ctServiceCenter_ServiceNavigation', _rows)
     this.setState(() => {
       return {
@@ -439,22 +337,6 @@ class Detail extends PureComponent {
         serviceSettings[0].isDefault = true
       }
     }
-  }
-
-  handleDisableAutoOrder = () => {
-    const { serviceSettings } = this.state
-
-    if (serviceSettings.length === 0) {
-      return true
-    }
-    const validRow = serviceSettings.find(
-      o => o.isDeleted === undefined || o.isDeleted === false,
-    )
-    if (validRow) {
-      return false
-    }
-
-    return true
   }
 
   checkIsDefaultExist = () => {
@@ -483,80 +365,6 @@ class Detail extends PureComponent {
     return addedRows
   }
 
-  checkIsModalityUnique = ({ rows, changed }) => {
-    if (!changed) return rows
-    const key = Object.keys(changed)[0]
-    const obj = changed[key]
-    if (obj.modalityFK !== undefined) {
-      const hasDuplicate = rows.filter(
-        i => !i.isDeleted && i.modalityFK === obj.modalityFK,
-      )
-      if (hasDuplicate.length >= 2) {
-        return rows.map(row =>
-          row.id === parseInt(key, 10)
-            ? { ...row, modalityFK: undefined }
-            : row,
-        )
-      }
-    }
-    return rows
-  }
-
-  commitModalityChanges = ({ rows, changed }) => {
-    const _rows = this.checkIsModalityUnique({ rows, changed })
-    const { setFieldValue, values } = this.props
-
-    _rows.forEach((val, i) => {
-      val.serviceFK = values.id
-      val.modalityFKNavigation = null
-    })
-
-    setFieldValue('CTService_Modality', _rows)
-    this.setState(() => {
-      return {
-        modalitySettings: _rows,
-      }
-    })
-    return _rows
-  }
-
-  checkIsTestPanelUnique = ({ rows, changed }) => {
-    if (!changed) return rows
-    const key = Object.keys(changed)[0]
-    const obj = changed[key]
-    if (obj.testPanelFK !== undefined) {
-      const hasDuplicate = rows.filter(
-        i => !i.isDeleted && i.testPanelFK === obj.testPanelFK,
-      )
-      if (hasDuplicate.length >= 2) {
-        return rows.map(row =>
-          row.id === parseInt(key, 10)
-            ? { ...row, testPanelFK: undefined }
-            : row,
-        )
-      }
-    }
-    return rows
-  }
-
-  commitTestPanelChanges = ({ rows, changed }) => {
-    const _rows = this.checkIsTestPanelUnique({ rows, changed })
-    const { setFieldValue, values } = this.props
-
-    _rows.forEach((val, i) => {
-      val.serviceFK = values.id
-      val.testPanelFKNavigation = null
-    })
-
-    setFieldValue('ctService_TestPanel', _rows)
-    this.setState(() => {
-      return {
-        testPanels: _rows,
-      }
-    })
-    return _rows
-  }
-
   handleTagPanelChange = (value, tags, setFieldValue) => {
     const {
       ctService_Tag: originalTags = [],
@@ -578,76 +386,6 @@ class Detail extends PureComponent {
       })
 
     setFieldValue('ctService_Tag', [...currentTags, ...deletedTags])
-  }
-
-  handleExaminationItemChange = examinationItems => {
-    examinationItems = examinationItems.filter(v => v !== -99)
-    const { setFieldValue } = this.props
-    const {
-      ctService_ExaminationItem: originalExaminationItems = [],
-      id: serviceId,
-    } = this.props.initialValues
-
-    const currentExaminations = examinationItems.map(t => {
-      return {
-        serviceFK: serviceId,
-        examinationItemFK: t,
-        isDeleted: false,
-        ...originalExaminationItems.find(x => x.examinationItemFK === t),
-      }
-    })
-
-    const deletedExaminationItems = originalExaminationItems
-      .filter(t => !examinationItems.includes(t.examinationItemFK))
-      .map(t => {
-        return {
-          ...t,
-          isDeleted: true,
-        }
-      })
-
-    console.log([...currentExaminations, ...deletedExaminationItems])
-    setFieldValue('ctService_ExaminationItem', [
-      ...currentExaminations,
-      ...deletedExaminationItems,
-    ])
-  }
-  computeHiddenFields = rows => {
-    const serviceSettings = rows.filter(r => !r.isDeleted)
-
-    const hiddenFields = []
-    const { settingClinicService, clinicSettings, setFieldValue } = this.props
-    const { serviceCenterList = [], entity } = settingClinicService
-
-    const { isEnableNurseWorkItem } = clinicSettings.settings
-
-    const radioAndLabServiceCenterIds = serviceCenterList
-      .filter(sc =>
-        Object.values(RadioAndLabCategories).includes(
-          sc.serviceCenterCategoryFK,
-        ),
-      )
-      .map(sc => sc.id)
-
-    if (
-      serviceSettings.findIndex(sc =>
-        radioAndLabServiceCenterIds.includes(sc.serviceCenterFK),
-      ) === -1
-    ) {
-      //hiddenFields.push('ctService_Tag')
-    }
-
-    const hasInternalLabServiceCenter = checkAnyInternalLabServiceCenter(
-      serviceSettings,
-      serviceCenterList,
-    )
-    if (!hasInternalLabServiceCenter) {
-      hiddenFields.push('ctService_TestPanel')
-    }
-
-    if (!isEnableNurseWorkItem) hiddenFields.push('isNurseActualizable')
-
-    return hiddenFields
   }
 
   validationOfFormFields = fieldArray => {
@@ -674,22 +412,14 @@ class Detail extends PureComponent {
       ctService_Tag,
       errors,
     } = props
-    let settingsFiledArray = [
-      ...(this.state.modalitySettings || []),
-      ...(this.state.serviceSettings || []),
-      ...(this.state.testPanels || []),
-    ]
-
-    const { ctService_TestPanel: originalTestPanels } = props.initialValues
+    let settingsFiledArray = [...(this.state.serviceSettings || [])]
 
     const { serviceSettings } = this.state
     const serviceSettingsErrMsg = errors.ctServiceCenter_ServiceNavigation
-    const testPanelErrMsg = errors.ctService_TestPanel
     const shoudDisableSaveButton = () =>
       serviceSettings.filter(row => !row.isDeleted).length === 0 ||
       this.validationOfFormFields(settingsFiledArray)
     const { settings = [] } = clinicSettings
-    const hiddenFields = this.computeHiddenFields(this.state.serviceSettings)
     return (
       <React.Fragment>
         <GridContainer
@@ -720,14 +450,6 @@ class Detail extends PureComponent {
                     />
                   </GridItem>
                   <GridItem xs={6}>
-                    <FastField
-                      name='displayValue'
-                      render={args => (
-                        <TextField label='Display Value' {...args} />
-                      )}
-                    />
-                  </GridItem>
-                  <GridItem xs={6}>
                     <Field
                       name='effectiveDates'
                       render={args => {
@@ -747,15 +469,23 @@ class Detail extends PureComponent {
                       }}
                     />
                   </GridItem>
-                  <GridItem xs={6}>
+                  <GridItem xs={12}>
                     <FastField
-                      name='serviceCategoryFK'
+                      name='displayValue'
+                      render={args => (
+                        <TextField label='Display Value' {...args} />
+                      )}
+                    />
+                  </GridItem>
+                  <GridItem xs={12}>
+                    <FastField
+                      name='description'
                       render={args => {
                         return (
-                          <CodeSelect
-                            label='Service Category'
-                            code='CTServiceCategory'
-                            labelField='displayValue'
+                          <TextField
+                            label='Description'
+                            multiline
+                            rowsMax={4}
                             {...args}
                           />
                         )
@@ -778,41 +508,39 @@ class Detail extends PureComponent {
                   </GridItem>
                   <GridItem xs={6}>
                     <FastField
-                      name='description'
+                      name='serviceCategoryFK'
                       render={args => {
                         return (
-                          <TextField
-                            label='Description'
-                            multiline
-                            rowsMax={4}
+                          <CodeSelect
+                            label='Service Category'
+                            code='CTServiceCategory'
+                            labelField='displayValue'
                             {...args}
                           />
                         )
                       }}
                     />
                   </GridItem>
-                  {!hiddenFields.includes('ctService_Tag') && (
-                    <GridItem xs={12}>
-                      <Field
-                        name='ctService_Tag'
-                        render={args => (
-                          <TagPanel
-                            label='Tags:'
-                            tagCategory='Service'
-                            defaultTagNames={this.state.serviceTags}
-                            {...args}
-                            onChange={(value, tags) =>
-                              this.handleTagPanelChange(
-                                value,
-                                tags,
-                                args.form.setFieldValue,
-                              )
-                            }
-                          ></TagPanel>
-                        )}
-                      />
-                    </GridItem>
-                  )}
+                  <GridItem xs={12}>
+                    <Field
+                      name='ctService_Tag'
+                      render={args => (
+                        <TagPanel
+                          label='Tags:'
+                          tagCategory='Service'
+                          defaultTagNames={this.state.serviceTags}
+                          {...args}
+                          onChange={(value, tags) =>
+                            this.handleTagPanelChange(
+                              value,
+                              tags,
+                              args.form.setFieldValue,
+                            )
+                          }
+                        ></TagPanel>
+                      )}
+                    />
+                  </GridItem>
                   <GridItem xs={12}>
                     <GridContainer>
                       <GridItem xs={3}>
@@ -823,38 +551,6 @@ class Detail extends PureComponent {
                               <Switch
                                 label='Consultation Auto Order'
                                 onChange={e => this.handleAutoOrder(e)}
-                                // disabled={this.handleDisableAutoOrder()}
-                                {...args}
-                              />
-                            )
-                          }}
-                        />
-                      </GridItem>
-                      {/* <GridItem xs={4}>
-                        <Field
-                          name='isTrackResults'
-                          render={args => {
-                            return <Switch label='Track Results' {...args} />
-                          }}
-                        />{' '}
-                      </GridItem> */}
-                      <GridItem xs={3}>
-                        <Field
-                          name='isDisplayValueChangable'
-                          render={args => {
-                            return (
-                              <Switch label='Change Display Value' {...args} />
-                            )
-                          }}
-                        />
-                      </GridItem>
-                      <GridItem xs={3}>
-                        <Field
-                          name='isAutoDisplayInOrderCart'
-                          render={args => {
-                            return (
-                              <Switch
-                                label='Show in order cart as a priority'
                                 {...args}
                               />
                             )
@@ -895,33 +591,6 @@ class Detail extends PureComponent {
                 schema={itemSchema}
                 {...this.tableParas}
               />
-
-              {settings.isEnableServiceModality === true && (
-                <React.Fragment>
-                  <h4 style={{ fontWeight: 400 }}>
-                    <b>Modality Settings</b>
-                  </h4>
-                  <EditableTableGrid
-                    forceRender
-                    style={{
-                      marginTop: theme.spacing(1),
-                      margin: theme.spacing(2),
-                    }}
-                    rows={this.state.modalitySettings}
-                    FuncProps={{
-                      pagerConfig: {
-                        containerExtraComponent: this.PagerContent,
-                      },
-                    }}
-                    EditingProps={{
-                      showAddCommand: true,
-                      onCommitChanges: this.commitModalityChanges,
-                    }}
-                    schema={modalityItemSchema}
-                    {...this.modalityTableParas}
-                  />
-                </React.Fragment>
-              )}
             </div>
           </div>
         </GridContainer>
