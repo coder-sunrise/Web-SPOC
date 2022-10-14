@@ -357,7 +357,7 @@ const InventoryTypeListing = ({
 
   const consumableProps = {
     columns: [
-      { name: 'inventoryConsumableFK', title: 'Consumable Name' },
+      { name: 'inventoryConsumableFK', title: 'Product Name' },
       { name: 'quantity', title: 'Quantity' },
       { name: 'unitPrice', title: 'Unit Price' },
       { name: 'subTotal', title: 'Amount' },
@@ -558,7 +558,7 @@ const InventoryTypeListing = ({
         >
           <Authorized authority='inventorymaster.orderset.consumable'>
             <InventoryType
-              title='Consumable'
+              title='Ophthalmic Product'
               inventoryTypeProps={consumableProps}
               schema={consumableSchema}
               rows={consumableRows}

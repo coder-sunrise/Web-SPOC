@@ -399,7 +399,7 @@ class InventoryItemList extends React.Component {
     const commonOptions = [
       {
         id: ITEM_TYPE.CONSUMABLE,
-        name: 'Consumable',
+        name: 'Ophthalmic Product',
         content: this.addContent('inventoryconsumable', consumableAccessRight),
         accessRight: consumableAccessRight,
       },

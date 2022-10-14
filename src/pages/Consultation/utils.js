@@ -13,7 +13,7 @@ import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
 
 const orderTypes = [
   {
-    name: 'Consumable',
+    name: 'Ophthalmic Product',
     value: ORDER_TYPES.CONSUMABLE,
     prop: 'corConsumable',
     accessRight: 'queue.consultation.order.consumable',

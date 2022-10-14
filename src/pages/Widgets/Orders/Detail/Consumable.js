@@ -420,7 +420,7 @@ class Consumable extends PureComponent {
                     >
                       <LocalSearchSelect
                         temp
-                        label='Consumable Name'
+                        label='Product Name'
                         labelField='combinDisplayValue'
                         onChange={this.changeConsumable}
                         options={this.getConsumableOptions()}
