@@ -38,7 +38,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                   label='Inventory Type'
                   mode='multiple'
                   valueField='value'
-                  options={[{ value: 2, name: 'Consumable' }]}
+                  options={[{ value: 2, name: 'Ophthalmic Product' }]}
                   temp
                 />
               )}

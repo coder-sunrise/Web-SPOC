@@ -485,7 +485,9 @@ export const validateClaimAmount = (schemeRow, tempInvoicePayers) => {
       isConsumableCoverageMaxCapCheckRequired &&
       consumableTotalClaim > consumableCoverageMaxCap
     )
-      invalidMessage.push('Consumable claim amount has exceed the max cap')
+      invalidMessage.push(
+        'Ophthalmic Product claim amount has exceed the max cap',
+      )
 
     if (
       isServiceCoverageMaxCapCheckRequired &&

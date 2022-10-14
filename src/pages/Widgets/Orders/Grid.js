@@ -600,7 +600,7 @@ export default ({
         } catch (error) {
           console.log(error)
           notification.error({
-            message: `Revert consumable ${templateItem?.inventoryItemName} failed.`,
+            message: `Revert Ophthalmic Product ${templateItem?.inventoryItemName} failed.`,
           })
         }
       } else if (templateItem.visitOrderTemplateServiceItemDto) {

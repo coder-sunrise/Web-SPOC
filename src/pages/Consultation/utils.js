@@ -13,7 +13,7 @@ import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
 
 const orderTypes = [
   {
-    name: 'Consumable',
+    name: 'Ophthalmic Product',
     value: ORDER_TYPES.CONSUMABLE,
     prop: 'corConsumable',
     accessRight: 'queue.consultation.order.consumable',
@@ -183,7 +183,7 @@ const convertToConsultation = (
         orderRows.filter(o => o.type === p.value),
       )
     }
-  }) 
+  })
 
   values = convertEyeForms(values)
 
@@ -197,7 +197,7 @@ const convertToConsultation = (
           })
       : []
   })
- 
+
   return {
     ...values,
     isGSTInclusive,

@@ -392,7 +392,7 @@ export const countryCodes = [
 export const podoOrderType = [
   {
     value: 2,
-    name: 'Consumable',
+    name: 'Ophthalmic Product',
     prop: 'purchaseOrderConsumableItem',
     itemFKName: 'inventoryConsumableFK',
     ctName: 'inventoryconsumable',
@@ -406,7 +406,7 @@ export const podoOrderType = [
 export const rgType = [
   {
     value: 2,
-    name: 'Consumable',
+    name: 'Ophthalmic Product',
     prop: 'receivingGoodsConsumableItem',
     itemFKName: 'inventoryConsumableFK',
     ctName: 'inventoryconsumable',
@@ -471,7 +471,7 @@ const loadFromCodesConfig = {
 export const InventoryTypes = [
   {
     value: 2,
-    name: 'Consumable',
+    name: 'Ophthalmic Product',
     prop: 'consumableValueDto',
     itemFKName: 'inventoryConsumableFK',
     ctName: 'inventoryconsumable',
@@ -1414,7 +1414,7 @@ const queueItemStatus = [
 const preOrderItemCategory = [
   {
     value: 'Consumable',
-    name: 'Consumable',
+    name: 'Ophthalmic Product',
   },
   {
     value: 'Service',
@@ -1537,7 +1537,7 @@ const visitDoctorConsultationStatusColor = [
 ]
 
 const orderItemTypes = [
-  { type: 'Consumable', displayValue: 'Con' },
+  { type: 'Ophthalmic Product', displayValue: 'Con' },
   { type: 'Service', displayValue: 'Svc' },
 ]
 

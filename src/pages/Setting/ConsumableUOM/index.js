@@ -60,8 +60,8 @@ class ConsumableUOM extends PureComponent {
           observe='ConsumableUOMDetail'
           title={
             settingConsumableUOM.entity
-              ? 'Edit Consumable UOM'
-              : 'Add Consumable UOM'
+              ? 'Edit Ophthalmic Product UOM'
+              : 'Add Ophthalmic Product UOM'
           }
           maxWidth='md'
           bodyNoPadding

@@ -56,7 +56,9 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                     {...args}
                     label='Inventory Type'
                     allowClear={false}
-                    options={[{ name: 'Consumable', value: 'CONSUMABLE' }]}
+                    options={[
+                      { name: 'Ophthalmic Product', value: 'CONSUMABLE' },
+                    ]}
                     onChange={e => {
                       if (e) {
                         fm.setFieldValue('items', undefined)
