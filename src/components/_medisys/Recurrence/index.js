@@ -68,7 +68,7 @@ const Recurrence = ({
   else selectEventDate = eventDate
   return (
     <Fragment>
-      <Field
+      {/* <Field
         name='isEnableRecurrence'
         render={args => {
           return (
@@ -85,7 +85,7 @@ const Recurrence = ({
             />
           )
         }}
-      />
+      /> */}
       {isEnableRecurrence && (
         <FieldSet title='Recurrence' disabled={disabled}>
           <GridContainer item md={12}>

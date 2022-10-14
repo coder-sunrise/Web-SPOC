@@ -43,25 +43,6 @@ const ParseEyeFormData = response => {
   return newResponse
 }
 
-const checkMultiplePendingPackages = (response = {}) => {
-  const { pendingPackage } = response
-
-  if (pendingPackage) {
-    const packages = pendingPackage.reduce(
-      (distinct, data) =>
-        distinct.includes(data.patientPackageFK)
-          ? [...distinct]
-          : [...distinct, data.patientPackageFK],
-      [],
-    )
-
-    if (packages && packages.length > 1) {
-      return true
-    }
-  }
-  return false
-}
-
 export default createFormViewModel({
   namespace: 'consultation',
   config: {},
@@ -140,7 +121,6 @@ export default createFormViewModel({
           type: 'updateState',
           payload: {
             entity: undefined,
-            haveMultiplePendingPackages: false,
           },
         })
         const response = yield call(service.create, payload.id)
@@ -152,9 +132,6 @@ export default createFormViewModel({
             payload: {
               entity: response,
               version: payload.version,
-              haveMultiplePendingPackages: checkMultiplePendingPackages(
-                response,
-              ),
             },
           })
 
@@ -377,9 +354,6 @@ export default createFormViewModel({
             payload: {
               entity: response,
               version: payload.version,
-              haveMultiplePendingPackages: checkMultiplePendingPackages(
-                response,
-              ),
             },
           })
           yield put({
@@ -506,8 +480,7 @@ export default createFormViewModel({
             })),
             entity: undefined,
             isGSTInclusive: data.isGstInclusive,
-            gstValue: data.gstValue,
-            corPackage: data.corPackage,
+            gstValue: data.gstValue, 
             corVitalSign: data.corPatientNoteVitalSign || [],
           },
         })

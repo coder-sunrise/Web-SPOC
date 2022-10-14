@@ -5,7 +5,7 @@ import Info from '@material-ui/icons/Info'
 // common components
 import { GridContainer, GridItem } from '@/components'
 
-const styles = (theme) => ({
+const styles = theme => ({
   popover: {
     pointerEvents: 'none',
   },
@@ -29,12 +29,9 @@ const parseToPercentOrDollar = (type, value) => {
 }
 
 const MaxCapInfo = ({ classes, claimableSchemes = [], copaymentSchemeFK }) => {
-  const [
-    anchorEl,
-    setAnchorEl,
-  ] = useState(null)
+  const [anchorEl, setAnchorEl] = useState(null)
 
-  const handlePopoverOpen = (event) => setAnchorEl(event.currentTarget)
+  const handlePopoverOpen = event => setAnchorEl(event.currentTarget)
 
   const handlePopoverClose = () => setAnchorEl(null)
 
@@ -42,7 +39,7 @@ const MaxCapInfo = ({ classes, claimableSchemes = [], copaymentSchemeFK }) => {
 
   const scheme = claimableSchemes.find(
     item => item.length > 0 && item[0].id === copaymentSchemeFK,
-  ) 
+  )
 
   let patientMinPayable
   let categoriesMaxCap = []
@@ -63,7 +60,7 @@ const MaxCapInfo = ({ classes, claimableSchemes = [], copaymentSchemeFK }) => {
 
     if (isConsumableCoverageMaxCapCheckRequired)
       categoriesMaxCap.push({
-        type: 'Consumable',
+        type: 'Ophthalmic Product',
         value: consumableCoverageMaxCap,
       })
 
@@ -120,7 +117,7 @@ const MaxCapInfo = ({ classes, claimableSchemes = [], copaymentSchemeFK }) => {
             </GridItem>
           </GridContainer>
           <GridContainer>
-            {categoriesMaxCap.map((categoryMaxCap) => (
+            {categoriesMaxCap.map(categoryMaxCap => (
               <React.Fragment>
                 <GridItem md={10} className={classes.noPaddingLeft}>
                   <span>{categoryMaxCap.type} Max. Cap:</span>

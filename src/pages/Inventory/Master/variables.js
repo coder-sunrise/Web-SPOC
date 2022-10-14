@@ -15,18 +15,18 @@ export const InventoryMasterOption = props => {
   const Tabs = [
     {
       id: '1',
-      name: 'Consumable',
+      name: 'Ophthalmic Product',
       authority: 'inventorymaster.consumable',
       content: addContent(2, props),
       component: Consumable,
     },
-    {
-      id: '3',
-      name: 'Order Set',
-      authority: 'inventorymaster.orderset',
-      content: addContent(4, props),
-      component: OrderSet,
-    },
+    //{
+    //  id: '3',
+    //  name: 'Order Set',
+    //  authority: 'inventorymaster.orderset',
+    //  content: addContent(4, props),
+    //  component: OrderSet,
+    //},
   ]
   return Tabs.filter(tab => {
     const accessRight = Authorized.check(tab.authority)

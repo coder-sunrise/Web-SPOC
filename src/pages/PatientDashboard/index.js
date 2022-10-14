@@ -204,7 +204,6 @@ class PatientDashboard extends PureComponent {
       <div className={classes.root}>
         <Banner
           from='PatientDashboard'
-          // activePreOrderItem={patientProfile?.listingPreOrderItem.filter(item => !item.isDeleted) || []}
           extraCmt={this.getExtraComponent}
           {...this.props}
         />

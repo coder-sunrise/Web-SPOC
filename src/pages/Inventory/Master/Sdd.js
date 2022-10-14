@@ -85,18 +85,6 @@ const Sdd = ({ dispatch, handleSelectSdd, theme, ...props }) => {
           />
         </GridItem>
         <GridItem xs={3} style={{ marginTop: 10, marginBottom: 10 }}>
-          {/* <Button
-          variant='contained'
-          color='primary'
-          // onClick={() => {
-          //   dispatch({
-          //     type: 'vaccination/query',
-          //   })
-          // }}
-        >
-          Search
-        </Button> */}
-
           <ProgressButton
             color='primary'
             icon={<Search />}

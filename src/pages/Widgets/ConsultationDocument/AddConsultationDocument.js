@@ -23,7 +23,6 @@ import Memo from './Memo'
 import MedicalCertificate from './MedicalCertificate'
 import CertificateAttendance from './CertificateAttendance'
 import Others from './Others'
-import VaccinationCertificate from './VaccinationCertificate'
 
 const loadFromCodesConfig = {
   InsertConsumable: rows => {
@@ -307,7 +306,6 @@ class AddConsultationDocument extends PureComponent {
           </GridContainer>
           {type === '1' && <ReferralLetter {...cfg} />}
           {type === '2' && <Memo {...cfg} />}
-          {type === '3' && <VaccinationCertificate {...cfg} />}
           {type === '4' && <Others {...cfg} />}
           {type === '5' && <MedicalCertificate {...cfg} />}
           {type === '6' && <CertificateAttendance {...cfg} />}

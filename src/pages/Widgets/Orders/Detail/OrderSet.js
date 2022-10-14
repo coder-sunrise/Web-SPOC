@@ -23,7 +23,6 @@ import { qtyFormat } from '@/utils/config'
 import {
   openCautionAlertPrompt,
   GetOrderItemAccessRight,
-  ReplaceCertificateTeplate,
 } from '@/pages/Widgets/Orders/utils'
 import Authorized from '@/utils/Authorized'
 import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
@@ -202,12 +201,6 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
         datas.push(data)
         nextSequence += 1
       }
-    }
-    if (showNoTemplate) {
-      notification.warning({
-        message:
-          'Any changes will not be reflected in the vaccination certificate.',
-      })
     }
     dispatch({
       type: 'orders/upsertRows',

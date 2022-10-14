@@ -69,8 +69,6 @@ const defaultPatientEntity = {
       isConsent: false,
     },
   ],
-  patientPackage: [],
-  pendingPreOrderItem: [],
 }
 
 export default createFormViewModel({

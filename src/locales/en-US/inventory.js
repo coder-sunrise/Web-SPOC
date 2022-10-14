@@ -1,14 +1,14 @@
 export default {
   'inventory.master.title': 'Inventory Master',
 
-  'inventory.master.consumable.code': 'Consumable Code',
-  'inventory.master.consumable.name': 'Consumable Name',
+  'inventory.master.consumable.code': 'Product Code',
+  'inventory.master.consumable.name': 'Product Name',
   'inventory.master.consumable.description': 'Description',
   'inventory.master.consumable.remarks': 'Remarks',
   'inventory.master.consumable.enableRetail': 'Enable Retail',
   'inventory.master.consumable.supplier': 'Supplier',
   'inventory.master.consumable.baseUOM': 'UOM',
-  'inventory.master.consumable.category': 'Consumable Category',
+  'inventory.master.consumable.category': 'Product Category',
   'inventory.master.consumable.revenueCategory': 'Revenue Category',
   'inventory.master.consumable.effectiveStartDate': 'Effective Start Date',
   'inventory.master.consumable.effectiveEndDate': 'Effective End Date',
