@@ -51,9 +51,6 @@ const itemSchema = Yup.object().shape({
     .required()
     .min(0, 'Unit Price must be greater than or equal to $0.00'),
 })
-const modalityItemSchema = Yup.object().shape({
-  modalityFK: Yup.string().required(),
-})
 
 @connect(({ clinicSettings }) => ({
   clinicSettings,
