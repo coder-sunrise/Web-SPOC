@@ -4,7 +4,6 @@
 
 export const APPOINTMENT_STATUS = {
   CONFIRMED: 1,
-  DRAFT: 2,
   CANCELLED: 3,
   TURNEDUP: 4,
   RESCHEDULED: 5,
@@ -18,10 +17,6 @@ export const APPOINTMENT_STATUSOPTIONS = [
   {
     id: APPOINTMENT_STATUS.CONFIRMED,
     name: 'Confirmed',
-  },
-  {
-    id: APPOINTMENT_STATUS.DRAFT,
-    name: 'Draft',
   },
   {
     id: APPOINTMENT_STATUS.CANCELLED,
@@ -769,9 +764,6 @@ export const mapApptStatus = statusFK => {
     case APPOINTMENT_STATUS.DELETED:
       status = 'Deleted'
       break
-    case APPOINTMENT_STATUS.DRAFT:
-      status = 'Drafted'
-      break
     case APPOINTMENT_STATUS.TURNEDUP:
     case APPOINTMENT_STATUS.TURNEDUPLATE:
     case APPOINTMENT_STATUS.PFA_NOSHOW:
@@ -846,7 +838,6 @@ export const DOCUMENT_CATEGORY = {
 export const DOCUMENT_TEMPLATE_TYPE = {
   REFERRALLETTER: 1,
   MEMO: 2,
-  VACCCERT: 3,
   OTHERS: 4,
   CONSENTFORM: 5,
   QUESTIONNAIRE: 6,
@@ -858,7 +849,6 @@ export const DOCUMENTCATEGORY_DOCUMENTTYPE = [
     templateTypes: [
       DOCUMENT_TEMPLATE_TYPE.REFERRALLETTER,
       DOCUMENT_TEMPLATE_TYPE.MEMO,
-      DOCUMENT_TEMPLATE_TYPE.VACCCERT,
       DOCUMENT_TEMPLATE_TYPE.OTHERS,
     ],
   },

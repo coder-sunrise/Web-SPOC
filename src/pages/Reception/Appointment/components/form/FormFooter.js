@@ -13,7 +13,7 @@ const ButtonText = {
   CANCEL_APPOINTMENT: 'Cancel Appointment',
   CLOSE: 'Close',
   CHECK: 'Check Availability',
-  DRAFT: 'Save Draft',
+  // DRAFT: 'Save Draft',
   ADD: 'Save Appointment',
   EDIT: 'Save',
 }
@@ -32,7 +32,6 @@ const FormFooter = ({
   id,
 }) => {
   const isNew = appointmentStatusFK === undefined || !id
-  const isDraft = appointmentStatusFK === 2
   const isTurnedUp =
     appointmentStatusFK === APPOINTMENT_STATUS.TURNEDUP ||
     appointmentStatusFK === APPOINTMENT_STATUS.TURNEDUPLATE
@@ -44,7 +43,7 @@ const FormFooter = ({
     [classes.hideCancelAppointmentBtn]: isNew,
   }
 
-  const confirmBtnText = isNew || isDraft ? ButtonText.ADD : ButtonText.EDIT
+  const confirmBtnText = isNew ? ButtonText.ADD : ButtonText.EDIT
   return (
     <SizeContainer size='md'>
       <div className={classnames(classes.footer)}>
@@ -55,7 +54,7 @@ const FormFooter = ({
             onClick={handleCancelOrDeleteClick}
             disabled={disabled || isTurnedUp || isCancelled || !patientIsActive}
           >
-            {isDraft ? ButtonText.DELETE : ButtonText.CANCEL_APPOINTMENT}
+            {ButtonText.CANCEL_APPOINTMENT}
           </Button>
         </Authorized>
         <Button
@@ -65,17 +64,6 @@ const FormFooter = ({
         >
           {ButtonText.CHECK}
         </Button>
-        {(isNew || isDraft) && (
-          <Authorized authority='appointment.appointmentdetails'>
-            <Button
-              disabled={disabled || !patientIsActive}
-              onClick={handleSaveDraftClick}
-              color='primary'
-            >
-              {ButtonText.DRAFT}
-            </Button>
-          </Authorized>
-        )}
         <Authorized authority='appointment.appointmentdetails'>
           <Button
             disabled={disabled || isTurnedUp || isCancelled || !patientIsActive}

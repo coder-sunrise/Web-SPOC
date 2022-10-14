@@ -179,10 +179,7 @@ class Queue extends React.Component {
     visitID = undefined,
     patientID = undefined,
     appointmentID = undefined,
-    pdid = undefined,
-    pdroomid = undefined,
     visitMode = undefined,
-    visitOrderTemplateFK = undefined,
   }) => {
     const parameter = {
       md: 'visreg',
@@ -190,11 +187,7 @@ class Queue extends React.Component {
     if (patientID) parameter.pid = patientID
     if (visitID) parameter.vis = visitID
     if (appointmentID) parameter.apptid = appointmentID
-    if (pdid) parameter.pdid = pdid
-    if (pdroomid) parameter.pdroomid = pdroomid
     if (visitMode) parameter.visitMode = visitMode
-    if (visitOrderTemplateFK)
-      parameter.visitOrderTemplateFK = visitOrderTemplateFK
 
     // console.log(parameter)
     this.togglePatientSearch(false)
@@ -204,16 +197,10 @@ class Queue extends React.Component {
   handleActualizeAppointment = ({
     patientID = undefined,
     appointmentID = undefined,
-    primaryClinicianFK = undefined,
-    primaryClinicianRoomFK = undefined,
-    visitOrderTemplateFK = undefined,
   }) => {
     this.showVisitRegistration({
       patientID,
       appointmentID,
-      pdid: primaryClinicianFK,
-      pdroomid: primaryClinicianRoomFK,
-      visitOrderTemplateFK: visitOrderTemplateFK,
       visitMode: 'edit',
     })
   }
@@ -704,9 +691,6 @@ class Queue extends React.Component {
         this.handleActualizeAppointment({
           patientID: row.patientProfileFk,
           appointmentID: row.id,
-          primaryClinicianFK: doctorProfile ? doctorProfile.id : undefined,
-          primaryClinicianRoomFK: row.roomFk,
-          visitOrderTemplateFK: row.visitOrderTemplateFK,
         })
         break
       }

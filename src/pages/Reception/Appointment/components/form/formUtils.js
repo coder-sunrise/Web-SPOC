@@ -40,44 +40,47 @@ export const parseDateToServerDateFormatString = (date, format) => {
 export const ValidationSchema = Yup.object().shape({
   patientName: Yup.string().required('Patient Name is required'),
   patientContactNo: Yup.string().required('Contact No. is required'),
+  email: Yup.string()
+    .email()
+    .required('Email is required'),
   currentAppointment: Yup.object().shape({
     appointmentDate: Yup.string().required(),
   }),
-  isEnableRecurrence: Yup.boolean(),
-  recurrenceDto: Yup.object().when(
-    ['isEnableRecurrence', 'currentAppointment'],
-    (isEnableRecurrence, currentAppointment, recurrenceDto) => {
-      return recurrenceDto.shape({
-        recurrenceFrequency: Yup.number()
-          .min(1)
-          .max(99, 'Frequence must be less than or equal to 99')
-          .required(),
-        recurrenceCount: Yup.number()
-          .min(1)
-          .max(99, 'Number of Ocurrence must be less than or equal to 99')
-          .required(),
-        recurrenceDayOfTheMonth: Yup.number()
-          .transform(value => {
-            if (Number.isNaN(value)) return -1
-            return value
-          })
-          .when('recurrencePatternFK', {
-            is: recurrencePatternFK => recurrencePatternFK === 3,
-            then: Yup.number()
-              .min(1, 'Day of month cannot be less than 1')
-              .max(endOfMonth, `Day of month cannot exceed ${endOfMonth}`),
-          }),
-        recurrenceDaysOfTheWeek: Yup.array()
-          .transform(value => (value === null ? [] : value))
-          .when('recurrencePatternFK', {
-            is: recurrencePatternFK => recurrencePatternFK === 2,
-            then: Yup.array()
-              .min(1, 'Day(s) of week is required')
-              .required('Day(s) of week is required'),
-          }),
-      })
-    },
-  ),
+  // isEnableRecurrence: Yup.boolean(),
+  // recurrenceDto: Yup.object().when(
+  //   ['isEnableRecurrence', 'currentAppointment'],
+  //   (isEnableRecurrence, currentAppointment, recurrenceDto) => {
+  //     return recurrenceDto.shape({
+  //       recurrenceFrequency: Yup.number()
+  //         .min(1)
+  //         .max(99, 'Frequence must be less than or equal to 99')
+  //         .required(),
+  //       recurrenceCount: Yup.number()
+  //         .min(1)
+  //         .max(99, 'Number of Ocurrence must be less than or equal to 99')
+  //         .required(),
+  //       recurrenceDayOfTheMonth: Yup.number()
+  //         .transform(value => {
+  //           if (Number.isNaN(value)) return -1
+  //           return value
+  //         })
+  //         .when('recurrencePatternFK', {
+  //           is: recurrencePatternFK => recurrencePatternFK === 3,
+  //           then: Yup.number()
+  //             .min(1, 'Day of month cannot be less than 1')
+  //             .max(endOfMonth, `Day of month cannot exceed ${endOfMonth}`),
+  //         }),
+  //       recurrenceDaysOfTheWeek: Yup.array()
+  //         .transform(value => (value === null ? [] : value))
+  //         .when('recurrencePatternFK', {
+  //           is: recurrencePatternFK => recurrencePatternFK === 2,
+  //           then: Yup.array()
+  //             .min(1, 'Day(s) of week is required')
+  //             .required('Day(s) of week is required'),
+  //         }),
+  //     })
+  //   },
+  // ),
 })
 
 const convertReccurenceDaysOfTheWeek = (week = '') =>
@@ -147,12 +150,14 @@ export const mapPropsToValues = ({
 }) => {
   let _patientProfileFK
   let _patientContactNo
+  let _email
   let _patientName
   let _patientAccountNo
   if (patientEntity) {
     const { id, name, patientAccountNo: accNo, contact } = patientEntity
     _patientContactNo = contact.mobileContactNumber.number
     _patientName = name
+    _email = contact.contactEmailAddress.emailAddress
     _patientAccountNo = accNo
     _patientProfileFK = id
   }
@@ -163,6 +168,7 @@ export const mapPropsToValues = ({
     search: '',
     patientProfileFK: _patientProfileFK,
     patientContactNo: _patientContactNo,
+    email: _email,
     patientName: _patientName,
     patientAccountNo: _patientAccountNo,
     isEnableRecurrence: false,
@@ -183,9 +189,9 @@ export const mapPropsToValues = ({
         ),
       ],
     },
-    appointmentStatusFk: APPOINTMENT_STATUS.DRAFT,
+    appointmentStatusFk: APPOINTMENT_STATUS.CONFIRMED,
 
-    recurrenceDto: { ...initDailyRecurrence },
+    // recurrenceDto: { ...initDailyRecurrence },
     _appointmentDateIn: true,
     countryCodeFK: 1,
   }
@@ -293,6 +299,7 @@ export const mapPropsToValues = ({
       let {
         patientContactNo,
         patientName,
+        email,
         patientAccountNo,
         patientProfile,
         countryCodeFK,
@@ -300,6 +307,7 @@ export const mapPropsToValues = ({
       } = viewingAppointment
 
       if (patientProfile) {
+        console.log(patientProfile)
         const { name, patientAccountNo: accNo, contactNumbers } = patientProfile
         const _mobileContact = contactNumbers.find(
           item => item.numberTypeFK === 1,
@@ -322,6 +330,7 @@ export const mapPropsToValues = ({
         ...restViewingAppointment,
         search: '',
         patientContactNo,
+        email,
         patientName,
         patientAccountNo,
         countryCodeFK,

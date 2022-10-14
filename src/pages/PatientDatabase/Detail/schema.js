@@ -250,7 +250,9 @@ const schema = props => {
   if (!clinicSettings.isContactNoMandatoryInRegistration) {
     schemaDemographic.contact = Yup.object().shape({
       contactEmailAddress: Yup.object().shape({
-        emailAddress: Yup.string().email(),
+        emailAddress: Yup.string()
+          .email()
+          .required('Email is required'),
       }),
       contactAddress: Yup.array().of(
         Yup.object().shape({
@@ -270,7 +272,9 @@ const schema = props => {
   } else {
     schemaDemographic.contact = Yup.object().shape({
       contactEmailAddress: Yup.object().shape({
-        emailAddress: Yup.string().email(),
+        emailAddress: Yup.string()
+          .email()
+          .required('Email is required'),
       }),
       contactAddress: Yup.array().of(
         Yup.object().shape({
