@@ -41,20 +41,9 @@ const OrderSet = ({ dispatch, history, orderSet }) => {
   const getPackList = list => {
     if (list) {
       list.map(r => {
-        const {
-          medicationOrderSetItem,
-          consumableOrderSetItem,
-          vaccinationOrderSetItem,
-          serviceOrderSetItem,
-        } = r
+        const { consumableOrderSetItem, serviceOrderSetItem } = r
         let sellingPrice = 0
-        medicationOrderSetItem.forEach(o => {
-          sellingPrice += o.subTotal
-        })
         consumableOrderSetItem.forEach(o => {
-          sellingPrice += o.subTotal
-        })
-        vaccinationOrderSetItem.forEach(o => {
           sellingPrice += o.subTotal
         })
         serviceOrderSetItem.forEach(o => {

@@ -855,7 +855,7 @@ export const DispenseItemsColumnExtensions = (viewOnly = false) => {
       sortingEnabled: false,
       type: 'number',
       isDisabled: row => {
-        return viewOnly || !row.allowToDispense || row.isDispensedByPharmacy
+        return viewOnly || !row.allowToDispense
       },
       render: row => {
         if (viewOnly || !row.allowToDispense) {
@@ -869,7 +869,7 @@ export const DispenseItemsColumnExtensions = (viewOnly = false) => {
           )
         }
         let maxQuantity
-        if (row.isDefault || row.isDispensedByPharmacy) {
+        if (row.isDefault) {
           maxQuantity = row.quantity
         } else {
           maxQuantity = row.quantity > row.stock ? row.stock : row.quantity
@@ -882,7 +882,6 @@ export const DispenseItemsColumnExtensions = (viewOnly = false) => {
               format='0.0'
               //max={maxQuantity}
               min={0}
-              disabled={row.isDispensedByPharmacy}
               precision={1}
               value={row.dispenseQuantity}
             />

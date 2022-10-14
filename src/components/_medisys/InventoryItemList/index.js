@@ -97,14 +97,8 @@ class InventoryItemList extends React.Component {
   showConfirmationBox = (existingItemArray, newItemArray) => {
     const { dispatch } = this.props
 
-    const medicationArray = existingItemArray.filter(
-      item => item.inventoryMedicationFK,
-    )
     const consumableArray = existingItemArray.filter(
       item => item.inventoryConsumableFK,
-    )
-    const vaccinationArray = existingItemArray.filter(
-      item => item.inventoryVaccinationFK,
     )
     const serviceArray = existingItemArray.filter(
       item => item.serviceCenterServiceFK,
@@ -119,9 +113,7 @@ class InventoryItemList extends React.Component {
         additionalInfo: (
           <div style={{ fontSize: '1.3em' }}>
             <ul style={{ listStylePosition: 'inside' }}>
-              {this.dislayExistingItem(medicationArray, 'medicationName')}
               {this.dislayExistingItem(consumableArray, 'consumableName')}
-              {this.dislayExistingItem(vaccinationArray, 'vaccinationName')}
               {this.dislayExistingItem(serviceArray, 'serviceName')}
             </ul>
           </div>
@@ -309,13 +301,7 @@ class InventoryItemList extends React.Component {
                       totalPrice = 0,
                     } = option
                     let uomName = ''
-
-                    if (
-                      type === 'inventorymedication' ||
-                      type === 'inventoryvaccination'
-                    ) {
-                      uomName = dispensingUOM?.name
-                    } else if (type === 'inventoryconsumable') {
+                    if (type === 'inventoryconsumable') {
                       uomName = uom.name
                     } else if (type === 'ctservice') {
                       const optDisplay = `${displayValue} - ${code} (${currencySymbol}${unitPrice.toFixed(
@@ -336,9 +322,7 @@ class InventoryItemList extends React.Component {
                     return <span>{optDisplay}</span>
                   }}
                   localFilter={item =>
-                    (type !== 'inventoryconsumable' &&
-                      type !== 'inventorymedication') ||
-                    item.orderable
+                    type !== 'inventoryconsumable' || item.orderable
                   }
                   disabled={isDisabled}
                   {...args}

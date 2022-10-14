@@ -89,22 +89,16 @@ const constructPayload = values => {
   const updateTempDispenseItem = (items, inventoryFiledName) => {
     return items?.map(m => {
       let tempDispenseItem = []
-      if (!m.isPreOrder || (m.isPreOrder && m.isChargeToday)) {
-        const matchItem = values.dispenseItems.filter(
-          d =>
-            d.type === m.type &&
-            d.id === m.id &&
-            d.dispenseQuantity > 0 &&
-            !d.isDispensedByPharmacy,
-        )
-        if (matchItem.length) {
-          matchItem.forEach(item => {
-            tempDispenseItem.push({
-              ...getTransaction(item),
-              inventoryFK: item[inventoryFiledName],
-            })
+      const matchItem = values.dispenseItems.filter(
+        d => d.type === m.type && d.id === m.id && d.dispenseQuantity > 0,
+      )
+      if (matchItem.length) {
+        matchItem.forEach(item => {
+          tempDispenseItem.push({
+            ...getTransaction(item),
+            inventoryFK: item[inventoryFiledName],
           })
-        }
+        })
       }
       return {
         ...m,
@@ -127,9 +121,7 @@ const constructPayload = values => {
 
 const validDispense = (dispenseItems = []) => {
   let isValid = true
-  const dispensedItems = dispenseItems.filter(
-    d => !d.isPreOrder && d.stockFK && !d.isDispensedByPharmacy,
-  )
+  const dispensedItems = dispenseItems.filter(d => d.stockFK)
   for (let index = 0; index < dispensedItems.length; index++) {
     if (
       dispensedItems[index].dispenseQuantity > dispensedItems[index].quantity
@@ -152,21 +144,11 @@ const validDispense = (dispenseItems = []) => {
       break
     }
 
-    let matchItems = []
-    if (dispensedItems[index].isDrugMixture) {
-      matchItems = dispenseItems.filter(
-        d =>
-          d.type === dispensedItems[index].type &&
-          dispensedItems[index].isDrugMixture &&
-          d.drugMixtureFK === dispensedItems[index].drugMixtureFK,
-      )
-    } else {
-      matchItems = dispenseItems.filter(
-        d =>
-          d.type === dispensedItems[index].type &&
-          d.id === dispensedItems[index].id,
-      )
-    }
+    let matchItems = dispenseItems.filter(
+      d =>
+        d.type === dispensedItems[index].type &&
+        d.id === dispensedItems[index].id,
+    )
 
     if (
       dispensedItems[index].quantity !== _.sumBy(matchItems, 'dispenseQuantity')

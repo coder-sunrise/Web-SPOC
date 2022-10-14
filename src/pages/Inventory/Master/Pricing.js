@@ -8,14 +8,7 @@ import { InputNumber } from 'antd'
 
 const styles = () => ({})
 
-const Pricing = ({
-  values,
-  setFieldValue,
-  medicationDetail,
-  vaccinationDetail,
-  consumableDetail,
-  theme,
-}) => {
+const Pricing = ({ values, setFieldValue, consumableDetail, theme }) => {
   const [acp, setAcp] = useState(values.averageCostPrice || 0.0)
   const [markupMargin, setMarkupMargin] = useState(values.markupMargin || 0.0)
 
@@ -26,13 +19,6 @@ const Pricing = ({
   }
 
   const isEditMode = () => {
-    if (medicationDetail && medicationDetail.entity) {
-      return true
-    }
-    if (vaccinationDetail && vaccinationDetail.entity) {
-      return true
-    }
-
     if (consumableDetail && consumableDetail.entity) {
       return true
     }

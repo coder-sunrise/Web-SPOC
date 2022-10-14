@@ -82,18 +82,10 @@ import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 
           const item = {
             ...restProps,
-            isInventoryItem:
-              restProps.itemType.toLowerCase() !== 'lab' &&
-              restProps.itemType.toLowerCase() !== 'radiology' &&
-              restProps.itemType.toLowerCase() !== 'service' &&
-              !restProps.isDrugMixture,
-            subTotal: restProps.isPackage
-              ? restProps.packageRemainingAmountAfterGST
-              : restProps.currentAmount || 0,
+            isInventoryItem: restProps.itemType.toLowerCase() !== 'service',
+            subTotal: restProps.currentAmount || 0,
             itemDescription: restProps.itemName,
-            quantity: restProps.isPackage
-              ? restProps.packageRemainingQuantity
-              : restProps.currentQuantity || 0,
+            quantity: restProps.currentQuantity || 0,
           }
           return { ...item }
         }),
@@ -116,8 +108,6 @@ class AddCrNote extends Component {
     super(props)
     this.state = {
       selectedRows: [],
-      expandedGroups: [],
-      isExistPackage: false,
     }
 
     this.handleOnChangeQuantity = _.debounce(this.handleOnChangeQuantity, 100)
@@ -126,40 +116,6 @@ class AddCrNote extends Component {
   componentDidMount = () => {
     const { values } = this.props
     const { creditNoteItem } = values
-
-    const settings = JSON.parse(localStorage.getItem('clinicSettings'))
-    const { isEnablePackage = false } = settings
-    const packageItems = creditNoteItem.filter(item => item.isPackage)
-    const existPackage = isEnablePackage && packageItems.length > 0
-    this.setState({
-      isExistPackage: existPackage,
-    })
-
-    this.expandAllPackages(values)
-  }
-
-  expandAllPackages = values => {
-    const { creditNoteItem } = values
-
-    if (creditNoteItem) {
-      const groups = creditNoteItem.reduce(
-        (distinct, data) =>
-          distinct.includes(data.packageGlobalId)
-            ? [...distinct]
-            : [...distinct, data.packageGlobalId],
-        [],
-      )
-
-      this.setState({
-        expandedGroups: groups,
-      })
-    }
-  }
-
-  handleExpandedGroupsChange = e => {
-    this.setState({
-      expandedGroups: e,
-    })
   }
 
   handleCalcCrNoteItem = (selection = undefined) => {
@@ -173,7 +129,6 @@ class AddCrNote extends Component {
 
     const finalCreditTotal = creditNoteItem.reduce((total, item) => {
       if (rowSelection.includes(item.id)) {
-        if (item.isPackage) return total + item.packageRemainingAmountAfterGST
         return total + item.currentAmount
       }
       return total
@@ -191,51 +146,6 @@ class AddCrNote extends Component {
     const { values, setFieldValue } = this.props
 
     let newSelection = selection
-    if (this.state.isExistPackage) {
-      // If is select a package item, should auto select all items under the package
-      const newSelect = selection.find(
-        i => !this.state.selectedRows.includes(i),
-      )
-      if (newSelect) {
-        const item = values.creditNoteItem.find(i => i.id === newSelect)
-        if (item && item.isPackage) {
-          const otherItems = values.creditNoteItem.filter(
-            i =>
-              i.packageGlobalId === item.packageGlobalId &&
-              i.id !== newSelect &&
-              !i.isSelected,
-          )
-          if (otherItems && otherItems.length > 0) {
-            otherItems.forEach(i => {
-              i.isSelected = true
-              newSelection.push(i.id)
-            })
-          }
-        }
-      }
-
-      // If is remove selection from a package item, should auto remove selection all items under the package
-      const newUnselect = this.state.selectedRows.find(
-        i => !selection.includes(i),
-      )
-      if (newUnselect) {
-        const item = values.creditNoteItem.find(i => i.id === newUnselect)
-        if (item && item.isPackage) {
-          const otherItems = values.creditNoteItem.filter(
-            i =>
-              i.packageGlobalId === item.packageGlobalId &&
-              i.id !== newUnselect &&
-              i.isSelected,
-          )
-          if (otherItems && otherItems.length > 0) {
-            otherItems.forEach(i => {
-              i.isSelected = false
-              newSelection = newSelection.filter(s => s !== i.id)
-            })
-          }
-        }
-      }
-    }
 
     const newUnSelectItems = this.state.selectedRows.filter(
       i => !selection.includes(i),
@@ -309,34 +219,6 @@ class AddCrNote extends Component {
     } = this.props
     const { creditNoteItem, finalCredit, payerType } = values
 
-    const packageGroupCellContent = ({ row }) => {
-      if (row.value === undefined || row.value === '') {
-        return (
-          <span style={{ verticalAlign: 'middle' }}>
-            <strong>Non-Package Items</strong>
-          </span>
-        )
-      }
-
-      let label = 'Package'
-      if (!creditNoteItem) return ''
-      const data = creditNoteItem.filter(
-        item => item.packageGlobalId === row.value,
-      )
-      if (data.length > 0) {
-        label = `${data[0].packageCode} - ${data[0].packageName}`
-        if (data[0].isPackageExpired) {
-          label += ' (Expired)'
-        }
-      }
-
-      return (
-        <span style={{ verticalAlign: 'middle' }}>
-          <strong>{label}</strong>
-        </span>
-      )
-    }
-
     let CrNoteColumns = [
       { name: 'itemType', title: 'Type' },
       { name: 'itemName', title: 'Name' },
@@ -345,35 +227,15 @@ class AddCrNote extends Component {
       { name: 'currentAmount', title: 'Current CN Amt. ($)' },
     ]
 
-    if (this.state.isExistPackage) {
-      CrNoteColumns.splice(2, 0, {
-        name: 'quantity',
-        title: 'Purchased Quantity',
-      })
-      CrNoteColumns.splice(3, 0, {
-        name: 'packageConsumeQuantity',
-        title: 'Consumed Quantity',
-      })
-      CrNoteColumns.splice(4, 0, {
-        name: 'packageRemainingQuantity',
-        title: 'Balance Quantity',
-      })
-
-      CrNoteColumns.push({
-        name: 'packageGlobalId',
-        title: 'Package',
-      })
-    } else {
-      CrNoteColumns.splice(2, 0, { name: 'quantity', title: 'Total Qty.' })
-      CrNoteColumns.splice(3, 0, {
-        name: 'creditNoteQuantity',
-        title: 'Total CN Qty.',
-      })
-      CrNoteColumns.splice(4, 0, {
-        name: 'currentQuantity',
-        title: 'Current CN Qty.',
-      })
-    }
+    CrNoteColumns.splice(2, 0, { name: 'quantity', title: 'Total Qty.' })
+    CrNoteColumns.splice(3, 0, {
+      name: 'creditNoteQuantity',
+      title: 'Total CN Qty.',
+    })
+    CrNoteColumns.splice(4, 0, {
+      name: 'currentQuantity',
+      title: 'Current CN Qty.',
+    })
 
     return (
       <div>
@@ -384,30 +246,14 @@ class AddCrNote extends Component {
             selectable: true,
             selectConfig: {
               showSelectAll: true,
-              rowSelectionEnabled: row =>
-                (row.remainQuantity > 0 || row.remainAmount > 0) &&
-                (!row.isPackage ||
-                  (row.isPackage &&
-                    !row.isPackageExpired &&
-                    row.packageRemainingAmountAfterGST > 0)),
+              rowSelectionEnabled: true,
             },
             pager: false,
-            grouping: this.state.isExistPackage,
-            groupingConfig: {
-              state: {
-                grouping: [{ columnName: 'packageGlobalId' }],
-                expandedGroups: [...this.state.expandedGroups],
-                onExpandedGroupsChange: this.handleExpandedGroupsChange,
-              },
-              row: {
-                contentComponent: packageGroupCellContent,
-              },
-            },
           }}
           selection={this.state.selectedRows}
           onSelectionChange={this.handleSelectionChange}
-          defaultSorting={[{ columnName: 'packageGlobalId', direction: 'asc' }]}
-          rows={creditNoteItem.filter(cn => !cn.isPreOrder || cn.isChargeToday)}
+          defaultSorting={[{ columnName: 'itemType', direction: 'asc' }]}
+          rows={creditNoteItem}
           columns={CrNoteColumns}
           columnExtensions={[
             {
@@ -415,13 +261,6 @@ class AddCrNote extends Component {
               width: 150,
               sortingEnabled: false,
               render: row => {
-                let paddingRight = 0
-                if (row.isActualizedPreOrder || row.isPreOrder) {
-                  paddingRight = 24
-                }
-                if (row.isDrugMixture) {
-                  paddingRight = 10
-                }
                 const itemType = orderItemTypes.find(
                   t =>
                     t.type.toUpperCase() === (row.itemType || '').toUpperCase(),
@@ -432,7 +271,6 @@ class AddCrNote extends Component {
                       style={{
                         wordWrap: 'break-word',
                         whiteSpace: 'pre-wrap',
-                        paddingRight: paddingRight,
                       }}
                     >
                       <Tooltip title={row.itemType}>
@@ -465,18 +303,7 @@ class AddCrNote extends Component {
               align: 'right',
               sortingEnabled: false,
               render: row => {
-                const { currentQuantity, remainQuantity, isPackage } = row
-
-                if (isPackage) {
-                  return (
-                    <NumberInput
-                      size='sm'
-                      text
-                      value={currentQuantity}
-                      format='0.0'
-                    />
-                  )
-                }
+                const { currentQuantity, remainQuantity } = row
 
                 return (
                   <Field
@@ -528,46 +355,6 @@ class AddCrNote extends Component {
               },
             },
             {
-              columnName: 'packageConsumeQuantity',
-              width: 150,
-              align: 'right',
-              sortingEnabled: false,
-              render: row => {
-                const { quantity, packageRemainingQuantity, isPackage } = row
-                const totalConsumedQuantity =
-                  isPackage !== true
-                    ? undefined
-                    : quantity - (packageRemainingQuantity || 0)
-
-                return (
-                  <NumberInput
-                    size='sm'
-                    text
-                    value={totalConsumedQuantity}
-                    format='0.0'
-                  />
-                )
-              },
-            },
-            {
-              columnName: 'packageRemainingQuantity',
-              width: 150,
-              align: 'right',
-              sortingEnabled: false,
-              render: row => {
-                const { packageRemainingQuantity } = row
-
-                return (
-                  <NumberInput
-                    size='sm'
-                    text
-                    value={packageRemainingQuantity}
-                    format='0.0'
-                  />
-                )
-              },
-            },
-            {
               columnName: 'claimAmount',
               width: 120,
               type: 'currency',
@@ -585,17 +372,6 @@ class AddCrNote extends Component {
               align: 'right',
               sortingEnabled: false,
               render: row => {
-                if (row.isPackage) {
-                  return (
-                    <NumberInput
-                      size='sm'
-                      text
-                      currency
-                      value={row.packageRemainingAmountAfterGST}
-                    />
-                  )
-                }
-
                 return (
                   <Field
                     name={`creditNoteItem[${row.rowIndex}].currentAmount`}

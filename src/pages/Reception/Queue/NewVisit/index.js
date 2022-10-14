@@ -39,7 +39,7 @@ import FormFieldName from './formField'
 // misc utils
 import { formikMapPropsToValues, formikHandleSubmit } from './miscUtils'
 import { VISIT_STATUS } from '../variables'
-import { preOrderItemCategory } from '@/utils/codes'
+import { orderItemCategory } from '@/utils/codes'
 import _ from 'lodash'
 
 const styles = theme => ({

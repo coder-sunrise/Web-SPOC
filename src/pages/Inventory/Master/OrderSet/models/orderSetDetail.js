@@ -21,8 +21,6 @@ export default createFormViewModel({
         isOrderable: true,
         serviceOrderSetItem: [],
         consumableOrderSetItem: [],
-        medicationOrderSetItem: [],
-        vaccinationOrderSetItem: [],
         isActive: true,
       },
       // entity: {},

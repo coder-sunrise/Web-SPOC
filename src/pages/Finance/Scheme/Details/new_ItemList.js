@@ -165,21 +165,10 @@ class ItemList extends React.Component {
               content: this.addContent('inventoryconsumable'),
             },
             {
-              id: 3,
-              name: 'Vaccination',
-              content: this.addContent('inventoryvaccination'),
-            },
-            {
               id: 4,
               name: 'Service',
               content: this.addContent('ctservice'),
             },
-            /* Commented Package Input - Need to re-test if enabling it back in the future */
-            // {
-            //   id: 5,
-            //   name: 'Package',
-            //   content: this.addContent('inventorypackage'),
-            // },
           ]}
         />
         <CommonTableGrid

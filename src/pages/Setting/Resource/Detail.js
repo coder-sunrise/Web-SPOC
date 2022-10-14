@@ -23,6 +23,7 @@ import {
   timeFormat24Hour,
   Popconfirm,
   Button,
+  CodeSelect,
 } from '@/components'
 import Delete from '@material-ui/icons/Delete'
 import { ShoppingCartTwoTone } from '@material-ui/icons'
@@ -53,6 +54,7 @@ const resourceCapacitySchema = Yup.object().shape({
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
+    roomFK: Yup.number().required(),
     effectiveDates: Yup.array()
       .of(Yup.date())
       .min(2)
@@ -288,7 +290,7 @@ class Detail extends PureComponent {
                   }}
                 />
               </GridItem>
-              <GridItem md={6}>
+              <GridItem md={2}>
                 <FastField
                   name='sortOrder'
                   render={args => {
@@ -301,6 +303,14 @@ class Detail extends PureComponent {
                         {...args}
                       />
                     )
+                  }}
+                />
+              </GridItem>
+              <GridItem md={4}>
+                <FastField
+                  name='roomFK'
+                  render={args => {
+                    return <CodeSelect label='Room' code='ctRoom' {...args} />
                   }}
                 />
               </GridItem>

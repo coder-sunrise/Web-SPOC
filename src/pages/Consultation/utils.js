@@ -167,14 +167,9 @@ const convertToConsultation = (
 ) => {
   const { rows = [] } = consultationDocument
   consultationDocumentTypes.forEach(p => {
-    values[p.prop] = rows.filter(o => o.type === p.value && !o.vaccinationUFK)
+    values[p.prop] = rows.filter(o => o.type === p.value)
   })
-  const {
-    rows: orderRows = [],
-    finalAdjustments = [],
-    isGSTInclusive,
-    corPackage = [],
-  } = orders
+  const { rows: orderRows = [], finalAdjustments = [], isGSTInclusive } = orders
 
   values.corOrderAdjustment = finalAdjustments
   orderTypes.forEach((p, i) => {
@@ -222,10 +217,6 @@ const generateConsumable = item => {
     consumableName: item.consumableName,
     inventoryConsumableFK: item.inventoryConsumableFK,
     isDeleted: item.isDeleted,
-    isDispensedByPharmacy: item.isDispensedByPharmacy,
-    isNurseActualizeRequired: item.isNurseActualizeRequired,
-    isPreOrder: item.isPreOrder,
-    performingUserFK: item.performingUserFK,
     quantity: item.quantity,
     remark: item.remark,
     unitOfMeasurement: item.unitOfMeasurement,
