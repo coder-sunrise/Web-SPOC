@@ -321,7 +321,6 @@ class OrderSet extends PureComponent {
     this.changeOrderSet = (v, op) => {
       const { setValues, values, orderTypes, codetable, patient } = this.props
       const { entity = {} } = patient
-      const { patientAllergy = [] } = entity
       let rows = []
       if (op && op.serviceOrderSetItem) {
         rows = rows.concat(

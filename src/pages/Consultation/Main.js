@@ -280,12 +280,6 @@ const saveConsultation = ({
     newValues.visitConsultationTemplate.consultationTemplate =
       localStorage.getItem('consultationLayout') || ''
 
-    if (
-      newValues.patientMedicalHistory &&
-      !newValues.patientMedicalHistory.patientProfileFK
-    ) {
-      newValues.patientMedicalHistory.patientProfileFK = patient.entity.id
-    }
     dispatch({
       type: `consultation/${action}`,
       payload: cleanConsultation(newValues),
@@ -404,12 +398,7 @@ const pauseConsultation = async ({
   }
   newValues.visitConsultationTemplate.consultationTemplate =
     localStorage.getItem('consultationLayout') || ''
-  if (
-    newValues.patientMedicalHistory &&
-    !newValues.patientMedicalHistory.patientProfileFK
-  ) {
-    newValues.patientMedicalHistory.patientProfileFK = patient.entity.id
-  }
+
   if (
     !(await autoPrintSelection('pause', {
       dispatch,
@@ -627,18 +616,6 @@ class Main extends React.Component {
     })
   }
   shouldComponentUpdate = (nextProps, nextState) => {
-    if (nextProps.consultation.patientMedicalHistory) {
-      const { setFieldValue } = nextProps
-      setFieldValue('patientMedicalHistory', {
-        ...nextProps.consultation.patientMedicalHistory,
-      })
-      nextProps.dispatch({
-        type: 'consultation/updateState',
-        payload: {
-          patientMedicalHistory: undefined,
-        },
-      })
-    }
     if (nextProps.values.id !== this.props.values.id) return true
     if (nextProps.consultation.version !== this.props.consultation.version)
       return true

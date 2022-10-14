@@ -49,11 +49,7 @@ const AddOrder = ({
     })
 
     if (r) {
-      const {
-        retailInvoiceAdjustment,
-        retailInvoiceItem,
-        drugAllergies = [],
-      } = r
+      const { retailInvoiceAdjustment, retailInvoiceItem } = r
       const mapRetailItemPropertyToOrderProperty = o => {
         let obj
         switch (o.invoiceItemTypeFK) {

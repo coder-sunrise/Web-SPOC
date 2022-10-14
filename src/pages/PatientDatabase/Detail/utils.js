@@ -98,12 +98,6 @@ const upsertPatient = async ({
       if (patient.callback) patient.callback(response.id)
       const newEntity = mapEntityToValues(newPatient)
       resetForm(newEntity)
-      dispatch({
-        type: 'consultation/updateState',
-        payload: {
-          patientMedicalHistory: newEntity.patientMedicalHistory,
-        },
-      })
     }
     if (onConfirm && shouldCloseForm) {
       onConfirm()
