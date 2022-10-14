@@ -200,11 +200,6 @@ class PatientHistory extends Component {
 
     dispatch({
       type: 'codetable/fetchCodes',
-      payload: { code: 'ctg6pd' },
-    })
-
-    dispatch({
-      type: 'codetable/fetchCodes',
       payload: { code: 'ctcomplication' },
     })
 
@@ -904,14 +899,13 @@ class PatientHistory extends Component {
   getPatientInfo = () => {
     const {
       patient = {},
-      codetable: { ctg6pd = [], ctnationality = [], ctgender = [] },
+      codetable: { ctnationality = [], ctgender = [] },
     } = this.props
     const {
       name,
       patientAccountNo,
       nationalityFK,
       dob,
-      patientAllergy,
       genderFK,
       patientAllergyMetaData,
       patientMedicalHistory = {},
@@ -923,12 +917,6 @@ class PatientHistory extends Component {
     } = patientMedicalHistory
     const gender = ctgender.find(o => o.id === genderFK)
     const nationality = ctnationality.find(o => o.id === nationalityFK)
-    let g6PD
-    let patientNoAllergies
-    if (patientAllergyMetaData.length > 0) {
-      g6PD = ctg6pd.find(o => o.id === patientAllergyMetaData[0].g6PDFK)
-      patientNoAllergies = patientAllergyMetaData[0].noAllergies
-    }
 
     let age = '0'
     const years = Math.floor(moment.duration(moment().diff(dob)).asYears())
@@ -939,7 +927,6 @@ class PatientHistory extends Component {
       age = `{${months} ${years > 1 ? 'months' : 'month'}}`
     }
 
-    const allergies = _.orderBy(patientAllergy, ['type'], ['asc'])
     return [
       {
         patientName: name,
@@ -947,12 +934,6 @@ class PatientHistory extends Component {
         patientNationality: nationality ? nationality.name : '',
         patientAge: age,
         patientSex: gender ? gender.name : '',
-        patientG6PD: g6PD ? g6PD.name : '',
-        patientAllergy: allergies.length
-          ? allergies.map(o => o.allergyName).join(', ')
-          : patientNoAllergies
-          ? 'NKDA'
-          : '',
         patientSocialHistory: socialHistory,
         patientFamilyHistory: familyHistory,
         patientMajorInvestigation: medicalHistory,
@@ -1712,8 +1693,7 @@ class PatientHistory extends Component {
             current.orders.map(o => {
               return {
                 visitFK: current.currentId,
-                type: o.isDrugMixture ? 'Drug Mixture' : o.type,
-                isDrugMixture: o.isDrugMixture,
+                type: o.type,
                 name: o.name,
                 description: o.description,
                 remarks: o.remarks,

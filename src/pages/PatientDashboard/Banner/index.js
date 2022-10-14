@@ -115,7 +115,6 @@ class Banner extends PureComponent {
     showSchemeModal: false,
     showNonClaimableHistoryModal: false,
     showExaminationDetailsModal: false,
-    showPreOrderModal: false,
     isExpanded: false,
   }
 
@@ -123,14 +122,6 @@ class Banner extends PureComponent {
     super(props)
     this.fetchCodeTables()
   }
-
-  componentWillMount() {
-                         const { dispatch } = this.props
-                         // dispatch({
-                         //   type: 'codetable/fetchCodes',
-                         //   payload: { code: 'ctg6pd' },
-                         // })
-                       }
 
   componentWillUnmount() {
     const { dispatch, isDisposePatientEntity = true } = this.props
@@ -140,127 +131,6 @@ class Banner extends PureComponent {
         payload: { entity: null },
       })
     }
-  }
-
-  getAllergyData() {
-    const { patient } = this.props
-    const { entity } = patient
-    const { info } = entity
-    const { patientAllergy = [], patientAllergyMetaData = [] } = entity
-    const da = _.orderBy(patientAllergy, ['type'], ['asc']).filter(
-      t => t.patientAllergyStatusFK === 1,
-    )
-    const allergyData = da.reduce((data, current) => {
-      if (!data) return current.allergyName
-      return `${data}, ${current.allergyName}`
-    }, '')
-
-    this.setState({
-      existsAllergy: da.length ? true : false,
-    })
-
-    return (
-      entity &&
-      entity.isActive && (
-        <span style={{ marginTop: 5 }}>{allergyData || '-'}</span>
-      )
-    )
-  }
-
-  getAllergyLink(data) {
-    const { props } = this
-    const {
-      patient,
-      codetable: { ctg6pd = [] },
-      from,
-    } = props
-    const { entity } = patient
-    const info = entity
-    const { patientAllergy = [], patientAllergyMetaData = [] } = info
-    const da = _.orderBy(patientAllergy, ['type'], ['asc'])
-    let allergyData = '-'
-
-    if (da.length > 0) {
-      if (da.length >= 2) {
-        allergyData = `${da[0].allergyName}, ${da[1].allergyName}`
-      } else {
-        allergyData = `${da[0].allergyName}`
-      }
-    }
-
-    this.setState({
-      existsAllergy: da.length,
-    })
-    let g6PD
-    if (patientAllergyMetaData.length > 0) {
-      g6PD = ctg6pd.find(o => o.id === patientAllergyMetaData[0].g6PDFK)
-    }
-    return (
-      entity &&
-      entity.isActive && (
-        <div style={{ display: 'inline-block' }}>
-          {data === 'link' ? (
-            <Link
-              to={getAppendUrl({
-                md: 'pt',
-                cmt: 3,
-                pid: info.id,
-              })}
-              tabIndex='-1'
-            >
-              <IconButton style={{ padding: 0 }}>
-                <Edit color='action' />
-              </IconButton>
-            </Link>
-          ) : (
-            <div style={{ marginTop: 5 }}>
-              {allergyData.length > 25
-                ? `${allergyData.substring(0, 25).trim()}...`
-                : allergyData}
-
-              {da.length > 0 && (
-                <Popover
-                  icon={null}
-                  content={
-                    <div>
-                      {da.map((item, i) => {
-                        return (
-                          <GridContainer>
-                            <GridItem>
-                              {i + 1}. {item.allergyName}
-                            </GridItem>
-                          </GridContainer>
-                        )
-                      })}
-                    </div>
-                  }
-                  trigger='click'
-                  placement='bottomLeft'
-                >
-                  <div style={{ display: 'inline-block' }}>
-                    <MoreButton />
-                  </div>
-                </Popover>
-              )}
-
-              <div>
-                <span
-                  style={{
-                    color: 'darkblue',
-                    fontWeight: 500,
-                    position: 'relative',
-                    fontSize: '16.1px',
-                  }}
-                >
-                  G6PD:{' '}
-                </span>
-                {g6PD ? g6PD.name : '-'}
-              </div>
-            </div>
-          )}
-        </div>
-      )
-    )
   }
 
   fetchCodeTables = async () => {
@@ -295,8 +165,6 @@ class Banner extends PureComponent {
     history.push(getAppendUrl(parameter))
   }
   closeNotes = () => this.setState({ showNotesModal: false })
-  openPreOrders = () => this.setState({ showPreOrderModal: true })
-  closePreOrders = () => this.setState({ showPreOrderModal: false })
   openScheme = coPayerFK => {
     const { dispatch } = this.props
     dispatch({
@@ -625,14 +493,10 @@ class Banner extends PureComponent {
     const { props } = this
     const {
       extraCmt,
-      preOrderCmt,
       from = '',
       patient,
       codetable,
       classes,
-      activePreOrderItems,
-      onSelectPreOrder,
-      isEnableRecurrence,
       apptId,
       apptMode,
       style = {
@@ -643,7 +507,6 @@ class Banner extends PureComponent {
         backgroundColor: '#f0f8ff',
       },
       refreshingBalance,
-      disablePreOrder,
       dispatch,
       isReadOnly,
       isRetail,
@@ -692,9 +555,6 @@ class Banner extends PureComponent {
     // get scheme details based on scheme type
     const schemeDataList = []
     const g6PD = null
-
-    const pendingPreOrderItems =
-      entity.pendingPreOrderItem?.filter(item => !item.isDeleted) || []
 
     const persistentDiagnosis =
       isEnableJapaneseICD10Diagnosis === true &&
@@ -1005,24 +865,6 @@ class Banner extends PureComponent {
         </Col>
       </Row>
     )
-    const longTermMedication = (
-      <Row wrap={false}>
-        <Col flex='none'>
-          <Tooltip title='Long Term Medication'>
-            <span className={classes.header}>L.T. Med.: </span>
-          </Tooltip>
-        </Col>
-        <Col flex='auto' className={contentClass}>
-          <Tooltip
-            enterDelay={100}
-            title={info.patientMedicalHistory?.longTermMedication}
-            interactive='true'
-          >
-            <span>{info.patientMedicalHistory?.longTermMedication || '-'}</span>
-          </Tooltip>
-        </Col>
-      </Row>
-    )
     const patientAllergy = (
       <Row wrap={false}>
         <Col flex='none'>
@@ -1032,15 +874,11 @@ class Banner extends PureComponent {
           >
             Allergy:
           </span>
-          <span>{this.getAllergyLink('link')}</span>
+          <span>-</span>
         </Col>
         <Col flex='auto' className={contentClass}>
-          <Tooltip
-            enterDelay={100}
-            title={this.getAllergyData()}
-            interactive='true'
-          >
-            <span>{this.getAllergyData()}</span>
+          <Tooltip enterDelay={100} title={''} interactive='true'>
+            <span>-</span>
           </Tooltip>
         </Col>
       </Row>
@@ -1165,7 +1003,7 @@ class Banner extends PureComponent {
                     {patientPersistDiagnosis}
                   </GridItem>
                   <GridItem xs={6} md={4}>
-                    {longTermMedication}
+                    -
                   </GridItem>
                   <GridItem xs={6} md={4}>
                     {patientAllergy}

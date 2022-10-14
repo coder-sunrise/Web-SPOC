@@ -332,30 +332,6 @@ const consultationDocumentTypes = [
     },
   },
   {
-    value: '3',
-    name: 'Vaccination Certificate',
-    code: 'Vaccination Cert',
-    prop: 'corVaccinationCert',
-    downloadKey: 'vaccinationcertificateid',
-    downloadConfig: {
-      id: 10,
-      key: 'vaccinationcertificateid',
-      subject: 'Vaccination Certificate',
-      draft: row => {
-        return {
-          VaccinationCertificateDetails: [
-            {
-              ...row,
-              certificateDate: moment(row.certificateDate).format(
-                dateFormatLong,
-              ),
-            },
-          ],
-        }
-      },
-    },
-  },
-  {
     value: '4',
     name: 'Others',
     prop: 'corOtherDocuments',
@@ -611,7 +587,7 @@ const tagList = [
     value: 'Order',
     text: '<#Order#>',
     url: '',
-    getter: newVaccination => {
+    getter: () => {
       const { orders, patient, codetable } = window.g_app._store.getState()
       if (!orders) return '-'
 
@@ -1411,7 +1387,7 @@ const queueItemStatus = [
   },
 ]
 
-const preOrderItemCategory = [
+const orderItemCategory = [
   {
     value: 'Consumable',
     name: 'Consumable',
@@ -1435,10 +1411,6 @@ export const documentTemplateTypes = [
   {
     value: 2,
     name: 'Memo',
-  },
-  {
-    value: 3,
-    name: 'Vaccination Certificate',
   },
   {
     value: 4,
@@ -1502,32 +1474,6 @@ const examinationSteps = [
     name: 'Cancelled',
   },
 ]
-const individualCommentGroup = [
-  {
-    value: 1,
-    name: '1',
-  },
-  {
-    value: 2,
-    name: '2',
-  },
-  {
-    value: 3,
-    name: '3',
-  },
-  {
-    value: 4,
-    name: '4',
-  },
-  {
-    value: 5,
-    name: '5',
-  },
-  {
-    value: 6,
-    name: '6',
-  },
-]
 
 const visitDoctorConsultationStatusColor = [
   { value: VISITDOCTOR_CONSULTATIONSTATUS.WAITING, color: '#4255BD' },
@@ -1572,13 +1518,12 @@ export {
   year,
   queueProcessorType,
   queueItemStatus,
-  preOrderItemCategory,
+  orderItemCategory,
   tagCategory,
   isPanelItemRequired,
   languageCategory,
   pharmacyStatus,
   examinationSteps,
-  individualCommentGroup,
   visitDoctorConsultationStatusColor,
   orderItemTypes,
 }

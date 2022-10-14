@@ -216,7 +216,7 @@ export default compose(
       if (consumableStock.length === 0) {
         defaultConsumableStock = [
           {
-            inventoryVaccinationFK: id,
+            inventoryConsumableFK: id,
             batchNo: 'Not Applicable',
             stock: 0,
             isDefault: true,

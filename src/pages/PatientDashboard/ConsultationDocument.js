@@ -11,12 +11,6 @@ export default ({}) => (
         from: 'Dr Johnny',
       },
       {
-        id: 2,
-        type: 'Others',
-        subject: 'Vaccination Certificate',
-        from: 'Dr Levine',
-      },
-      {
         id: 3,
         type: 'Memo',
         subject: 'Patient Visit Reminder',

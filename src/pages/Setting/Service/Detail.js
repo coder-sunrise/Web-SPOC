@@ -613,42 +613,53 @@ class Detail extends PureComponent {
     ])
   }
   computeHiddenFields = rows => {
-    const serviceSettings = rows.filter(r => !r.isDeleted)
+                                  const serviceSettings = rows.filter(
+                                    r => !r.isDeleted,
+                                  )
 
-    const hiddenFields = []
-    const { settingClinicService, clinicSettings, setFieldValue } = this.props
-    const { serviceCenterList = [], entity } = settingClinicService
+                                  const hiddenFields = []
+                                  const {
+                                    settingClinicService,
+                                    clinicSettings,
+                                    setFieldValue,
+                                  } = this.props
+                                  const {
+                                    serviceCenterList = [],
+                                    entity,
+                                  } = settingClinicService
 
-    const { isEnableNurseWorkItem } = clinicSettings.settings
+                                  const {
+                                    isEnableNurseWorkItem,
+                                  } = clinicSettings.settings
 
-    const radioAndLabServiceCenterIds = serviceCenterList
-      .filter(sc =>
-        Object.values(RadioAndLabCategories).includes(
-          sc.serviceCenterCategoryFK,
-        ),
-      )
-      .map(sc => sc.id)
+                                  const radioAndLabServiceCenterIds = serviceCenterList
+                                    .filter(sc =>
+                                      Object.values(
+                                        RadioAndLabCategories,
+                                      ).includes(sc.serviceCenterCategoryFK),
+                                    )
+                                    .map(sc => sc.id)
 
-    if (
-      serviceSettings.findIndex(sc =>
-        radioAndLabServiceCenterIds.includes(sc.serviceCenterFK),
-      ) === -1
-    ) {
-      //hiddenFields.push('ctService_Tag')
-    }
+                                  if (
+                                    serviceSettings.findIndex(sc =>
+                                      radioAndLabServiceCenterIds.includes(
+                                        sc.serviceCenterFK,
+                                      ),
+                                    ) === -1
+                                  ) {
+                                    //hiddenFields.push('ctService_Tag')
+                                  }
 
-    const hasInternalLabServiceCenter = checkAnyInternalLabServiceCenter(
-      serviceSettings,
-      serviceCenterList,
-    )
-    if (!hasInternalLabServiceCenter) {
-      hiddenFields.push('ctService_TestPanel')
-    }
+                                  const hasInternalLabServiceCenter = checkAnyInternalLabServiceCenter(
+                                    serviceSettings,
+                                    serviceCenterList,
+                                  )
+                                  if (!hasInternalLabServiceCenter) {
+                                    hiddenFields.push('ctService_TestPanel')
+                                  }
 
-    if (!isEnableNurseWorkItem) hiddenFields.push('isNurseActualizable')
-
-    return hiddenFields
-  }
+                                  return hiddenFields
+                                }
 
   validationOfFormFields = fieldArray => {
     let errorArr = []

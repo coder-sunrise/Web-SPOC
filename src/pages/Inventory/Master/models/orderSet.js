@@ -19,20 +19,6 @@ export default createListViewModel({
     subscriptions: ({ dispatch, history }) => {
       history.listen((loct, method) => {
         const { pathname, search, query = {} } = loct
-        // if (pathname === '/inventory/master/package' && !query.uid) {
-        //   dispatch({
-        //     type: 'updateState',
-        //     payload: {
-        //       currentTab: Number(query.t) || 0,
-        //     },
-        //   })
-        // }
-
-        // if (pathname === '/inventory/master' && search === '?t=3') {
-        //   dispatch({
-        //     type: 'orderSet/query',
-        //   })
-        // }
       })
     },
     effects: {

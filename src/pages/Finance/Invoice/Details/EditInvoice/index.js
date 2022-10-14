@@ -292,58 +292,10 @@ class EditInvoice extends Component {
                 width: 300,
                 disabled: true,
                 render: row => {
-                  let paddingRight = 0
-                  if (row.isActualizedPreOrder || row.isPreOrder) {
-                    paddingRight = 24
-                  }
-                  if (row.isDrugMixture) {
-                    paddingRight = 10
-                  }
                   return (
                     <div style={{ position: 'relative' }}>
-                      <div
-                        className={classes.wrapCellTextStyle}
-                        style={{ paddingRight: paddingRight }}
-                      >
+                      <div className={classes.wrapCellTextStyle}>
                         {row.itemType}
-                        <div
-                          style={{
-                            position: 'absolute',
-                            top: '-1px',
-                            right: '-6px',
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: 'inline-block',
-                              position: 'relative',
-                            }}
-                          >
-                            {this.drugMixtureIndicator(row)}
-                          </div>
-                          {(row.isActualizedPreOrder || row.isPreOrder) && (
-                            <Tooltip
-                              title={
-                                row.isPreOrder
-                                  ? 'New Pre-Order'
-                                  : 'Actualized Pre-Order'
-                              }
-                            >
-                              <div
-                                className={classes.rightIcon}
-                                style={{
-                                  borderRadius: 4,
-                                  backgroundColor: row.isPreOrder
-                                    ? '#4255bd'
-                                    : 'green',
-                                  display: 'inline-block',
-                                }}
-                              >
-                                Pre
-                              </div>
-                            </Tooltip>
-                          )}
-                        </div>
                       </div>
                     </div>
                   )
@@ -362,8 +314,7 @@ class EditInvoice extends Component {
                 onChange: e => {
                   this.updateUnitPrice(e.row)
                 },
-                isDisabled: row =>
-                  (row.isPreOrder && !row.isChargeToday) || row.hasPaid,
+                isDisabled: row => row.hasPaid,
               },
               {
                 columnName: 'quantity',
@@ -411,10 +362,7 @@ class EditInvoice extends Component {
                                 }
                               },
                             }}
-                            disabled={
-                              (row.isPreOrder && !row.isChargeToday) ||
-                              row.hasPaid
-                            }
+                            disabled={row.hasPaid}
                           />
                         )}
                       />
@@ -452,10 +400,7 @@ class EditInvoice extends Component {
                                     }
                                   },
                                 }}
-                                disabled={
-                                  (row.isPreOrder && !row.isChargeToday) ||
-                                  row.hasPaid
-                                }
+                                disabled={row.hasPaid}
                               />
                             )}
                           />
@@ -488,10 +433,7 @@ class EditInvoice extends Component {
                                     }
                                   },
                                 }}
-                                disabled={
-                                  (row.isPreOrder && !row.isChargeToday) ||
-                                  row.hasPaid
-                                }
+                                disabled={row.hasPaid}
                               />
                             )}
                           />
@@ -523,10 +465,7 @@ class EditInvoice extends Component {
                                 }
                               },
                             }}
-                            disabled={
-                              (row.isPreOrder && !row.isChargeToday) ||
-                              row.hasPaid
-                            }
+                            disabled={row.hasPaid}
                           />
                         )}
                       />
@@ -543,15 +482,10 @@ class EditInvoice extends Component {
                 onChange: e => {
                   this.updateTotal(e.row)
                 },
-                isDisabled: row =>
-                  (row.isPreOrder && !row.isChargeToday) || row.hasPaid,
+                isDisabled: row => row.hasPaid,
                 render: row => (
                   <NumberInput
-                    value={
-                      (row.isPreOrder && !row.isChargeToday) || row.hasPaid
-                        ? 0
-                        : row.totalAfterItemAdjustment
-                    }
+                    value={row.hasPaid ? 0 : row.totalAfterItemAdjustment}
                     text
                     currency
                   />

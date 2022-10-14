@@ -362,8 +362,6 @@ const Grid = ({
           handleActualizeAppointment({
             patientID: row.patientProfileFk,
             appointmentID: row.id,
-            primaryClinicianFK: doctorProfile ? doctorProfile.id : undefined,
-            primaryClinicianRoomFK: row.roomFk,
           })
           break
         }

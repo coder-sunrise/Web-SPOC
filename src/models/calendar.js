@@ -212,9 +212,7 @@ export default createListViewModel({
               calendarResourceFK: item.calendarResourceFK,
               appointmentTypeFK: item.appointmentTypeFK,
               startTime: item.startTime,
-              endTime: item.endTime,
-              roomFk: item.roomFk,
-              isPrimaryClinician: item.isPrimaryClinician,
+              endTime: item.endTime, 
               sortOrder: item.sortOrder,
             }))
 
@@ -424,9 +422,8 @@ export default createListViewModel({
               return {
                 ...restApptData,
                 appointmentDate: appointmentDate,
-                appointmentStatusFk: APPOINTMENT_STATUS.DRAFT, //undefined is new, will updated to Darft
+                appointmentStatusFk: APPOINTMENT_STATUS.CONFIRMED, //undefined is new, will updated to Darft
                 isEditedAsSingleAppointment: false,
-                appointmentPreOrderItem: [],
                 appointments_Resources: [
                   ...apptResources.map((res, index) => {
                     const { id, appointmentFK, ...restResourceData } = res
@@ -600,9 +597,7 @@ export default createListViewModel({
           apptDateTo: end,
           doctor: doctor.join(),
           appStatus: [
-            APPOINTMENT_STATUS.CONFIRMED,
-            APPOINTMENT_STATUS.DRAFT,
-            // APPOINTMENT_STATUS.CANCELLED,
+            APPOINTMENT_STATUS.CONFIRMED, 
             APPOINTMENT_STATUS.TURNEDUP,
             APPOINTMENT_STATUS.RESCHEDULED,
             APPOINTMENT_STATUS.PFA_RESCHEDULED,
@@ -664,7 +659,6 @@ export default createListViewModel({
           apptDateTo: end,
           appStatus: [
             APPOINTMENT_STATUS.CONFIRMED,
-            APPOINTMENT_STATUS.DRAFT,
             APPOINTMENT_STATUS.TURNEDUP,
             APPOINTMENT_STATUS.RESCHEDULED,
             APPOINTMENT_STATUS.PFA_RESCHEDULED,

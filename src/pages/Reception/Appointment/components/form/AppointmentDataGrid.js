@@ -75,120 +75,119 @@ class AppointmentDataGrid extends React.Component {
       apptTimeIntervel,
       disabled,
     ).map(column => {
-      if (column.columnName === 'isPrimaryClinician') {
-        return {
-          ...column,
-          checkedValue: true,
-          uncheckedValue: false,
-          onChange: this.onRadioChange,
-        }
-      }
+                      if (column.columnName === 'isPrimaryClinician') {
+                        return {
+                          ...column,
+                          checkedValue: true,
+                          uncheckedValue: false,
+                          onChange: this.onRadioChange,
+                        }
+                      }
 
-      if (column.type === 'time') {
-        return {
-          ...column,
-          currentDate: appointmentDate
-            ? moment(appointmentDate, dateFormat)
-            : moment(),
-        }
-      }
+                      if (column.type === 'time') {
+                        return {
+                          ...column,
+                          currentDate: appointmentDate
+                            ? moment(appointmentDate, dateFormat)
+                            : moment(),
+                        }
+                      }
 
-      if (column.columnName === 'roomFk') {
-        return {
-          ...column,
-          render: row => {
-            const { rooms = [] } = this.props
-            const room = rooms.find(item => item.id === row.roomFk)
-            if (room) return room.name
-            return ''
-          },
-        }
-      }
+                      if (column.columnName === 'calendarResourceFK') {
+                        return {
+                          ...column,
+                          render: row => {
+                            const { calendarResourceFK } = row
+                            const { ctcalendarresource = [] } = this.props
+                            const calendarResource = ctcalendarresource.find(
+                              item => item.id === calendarResourceFK,
+                            )
 
-      if (column.columnName === 'calendarResourceFK') {
-        return {
-          ...column,
-          render: row => {
-            const { calendarResourceFK } = row
-            const { ctcalendarresource = [] } = this.props
-            const calendarResource = ctcalendarresource.find(
-              item => item.id === calendarResourceFK,
-            )
+                            if (!calendarResource) return null
+                            if (
+                              calendarResource.resourceType ===
+                              CALENDAR_RESOURCE.DOCTOR
+                            ) {
+                              const title =
+                                calendarResource.clinicianProfileDto.title || ''
+                              return (
+                                <p>{`${title} ${calendarResource.clinicianProfileDto.name}`}</p>
+                              )
+                            } else {
+                              return calendarResource.name
+                            }
+                          },
+                          onChange: ({ row, option }) => {
+                            const { data, handleCommitChanges } = this.props
+                            const newRows = data.map(eachRow =>
+                              eachRow.id !== row.id
+                                ? {
+                                    ...eachRow,
+                                  }
+                                : {
+                                    ...eachRow,
+                                    calendarResource: option
+                                      ? { ...option }
+                                      : undefined,
+                                    isPrimaryClinician:
+                                      !option ||
+                                      option.resourceType ===
+                                        CALENDAR_RESOURCE.RESOURCE
+                                        ? false
+                                        : eachRow.isPrimaryClinician,
+                                  },
+                            )
+                            handleCommitChanges({ rows: newRows })
+                          },
+                          localFilter: o =>
+                            o.isActive &&
+                            (checkAddResource() ||
+                              o.resourceType === CALENDAR_RESOURCE.DOCTOR),
+                        }
+                      }
 
-            if (!calendarResource) return null
-            if (calendarResource.resourceType === CALENDAR_RESOURCE.DOCTOR) {
-              const title = calendarResource.clinicianProfileDto.title || ''
-              return (
-                <p>{`${title} ${calendarResource.clinicianProfileDto.name}`}</p>
-              )
-            } else {
-              return calendarResource.name
-            }
-          },
-          onChange: ({ row, option }) => {
-            const { data, handleCommitChanges } = this.props
-            const newRows = data.map(eachRow =>
-              eachRow.id !== row.id
-                ? {
-                    ...eachRow,
-                  }
-                : {
-                    ...eachRow,
-                    calendarResource: option ? { ...option } : undefined,
-                    isPrimaryClinician:
-                      !option ||
-                      option.resourceType === CALENDAR_RESOURCE.RESOURCE
-                        ? false
-                        : eachRow.isPrimaryClinician,
-                  },
-            )
-            handleCommitChanges({ rows: newRows })
-          },
-          localFilter: o =>
-            o.isActive &&
-            (checkAddResource() || o.resourceType === CALENDAR_RESOURCE.DOCTOR),
-        }
-      }
+                      if (column.columnName === 'appointmentTypeFK') {
+                        return {
+                          ...column,
+                          render: row => {
+                            const { appointmentTypeFK } = row
+                            const { appointmentTypes = [] } = this.props
+                            const appointmentType = appointmentTypes.find(
+                              item => item.id === appointmentTypeFK,
+                            )
 
-      if (column.columnName === 'appointmentTypeFK') {
-        return {
-          ...column,
-          render: row => {
-            const { appointmentTypeFK } = row
-            const { appointmentTypes = [] } = this.props
-            const appointmentType = appointmentTypes.find(
-              item => item.id === appointmentTypeFK,
-            )
+                            if (!appointmentType) return null
+                            return (
+                              <AppointmentTypeLabel
+                                color={appointmentType.tagColorHex}
+                                label={appointmentType.displayValue}
+                              />
+                            )
+                          },
+                          renderDropdown: option => {
+                            let color
+                            if (option.tagColorHex)
+                              color = option.tagColorHex.includes('#')
+                                ? option.tagColorHex
+                                : `#${option.tagColorHex}`
+                            return (
+                              <AppointmentTypeLabel
+                                color={color}
+                                label={option.displayValue}
+                              />
+                            )
+                          },
+                        }
+                      }
 
-            if (!appointmentType) return null
-            return (
-              <AppointmentTypeLabel
-                color={appointmentType.tagColorHex}
-                label={appointmentType.displayValue}
-              />
-            )
-          },
-          renderDropdown: option => {
-            let color
-            if (option.tagColorHex)
-              color = option.tagColorHex.includes('#')
-                ? option.tagColorHex
-                : `#${option.tagColorHex}`
-            return (
-              <AppointmentTypeLabel color={color} label={option.displayValue} />
-            )
-          },
-        }
-      }
-
-      if (column.columnName === 'startTime') {
-        return {
-          ...column,
-          onChange: row => {},
-        }
-      }
-      return { ...column }
-    })
+                      if (column.columnName === 'startTime') {
+                        return {
+                          ...column,
+                          onChange: row => {},
+                        }
+                      }
+                      return { ...column }
+                    })
     return columnExtensions
   }
 

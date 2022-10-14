@@ -6,10 +6,7 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { Divider } from '@material-ui/core'
 import Cross from '@material-ui/icons/HighlightOff'
 import VisitOrderTemplateIndicateString from './VisitOrderTemplateIndicateString'
-import {
-  isMatchInstructionRule,
-  ReplaceCertificateTeplate,
-} from '@/pages/Widgets/Orders/utils'
+import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
 import {
   calculateAdjustAmount,
   getUniqueId,
@@ -158,7 +155,6 @@ export default ({
       inventoryConsumableFK: consumable.id,
       isActive: true,
       isDeleted: false,
-      isDispensedByPharmacy: consumable.isDispensedByPharmacy,
       isMinus: !!(
         currentVisitOrderTemplate.adjValue &&
         currentVisitOrderTemplate.adjValue < 0
@@ -167,7 +163,6 @@ export default ({
         currentVisitOrderTemplate.adjType &&
         currentVisitOrderTemplate.adjType === 'ExactAmount'
       ),
-      isNurseActualizeRequired: consumable.isNurseActualizable,
       isOrderedByDoctor: true,
       performingUserFK:
         user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
@@ -633,10 +628,7 @@ export default ({
           .map(r => {
             return {
               ...r,
-              currentTotal:
-                (!r.isPreOrder && !r.hasPaid) || r.isChargeToday
-                  ? r.totalAfterItemAdjustment
-                  : 0,
+              currentTotal: r.totalAfterItemAdjustment,
               isEditingEntity: isEditingEntity,
               isEnableEditOrder: isEnableEditOrder,
             }
@@ -912,10 +904,7 @@ export default ({
                   <Tooltip
                     title={
                       <div>
-                        {`Code: ${row.serviceCode ||
-                          row.drugCode ||
-                          row.consumableCode ||
-                          row.vaccinationCode}`}
+                        {`Code: ${row.serviceCode || row.consumableCode}`}
                         <br />
                         {`Name: ${getDisplayName(row)}`}
                       </div>
@@ -1033,10 +1022,7 @@ export default ({
                     style={{ marginRight: 5 }}
                     disabled={
                       row.isEditingEntity ||
-                      (!row.isActive &&
-                        row.type !== '5' &&
-                        !row.isDrugMixture) ||
-                      row.isPreOrderActualize ||
+                      (!row.isActive && row.type !== '5') ||
                       !editEnable ||
                       getOrderAccessRight(
                         editAccessRight,
@@ -1051,7 +1037,6 @@ export default ({
                       type='danger'
                       disabled={
                         row.isEditingEntity ||
-                        row.isPreOrderActualize ||
                         !deleteEnable ||
                         getOrderAccessRight(
                           editAccessRight,

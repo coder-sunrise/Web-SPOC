@@ -4,7 +4,7 @@ import _ from 'lodash'
 import service from '@/pages/Inventory/InventoryAdjustment/services'
 
 import { getUniqueId, maxReducer, calculateAmount } from '@/utils/utils'
- 
+
 const initialState = {
   rows: [],
   finalAdjustments: [],
@@ -25,17 +25,10 @@ const initialState = {
     isMinus: true,
     adjValue: 0,
     isExactAmount: true,
-    // isDispensedByPharmacy: false,
-    // isNurseActualizeRequired: false,
   },
   defaultOrderSet: {
     orderSetItems: [],
   },
-  // defaultTreatment: {},
-  // corPackage: [],
-  // defaultPackage: {
-  //   packageItems: [],
-  // },
 }
 export default createListViewModel({
   namespace: 'orders',
@@ -57,23 +50,6 @@ export default createListViewModel({
         const orders = yield select(st => st.orders)
         const consultationDocument = yield select(st => st.consultationDocument)
         const { rows } = consultationDocument
-        const {
-          entity: { corVaccinationCert = [] },
-        } = orders
-        const activeCORVaccinationCert = corVaccinationCert.find(
-          vc => !vc.isDeleted,
-        )
-        if (
-          activeCORVaccinationCert &&
-          !rows.find(cd => cd.uid === activeCORVaccinationCert.uid)
-        ) {
-          yield put({
-            type: 'consultationDocument/updateState',
-            payload: {
-              rows: [...rows, activeCORVaccinationCert],
-            },
-          })
-        }
 
         yield put({
           type: 'calculateAmount',
@@ -91,31 +67,13 @@ export default createListViewModel({
       *upsertRows({ payload }, { select, call, put, delay }) {
         const orders = yield select(st => st.orders)
         const { rows } = orders
-        let newVaccinationCertificates = []
-        const getCertificate = (vaccination, uid) => {
-          const corVaccinationCert =
-            vaccination.type === '2'
-              ? (vaccination.corVaccinationCert || []).map(vc => {
-                  return {
-                    ...vc,
-                    vaccinationUFK: uid,
-                    uid: getUniqueId(),
-                  }
-                })
-              : []
-          newVaccinationCertificates = newVaccinationCertificates.concat(
-            corVaccinationCert,
-          )
-          return corVaccinationCert
-        }
-        const newVaccinations = [
+        const neworders = [
           ...rows,
           ...payload.map(v => {
             const uid = getUniqueId()
             return {
               ...v,
               uid,
-              corVaccinationCert: getCertificate(v, uid),
             }
           }),
         ]
@@ -123,23 +81,9 @@ export default createListViewModel({
         yield put({
           type: 'updateState',
           payload: {
-            rows: newVaccinations,
+            rows: neworders,
           },
         })
-
-        // insert generate certificate
-        if (newVaccinationCertificates.length > 0) {
-          const consultationDocument = yield select(
-            st => st.consultationDocument,
-          )
-          const { rows: documentRows } = consultationDocument
-          yield put({
-            type: 'consultationDocument/updateState',
-            payload: {
-              rows: [...documentRows, ...newVaccinationCertificates],
-            },
-          })
-        }
 
         yield put({
           type: 'calculateAmount',
@@ -199,45 +143,11 @@ export default createListViewModel({
         if (payload) {
           const deleteRow = rows.find(o => o.uid === payload.uid)
           if (deleteRow) {
-            // delete auto generated certificate
-            if (deleteRow.type === '2') {
-              const activeCertificate = deleteRow.corVaccinationCert.find(
-                vc => !vc.isDeleted,
-              )
-              if (activeCertificate) {
-                let newDocumentRows
-                if (activeCertificate.id > 0) {
-                  newDocumentRows = documentRows.map(d => {
-                    if (activeCertificate.uid === d.uid)
-                      return { ...d, isDeleted: true }
-                    return d
-                  })
-                } else {
-                  newDocumentRows = documentRows.filter(
-                    d => d.uid !== activeCertificate.uid,
-                  )
-                }
-                yield put({
-                  type: 'consultationDocument/updateState',
-                  payload: {
-                    rows: newDocumentRows,
-                  },
-                })
-              }
-            }
-
             // delete order
             if (deleteRow.id > 0) {
               tempRows = rows.map(o => {
                 if (!payload || o.uid === payload.uid) {
                   o.isDeleted = true
-                  if (deleteRow.type === '2') {
-                    o.corVaccinationCert = o.corVaccinationCert
-                      .filter(vc => vc.id > 0)
-                      .map(vc => {
-                        return { ...vc, isDeleted: true }
-                      })
-                  }
                 }
                 return o
               })

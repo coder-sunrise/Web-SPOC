@@ -92,10 +92,7 @@ class SystemSetting extends PureComponent {
         (accessRight && accessRight.rights === 'hidden') ||
         accessRight.rights === 'disable'
       )
-        return [..._result]
-
-      if (m.text === 'Package' && !settings.isEnablePackage) return [..._result]
-
+        return [..._result] 
       return [..._result, { ...m, rights: accessRight.rights }]
     }
 
