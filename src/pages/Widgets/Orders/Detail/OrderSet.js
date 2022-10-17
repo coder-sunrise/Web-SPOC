@@ -23,7 +23,6 @@ import { qtyFormat } from '@/utils/config'
 import {
   openCautionAlertPrompt,
   GetOrderItemAccessRight,
-  ReplaceCertificateTeplate,
 } from '@/pages/Widgets/Orders/utils'
 import Authorized from '@/utils/Authorized'
 import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
@@ -203,12 +202,6 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
         nextSequence += 1
       }
     }
-    if (showNoTemplate) {
-      notification.warning({
-        message:
-          'Any changes will not be reflected in the vaccination certificate.',
-      })
-    }
     dispatch({
       type: 'orders/upsertRows',
       payload: datas,
@@ -328,7 +321,6 @@ class OrderSet extends PureComponent {
     this.changeOrderSet = (v, op) => {
       const { setValues, values, orderTypes, codetable, patient } = this.props
       const { entity = {} } = patient
-      const { patientAllergy = [] } = entity
       let rows = []
       if (op && op.serviceOrderSetItem) {
         rows = rows.concat(

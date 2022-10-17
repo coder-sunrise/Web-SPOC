@@ -77,14 +77,7 @@ export default createFormViewModel({
                 },
               })
             })
-          }
-          if (query.pdroomid) {
-            const pdroomidInt = parseInt(query.pdroomid, 10)
-            dispatch({
-              type: 'updateState',
-              payload: { roomFK: pdroomidInt || undefined },
-            })
-          }
+          } 
           if (query.visitMode) {
             dispatch({
               type: 'updateState',
@@ -107,9 +100,7 @@ export default createFormViewModel({
             'refno',
             'new',
             'type',
-            'apptid',
-            'pdid',
-            'pdroomid',
+            'apptid', 
             'visitMode',
             'visitOrderTemplateFK',
           ]),

@@ -49,11 +49,7 @@ const AddOrder = ({
     })
 
     if (r) {
-      const {
-        retailInvoiceAdjustment,
-        retailInvoiceItem,
-        drugAllergies = [],
-      } = r
+      const { retailInvoiceAdjustment, retailInvoiceItem } = r
       const mapRetailItemPropertyToOrderProperty = o => {
         let obj
         switch (o.invoiceItemTypeFK) {
@@ -254,7 +250,7 @@ export default compose(
         onConfirm,
         dispense,
         onReloadClick,
-        codetable: { inventoryconsumable, inventorymedication, ctservice },
+        codetable: { inventoryconsumable, ctservice },
         visitType,
         history,
         forms,
@@ -293,10 +289,7 @@ export default compose(
                 unitPrice: roundTo(o.total) || 0,
                 quantity: o.quantity,
                 itemRevenueCategoryFK: revenueCategoryFK,
-                isDrugMixture: false,
                 isClaimable: true,
-                isDispensedByPharmacy: o.isDispensedByPharmacy,
-                isNurseActualizeRequired: o.isNurseActualizeRequired,
                 retailVisitInvoiceService: {
                   id: o.innerLayerId,
                   concurrencyToken: o.innerLayerConcurrencyToken,
@@ -331,10 +324,7 @@ export default compose(
                 unitPrice: actualUnitPrice,
                 quantity: o.quantity,
                 itemRevenueCategoryFK: revenueCategory.id,
-                isDrugMixture: false,
                 isClaimable: true,
-                isDispensedByPharmacy: o.isDispensedByPharmacy,
-                isNurseActualizeRequired: o.isNurseActualizeRequired,
                 retailVisitInvoiceConsumable: {
                   id: o.innerLayerId,
                   concurrencyToken: o.innerLayerConcurrencyToken,

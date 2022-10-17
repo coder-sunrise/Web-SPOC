@@ -44,14 +44,11 @@ export const AppointmentDataColumn = [
   { name: 'appointmentTypeFK', title: 'Appointment Type' },
   { name: 'startTime', title: 'Time From' },
   { name: 'endTime', title: 'Appt Duration' },
-  { name: 'roomFk', title: 'Room' },
-  { name: 'isPrimaryClinician', title: 'Primary Doctor' },
 ]
 
 export const AppointmentDataColExtensions = (apptTimeIntervel, disabled) => [
   {
     columnName: 'calendarResourceFK',
-    width: 170,
     type: 'codeSelect',
     code: 'ctcalendarresource',
     valueField: 'id',
@@ -69,7 +66,7 @@ export const AppointmentDataColExtensions = (apptTimeIntervel, disabled) => [
   {
     columnName: 'appointmentTypeFK',
     type: 'codeSelect',
-    width: 150,
+    width: 200,
     code: 'ctappointmenttype',
     labelField: 'displayValue',
     valueField: 'id',
@@ -142,24 +139,6 @@ export const AppointmentDataColExtensions = (apptTimeIntervel, disabled) => [
     },
   },
   {
-    columnName: 'roomFk',
-    width: 110,
-    type: 'codeSelect',
-    code: 'ctroom',
-  },
-  {
-    columnName: 'isPrimaryClinician',
-    width: 110,
-    type: 'radio',
-    isDisabled: row => disabled,
-    isHiddend: row => {
-      return (
-        !row.calendarResource ||
-        row.calendarResource.resourceType === CALENDAR_RESOURCE.RESOURCE
-      )
-    },
-  },
-  {
     columnName: 'conflicts',
     // type: 'error',
     editingEnabled: false,
@@ -180,6 +159,7 @@ export const AppointmentDataColExtensions = (apptTimeIntervel, disabled) => [
 export const initialAptInfo = {
   patientName: '',
   patientContactNo: '',
+  email: '',
   isEnableRecurrence: false,
 }
 

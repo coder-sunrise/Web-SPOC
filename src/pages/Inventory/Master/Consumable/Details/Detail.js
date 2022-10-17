@@ -64,6 +64,7 @@ const Detail = ({
                         label={formatMessage({
                           id: 'inventory.master.consumable.name',
                         })}
+                        maxLength={2000}
                         {...args}
                       />
                     )
@@ -79,6 +80,7 @@ const Detail = ({
                         label={formatMessage({
                           id: 'inventory.master.consumable.description',
                         })}
+                        maxLength={2000}
                         {...args}
                       />
                     )
@@ -96,6 +98,7 @@ const Detail = ({
                         })}
                         multiline
                         rowsMax='5'
+                        maxLength={2000}
                         {...args}
                       />
                     )

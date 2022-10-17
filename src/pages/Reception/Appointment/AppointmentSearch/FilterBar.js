@@ -197,24 +197,13 @@ const FilterBar = ({
             )}
           />
         </GridItem>
-        <GridItem md={6}>
+        <GridItem md={1}>
           <FastField
-            name='filterByRoomBlockGroup'
-            render={args => {
-              return (
-                <CodeSelect
-                  label='Room'
-                  code='ctRoom'
-                  mode='multiple'
-                  maxTagPlaceholder='rooms'
-                  maxTagCount={maxRoomBlockGroupTagCount}
-                  {...args}
-                />
-              )
-            }}
+            name='bookOn'
+            render={args => <DatePicker label='Book On' {...args} />}
           />
         </GridItem>
-        <GridItem md={6}>
+        <GridItem md={5}>
           <Field
             name='bookBy'
             render={args => {
@@ -230,7 +219,23 @@ const FilterBar = ({
             }}
           />
         </GridItem>
-
+        {/* <GridItem md={6}>
+          <FastField
+            name='filterByRoomBlockGroup'
+            render={args => {
+              return (
+                <CodeSelect
+                  label='Room'
+                  code='ctRoom'
+                  mode='multiple'
+                  maxTagPlaceholder='rooms'
+                  maxTagCount={maxRoomBlockGroupTagCount}
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem> */}
         <GridItem md={6}>
           <Field
             name='filterByApptType'
@@ -260,12 +265,6 @@ const FilterBar = ({
                 maxTagPlaceholder='appointment types'
               />
             )}
-          />
-        </GridItem>
-        <GridItem md={6}>
-          <FastField
-            name='bookOn'
-            render={args => <DatePicker label='Book On' {...args} />}
           />
         </GridItem>
         <GridItem md={6}>

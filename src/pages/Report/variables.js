@@ -168,22 +168,4 @@ export const menuData = [
            url: '/report/referralsourcereport',
            authority: 'report.other.referralsource',
          },
-         {
-           title: 'Finance',
-           text: 'WIP Revenue Report',
-           url: '/report/wiprevenue',
-           authority: 'report.finance.wiprevenuereport',
-         },
-         {
-           title: 'Finance',
-           text: 'Sales Listing By Performer Report',
-           url: '/report/saleslistingbyperformer',
-           authority: 'report.finance.saleslistingbyperformerreport',
-         },
-         {
-           title: 'Finance',
-           text: 'Package Expiry Report',
-           url: '/report/packageexpiry',
-           authority: 'report.finance.packageexpiryreport',
-         },
        ]

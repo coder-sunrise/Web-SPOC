@@ -11,14 +11,6 @@ const defaultPatientEntity = {
   effectiveEndDate: moment('2099-12-31').formatUTC(),
   patientAccountNo: '',
   patientEmergencyContact: [],
-  patientAllergy: [],
-  patientMedicalHistory: {
-    medicalHistory: '',
-    socialHistory: '',
-    familyHistory: '',
-  },
-  patientAllergyMetaData: [],
-  patientMedicalAlert: [],
   patientScheme: [],
   schemePayer: [],
   referredBy: '',
@@ -69,8 +61,6 @@ const defaultPatientEntity = {
       isConsent: false,
     },
   ],
-  patientPackage: [],
-  pendingPreOrderItem: [],
 }
 
 export default createFormViewModel({
@@ -230,12 +220,6 @@ export default createFormViewModel({
               currentPatientId: null,
             },
           }),
-          yield put({
-            type: 'consultation/updateState',
-            payload: {
-              patientMedicalHistory: undefined,
-            },
-          }),
           // reset patient model state to default state
           yield put({
             type: 'updateState',
@@ -272,15 +256,6 @@ export default createFormViewModel({
           }
 
           ps.preSchemeTypeFK = ps.schemeTypeFK
-        })
-        data.patientMedicalHistory =
-          data.patientMedicalHistory ||
-          defaultPatientEntity.patientMedicalHistory
-        yield put({
-          type: 'updateState',
-          payload: {
-            entity: data,
-          },
         })
       },
       *queryDeposit({ payload }, { select, call, put }) {

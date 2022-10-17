@@ -32,9 +32,6 @@ const widgets = [
         padding: '5px',
       },
     },
-    testProps: {
-      test: '123',
-    },
     toolbarAddon: (
       <AuthorizedContext>
         {r => {
@@ -43,23 +40,6 @@ const widgets = [
         }}
       </AuthorizedContext>
     ),
-  },
-  {
-    id: '13',
-    name: 'Medical History',
-    accessRight: 'queue.consultation.widgets.medicalhistory',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/MedicalHistory'),
-      loading: Loading,
-    }),
-    model: 'patientMedicalHistory',
-    layoutConfig: {
-      h: 2,
-      w: 12,
-      style: {
-        padding: 5,
-      },
-    },
   },
   {
     id: '2',

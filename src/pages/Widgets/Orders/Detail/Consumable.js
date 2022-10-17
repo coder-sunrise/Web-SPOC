@@ -123,8 +123,6 @@ const getVisitDoctorUserId = props => {
         values.adjAmount < 0
           ? -Math.abs(values.adjValue)
           : Math.abs(values.adjValue),
-      packageGlobalId:
-        values.packageGlobalId !== undefined ? values.packageGlobalId : '',
     }
     dispatch({
       type: 'orders/upsertRow',
@@ -224,8 +222,7 @@ class Consumable extends PureComponent {
 
   updateTotalPrice = v => {
     if (v || v === 0) {
-      const { isExactAmount, isMinus, adjValue, isPackage } = this.props.values
-      if (isPackage) return
+      const { isExactAmount, isMinus, adjValue } = this.props.values
 
       let value = adjValue
       if (!isMinus) {
@@ -423,7 +420,7 @@ class Consumable extends PureComponent {
                     >
                       <LocalSearchSelect
                         temp
-                        label='Consumable Name'
+                        label='Product Name'
                         labelField='combinDisplayValue'
                         onChange={this.changeConsumable}
                         options={this.getConsumableOptions()}
@@ -436,52 +433,7 @@ class Consumable extends PureComponent {
                 }}
               />
             </GridItem>
-            {values.isPackage && (
-              <React.Fragment>
-                <GridItem xs={3}>
-                  <Field
-                    name='packageConsumeQuantity'
-                    render={args => {
-                      return (
-                        <NumberInput
-                          label='Consumed Quantity'
-                          style={{
-                            marginLeft: theme.spacing(7),
-                            paddingRight: theme.spacing(6),
-                          }}
-                          step={1}
-                          min={0}
-                          max={values.remainingQuantity}
-                          disabled={
-                            this.props.visitRegistration.entity.visit
-                              .isInvoiceFinalized
-                          }
-                          {...args}
-                        />
-                      )
-                    }}
-                  />
-                </GridItem>
-                <GridItem xs={1}>
-                  <Field
-                    name='remainingQuantity'
-                    render={args => {
-                      return (
-                        <NumberInput
-                          style={{
-                            marginTop: theme.spacing(3),
-                          }}
-                          formatter={v => `/ ${parseFloat(v).toFixed(1)}`}
-                          text
-                          {...args}
-                        />
-                      )
-                    }}
-                  />
-                </GridItem>
-              </React.Fragment>
-            )}
-            {!values.isPackage && (
+            {
               <GridItem xs={3}>
                 <FastField
                   name='quantity'
@@ -509,7 +461,7 @@ class Consumable extends PureComponent {
                   }}
                 />
               </GridItem>
-            )}
+            }
           </GridContainer>
 
           <GridContainer>

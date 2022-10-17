@@ -197,14 +197,7 @@ export const formikMapPropsToValues = ({
       }),
       {},
     )
-    const { location } = history
-    if (location.query.pdid) {
-      doctorProfile = doctorProfiles.find(
-        item => item.clinicianProfile.id === parseInt(location.query.pdid, 10),
-      )
-      doctorProfileFK = doctorProfile ? doctorProfile.id : doctorProfileFK
-    }
-
+    const { location } = history  
     const { visitOrderTemplateFK, visitEyeRefractionForm } = visitEntries
 
     if (!visitEntries.id) {

@@ -332,30 +332,6 @@ const consultationDocumentTypes = [
     },
   },
   {
-    value: '3',
-    name: 'Vaccination Certificate',
-    code: 'Vaccination Cert',
-    prop: 'corVaccinationCert',
-    downloadKey: 'vaccinationcertificateid',
-    downloadConfig: {
-      id: 10,
-      key: 'vaccinationcertificateid',
-      subject: 'Vaccination Certificate',
-      draft: row => {
-        return {
-          VaccinationCertificateDetails: [
-            {
-              ...row,
-              certificateDate: moment(row.certificateDate).format(
-                dateFormatLong,
-              ),
-            },
-          ],
-        }
-      },
-    },
-  },
-  {
     value: '4',
     name: 'Others',
     prop: 'corOtherDocuments',
@@ -392,7 +368,7 @@ export const countryCodes = [
 export const podoOrderType = [
   {
     value: 2,
-    name: 'Consumable',
+    name: 'Ophthalmic Product',
     prop: 'purchaseOrderConsumableItem',
     itemFKName: 'inventoryConsumableFK',
     ctName: 'inventoryconsumable',
@@ -406,7 +382,7 @@ export const podoOrderType = [
 export const rgType = [
   {
     value: 2,
-    name: 'Consumable',
+    name: 'Ophthalmic Product',
     prop: 'receivingGoodsConsumableItem',
     itemFKName: 'inventoryConsumableFK',
     ctName: 'inventoryconsumable',
@@ -448,13 +424,6 @@ const loadFromCodesConfig = {
   InsertPatientInfo: (codetable, patient) => {
     let result
     let patientGender = codetable.ctgender.find(x => x.id === patient.genderFK)
-    let patientAllergy
-    for (let index = 0; index < patient.patientAllergy.length; index++) {
-      if (patient.patientAllergy[index].type === 'Allergy')
-        patientAllergy =
-          (patientAllergy ? `${patientAllergy}, ` : '') +
-          patient.patientAllergy[index].allergyName
-    }
     result = `<p>Patient Name: ${patient.name}</p>`
     result += `<p>Patient Ref. No.: ${patient.patientReferenceNo}</p>`
     result += `<p>Patient Acc. No.: ${patient.patientAccountNo}</p>`
@@ -463,7 +432,6 @@ const loadFromCodesConfig = {
       1,
     )}/${calculateAgeFromDOB(patient.dob)}</p>`
 
-    result += `<p>Drug Allergy: ${patientAllergy || 'N.A.'}</p>`
     return result
   },
 }
@@ -471,7 +439,7 @@ const loadFromCodesConfig = {
 export const InventoryTypes = [
   {
     value: 2,
-    name: 'Consumable',
+    name: 'Ophthalmic Product',
     prop: 'consumableValueDto',
     itemFKName: 'inventoryConsumableFK',
     ctName: 'inventoryconsumable',
@@ -583,17 +551,6 @@ const tagList = [
         let patientGender = codetable.ctgender.find(
           x => x.id === patient.entity.genderFK,
         )
-        let patientAllergy
-        for (
-          let index = 0;
-          index < patient.entity.patientAllergy.length;
-          index++
-        ) {
-          if (patient.entity.patientAllergy[index].type === 'Allergy')
-            patientAllergy =
-              (patientAllergy ? `${patientAllergy}, ` : '') +
-              patient.entity.patientAllergy[index].allergyName
-        }
         result = `<p>Patient Name: ${patient.entity.name}</p>`
         result += `<p>Patient Ref. No.: ${patient.entity.patientReferenceNo}</p>`
         result += `<p>Patient Acc. No.: ${patient.entity.patientAccountNo}</p>`
@@ -601,8 +558,6 @@ const tagList = [
           0,
           1,
         )}/${calculateAgeFromDOB(patient.entity.dob)}</p>`
-
-        result += `<p>Drug Allergy: ${patientAllergy || 'N.A.'}</p>`
       }
       return result || 'N.A.'
     },
@@ -611,7 +566,7 @@ const tagList = [
     value: 'Order',
     text: '<#Order#>',
     url: '',
-    getter: newVaccination => {
+    getter: () => {
       const { orders, patient, codetable } = window.g_app._store.getState()
       if (!orders) return '-'
 
@@ -1411,10 +1366,10 @@ const queueItemStatus = [
   },
 ]
 
-const preOrderItemCategory = [
+const orderItemCategory = [
   {
     value: 'Consumable',
-    name: 'Consumable',
+    name: 'Ophthalmic Product',
   },
   {
     value: 'Service',
@@ -1435,10 +1390,6 @@ export const documentTemplateTypes = [
   {
     value: 2,
     name: 'Memo',
-  },
-  {
-    value: 3,
-    name: 'Vaccination Certificate',
   },
   {
     value: 4,
@@ -1502,32 +1453,6 @@ const examinationSteps = [
     name: 'Cancelled',
   },
 ]
-const individualCommentGroup = [
-  {
-    value: 1,
-    name: '1',
-  },
-  {
-    value: 2,
-    name: '2',
-  },
-  {
-    value: 3,
-    name: '3',
-  },
-  {
-    value: 4,
-    name: '4',
-  },
-  {
-    value: 5,
-    name: '5',
-  },
-  {
-    value: 6,
-    name: '6',
-  },
-]
 
 const visitDoctorConsultationStatusColor = [
   { value: VISITDOCTOR_CONSULTATIONSTATUS.WAITING, color: '#4255BD' },
@@ -1537,7 +1462,7 @@ const visitDoctorConsultationStatusColor = [
 ]
 
 const orderItemTypes = [
-  { type: 'Consumable', displayValue: 'Con' },
+  { type: 'Ophthalmic Product', displayValue: 'Con' },
   { type: 'Service', displayValue: 'Svc' },
 ]
 
@@ -1572,13 +1497,12 @@ export {
   year,
   queueProcessorType,
   queueItemStatus,
-  preOrderItemCategory,
+  orderItemCategory,
   tagCategory,
   isPanelItemRequired,
   languageCategory,
   pharmacyStatus,
   examinationSteps,
-  individualCommentGroup,
   visitDoctorConsultationStatusColor,
   orderItemTypes,
 }

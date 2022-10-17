@@ -48,27 +48,10 @@ const InventoryTypeListing = ({
     // }
   }, [])
 
-  const {
-    medicationOrderSetItem,
-    consumableOrderSetItem,
-    vaccinationOrderSetItem,
-    serviceOrderSetItem,
-  } = values
+  const { consumableOrderSetItem, serviceOrderSetItem } = values
 
-  const medicationSchema = Yup.object().shape({
-    inventoryMedicationFK: Yup.number().required(),
-    quantity: Yup.number()
-      .required()
-      .min(1),
-  })
   const consumableSchema = Yup.object().shape({
     inventoryConsumableFK: Yup.number().required(),
-    quantity: Yup.number()
-      .required()
-      .min(1),
-  })
-  const vaccinationSchema = Yup.object().shape({
-    inventoryVaccinationFK: Yup.number().required(),
     quantity: Yup.number()
       .required()
       .min(1),
@@ -82,18 +65,10 @@ const InventoryTypeListing = ({
       .min(1),
   })
 
-  const [medicationRows, setMedicationRows] = useState(medicationOrderSetItem)
   const [consumableRows, setConsumableRows] = useState(consumableOrderSetItem)
-  const [vaccinationRows, setVaccinationRows] = useState(
-    vaccinationOrderSetItem,
-  )
   const [serviceRows, setServiceRows] = useState(serviceOrderSetItem)
 
-  const [medicationList, setMedicationList] = useState([])
-
   const [consumableList, setConsumableList] = useState([])
-
-  const [vaccinationList, setVaccinationList] = useState([])
 
   const [selectedItem, setSelectedItem] = useState(() => {})
 
@@ -133,14 +108,6 @@ const InventoryTypeListing = ({
               inventoryItemList.filter(item => item.orderable),
             )
           }
-          case 'MedicationItemList': {
-            return setMedicationList(
-              inventoryItemList.filter(item => item.orderable),
-            )
-          }
-          case 'VaccinationItemList': {
-            return setVaccinationList(inventoryItemList)
-          }
           default: {
             return null
           }
@@ -157,12 +124,10 @@ const InventoryTypeListing = ({
         commitCount: (commitCount += 1),
       },
     })
-  }, [medicationList, consumableList, vaccinationList])
+  }, [consumableList])
 
   useEffect(() => {
-    setMedicationRows(medicationOrderSetItem)
     setConsumableRows(consumableOrderSetItem)
-    setVaccinationRows(vaccinationOrderSetItem)
     setServiceRows(serviceOrderSetItem)
     // dispatch({
     //   // force current edit row components to update
@@ -186,9 +151,6 @@ const InventoryTypeListing = ({
       }
       return total
     }
-    medicationRows.forEach(row => {
-      calTotal(row)
-    })
 
     serviceRows.forEach(row => {
       calTotal(row)
@@ -198,22 +160,14 @@ const InventoryTypeListing = ({
       calTotal(row)
     })
 
-    vaccinationRows.forEach(row => {
-      calTotal(row)
-    })
-
-    setFieldValue('medicationOrderSetItem', medicationRows)
     setFieldValue('consumableOrderSetItem', consumableRows)
-    setFieldValue('vaccinationOrderSetItem', vaccinationRows)
     setFieldValue('serviceOrderSetItem', serviceRows)
 
     setTotalPrice(total)
 
     setValues({
       ...values,
-      medicationOrderSetItem: medicationRows,
       consumableOrderSetItem: consumableRows,
-      vaccinationOrderSetItem: vaccinationRows,
       serviceOrderSetItem: serviceRows,
       totalPrice: total,
     })
@@ -225,7 +179,7 @@ const InventoryTypeListing = ({
     //     commitCount: (commitCount += 1),
     //   },
     // })
-  }, [medicationRows, consumableRows, vaccinationRows, serviceRows])
+  }, [consumableRows, serviceRows])
 
   const onCommitChanges = type => ({ rows, deleted, added, changed }) => {
     if (deleted) {
@@ -243,14 +197,8 @@ const InventoryTypeListing = ({
       })
 
       switch (type) {
-        case 'medicationOrderSetItem': {
-          return setMedicationRows(newArray)
-        }
         case 'consumableOrderSetItem': {
           return setConsumableRows(newArray)
-        }
-        case 'vaccinationOrderSetItem': {
-          return setVaccinationRows(newArray)
         }
         case 'serviceOrderSetItem': {
           return setServiceRows(newArray)
@@ -262,17 +210,9 @@ const InventoryTypeListing = ({
       }
     } else if (added) {
       switch (type) {
-        case 'medicationOrderSetItem': {
-          setMedicationRows([...medicationRows, rows[0]])
-          return setFieldValue(`${type}`, medicationRows)
-        }
         case 'consumableOrderSetItem': {
           setConsumableRows([...consumableRows, rows[0]])
           return setFieldValue(`${type}`, consumableRows)
-        }
-        case 'vaccinationOrderSetItem': {
-          setVaccinationRows([...vaccinationRows, rows[0]])
-          return setFieldValue(`${type}`, vaccinationRows)
         }
         case 'serviceOrderSetItem': {
           const { serviceCenterServiceFK, serviceName } = rows[0]
@@ -304,22 +244,10 @@ const InventoryTypeListing = ({
     } else if (changed) {
       const getType = t => {
         switch (t) {
-          case 'medicationOrderSetItem': {
-            return {
-              stateRows: medicationRows,
-              setStateRow: v => setMedicationRows(v),
-            }
-          }
           case 'consumableOrderSetItem': {
             return {
               stateRows: consumableRows,
               setStateRow: v => setConsumableRows(v),
-            }
-          }
-          case 'vaccinationOrderSetItem': {
-            return {
-              stateRows: vaccinationRows,
-              setStateRow: v => setVaccinationRows(v),
             }
           }
           case 'serviceOrderSetItem': {
@@ -429,7 +357,7 @@ const InventoryTypeListing = ({
 
   const consumableProps = {
     columns: [
-      { name: 'inventoryConsumableFK', title: 'Consumable Name' },
+      { name: 'inventoryConsumableFK', title: 'Product Name' },
       { name: 'quantity', title: 'Quantity' },
       { name: 'unitPrice', title: 'Unit Price' },
       { name: 'subTotal', title: 'Amount' },
@@ -630,7 +558,7 @@ const InventoryTypeListing = ({
         >
           <Authorized authority='inventorymaster.orderset.consumable'>
             <InventoryType
-              title='Consumable'
+              title='Ophthalmic Product'
               inventoryTypeProps={consumableProps}
               schema={consumableSchema}
               rows={consumableRows}

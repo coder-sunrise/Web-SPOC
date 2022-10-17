@@ -23,7 +23,6 @@ import Memo from './Memo'
 import MedicalCertificate from './MedicalCertificate'
 import CertificateAttendance from './CertificateAttendance'
 import Others from './Others'
-import VaccinationCertificate from './VaccinationCertificate'
 
 const loadFromCodesConfig = {
   InsertConsumable: rows => {
@@ -56,13 +55,6 @@ const loadFromCodesConfig = {
   InsertPatientInfo: (codetable, patient) => {
     let result
     let patientGender = codetable.ctgender.find(x => x.id === patient.genderFK)
-    let patientAllergy
-    for (let index = 0; index < patient.patientAllergy.length; index++) {
-      if (patient.patientAllergy[index].type === 'Allergy')
-        patientAllergy =
-          (patientAllergy ? `${patientAllergy}, ` : '') +
-          patient.patientAllergy[index].allergyName
-    }
     result = `<p>Patient Name: ${patient.name}</p>`
     result += `<p>Patient Ref. No.: ${patient.patientReferenceNo}</p>`
     result += `<p>Patient Acc. No.: ${patient.patientAccountNo}</p>`
@@ -71,7 +63,6 @@ const loadFromCodesConfig = {
       1,
     )}/${calculateAgeFromDOB(patient.dob)}</p>`
 
-    result += `<p>Drug Allergy: ${patientAllergy || 'N.A.'}</p>`
     return result
   },
   loadFromCodes: [
@@ -307,7 +298,6 @@ class AddConsultationDocument extends PureComponent {
           </GridContainer>
           {type === '1' && <ReferralLetter {...cfg} />}
           {type === '2' && <Memo {...cfg} />}
-          {type === '3' && <VaccinationCertificate {...cfg} />}
           {type === '4' && <Others {...cfg} />}
           {type === '5' && <MedicalCertificate {...cfg} />}
           {type === '6' && <CertificateAttendance {...cfg} />}
