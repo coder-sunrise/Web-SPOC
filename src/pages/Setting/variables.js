@@ -159,6 +159,12 @@ export const menuData = [
            url: '/setting/casetype',
          },
          {
+           authority: 'settings.clinicsetting.salestype',
+           title: 'Clinic Setting',
+           text: 'Sales Type',
+           url: '/setting/salestype',
+         },
+         {
            authority: 'settings.clinicsetting.casedescription',
            title: 'Clinic Setting',
            text: 'Case Description',
