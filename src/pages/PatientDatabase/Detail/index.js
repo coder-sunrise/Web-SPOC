@@ -144,35 +144,6 @@ class PatientDetail extends PureComponent {
           loading: Loading,
         }),
       },
-      // {
-      //   id: '3',
-      //   name: 'Allergies',
-      //   access: [
-      //     'patientdatabase.newpatient',
-      //     'patientdatabase.patientprofiledetails',
-      //   ],
-      //   schema: schemas.allergies,
-      //   component: Loadable({
-      //     loader: () => import('./Allergies'),
-      //     render: (loaded, p) => {
-      //       let Cmpnet = loaded.default
-      //       return <Cmpnet schema={schemas.allergies} {...p} />
-      //     },
-      //     loading: Loading,
-      //   }),
-      // },
-      {
-        id: '9',
-        name: 'Medical History',
-        component: Loadable({
-          loader: () => import('./MedicalHistory'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...p} />
-          },
-          loading: Loading,
-        }),
-      },
       {
         id: '4',
         name: 'Schemes',
@@ -186,22 +157,6 @@ class PatientDetail extends PureComponent {
           render: (loaded, p) => {
             let Cmpnet = loaded.default
             return <Cmpnet schema={schemas.schemes} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '12',
-        name: 'Claim History',
-        access: [
-          'patientdatabase.newpatient',
-          'patientdatabase.patientprofiledetails',
-        ],
-        component: Loadable({
-          loader: () => import('./ClaimHistory'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...p} patientProfileFK={props.values.id} />
           },
           loading: Loading,
         }),
@@ -319,27 +274,6 @@ class PatientDetail extends PureComponent {
       },
     })
 
-    const accessRight = Authorized.check(
-      'patientdatabase.patientprofiledetails.medicalhistory',
-    )
-    if (accessRight) {
-      const hiddenMedicalHistoryByAccessRight = accessRight.rights === 'hidden'
-      if (hiddenMedicalHistoryByAccessRight) {
-        this.widgets = this.widgets.filter(t => t.id !== '9')
-      }
-    }
-
-    const AllergiesAccessRight = Authorized.check(
-      'patientdatabase.patientprofiledetails.allergies',
-    )
-    if (AllergiesAccessRight) {
-      const hiddenAllergiesByAccessRight =
-        AllergiesAccessRight.rights === 'hidden'
-      if (hiddenAllergiesByAccessRight) {
-        this.widgets = this.widgets.filter(t => t.id !== '3')
-      }
-    }
-
     const SchemeAccessRight = Authorized.check('scheme.schemedetails')
     if (SchemeAccessRight) {
       const hiddenSchemeByAccessRight = SchemeAccessRight.rights === 'hidden'
@@ -359,14 +293,7 @@ class PatientDetail extends PureComponent {
       }
     }
     const { clinicSettings } = this.props
-
-    const viewClaimHistoryRight = Authorized.check(
-      'patientdatabase.patientprofiledetails.claimhistory',
-    ) || { rights: 'hidden' }
-    if (viewClaimHistoryRight.rights === 'hidden') {
-      this.widgets = this.widgets.filter(t => t.id !== '12')
-    }
-
+ 
     const viewPatientResultsRight = Authorized.check(
       'patientdatabase.patientprofiledetails.patientresults',
     ) || { rights: 'hidden' }

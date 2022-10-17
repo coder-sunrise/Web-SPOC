@@ -116,7 +116,6 @@ const Grid = ({
 
   const onAddedRowsChange = addedRows => {
     return addedRows.map(row => ({
-      patientAllergyStatusFK: 1,
       ...row,
       isConfirmed: true,
     }))

@@ -43,7 +43,6 @@ import HistoryDiagnosis from './HistoryDiagnosis'
 import { SwitcherTwoTone } from '@ant-design/icons'
 import { SCHEME_TYPE } from '@/utils/constants'
 import CopayerDetails from '@/pages/Setting/Company/CopayerDetails'
-import ClaimHistory from '@/pages/PatientDatabase/Detail/ClaimHistory'
 import PatientResults from '@/pages/PatientDatabase/Detail/Results'
 
 const headerStyles = {
@@ -106,15 +105,12 @@ const styles = theme => ({
 )
 class Banner extends PureComponent {
   state = {
-    existsAllergy: false,
     refreshedSchemeData: {},
     refreshedSchemePayerData: {},
     currPatientCoPaymentSchemeFK: 0,
     currentSchemeType: 0,
     showNotesModal: false,
     showSchemeModal: false,
-    showNonClaimableHistoryModal: false,
-    showExaminationDetailsModal: false,
     isExpanded: false,
   }
 
@@ -444,44 +440,6 @@ class Banner extends PureComponent {
     return 12
   }
 
-  openNonClaimableHistory = () => {
-    const { dispatch, patient } = this.props
-    const { entity = {} } = patient
-    dispatch({
-      type: 'nonClaimableHistory/query',
-      payload: {
-        patientProfileFK: entity.id,
-      },
-    })
-
-    this.setState({ showNonClaimableHistoryModal: true })
-  }
-  openExaminationResults = () => {
-    const { dispatch, patient } = this.props
-    const { entity = {} } = patient
-    this.setState({ showExaminationDetailsModal: true })
-  }
-  closeNonClaimableHistory = () => {
-    const { dispatch, patient } = this.props
-    const { entity } = patient
-    dispatch({
-      type: 'patient/query',
-      payload: {
-        id: entity.id,
-      },
-    })
-
-    dispatch({
-      type: 'nonClaimableHistory/updateState',
-      payload: {
-        list: [],
-      },
-    })
-    this.setState({ showNonClaimableHistoryModal: false })
-  }
-  closeExaminationDetails = () => {
-    this.setState({ showExaminationDetailsModal: false })
-  }
   expandOrCollespe = () => {
     this.setState({ isExpanded: !this.state.isExpanded })
     if (this.props.setPatientBannerHeight) {
@@ -526,10 +484,6 @@ class Banner extends PureComponent {
       'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
     ) || { rights: 'hidden' }
 
-    const nonClaimableHistoryAccessRight = Authorized.check(
-      'patientdatabase.patientprofiledetails.patienthistory.nonclaimablehistory',
-    ) || { rights: 'hidden' }
-
     const viewPatientProfileAccess = Authorized.check(
       'patientdatabase.patientprofiledetails',
     )
@@ -544,17 +498,11 @@ class Banner extends PureComponent {
     const { ctsalutation = [] } = codetable
     const info = entity
     const name = `${info.name}`
-    /* const allergiesStyle = () => {
-      return {
-        color: this.state.existsAllergy ? 'red' : 'darkblue',
-        fontWeight: 500,
-      }
-    } */
+
     const year = Math.floor(moment.duration(moment().diff(info.dob)).asYears())
 
     // get scheme details based on scheme type
     const schemeDataList = []
-    const g6PD = null
 
     const persistentDiagnosis =
       isEnableJapaneseICD10Diagnosis === true &&
@@ -571,10 +519,6 @@ class Banner extends PureComponent {
             .map(d => d.diagnosisDescription)
             .join(', ')
         : '-'
-
-    const viewNonClaimableHistoryRight = Authorized.check(
-      'patientdatabase.patientprofiledetails.claimhistory.viewnonclaimablehistory',
-    ) || { rights: 'hidden' }
 
     const patientTitle = (
       <div>
@@ -694,21 +638,6 @@ class Banner extends PureComponent {
         </Col>
       </Row>
     )
-    const patientG6PD = (
-      <Row wrap={false}>
-        <Col flex='none'>
-          <span
-            className={classes.header}
-            style={{ color: g6PD && g6PD.name === 'Yes' ? 'red' : 'darkblue' }}
-          >
-            G6PD:{' '}
-          </span>
-        </Col>
-        <Col flex='auto' className={contentClass}>
-          <span>{g6PD ? g6PD.name : '-'}</span>
-        </Col>
-      </Row>
-    )
     const patientOS = (
       <div>
         <span
@@ -809,76 +738,6 @@ class Banner extends PureComponent {
             interactive='true'
           >
             <span> {info.patientRequest || '-'}</span>
-          </Tooltip>
-        </Col>
-      </Row>
-    )
-    const patientHRP = (
-      <Row wrap={false}>
-        <Col flex='none'>
-          <span
-            className={classes.header}
-            style={{
-              color: info.patientMedicalHistory?.highRiskCondition
-                ? 'red'
-                : 'darkblue',
-            }}
-          >
-            HRP:{' '}
-          </span>
-        </Col>
-        <Col flex='auto' className={contentClass}>
-          <Tooltip
-            enterDelay={100}
-            title={info.patientMedicalHistory?.highRiskCondition}
-            interactive='true'
-          >
-            <span>{info.patientMedicalHistory?.highRiskCondition || '-'}</span>
-          </Tooltip>
-        </Col>
-      </Row>
-    )
-    const patientPersistDiagnosis = (
-      <Row wrap={false}>
-        <Col flex='none'>
-          <Tooltip title='Persistent Diagnosis'>
-            <span className={classes.header}>
-              P. Diagnosis
-              {isEnableJapaneseICD10Diagnosis === true &&
-              info?.patientHistoryDiagnosis?.length > 0 ? (
-                <span>{`(${info?.patientHistoryDiagnosis?.length})`}</span>
-              ) : (
-                <span></span>
-              )}
-              :{' '}
-            </span>
-          </Tooltip>
-        </Col>
-        <Col flex='auto' className={contentClass}>
-          <Tooltip
-            enterDelay={100}
-            title={persistentDiagnosis}
-            interactive='true'
-          >
-            <span>{persistentDiagnosis}</span>
-          </Tooltip>
-        </Col>
-      </Row>
-    )
-    const patientAllergy = (
-      <Row wrap={false}>
-        <Col flex='none'>
-          <span
-            className={classes.header}
-            style={{ color: this.state.existsAllergy ? 'red' : 'darkblue' }}
-          >
-            Allergy:
-          </span>
-          <span>-</span>
-        </Col>
-        <Col flex='auto' className={contentClass}>
-          <Tooltip enterDelay={100} title={''} interactive='true'>
-            <span>-</span>
           </Tooltip>
         </Col>
       </Row>
@@ -984,9 +843,7 @@ class Banner extends PureComponent {
                   <GridItem xs={6} md={4}>
                     {patientTag}
                   </GridItem>
-                  <GridItem xs={6} md={4}>
-                    {patientG6PD}
-                  </GridItem>
+                  <GridItem xs={6} md={4}></GridItem>
                   <GridItem xs={6} md={4}>
                     {patientOS}
                   </GridItem>
@@ -996,18 +853,12 @@ class Banner extends PureComponent {
                   <GridItem xs={6} md={4}>
                     {patientRequest}
                   </GridItem>
-                  <GridItem xs={6} md={4}>
-                    {patientHRP}
-                  </GridItem>
-                  <GridItem xs={6} md={4}>
-                    {patientPersistDiagnosis}
-                  </GridItem>
+                  <GridItem xs={6} md={4}></GridItem>
+                  <GridItem xs={6} md={4}></GridItem>
                   <GridItem xs={6} md={4}>
                     -
                   </GridItem>
-                  <GridItem xs={6} md={4}>
-                    {patientAllergy}
-                  </GridItem>
+                  <GridItem xs={6} md={4}></GridItem>
                 </GridContainer>
               </GridItem>
               <GridItem xs={2} md={2}>
@@ -1027,56 +878,7 @@ class Banner extends PureComponent {
                   ) : (
                     <GridItem xs={12} md={12}></GridItem>
                   )}
-                  <GridItem xs={12} md={12}>
-                    {viewNonClaimableHistoryRight.rights === 'enable' && (
-                      <span className={classes.header}>
-                        <span
-                          style={{
-                            display: 'block',
-                            textDecoration: 'underline',
-                            cursor: 'pointer',
-                          }}
-                          onClick={e => {
-                            this.openNonClaimableHistory()
-                          }}
-                        >
-                          {`Non Claimable History (${info.nonClaimableHistoryCount ||
-                            0})`}
-                        </span>
-                      </span>
-                    )}
-                    <div>
-                      {notesHistoryAccessRight.rights !== 'hidden' && (
-                        <span
-                          className={classes.header}
-                          style={{ marginRight: 10 }}
-                        >
-                          {patientNotesLinkElm}
-                        </span>
-                      )}
-                    </div>
-                    <span
-                      className={classes.header}
-                      style={{
-                        display: 'block',
-                        paddingRight: 10,
-                        textDecoration: 'underline',
-                        cursor: 'pointer',
-                      }}
-                      to={getAppendUrl({
-                        md: 'pt',
-                        cmt: 1,
-                        pid: info.id,
-                      })}
-                      onClick={e => {
-                        this.openExaminationResults()
-                      }}
-                      // disabled={}
-                      tabIndex='-1'
-                    >
-                      Examination Results
-                    </span>
-                  </GridItem>
+                  <GridItem xs={12} md={12}></GridItem>
                 </GridContainer>
               </GridItem>
             </GridContainer>
@@ -1142,19 +944,7 @@ class Banner extends PureComponent {
           fullScreen
         >
           <CopayerDetails fromCommonModal />
-        </CommonModal>
-        <CommonModal
-          open={this.state.showNonClaimableHistoryModal}
-          title='Claim History'
-          onClose={this.closeNonClaimableHistory}
-          maxWidth='lg'
-        >
-          <ClaimHistory
-            defaultTab='NonClaimableHistory'
-            patientProfileFK={entity.id}
-            values={{ isActive: entity.isActive }}
-          />
-        </CommonModal>
+        </CommonModal> 
         <CommonModal
           open={this.state.showExaminationDetailsModal}
           title='Examination Details'

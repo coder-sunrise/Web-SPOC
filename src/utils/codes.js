@@ -424,13 +424,6 @@ const loadFromCodesConfig = {
   InsertPatientInfo: (codetable, patient) => {
     let result
     let patientGender = codetable.ctgender.find(x => x.id === patient.genderFK)
-    let patientAllergy
-    for (let index = 0; index < patient.patientAllergy.length; index++) {
-      if (patient.patientAllergy[index].type === 'Allergy')
-        patientAllergy =
-          (patientAllergy ? `${patientAllergy}, ` : '') +
-          patient.patientAllergy[index].allergyName
-    }
     result = `<p>Patient Name: ${patient.name}</p>`
     result += `<p>Patient Ref. No.: ${patient.patientReferenceNo}</p>`
     result += `<p>Patient Acc. No.: ${patient.patientAccountNo}</p>`
@@ -439,7 +432,6 @@ const loadFromCodesConfig = {
       1,
     )}/${calculateAgeFromDOB(patient.dob)}</p>`
 
-    result += `<p>Drug Allergy: ${patientAllergy || 'N.A.'}</p>`
     return result
   },
 }
@@ -559,17 +551,6 @@ const tagList = [
         let patientGender = codetable.ctgender.find(
           x => x.id === patient.entity.genderFK,
         )
-        let patientAllergy
-        for (
-          let index = 0;
-          index < patient.entity.patientAllergy.length;
-          index++
-        ) {
-          if (patient.entity.patientAllergy[index].type === 'Allergy')
-            patientAllergy =
-              (patientAllergy ? `${patientAllergy}, ` : '') +
-              patient.entity.patientAllergy[index].allergyName
-        }
         result = `<p>Patient Name: ${patient.entity.name}</p>`
         result += `<p>Patient Ref. No.: ${patient.entity.patientReferenceNo}</p>`
         result += `<p>Patient Acc. No.: ${patient.entity.patientAccountNo}</p>`
@@ -577,8 +558,6 @@ const tagList = [
           0,
           1,
         )}/${calculateAgeFromDOB(patient.entity.dob)}</p>`
-
-        result += `<p>Drug Allergy: ${patientAllergy || 'N.A.'}</p>`
       }
       return result || 'N.A.'
     },

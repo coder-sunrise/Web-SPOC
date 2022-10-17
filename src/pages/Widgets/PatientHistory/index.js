@@ -901,20 +901,7 @@ class PatientHistory extends Component {
       patient = {},
       codetable: { ctnationality = [], ctgender = [] },
     } = this.props
-    const {
-      name,
-      patientAccountNo,
-      nationalityFK,
-      dob,
-      genderFK,
-      patientAllergyMetaData,
-      patientMedicalHistory = {},
-    } = patient
-    const {
-      medicalHistory,
-      familyHistory,
-      socialHistory,
-    } = patientMedicalHistory
+    const { name, patientAccountNo, nationalityFK, dob, genderFK } = patient
     const gender = ctgender.find(o => o.id === genderFK)
     const nationality = ctnationality.find(o => o.id === nationalityFK)
 
@@ -934,9 +921,6 @@ class PatientHistory extends Component {
         patientNationality: nationality ? nationality.name : '',
         patientAge: age,
         patientSex: gender ? gender.name : '',
-        patientSocialHistory: socialHistory,
-        patientFamilyHistory: familyHistory,
-        patientMajorInvestigation: medicalHistory,
       },
     ]
   }
