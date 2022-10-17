@@ -829,6 +829,12 @@ const _routes = [
             authority: ['settings.clinicsetting.casetype'],
           },
           {
+            path: '/setting/salestype',
+            name: 'salestype',
+            component: './Setting/SalesType',
+            authority: ['settings.clinicsetting.salestype'],
+          },
+          {
             path: '/setting/casedescription',
             name: 'casedescription',
             component: './Setting/CaseDescription',

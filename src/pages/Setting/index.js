@@ -101,7 +101,7 @@ class SystemSetting extends PureComponent {
         .reduce(filterByAccessRight, [])
         .filter(m => {
           return (
-            m.text.toLocaleLowerCase().indexOf(searchText) >= 0 || !searchText
+            m.text?.toLocaleLowerCase().indexOf(searchText) >= 0 || !searchText
           )
         })
 

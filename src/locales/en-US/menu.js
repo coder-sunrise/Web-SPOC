@@ -150,6 +150,7 @@ export default {
   'menu.setting.referralperson': 'Referral Person',
   'menu.setting.visitordertemplate': 'Visit Purpose',
   'menu.setting.casetype': 'Case Type',
+  'menu.setting.salestype': 'Sales Type',
   'menu.setting.casedescription': 'Case Description',
   'menu.setting.refractiontesttype': 'Refraction Test Type',
   'menu.setting.invoiceadjustment': 'Invoice Adjustment',
