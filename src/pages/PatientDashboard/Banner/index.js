@@ -668,6 +668,18 @@ class Banner extends PureComponent {
         </Col>
       </Row>
     )
+    const referralSource = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header} style={{ color: 'darkblue' }}>
+            Spoken Language:{' '}
+          </span>
+        </Col>
+        <Col flex='auto' className={contentClass}>
+          <span>{info.referralSource ? info.referralSource : '-'}</span>
+        </Col>
+      </Row>
+    )
     const patientOS = (
       <div>
         <span
@@ -873,7 +885,6 @@ class Banner extends PureComponent {
                   <GridItem xs={6} md={4}>
                     {patientTag}
                   </GridItem>
-                  <GridItem xs={6} md={4}></GridItem>
                   <GridItem xs={6} md={4}>
                     {spokenLanguage}
                   </GridItem>
@@ -891,9 +902,6 @@ class Banner extends PureComponent {
                   </GridItem>
                   <GridItem xs={6} md={4}></GridItem>
                   <GridItem xs={6} md={4}></GridItem>
-                  <GridItem xs={6} md={4}>
-                    -
-                  </GridItem>
                   <GridItem xs={6} md={4}></GridItem>
                 </GridContainer>
               </GridItem>
