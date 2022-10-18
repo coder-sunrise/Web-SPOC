@@ -159,10 +159,10 @@ export const menuData = [
     url: '/setting/casetype',
   },
   {
-    path: '/setting/salestype',
-    name: 'salestype',
-    component: './Setting/SalesType',
-    authority: ['settings.clinicsetting.salestype'],
+    authority: 'settings.clinicsetting.salestype',
+    title: 'Clinic Setting',
+    text: 'Sales Type',
+    url: '/setting/salestype',
   },
   {
     authority: 'settings.clinicsetting.casedescription',

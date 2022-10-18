@@ -129,7 +129,7 @@ class PatientDetail extends PureComponent {
       },
       {
         id: '2',
-        name: 'Emergency Contact',
+        name: 'Family Members',
         access: [
           'patientdatabase.newpatient',
           'patientdatabase.patientprofiledetails',

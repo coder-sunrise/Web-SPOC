@@ -11,7 +11,7 @@ import {
   Tooltip,
   GridContainer,
   GridItem,
-  Field
+  Field,
 } from '@/components'
 import Loading from '@/components/PageLoading/index'
 import service from '@/services/patient'
@@ -26,21 +26,25 @@ class EmergencyContact extends PureComponent {
     showModal: false,
   }
 
-
   render() {
     const { classes, dispatch, values, schema, ...restProps } = this.props
-    const accessRight = Authorized.check('patientdatabase.patientprofiledetails.emergencycontact')
+    const accessRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.familymembers',
+    )
     let disabledByAccessRight = true
     if (accessRight) disabledByAccessRight = accessRight.rights === 'disable'
 
     return (
       <GridContainer>
         <GridItem>
-          <EmergencyContactGrid {...this.props} disabled={disabledByAccessRight}/>
+          <EmergencyContactGrid
+            {...this.props}
+            disabled={disabledByAccessRight}
+          />
         </GridItem>
         <GridItem style={{ marginTop: 50 }}>
-          <h4 style={{ fontWeight: 500 }}>Family Members</h4>
-          <FamilyMemberGrid {...this.props} disabled={disabledByAccessRight}/>
+          <h4 style={{ fontWeight: 500 }}>Family Group</h4>
+          <FamilyMemberGrid {...this.props} disabled={disabledByAccessRight} />
         </GridItem>
       </GridContainer>
     )

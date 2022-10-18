@@ -126,7 +126,7 @@ const schemaDemographic = {
     .NRIC()
     .required(),
   genderFK: Yup.number().required(),
-  nationalityFK: Yup.number().required(),
+  nationalityFK: Yup.number(),
   referredBy: Yup.string(),
   referralSourceFK: Yup.number().when('referredBy', {
     is: 'Company',
@@ -138,7 +138,9 @@ const schemaDemographic = {
   }),
   contact: Yup.object().shape({
     contactEmailAddress: Yup.object().shape({
-      emailAddress: Yup.string().email(),
+      emailAddress: Yup.string()
+        .email()
+        .required(),
     }),
     mobileContactNumber: null,
   }),
@@ -213,7 +215,7 @@ const schema = props => {
   if (!clinicSettings.isNationalityMandatoryInRegistration) {
     schemaDemographic.nationalityFK = Yup.number()
   } else {
-    schemaDemographic.nationalityFK = Yup.number().required()
+    schemaDemographic.nationalityFK = Yup.number()
   }
   if (!clinicSettings.isContactNoMandatoryInRegistration) {
     schemaDemographic.contact = Yup.object().shape({
