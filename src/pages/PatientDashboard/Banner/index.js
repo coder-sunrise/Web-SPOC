@@ -21,18 +21,18 @@ import { MoreButton, LoadingWrapper } from '@/components/_medisys'
 import PatientLabelBtn from '@/components/_medisys/PatientInfoSideBanner/PatientLabelBtn'
 import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 import {
-    GridContainer,
-    GridItem,
-    CodeSelect,
-    DatePicker,
-    dateFormatLong,
-    Skeleton,
-    Tooltip,
-    IconButton,
-    Popover,
-    NumberInput,
-    CommonModal,
-    notification,
+  GridContainer,
+  GridItem,
+  CodeSelect,
+  DatePicker,
+  dateFormatLong,
+  Skeleton,
+  Tooltip,
+  IconButton,
+  Popover,
+  NumberInput,
+  CommonModal,
+  notification,
 } from '@/components'
 
 import Authorized from '@/utils/Authorized'
@@ -46,984 +46,984 @@ import CopayerDetails from '@/pages/Setting/Company/CopayerDetails'
 import PatientResults from '@/pages/PatientDatabase/Detail/Results'
 
 const headerStyles = {
-    color: 'darkblue',
-    fontWeight: 500,
-    position: 'relative',
+  color: 'darkblue',
+  fontWeight: 500,
+  position: 'relative',
 }
 
 const styles = theme => ({
-    header: {
-        color: 'darkblue',
-        fontWeight: 500,
-        height: 26,
-        display: 'inline-block',
-        position: 'relative',
-    },
-    // cell: {
-    //   margin: '3px 0',
-    // },
-    part: {
-        display: 'inline-block',
-    },
-    contentWithWrap: {
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-        paddingLeft: '5px',
-        wordBreak: 'break-word',
-    },
-    contentWithoutWrap: {
-        paddingLeft: '5px',
-        wordBreak: 'break-word',
-    },
-    contents: {
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        display: '-webkit-box',
-        WebkitBoxOrient: 'vertical',
-        WebkitLineClamp: 2,
-    },
+  header: {
+    color: 'darkblue',
+    fontWeight: 500,
+    height: 26,
+    display: 'inline-block',
+    position: 'relative',
+  },
+  // cell: {
+  //   margin: '3px 0',
+  // },
+  part: {
+    display: 'inline-block',
+  },
+  contentWithWrap: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    paddingLeft: '5px',
+    wordBreak: 'break-word',
+  },
+  contentWithoutWrap: {
+    paddingLeft: '5px',
+    wordBreak: 'break-word',
+  },
+  contents: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    display: '-webkit-box',
+    WebkitBoxOrient: 'vertical',
+    WebkitLineClamp: 2,
+  },
 })
 
 @control()
 @connect(
-    ({
-        patient,
-        codetable,
-        loading,
-        visitRegistration,
-        clinicSettings,
-        global,
-    }) => ({
-        patient,
-        codetable,
-        visitRegistration,
-        ctschemetype: codetable.ctschemetype || [],
-        clinicSettings: clinicSettings.settings || clinicSettings.default,
-        mainDivHeight: global.mainDivHeight,
-    }),
+  ({
+    patient,
+    codetable,
+    loading,
+    visitRegistration,
+    clinicSettings,
+    global,
+  }) => ({
+    patient,
+    codetable,
+    visitRegistration,
+    ctschemetype: codetable.ctschemetype || [],
+    clinicSettings: clinicSettings.settings || clinicSettings.default,
+    mainDivHeight: global.mainDivHeight,
+  }),
 )
 class Banner extends PureComponent {
-    state = {
-        refreshedSchemeData: {},
-        refreshedSchemePayerData: {},
-        currPatientCoPaymentSchemeFK: 0,
-        currentSchemeType: 0,
-        showNotesModal: false,
-        showSchemeModal: false,
-        isExpanded: false,
+  state = {
+    refreshedSchemeData: {},
+    refreshedSchemePayerData: {},
+    currPatientCoPaymentSchemeFK: 0,
+    currentSchemeType: 0,
+    showNotesModal: false,
+    showSchemeModal: false,
+    isExpanded: false,
+  }
+
+  constructor(props) {
+    super(props)
+    this.fetchCodeTables()
+  }
+
+  componentWillUnmount() {
+    const { dispatch, isDisposePatientEntity = true } = this.props
+    if (isDisposePatientEntity) {
+      dispatch({
+        type: 'patient/updateState',
+        payload: { entity: null },
+      })
+    }
+  }
+
+  fetchCodeTables = async () => {
+    const { dispatch } = this.props
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctsalutation',
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctschemetype',
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'copaymentscheme',
+      },
+    })
+  }
+
+  openNotes = () => this.setState({ showNotesModal: true })
+  openEditVisit = () => {
+    const parameter = {
+      md: 'visreg',
+    }
+    parameter.vis = this.props.visitRegistration?.entity?.visit?.id
+    parameter.visitMode = 'edit'
+    history.push(getAppendUrl(parameter))
+  }
+  closeNotes = () => this.setState({ showNotesModal: false })
+  openScheme = coPayerFK => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'copayerDetail/queryCopayerDetails',
+      payload: {
+        id: coPayerFK,
+      },
+    })
+
+    this.setState({ showSchemeModal: true })
+  }
+  closeScheme = () => {
+    const { dispatch } = this.props
+
+    dispatch({
+      type: 'copayerDetail/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
+    this.setState({ showSchemeModal: false })
+  }
+  confirmCopayer = () => {
+    const { dispatch, patient } = this.props
+    const { entity } = patient
+    dispatch({
+      type: 'patient/query',
+      payload: {
+        id: entity.id,
+      },
+    })
+
+    dispatch({
+      type: 'copayerDetail/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
+    this.setState({ showSchemeModal: false })
+  }
+  openPatientProfile = () => {
+    if (this.props.from !== 'Appointment') return
+    const { dispatch, patient } = this.props
+    const { entity } = patient
+    this.setState({ showPatientProfile: true })
+  }
+  closePatientProfile = () => {
+    const { dispatch, patient } = this.props
+    const { entity } = patient
+    dispatch({
+      type: 'patient/query',
+      payload: {
+        id: entity.id,
+      },
+    })
+    this.setState({ showPatientProfile: false })
+  }
+
+  getSchemeList = schemeDataList => {
+    const { patient, clinicSettings } = this.props
+    const { entity } = patient
+    const { patientScheme } = entity
+    if (schemeDataList.length === 0) return '-'
+    const { schemeInsuranceDisplayColorCode = '' } = clinicSettings
+    return schemeDataList.map((s, i, arr) => {
+      var scheme =
+        patientScheme.find(
+          ps => ps.coPaymentSchemeFK === s.coPaymentSchemeFK,
+        ) || {}
+      return <span style={{ paddingRight: 5 }}></span>
+    })
+  }
+  getTagData = () => {
+    const { patient } = this.props
+    const { entity } = patient
+    let tagData = ''
+    if (entity.patientTag.length > 0) {
+      tagData = entity.patientTag.map(t => t.tagName).join(', ')
+    }
+    if (entity.patientTagRemarks) {
+      if (tagData === '') {
+        tagData = entity.patientTagRemarks
+      } else {
+        tagData += ' -' + entity.patientTagRemarks
+      }
+    }
+    if (!!tagData) return tagData
+    return '-'
+  }
+
+  getSchemeDetails = schemeData => {
+    const { refreshedSchemeData } = this.state
+
+    if (
+      !_.isEmpty(refreshedSchemeData) &&
+      refreshedSchemeData.isSuccessful === true
+    ) {
+      return { ...refreshedSchemeData }
     }
 
-    constructor(props) {
-        super(props)
-        this.fetchCodeTables()
+    // Scheme Balance
+    const balance =
+      schemeData.patientSchemeBalance.length <= 0
+        ? undefined
+        : schemeData.patientSchemeBalance[0].balance
+    // Patient Acute Visit Patient Balance
+    const acuteVPBal =
+      schemeData.patientSchemeBalance.length <= 0
+        ? undefined
+        : schemeData.patientSchemeBalance[0].acuteVisitPatientBalance
+    // Patient Acute Visit Clinic Balance
+    const acuteVCBal =
+      schemeData.patientSchemeBalance.length <= 0
+        ? undefined
+        : schemeData.patientSchemeBalance[0].acuteVisitClinicBalance
+
+    const chronicStatus =
+      schemeData.patientSchemeBalance.length <= 0
+        ? undefined
+        : schemeData.patientSchemeBalance[0].chronicBalanceStatusCode
+
+    this.setState({
+      currPatientCoPaymentSchemeFK: schemeData.id,
+      currentSchemeType: schemeData.schemeTypeFK,
+    })
+
+    const { codetable } = this.props
+    const { ctschemetype = [], copaymentscheme = [] } = codetable
+    const schemeType = ctschemetype.find(o => o.id === schemeData.schemeTypeFK)
+    const copaymentScheme = copaymentscheme.find(
+      o => o.id === schemeData.coPaymentSchemeFK,
+    )
+    return {
+      balance,
+      patientCoPaymentSchemeFK: schemeData.id,
+      schemeTypeFK: schemeData.schemeTypeFK,
+      coPaymentSchemeFK: schemeData.coPaymentSchemeFK,
+      validFrom: schemeData.validFrom,
+      validTo: schemeData.validTo,
+      acuteVisitPatientBalance: acuteVPBal,
+      acuteVisitClinicBalance: acuteVCBal,
+      statusDescription: refreshedSchemeData.statusDescription,
+      acuteBalanceStatusCode:
+        !_.isEmpty(refreshedSchemeData) &&
+        refreshedSchemeData.isSuccessful === false
+          ? 'ERROR'
+          : undefined,
+      chronicBalanceStatusCode:
+        !_.isEmpty(refreshedSchemeData) &&
+        refreshedSchemeData.isSuccessful === false
+          ? 'ERROR'
+          : chronicStatus,
+      isSuccessful:
+        refreshedSchemeData.isSuccessful !== ''
+          ? refreshedSchemeData.isSuccessful
+          : '',
+      schemeTypeName: schemeType ? schemeType.name : undefined,
+      copaymentSchemeName: copaymentScheme ? copaymentScheme.name : undefined,
     }
+  }
 
-    componentWillUnmount() {
-        const { dispatch, isDisposePatientEntity = true } = this.props
-        if (isDisposePatientEntity) {
-            dispatch({
-                type: 'patient/updateState',
-                payload: { entity: null },
-            })
-        }
-    }
+  getSchemePayerDetails = schemePayer => {
+    const { patientScheme } = this.props.patient.entity
+    const schemeData = patientScheme.find(
+      row => row.schemeTypeFK === schemePayer.schemeFK,
+    )
+    const balanceData = schemeData.patientSchemeBalance.find(
+      row => row.schemePayerFK === schemePayer.id,
+    )
 
-    fetchCodeTables = async () => {
-        const { dispatch } = this.props
-        await dispatch({
-            type: 'codetable/fetchCodes',
-            payload: {
-                code: 'ctsalutation',
-            },
-        })
-        await dispatch({
-            type: 'codetable/fetchCodes',
-            payload: {
-                code: 'ctschemetype',
-            },
-        })
-        await dispatch({
-            type: 'codetable/fetchCodes',
-            payload: {
-                code: 'copaymentscheme',
-            },
-        })
-    }
+    if (
+      !_.isEmpty(this.state.refreshedSchemePayerData.payerBalanceList) &&
+      this.state.refreshedSchemePayerData.isSuccessful === true
+    ) {
+      // return { ...this.state.refreshedSchemePayerData }
 
-    openNotes = () => this.setState({ showNotesModal: true })
-    openEditVisit = () => {
-        const parameter = {
-            md: 'visreg',
-        }
-        parameter.vis = this.props.visitRegistration?.entity?.visit?.id
-        parameter.visitMode = 'edit'
-        history.push(getAppendUrl(parameter))
-    }
-    closeNotes = () => this.setState({ showNotesModal: false })
-    openScheme = coPayerFK => {
-        const { dispatch } = this.props
-        dispatch({
-            type: 'copayerDetail/queryCopayerDetails',
-            payload: {
-                id: coPayerFK,
-            },
-        })
+      const refreshData = this.state.refreshedSchemePayerData.payerBalanceList.find(
+        row => row.schemePayerFK === schemePayer.id,
+      )
 
-        this.setState({ showSchemeModal: true })
-    }
-    closeScheme = () => {
-        const { dispatch } = this.props
-
-        dispatch({
-            type: 'copayerDetail/updateState',
-            payload: {
-                entity: undefined,
-            },
-        })
-        this.setState({ showSchemeModal: false })
-    }
-    confirmCopayer = () => {
-        const { dispatch, patient } = this.props
-        const { entity } = patient
-        dispatch({
-            type: 'patient/query',
-            payload: {
-                id: entity.id,
-            },
-        })
-
-        dispatch({
-            type: 'copayerDetail/updateState',
-            payload: {
-                entity: undefined,
-            },
-        })
-        this.setState({ showSchemeModal: false })
-    }
-    openPatientProfile = () => {
-        if (this.props.from !== 'Appointment') return
-        const { dispatch, patient } = this.props
-        const { entity } = patient
-        this.setState({ showPatientProfile: true })
-    }
-    closePatientProfile = () => {
-        const { dispatch, patient } = this.props
-        const { entity } = patient
-        dispatch({
-            type: 'patient/query',
-            payload: {
-                id: entity.id,
-            },
-        })
-        this.setState({ showPatientProfile: false })
-    }
-
-    getSchemeList = schemeDataList => {
-        const { patient, clinicSettings } = this.props
-        const { entity } = patient
-        const { patientScheme } = entity
-        if (schemeDataList.length === 0) return '-'
-        const { schemeInsuranceDisplayColorCode = '' } = clinicSettings
-        return schemeDataList.map((s, i, arr) => {
-            var scheme =
-                patientScheme.find(
-                    ps => ps.coPaymentSchemeFK === s.coPaymentSchemeFK,
-                ) || {}
-            return <span style={{ paddingRight: 5 }}></span>
-        })
-    }
-    getTagData = () => {
-        const { patient } = this.props
-        const { entity } = patient
-        let tagData = ''
-        if (entity.patientTag.length > 0) {
-            tagData = entity.patientTag.map(t => t.tagName).join(', ')
-        }
-        if (entity.patientTagRemarks) {
-            if (tagData === '') {
-                tagData = entity.patientTagRemarks
-            } else {
-                tagData += ' -' + entity.patientTagRemarks
-            }
-        }
-        if (!!tagData) return tagData
-        return '-'
-    }
-
-    getSchemeDetails = schemeData => {
-        const { refreshedSchemeData } = this.state
-
-        if (
-            !_.isEmpty(refreshedSchemeData) &&
-            refreshedSchemeData.isSuccessful === true
-        ) {
-            return { ...refreshedSchemeData }
-        }
-
-        // Scheme Balance
-        const balance =
-            schemeData.patientSchemeBalance.length <= 0
-                ? undefined
-                : schemeData.patientSchemeBalance[0].balance
-        // Patient Acute Visit Patient Balance
-        const acuteVPBal =
-            schemeData.patientSchemeBalance.length <= 0
-                ? undefined
-                : schemeData.patientSchemeBalance[0].acuteVisitPatientBalance
-        // Patient Acute Visit Clinic Balance
-        const acuteVCBal =
-            schemeData.patientSchemeBalance.length <= 0
-                ? undefined
-                : schemeData.patientSchemeBalance[0].acuteVisitClinicBalance
-
-        const chronicStatus =
-            schemeData.patientSchemeBalance.length <= 0
-                ? undefined
-                : schemeData.patientSchemeBalance[0].chronicBalanceStatusCode
-
-        this.setState({
-            currPatientCoPaymentSchemeFK: schemeData.id,
-            currentSchemeType: schemeData.schemeTypeFK,
-        })
-
-        const { codetable } = this.props
-        const { ctschemetype = [], copaymentscheme = [] } = codetable
-        const schemeType = ctschemetype.find(o => o.id === schemeData.schemeTypeFK)
-        const copaymentScheme = copaymentscheme.find(
-            o => o.id === schemeData.coPaymentSchemeFK,
-        )
+      if (refreshData)
         return {
-            balance,
-            patientCoPaymentSchemeFK: schemeData.id,
-            schemeTypeFK: schemeData.schemeTypeFK,
-            coPaymentSchemeFK: schemeData.coPaymentSchemeFK,
-            validFrom: schemeData.validFrom,
-            validTo: schemeData.validTo,
-            acuteVisitPatientBalance: acuteVPBal,
-            acuteVisitClinicBalance: acuteVCBal,
-            statusDescription: refreshedSchemeData.statusDescription,
-            acuteBalanceStatusCode:
-                !_.isEmpty(refreshedSchemeData) &&
-                    refreshedSchemeData.isSuccessful === false
-                    ? 'ERROR'
-                    : undefined,
-            chronicBalanceStatusCode:
-                !_.isEmpty(refreshedSchemeData) &&
-                    refreshedSchemeData.isSuccessful === false
-                    ? 'ERROR'
-                    : chronicStatus,
-            isSuccessful:
-                refreshedSchemeData.isSuccessful !== ''
-                    ? refreshedSchemeData.isSuccessful
-                    : '',
-            schemeTypeName: schemeType ? schemeType.name : undefined,
-            copaymentSchemeName: copaymentScheme ? copaymentScheme.name : undefined,
+          payerName: schemePayer.payerName,
+          payerAccountNo: schemePayer.payerID,
+          balance: balanceData.balance >= 0 ? balanceData.balance : '-',
+          patientCoPaymentSchemeFK: refreshData.finalBalance,
+          schemeTypeFK: refreshData.schemeTypeFK,
+          schemeType: schemePayer.schemeType,
+          validFrom: schemeData.validFrom,
+          validTo: schemeData.validTo,
+          statusDescription: refreshData.statusDescription,
+          isSuccessful:
+            refreshData.isSuccessful !== '' ? refreshData.isSuccessful : '',
+          schemeTypeName: '',
         }
     }
 
-    getSchemePayerDetails = schemePayer => {
-        const { patientScheme } = this.props.patient.entity
-        const schemeData = patientScheme.find(
-            row => row.schemeTypeFK === schemePayer.schemeFK,
-        )
-        const balanceData = schemeData.patientSchemeBalance.find(
-            row => row.schemePayerFK === schemePayer.id,
-        )
+    const errorData = this.state.refreshedSchemePayerData
 
-        if (
-            !_.isEmpty(this.state.refreshedSchemePayerData.payerBalanceList) &&
-            this.state.refreshedSchemePayerData.isSuccessful === true
-        ) {
-            // return { ...this.state.refreshedSchemePayerData }
+    return {
+      payerName: schemePayer.payerName,
+      payerAccountNo: schemePayer.payerID,
+      balance: balanceData.balance >= 0 ? balanceData.balance : '-',
+      patientCoPaymentSchemeFK: balanceData.patientCopaymentSchemeFK,
+      schemeTypeFK: schemePayer.schemeFK,
+      schemeType: schemePayer.schemeType,
+      validFrom: schemeData.validFrom,
+      validTo: schemeData.validTo,
+      statusDescription:
+        errorData.statusDescription || schemeData.statusDescription,
+      isSuccessful: errorData.isSuccessful || schemeData.isSuccessful,
+      schemeTypeName: '',
+    }
+  }
 
-            const refreshData = this.state.refreshedSchemePayerData.payerBalanceList.find(
-                row => row.schemePayerFK === schemePayer.id,
-            )
+  displayMedicalProblemData(entity = { patientHistoryDiagnosis: [] }) {
+    let medicalProblemData = '-'
+    const { patientHistoryDiagnosis = [] } = entity
 
-            if (refreshData)
-                return {
-                    payerName: schemePayer.payerName,
-                    payerAccountNo: schemePayer.payerID,
-                    balance: balanceData.balance >= 0 ? balanceData.balance : '-',
-                    patientCoPaymentSchemeFK: refreshData.finalBalance,
-                    schemeTypeFK: refreshData.schemeTypeFK,
-                    schemeType: schemePayer.schemeType,
-                    validFrom: schemeData.validFrom,
-                    validTo: schemeData.validTo,
-                    statusDescription: refreshData.statusDescription,
-                    isSuccessful:
-                        refreshData.isSuccessful !== '' ? refreshData.isSuccessful : '',
-                    schemeTypeName: '',
-                }
-        }
-
-        const errorData = this.state.refreshedSchemePayerData
-
-        return {
-            payerName: schemePayer.payerName,
-            payerAccountNo: schemePayer.payerID,
-            balance: balanceData.balance >= 0 ? balanceData.balance : '-',
-            patientCoPaymentSchemeFK: balanceData.patientCopaymentSchemeFK,
-            schemeTypeFK: schemePayer.schemeFK,
-            schemeType: schemePayer.schemeType,
-            validFrom: schemeData.validFrom,
-            validTo: schemeData.validTo,
-            statusDescription:
-                errorData.statusDescription || schemeData.statusDescription,
-            isSuccessful: errorData.isSuccessful || schemeData.isSuccessful,
-            schemeTypeName: '',
-        }
+    if (patientHistoryDiagnosis.length > 0) {
+      if (patientHistoryDiagnosis.length >= 2) {
+        medicalProblemData = `${patientHistoryDiagnosis[0].diagnosisDescription}, ${patientHistoryDiagnosis[1].diagnosisDescription}`
+      } else {
+        medicalProblemData = `${patientHistoryDiagnosis[0].diagnosisDescription}`
+      }
     }
 
-    displayMedicalProblemData(entity = { patientHistoryDiagnosis: [] }) {
-        let medicalProblemData = '-'
-        const { patientHistoryDiagnosis = [] } = entity
+    return (
+      <div style={{ display: 'inline-block', marginTop: 5 }}>
+        <div style={{ display: 'inline-block' }}>
+          {medicalProblemData.length > 25
+            ? `${medicalProblemData.substring(0, 25).trim()}...`
+            : medicalProblemData}
+        </div>
 
-        if (patientHistoryDiagnosis.length > 0) {
-            if (patientHistoryDiagnosis.length >= 2) {
-                medicalProblemData = `${patientHistoryDiagnosis[0].diagnosisDescription}, ${patientHistoryDiagnosis[1].diagnosisDescription}`
-            } else {
-                medicalProblemData = `${patientHistoryDiagnosis[0].diagnosisDescription}`
+        {patientHistoryDiagnosis.length > 0 && (
+          <Popover
+            icon={null}
+            content={
+              <HistoryDiagnosis
+                patientHistoryDiagnosis={entity.patientHistoryDiagnosis}
+              />
             }
-        }
-
-        return (
-            <div style={{ display: 'inline-block', marginTop: 5 }}>
-                <div style={{ display: 'inline-block' }}>
-                    {medicalProblemData.length > 25
-                        ? `${medicalProblemData.substring(0, 25).trim()}...`
-                        : medicalProblemData}
-                </div>
-
-                {patientHistoryDiagnosis.length > 0 && (
-                    <Popover
-                        icon={null}
-                        content={
-                            <HistoryDiagnosis
-                                patientHistoryDiagnosis={entity.patientHistoryDiagnosis}
-                            />
-                        }
-                        trigger='click'
-                        placement='bottomLeft'
-                    >
-                        <div style={{ display: 'inline-block' }}>
-                            <MoreButton />
-                        </div>
-                    </Popover>
-                )}
+            trigger='click'
+            placement='bottomLeft'
+          >
+            <div style={{ display: 'inline-block' }}>
+              <MoreButton />
             </div>
-        )
+          </Popover>
+        )}
+      </div>
+    )
+  }
+
+  onViewPatientProfile = event => {
+    event.preventDefault()
+    const { patient, history, from, dispatch } = this.props
+    const { entity } = patient
+    const info = entity
+
+    this.props.dispatch({
+      type: 'global/updateState',
+      payload: {
+        fullscreen: true,
+        showPatientInfoPanel: true,
+      },
+    })
+  }
+
+  getBannerMd = () => {
+    const { from, extraCmt } = this.props
+    if (from === 'Consultation') return 9
+    if (from === 'PatientDashboard') return 11
+    if (from === 'VisitReg') return 12
+    if (extraCmt) return 11
+    return 12
+  }
+
+  onViewExternalTrackingClick = () => {
+    const { dispatch, patient } = this.props
+    const { entity = {} } = patient
+    this.setState({ showExternalTrackingModal: true })
+  }
+  onViewPatientDocumentClick = patientProfileFK => {
+    history.push(
+      getAppendUrl({
+        md: 'pt',
+        cmt: 7,
+        pid: patientProfileFK,
+        v: Date.now(),
+      }),
+    )
+  }
+  closeExternalTracking = () => {
+    this.setState({ showExternalTrackingModal: false })
+  }
+  expandOrCollespe = () => {
+    this.setState({ isExpanded: !this.state.isExpanded })
+    if (this.props.setPatientBannerHeight) {
+      this.props.setPatientBannerHeight()
     }
+  }
 
-    onViewPatientProfile = event => {
-        event.preventDefault()
-        const { patient, history, from, dispatch } = this.props
-        const { entity } = patient
-        const info = entity
+  render() {
+    const { props } = this
+    const {
+      extraCmt,
+      from = '',
+      patient,
+      codetable,
+      classes,
+      apptId,
+      apptMode,
+      style = {
+        position: 'sticky',
+        overflowY: 'auto',
+        top: headerHeight,
+        zIndex: 998,
+        backgroundColor: '#f0f8ff',
+      },
+      refreshingBalance,
+      dispatch,
+      isReadOnly,
+      isRetail,
+      editingOrder,
+      clinicSettings,
+      visitRegistration,
+      isEditVisitEnable = false,
+    } = props
 
-        this.props.dispatch({
-            type: 'global/updateState',
-            payload: {
-                fullscreen: true,
-                showPatientInfoPanel: true,
-            },
-        })
-    }
+    const visitInfo = visitRegistration?.entity?.visit
+    const { isEnableJapaneseICD10Diagnosis } = clinicSettings
+    const contentClass = this.state.isExpanded
+      ? classes.contentWithoutWrap
+      : classes.contentWithWrap
 
-    getBannerMd = () => {
-        const { from, extraCmt } = this.props
-        if (from === 'Consultation') return 9
-        if (from === 'PatientDashboard') return 11
-        if (from === 'VisitReg') return 12
-        if (extraCmt) return 11
-        return 12
-    }
+    const notesHistoryAccessRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
+    ) || { rights: 'hidden' }
 
-    onViewExternalTrackingClick = () => {
-        const { dispatch, patient } = this.props
-        const { entity = {} } = patient
-        this.setState({ showExternalTrackingModal: true })
-    }
-    onViewPatientDocumentClick = patientProfileFK => {
-        history.push(
-            getAppendUrl({
-                md: 'pt',
-                cmt: 7,
-                pid: patientProfileFK,
-                v: Date.now(),
-            }),
-        )
-    }
-    closeExternalTracking = () => {
-        this.setState({ showExternalTrackingModal: false })
-    }
-    expandOrCollespe = () => {
-        this.setState({ isExpanded: !this.state.isExpanded })
-        if (this.props.setPatientBannerHeight) {
-            this.props.setPatientBannerHeight()
-        }
-    }
+    const viewPatientProfileAccess = Authorized.check(
+      'patientdatabase.patientprofiledetails',
+    )
 
-    render() {
-        const { props } = this
-        const {
-            extraCmt,
-            from = '',
-            patient,
-            codetable,
-            classes,
-            apptId,
-            apptMode,
-            style = {
-                position: 'sticky',
-                overflowY: 'auto',
-                top: headerHeight,
-                zIndex: 998,
-                backgroundColor: '#f0f8ff',
-            },
-            refreshingBalance,
-            dispatch,
-            isReadOnly,
-            isRetail,
-            editingOrder,
-            clinicSettings,
-            visitRegistration,
-            isEditVisitEnable = false,
-        } = props
+    const { entity } = patient
+    if (!entity)
+      return (
+        <Paper>
+          <Skeleton variant='rect' width='100%' height={100} />
+        </Paper>
+      )
+    const { ctsalutation = [] } = codetable
+    const info = entity
+    const name = `${info.name}`
 
-        const visitInfo = visitRegistration?.entity?.visit
-        const { isEnableJapaneseICD10Diagnosis } = clinicSettings
-        const contentClass = this.state.isExpanded
-            ? classes.contentWithoutWrap
-            : classes.contentWithWrap
+    const year = Math.floor(moment.duration(moment().diff(info.dob)).asYears())
 
-        const notesHistoryAccessRight = Authorized.check(
-            'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
-        ) || { rights: 'hidden' }
+    // get scheme details based on scheme type
+    const schemeDataList = []
 
-        const viewPatientProfileAccess = Authorized.check(
-            'patientdatabase.patientprofiledetails',
-        )
-
-        const { entity } = patient
-        if (!entity)
-            return (
-                <Paper>
-                    <Skeleton variant='rect' width='100%' height={100} />
-                </Paper>
+    const persistentDiagnosis =
+      isEnableJapaneseICD10Diagnosis === true &&
+      info.patientHistoryDiagnosis.length > 0
+        ? info.patientHistoryDiagnosis
+            .map(
+              d =>
+                `${d.diagnosisDescription} ${d.jpnDiagnosisDescription || ''}`,
             )
-        const { ctsalutation = [] } = codetable
-        const info = entity
-        const name = `${info.name}`
+            .join(', ')
+        : isEnableJapaneseICD10Diagnosis === false &&
+          info.patientHistoryDiagnosis.length > 0
+        ? info.patientHistoryDiagnosis
+            .map(d => d.diagnosisDescription)
+            .join(', ')
+        : '-'
 
-        const year = Math.floor(moment.duration(moment().diff(info.dob)).asYears())
+    const patientTitle = (
+      <div>
+        <Link
+          className={classes.header}
+          style={{
+            display: 'inline-flex',
+            paddingRight: 5,
+          }}
+          to={getAppendUrl({
+            md: 'pt',
+            cmt: 1,
+            pid: info.id,
+          })}
+          disabled={
+            !viewPatientProfileAccess ||
+            (viewPatientProfileAccess &&
+              viewPatientProfileAccess.rights !== 'enable')
+          }
+          tabIndex='-1'
+        >
+          <Tooltip enterDelay={100} title={name} placement='bottom-start'>
+            <span
+              style={{
+                textOverflow: 'ellipsis',
+                textDecoration: 'underline',
+                display: 'inline-block',
+                width: '100%',
+                overflow: 'hidden',
+                fontWeight: 500,
+                fontSize: '1.1rem',
+                color: 'rgb(75, 172, 198)',
+              }}
+            >
+              {name}
+            </span>
+          </Tooltip>
+        </Link>
+        {'( '}
+        <span className={classes.part}>{info.patientReferenceNo}</span>
+        {') '}
+        <span className={classes.part}>
+          {
+            <CodeSelect
+              code='ctGender'
+              // optionLabelLength={1}
+              text
+              labelField='code'
+              value={info.genderFK}
+            />
+          }
+        </span>
+        {'/'}
+        <span className={classes.part}>{year > 1 ? `${year}` : `${year}`}</span>
+        {', '}
+        <span className={classes.part}>{info.patientAccountNo}</span>
+        {', '}
+        <span className={classes.part}>
+          <DatePicker
+            className={classes.part}
+            text
+            format={dateFormatLong}
+            value={info.dob}
+          />
+        </span>
+        <span className={classes.part}>{`, ${info.contact?.mobileContactNumber
+          ?.number || ''}`}</span>
+        {', '}
+        <span className={classes.part}>
+          <CodeSelect
+            className={classes.part}
+            text
+            code='ctNationality'
+            value={info.nationalityFK}
+          />
+        </span>
 
-        // get scheme details based on scheme type
-        const schemeDataList = []
-
-        const persistentDiagnosis =
-            isEnableJapaneseICD10Diagnosis === true &&
-                info.patientHistoryDiagnosis.length > 0
-                ? info.patientHistoryDiagnosis
-                    .map(
-                        d =>
-                            `${d.diagnosisDescription} ${d.jpnDiagnosisDescription || ''}`,
-                    )
-                    .join(', ')
-                : isEnableJapaneseICD10Diagnosis === false &&
-                    info.patientHistoryDiagnosis.length > 0
-                    ? info.patientHistoryDiagnosis
-                        .map(d => d.diagnosisDescription)
-                        .join(', ')
-                    : '-'
-
-        const patientTitle = (
-            <div>
-                <Link
-                    className={classes.header}
-                    style={{
-                        display: 'inline-flex',
-                        paddingRight: 5,
-                    }}
-                    to={getAppendUrl({
-                        md: 'pt',
-                        cmt: 1,
-                        pid: info.id,
-                    })}
-                    disabled={
-                        !viewPatientProfileAccess ||
-                        (viewPatientProfileAccess &&
-                            viewPatientProfileAccess.rights !== 'enable')
-                    }
-                    tabIndex='-1'
-                >
-                    <Tooltip enterDelay={100} title={name} placement='bottom-start'>
-                        <span
-                            style={{
-                                textOverflow: 'ellipsis',
-                                textDecoration: 'underline',
-                                display: 'inline-block',
-                                width: '100%',
-                                overflow: 'hidden',
-                                fontWeight: 500,
-                                fontSize: '1.1rem',
-                                color: 'rgb(75, 172, 198)',
-                            }}
-                        >
-                            {name}
-                        </span>
-                    </Tooltip>
-                </Link>
-                {'( '}
-                <span className={classes.part}>{info.patientReferenceNo}</span>
-                {') '}
-                <span className={classes.part}>
-                    {
-                        <CodeSelect
-                            code='ctGender'
-                            // optionLabelLength={1}
-                            text
-                            labelField='code'
-                            value={info.genderFK}
-                        />
-                    }
-                </span>
-                {'/'}
-                <span className={classes.part}>{year > 1 ? `${year}` : `${year}`}</span>
-                {', '}
-                <span className={classes.part}>{info.patientAccountNo}</span>
-                {', '}
-                <span className={classes.part}>
-                    <DatePicker
-                        className={classes.part}
-                        text
-                        format={dateFormatLong}
-                        value={info.dob}
-                    />
-                </span>
-                <span className={classes.part}>{`, ${info.contact?.mobileContactNumber
-                    ?.number || ''}`}</span>
-                {', '}
-                <span className={classes.part}>
-                    <CodeSelect
-                        className={classes.part}
-                        text
-                        code='ctNationality'
-                        value={info.nationalityFK}
-                    />
-                </span>
-
-                <span className={classes.part} style={{ top: 3, position: 'relative' }}>
-                    <Tooltip
-                        enterDelay={100}
-                        title='Sticky Notes'
-                        placement='bottom-start'
-                    >
-                        <PatientStickyNotesBtn patientProfileFK={info.id} />
-                    </Tooltip>
-                </span>
-                {from === 'VisitReg' && (
-                    <span
-                        className={classes.part}
-                        style={{ top: 3, position: 'relative' }}
-                    >
-                        <PatientLabelBtn
-                            patientId={info.id}
-                            codetable={codetable}
-                            iconOnly={true}
-                            entity={entity}
-                            clinicSettings={clinicSettings}
-                        />
-                    </span>
-                )}
-            </div>
-        )
-        const patientTag = (
-            <Row wrap={false}>
-                <Col flex='none'>
-                    <span className={classes.header}>Tag: </span>
-                </Col>
-                <Col flex='auto' className={contentClass}>
-                    <Tooltip
-                        enterDelay={100}
-                        title={this.getTagData()}
-                        placement='bottom-start'
-                        interactive='true'
-                    >
-                        <span>{this.getTagData()}</span>
-                    </Tooltip>
-                </Col>
-            </Row>
-        )
-        const spokenLanguage = (
-            <Row wrap={false}>
-                <Col flex='none'>
-                    <span className={classes.header} style={{ color: 'darkblue' }}>
-                        Spoken Language:{' '}
-                    </span>
-                </Col>
-                <Col flex='auto' className={contentClass}>
-                    <span>{info.spokenLanguage ? info.spokenLanguage : '-'}</span>
-                </Col>
-            </Row>
-        )
-        const patientOS = (
-            <div>
-                <span
-                    style={{
-                        ...headerStyles,
-                        color: info.outstandingBalance ? 'red' : headerStyles.color,
-                    }}
-                >
-                    O/S Balance:
-                </span>
-                <Tooltip
-                    enterDelay={100}
-                    title={
-                        info.outstandingBalance
-                            ? `${currencySymbol}${_.round(info.outstandingBalance, 2)}`
-                            : ''
-                    }
-                >
-                    <span
-                        style={{
-                            fontWeight: 500,
-                            marginTop: 5,
-                            paddingLeft: 5,
-                        }}
-                    >
-                        {info.outstandingBalance ? (
-                            <NumberInput
-                                text
-                                currency
-                                value={_.round(info.outstandingBalance, 2)}
-                            />
-                        ) : (
-                            '-'
-                        )}
-                    </span>
-                </Tooltip>
-            </div>
-        )
-        const patientSchemeDetails = (
-            <Row wrap={false}>
-                <Col flex='none'>
-                    <span className={classes.header}>
-                        Scheme
-                        {schemeDataList.length > 0 ? (
-                            <span>{`(${schemeDataList.length})`}</span>
-                        ) : (
-                            <span></span>
-                        )}
-                        :
-                    </span>
-                </Col>
-                <Col flex='auto' className={contentClass}>
-                    {/* <LoadingWrapper
+        <span className={classes.part} style={{ top: 3, position: 'relative' }}>
+          <Tooltip
+            enterDelay={100}
+            title='Sticky Notes'
+            placement='bottom-start'
+          >
+            <PatientStickyNotesBtn patientProfileFK={info.id} />
+          </Tooltip>
+        </span>
+        {from === 'VisitReg' && (
+          <span
+            className={classes.part}
+            style={{ top: 3, position: 'relative' }}
+          >
+            <PatientLabelBtn
+              patientId={info.id}
+              codetable={codetable}
+              iconOnly={true}
+              entity={entity}
+              clinicSettings={clinicSettings}
+            />
+          </span>
+        )}
+      </div>
+    )
+    const patientTag = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header}>Tag: </span>
+        </Col>
+        <Col flex='auto' className={contentClass}>
+          <Tooltip
+            enterDelay={100}
+            title={this.getTagData()}
+            placement='bottom-start'
+            interactive='true'
+          >
+            <span>{this.getTagData()}</span>
+          </Tooltip>
+        </Col>
+      </Row>
+    )
+    const spokenLanguage = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header} style={{ color: 'darkblue' }}>
+            Spoken Language:{' '}
+          </span>
+        </Col>
+        <Col flex='auto' className={contentClass}>
+          <span>{info.spokenLanguage ? info.spokenLanguage : '-'}</span>
+        </Col>
+      </Row>
+    )
+    const patientOS = (
+      <div>
+        <span
+          style={{
+            ...headerStyles,
+            color: info.outstandingBalance ? 'red' : headerStyles.color,
+          }}
+        >
+          O/S Balance:
+        </span>
+        <Tooltip
+          enterDelay={100}
+          title={
+            info.outstandingBalance
+              ? `${currencySymbol}${_.round(info.outstandingBalance, 2)}`
+              : ''
+          }
+        >
+          <span
+            style={{
+              fontWeight: 500,
+              marginTop: 5,
+              paddingLeft: 5,
+            }}
+          >
+            {info.outstandingBalance ? (
+              <NumberInput
+                text
+                currency
+                value={_.round(info.outstandingBalance, 2)}
+              />
+            ) : (
+              '-'
+            )}
+          </span>
+        </Tooltip>
+      </div>
+    )
+    const patientSchemeDetails = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header}>
+            Scheme
+            {schemeDataList.length > 0 ? (
+              <span>{`(${schemeDataList.length})`}</span>
+            ) : (
+              <span></span>
+            )}
+            :
+          </span>
+        </Col>
+        <Col flex='auto' className={contentClass}>
+          {/* <LoadingWrapper
             loading={refreshingBalance}
             text='Retrieving balance...'
           > */}
-                    <Tooltip
-                        enterDelay={100}
-                        style={{ width: 300 }}
-                        title={
-                            <div>
-                                {this.getSchemeList(
-                                    _.orderBy(
-                                        schemeDataList,
-                                        ['schemeTypeFK', 'validTo'],
-                                        ['desc', 'asc'],
-                                    ),
-                                )}
-                            </div>
-                        }
-                        interactive='true'
-                    >
-                        <span>
-                            {this.getSchemeList(
-                                _.orderBy(
-                                    schemeDataList,
-                                    ['schemeTypeFK', 'validTo'],
-                                    ['desc', 'asc'],
-                                ),
-                            )}
-                        </span>
-                    </Tooltip>
-                    {/* </LoadingWrapper> */}
-                </Col>
-            </Row>
-        )
-        const patientRequest = (
-            <Row wrap={false}>
-                <Col flex='none'>
-                    <Tooltip title='Patient Request'>
-                        <span className={classes.header}>Patient Request: </span>
-                    </Tooltip>
-                </Col>
-                <Col flex='auto' className={contentClass}>
-                    <Tooltip
-                        enterDelay={100}
-                        title={info.patientRequest}
-                        interactive='true'
-                    >
-                        <span> {info.patientRequest || '-'}</span>
-                    </Tooltip>
-                </Col>
-            </Row>
-        )
-        const visitDateElm = (
-            <Row wrap={false}>
-                <Col flex='none'>
-                    <span className={classes.header}>Visit Date: </span>
-                </Col>
-                <Col flex='auto' className={contentClass}>
-                    {moment(visitRegistration?.entity?.visit?.visitDate).format(
-                        dateFormatLong,
-                    )}
-                </Col>
-            </Row>
-        )
-        const visitPurposeElm = (
-            <Row wrap={false}>
-                <Col flex='none'>
-                    <span className={classes.header}>Visit Purpose: </span>
-                </Col>
-                <Col flex='auto' className={contentClass}>
-                    {visitRegistration?.entity?.visit?.visitOrderTemplateDetails ? (
-                        <VisitOrderTemplateIndicateString
-                            oneline
-                            visitOrderTemplateDetails={
-                                visitRegistration?.entity?.visit?.visitOrderTemplateDetails
-                            }
-                        ></VisitOrderTemplateIndicateString>
-                    ) : (
-                        <span>-</span>
-                    )}
-                </Col>
-            </Row>
-        )
-        const visitRemarksElm = (
-            <Row wrap={false}>
-                <Col flex='none'>
-                    <span className={classes.header}>Visit Remarks: </span>
-                </Col>
-                <Col flex='auto' className={contentClass}>
-                    <Tooltip
-                        enterDelay={100}
-                        title={visitRegistration?.entity?.visit?.visitRemarks || '-'}
-                        interactive='true'
-                    >
-                        <span>{visitRegistration?.entity?.visit?.visitRemarks || '-'}</span>
-                    </Tooltip>
-                </Col>
-            </Row>
-        )
-        const patientNotesLinkElm = (
-            <span
-                className={classes.header}
-                style={{
-                    display: 'inline-block',
-                    textDecoration: 'underline',
-                    cursor: 'pointer',
-                }}
-                onClick={e => {
-                    this.openNotes()
-                }}
-            >
-                Notes
+          <Tooltip
+            enterDelay={100}
+            style={{ width: 300 }}
+            title={
+              <div>
+                {this.getSchemeList(
+                  _.orderBy(
+                    schemeDataList,
+                    ['schemeTypeFK', 'validTo'],
+                    ['desc', 'asc'],
+                  ),
+                )}
+              </div>
+            }
+            interactive='true'
+          >
+            <span>
+              {this.getSchemeList(
+                _.orderBy(
+                  schemeDataList,
+                  ['schemeTypeFK', 'validTo'],
+                  ['desc', 'asc'],
+                ),
+              )}
             </span>
-        )
-        const patientEditVisitElm = (
-            <span
-                className={classes.header}
-                style={{
-                    display: 'block',
-                    cursor: 'pointer',
-                    textDecoration: 'underline',
-                }}
-                onClick={e => {
-                    this.openEditVisit()
-                }}
-            >
-                Edit Visit
-            </span>
-        )
-        const schemeCountElm =
-            schemeDataList.length > 0 ? (
-                <span>{`(${schemeDataList.length})`}</span>
-            ) : (
-                <span></span>
-            )
+          </Tooltip>
+          {/* </LoadingWrapper> */}
+        </Col>
+      </Row>
+    )
+    const patientRequest = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <Tooltip title='Patient Request'>
+            <span className={classes.header}>Patient Request: </span>
+          </Tooltip>
+        </Col>
+        <Col flex='auto' className={contentClass}>
+          <Tooltip
+            enterDelay={100}
+            title={info.patientRequest}
+            interactive='true'
+          >
+            <span> {info.patientRequest || '-'}</span>
+          </Tooltip>
+        </Col>
+      </Row>
+    )
+    const visitDateElm = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header}>Visit Date: </span>
+        </Col>
+        <Col flex='auto' className={contentClass}>
+          {moment(visitRegistration?.entity?.visit?.visitDate).format(
+            dateFormatLong,
+          )}
+        </Col>
+      </Row>
+    )
+    const visitPurposeElm = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header}>Visit Purpose: </span>
+        </Col>
+        <Col flex='auto' className={contentClass}>
+          {visitRegistration?.entity?.visit?.visitOrderTemplateDetails ? (
+            <VisitOrderTemplateIndicateString
+              oneline
+              visitOrderTemplateDetails={
+                visitRegistration?.entity?.visit?.visitOrderTemplateDetails
+              }
+            ></VisitOrderTemplateIndicateString>
+          ) : (
+            <span>-</span>
+          )}
+        </Col>
+      </Row>
+    )
+    const visitRemarksElm = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header}>Visit Remarks: </span>
+        </Col>
+        <Col flex='auto' className={contentClass}>
+          <Tooltip
+            enterDelay={100}
+            title={visitRegistration?.entity?.visit?.visitRemarks || '-'}
+            interactive='true'
+          >
+            <span>{visitRegistration?.entity?.visit?.visitRemarks || '-'}</span>
+          </Tooltip>
+        </Col>
+      </Row>
+    )
+    const patientNotesLinkElm = (
+      <span
+        className={classes.header}
+        style={{
+          display: 'inline-block',
+          textDecoration: 'underline',
+          cursor: 'pointer',
+        }}
+        onClick={e => {
+          this.openNotes()
+        }}
+      >
+        Notes
+      </span>
+    )
+    const patientEditVisitElm = (
+      <span
+        className={classes.header}
+        style={{
+          display: 'block',
+          cursor: 'pointer',
+          textDecoration: 'underline',
+        }}
+        onClick={e => {
+          this.openEditVisit()
+        }}
+      >
+        Edit Visit
+      </span>
+    )
+    const schemeCountElm =
+      schemeDataList.length > 0 ? (
+        <span>{`(${schemeDataList.length})`}</span>
+      ) : (
+        <span></span>
+      )
 
-        return (
-            <Paper id='patientBanner' style={style}>
-                <GridContainer
-                    style={{ minHeight: 100, width: '100%', padding: '5px 0' }}
-                >
-                    <GridItem
-                        style={{ padding: 0 }}
-                        xs={this.getBannerMd()}
-                        md={this.getBannerMd()}
-                    >
-                        <GridContainer>
-                            <GridItem xs={10} md={10}>
-                                <GridContainer>
-                                    <GridItem md={12}>{patientTitle}</GridItem>
-                                    <GridItem xs={6} md={4}>
-                                        {patientTag}
-                                    </GridItem>
-                                    <GridItem xs={6} md={4}></GridItem>
-                                    <GridItem xs={6} md={4}>
-                                        {spokenLanguage}
-                                    </GridItem>
-                                    <GridItem xs={6} md={4}>
-                                        {patientOS}
-                                    </GridItem>
-                                    <GridItem xs={6} md={4}>
-                                        {patientSchemeDetails}
-                                    </GridItem>
-                                    <GridItem xs={6} md={4}>
-                                        {referralSource}
-                                    </GridItem>
-                                    <GridItem xs={6} md={4}>
-                                        {patientRequest}
-                                    </GridItem>
-                                    <GridItem xs={6} md={4}></GridItem>
-                                    <GridItem xs={6} md={4}></GridItem>
-                                    <GridItem xs={6} md={4}>
-                                        -
-                                    </GridItem>
-                                    <GridItem xs={6} md={4}></GridItem>
-                                </GridContainer>
-                            </GridItem>
-                            <GridItem xs={2} md={2}>
-                                {/* right half */}
-                                <GridContainer>
-                                    {entity?.lastVisitDate ? (
-                                        <GridItem
-                                            xs={12}
-                                            md={12}
-                                            style={{ height: 26, paddingTop: 5 }}
-                                        >
-                                            <span className={classes.header}>Last Visit: </span>
-                                            <span style={{ paddingLeft: 5 }}>
-                                                {moment(entity.lastVisitDate).format('DD MMM YYYY')}
-                                            </span>
-                                        </GridItem>
-                                    ) : (
-                                        <GridItem xs={12} md={12}></GridItem>
-                                    )}
-                                    <GridItem xs={12} md={12}>
-                                        <span
-                                            className={classes.header}
-                                            style={{
-                                                display: 'block',
-                                                paddingRight: 10,
-                                                textDecoration: 'underline',
-                                                cursor: 'pointer',
-                                            }}
-                                            onClick={e => this.onViewExternalTrackingClick()}
-                                            tabIndex='-1'
-                                        >
-                                            External Tracking
-                                        </span>
-                                        <span
-                                            className={classes.header}
-                                            style={{
-                                                display: 'block',
-                                                paddingRight: 10,
-                                                textDecoration: 'underline',
-                                                cursor: 'pointer',
-                                            }}
-                                            onClick={e => this.onViewPatientDocumentClick(info.id)}
-                                            tabIndex='-1'
-                                        >
-                                            Patient Documents
-                                        </span>
-                                    </GridItem>
-                                </GridContainer>
-                            </GridItem>
-                        </GridContainer>
-                    </GridItem>
-
-                    {extraCmt && (
-                        <GridItem xs={3} md={12 - this.getBannerMd()}>
-                            {extraCmt()}
-                        </GridItem>
-                    )}
+    return (
+      <Paper id='patientBanner' style={style}>
+        <GridContainer
+          style={{ minHeight: 100, width: '100%', padding: '5px 0' }}
+        >
+          <GridItem
+            style={{ padding: 0 }}
+            xs={this.getBannerMd()}
+            md={this.getBannerMd()}
+          >
+            <GridContainer>
+              <GridItem xs={10} md={10}>
+                <GridContainer>
+                  <GridItem md={12}>{patientTitle}</GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientTag}
+                  </GridItem>
+                  <GridItem xs={6} md={4}></GridItem>
+                  <GridItem xs={6} md={4}>
+                    {spokenLanguage}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientOS}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientSchemeDetails}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {referralSource}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
+                    {patientRequest}
+                  </GridItem>
+                  <GridItem xs={6} md={4}></GridItem>
+                  <GridItem xs={6} md={4}></GridItem>
+                  <GridItem xs={6} md={4}>
+                    -
+                  </GridItem>
+                  <GridItem xs={6} md={4}></GridItem>
                 </GridContainer>
-                <span
-                    style={{
-                        top: 5,
-                        right: 5,
-                        display: 'inline-block',
-                        position: 'absolute',
-                    }}
-                >
-                    <IconButton onClick={this.expandOrCollespe}>
-                        {this.state.isExpanded ? (
-                            <Tooltip title='Expand Panel'>
-                                <ExpandLessTwoTone />
-                            </Tooltip>
-                        ) : (
-                            <Tooltip title='Collapse Panel'>
-                                <ExpandMoreTwoTone />
-                            </Tooltip>
-                        )}
-                    </IconButton>
-                </span>
-                <CommonModal
-                    open={this.state.showPatientProfile}
-                    onClose={this.closePatientProfile}
-                    title='Patient Profile'
-                    observe='PatientDetail'
-                    authority='patient'
-                    fullScreen
-                    overrideLoading
-                    showFooter={false}
-                >
-                    <PatientDetail
-                        history={this.props.history}
-                        linkProps={{
-                            to: '#',
-                        }}
-                        onClose={this.closePatientProfile}
-                    />
-                </CommonModal>
-                <CommonModal
-                    open={this.state.showNotesModal}
-                    title='Notes'
-                    onClose={this.closeNotes}
-                    maxWidth='lg'
-                >
-                    <PatientNurseNotes {...this.props} />
-                </CommonModal>
-                <CommonModal
-                    open={this.state.showSchemeModal}
-                    title='Co-Payer Details'
-                    onClose={this.closeScheme}
-                    onConfirm={this.confirmCopayer}
-                    fullScreen
-                >
-                    <CopayerDetails fromCommonModal />
-                </CommonModal>
+              </GridItem>
+              <GridItem xs={2} md={2}>
+                {/* right half */}
+                <GridContainer>
+                  {entity?.lastVisitDate ? (
+                    <GridItem
+                      xs={12}
+                      md={12}
+                      style={{ height: 26, paddingTop: 5 }}
+                    >
+                      <span className={classes.header}>Last Visit: </span>
+                      <span style={{ paddingLeft: 5 }}>
+                        {moment(entity.lastVisitDate).format('DD MMM YYYY')}
+                      </span>
+                    </GridItem>
+                  ) : (
+                    <GridItem xs={12} md={12}></GridItem>
+                  )}
+                  <GridItem xs={12} md={12}>
+                    <span
+                      className={classes.header}
+                      style={{
+                        display: 'block',
+                        paddingRight: 10,
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                      }}
+                      onClick={e => this.onViewExternalTrackingClick()}
+                      tabIndex='-1'
+                    >
+                      External Tracking
+                    </span>
+                    <span
+                      className={classes.header}
+                      style={{
+                        display: 'block',
+                        paddingRight: 10,
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                      }}
+                      onClick={e => this.onViewPatientDocumentClick(info.id)}
+                      tabIndex='-1'
+                    >
+                      Patient Documents
+                    </span>
+                  </GridItem>
+                </GridContainer>
+              </GridItem>
+            </GridContainer>
+          </GridItem>
 
-                <CommonModal
-                    open={this.state.showExternalTrackingModal}
-                    title='External Tracking'
-                    onClose={this.closeExternalTracking}
-                    maxWidth='lg'
-                >
-                    <PatientResults
-                        patient={patient}
-                        patientProfileFK={entity.id}
-                        defaultActiveKey='1'
-                    />
-                </CommonModal>
-            </Paper>
-        )
-    }
+          {extraCmt && (
+            <GridItem xs={3} md={12 - this.getBannerMd()}>
+              {extraCmt()}
+            </GridItem>
+          )}
+        </GridContainer>
+        <span
+          style={{
+            top: 5,
+            right: 5,
+            display: 'inline-block',
+            position: 'absolute',
+          }}
+        >
+          <IconButton onClick={this.expandOrCollespe}>
+            {this.state.isExpanded ? (
+              <Tooltip title='Expand Panel'>
+                <ExpandLessTwoTone />
+              </Tooltip>
+            ) : (
+              <Tooltip title='Collapse Panel'>
+                <ExpandMoreTwoTone />
+              </Tooltip>
+            )}
+          </IconButton>
+        </span>
+        <CommonModal
+          open={this.state.showPatientProfile}
+          onClose={this.closePatientProfile}
+          title='Patient Profile'
+          observe='PatientDetail'
+          authority='patient'
+          fullScreen
+          overrideLoading
+          showFooter={false}
+        >
+          <PatientDetail
+            history={this.props.history}
+            linkProps={{
+              to: '#',
+            }}
+            onClose={this.closePatientProfile}
+          />
+        </CommonModal>
+        <CommonModal
+          open={this.state.showNotesModal}
+          title='Notes'
+          onClose={this.closeNotes}
+          maxWidth='lg'
+        >
+          <PatientNurseNotes {...this.props} />
+        </CommonModal>
+        <CommonModal
+          open={this.state.showSchemeModal}
+          title='Co-Payer Details'
+          onClose={this.closeScheme}
+          onConfirm={this.confirmCopayer}
+          fullScreen
+        >
+          <CopayerDetails fromCommonModal />
+        </CommonModal>
+
+        <CommonModal
+          open={this.state.showExternalTrackingModal}
+          title='External Tracking'
+          onClose={this.closeExternalTracking}
+          maxWidth='lg'
+        >
+          <PatientResults
+            patient={patient}
+            patientProfileFK={entity.id}
+            defaultActiveKey='1'
+          />
+        </CommonModal>
+      </Paper>
+    )
+  }
 }
 
 export default withStyles(styles, { withTheme: true })(Banner)
