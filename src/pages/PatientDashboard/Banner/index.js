@@ -114,7 +114,7 @@ class Banner extends PureComponent {
     showNotesModal: false,
     showSchemeModal: false,
     showNonClaimableHistoryModal: false,
-    showExaminationDetailsModal: false,
+    showExternalTrackingModal: false,
     showPreOrderModal: false,
     isExpanded: false,
   }
@@ -125,12 +125,12 @@ class Banner extends PureComponent {
   }
 
   componentWillMount() {
-                         const { dispatch } = this.props
-                         // dispatch({
-                         //   type: 'codetable/fetchCodes',
-                         //   payload: { code: 'ctg6pd' },
-                         // })
-                       }
+    const { dispatch } = this.props
+    // dispatch({
+    //   type: 'codetable/fetchCodes',
+    //   payload: { code: 'ctg6pd' },
+    // })
+  }
 
   componentWillUnmount() {
     const { dispatch, isDisposePatientEntity = true } = this.props
@@ -588,10 +588,20 @@ class Banner extends PureComponent {
 
     this.setState({ showNonClaimableHistoryModal: true })
   }
-  openExaminationResults = () => {
+  onViewExternalTrackingClick = () => {
     const { dispatch, patient } = this.props
     const { entity = {} } = patient
-    this.setState({ showExaminationDetailsModal: true })
+    this.setState({ showExternalTrackingModal: true })
+  }
+  onViewPatientDocumentClick = patientProfileFK => {
+    history.push(
+      getAppendUrl({
+        md: 'pt',
+        cmt: 7,
+        pid: patientProfileFK,
+        v: Date.now(),
+      }),
+    )
   }
   closeNonClaimableHistory = () => {
     const { dispatch, patient } = this.props
@@ -611,8 +621,8 @@ class Banner extends PureComponent {
     })
     this.setState({ showNonClaimableHistoryModal: false })
   }
-  closeExaminationDetails = () => {
-    this.setState({ showExaminationDetailsModal: false })
+  closeExternalTracking = () => {
+    this.setState({ showExternalTrackingModal: false })
   }
   expandOrCollespe = () => {
     this.setState({ isExpanded: !this.state.isExpanded })
@@ -756,8 +766,6 @@ class Banner extends PureComponent {
         {'( '}
         <span className={classes.part}>{info.patientReferenceNo}</span>
         {') '}
-        <span className={classes.part}>{info.patientAccountNo}</span>
-        {', '}
         <span className={classes.part}>
           {
             <CodeSelect
@@ -771,6 +779,8 @@ class Banner extends PureComponent {
         </span>
         {'/'}
         <span className={classes.part}>{year > 1 ? `${year}` : `${year}`}</span>
+        {', '}
+        <span className={classes.part}>{info.patientAccountNo}</span>
         {', '}
         <span className={classes.part}>
           <DatePicker
@@ -839,13 +849,27 @@ class Banner extends PureComponent {
         <Col flex='none'>
           <span
             className={classes.header}
-            style={{ color: g6PD && g6PD.name === 'Yes' ? 'red' : 'darkblue' }}
+            style={{
+              color: g6PD && g6PD.name === 'Yes' ? 'red' : 'darkblue',
+            }}
           >
             G6PD:{' '}
           </span>
         </Col>
         <Col flex='auto' className={contentClass}>
           <span>{g6PD ? g6PD.name : '-'}</span>
+        </Col>
+      </Row>
+    )
+    const spokenLanguage = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header} style={{ color: 'darkblue' }}>
+            Spoken Language:{' '}
+          </span>
+        </Col>
+        <Col flex='auto' className={contentClass}>
+          <span>{info.spokenLanguage ? g6PD.spokenLanguage : '-'}</span>
         </Col>
       </Row>
     )
@@ -939,7 +963,7 @@ class Banner extends PureComponent {
       <Row wrap={false}>
         <Col flex='none'>
           <Tooltip title='Patient Request'>
-            <span className={classes.header}>Request: </span>
+            <span className={classes.header}>Patient Request: </span>
           </Tooltip>
         </Col>
         <Col flex='auto' className={contentClass}>
@@ -975,6 +999,18 @@ class Banner extends PureComponent {
           >
             <span>{info.patientMedicalHistory?.highRiskCondition || '-'}</span>
           </Tooltip>
+        </Col>
+      </Row>
+    )
+    const referralSource = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header} style={{ color: 'darkblue' }}>
+            Referal Source:{' '}
+          </span>
+        </Col>
+        <Col flex='auto' className={contentClass}>
+          <span>{info.referralSource ? g6PD.referralSource : '-'}</span>
         </Col>
       </Row>
     )
@@ -1147,7 +1183,7 @@ class Banner extends PureComponent {
                     {patientTag}
                   </GridItem>
                   <GridItem xs={6} md={4}>
-                    {patientG6PD}
+                    {spokenLanguage}
                   </GridItem>
                   <GridItem xs={6} md={4}>
                     {patientOS}
@@ -1156,20 +1192,23 @@ class Banner extends PureComponent {
                     {patientSchemeDetails}
                   </GridItem>
                   <GridItem xs={6} md={4}>
+                    {referralSource}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
                     {patientRequest}
                   </GridItem>
-                  <GridItem xs={6} md={4}>
+                  {/* <GridItem xs={6} md={4}>
                     {patientHRP}
-                  </GridItem>
-                  <GridItem xs={6} md={4}>
+                  </GridItem> */}
+                  {/* <GridItem xs={6} md={4}>
                     {patientPersistDiagnosis}
-                  </GridItem>
-                  <GridItem xs={6} md={4}>
+                  </GridItem> */}
+                  {/* <GridItem xs={6} md={4}>
                     {longTermMedication}
-                  </GridItem>
-                  <GridItem xs={6} md={4}>
+                  </GridItem> */}
+                  {/* <GridItem xs={6} md={4}>
                     {patientAllergy}
-                  </GridItem>
+                  </GridItem> */}
                 </GridContainer>
               </GridItem>
               <GridItem xs={2} md={2}>
@@ -1190,7 +1229,7 @@ class Banner extends PureComponent {
                     <GridItem xs={12} md={12}></GridItem>
                   )}
                   <GridItem xs={12} md={12}>
-                    {viewNonClaimableHistoryRight.rights === 'enable' && (
+                    {/* {viewNonClaimableHistoryRight.rights === 'enable' && (
                       <span className={classes.header}>
                         <span
                           style={{
@@ -1206,7 +1245,7 @@ class Banner extends PureComponent {
                             0})`}
                         </span>
                       </span>
-                    )}
+                    )} */}
                     <div>
                       {notesHistoryAccessRight.rights !== 'hidden' && (
                         <span
@@ -1217,7 +1256,7 @@ class Banner extends PureComponent {
                         </span>
                       )}
                     </div>
-                    <span
+                    {/* <span
                       className={classes.header}
                       style={{
                         display: 'block',
@@ -1237,6 +1276,32 @@ class Banner extends PureComponent {
                       tabIndex='-1'
                     >
                       Examination Results
+                    </span> */}
+                    <span
+                      className={classes.header}
+                      style={{
+                        display: 'block',
+                        paddingRight: 10,
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                      }}
+                      onClick={e => this.onViewExternalTrackingClick()}
+                      tabIndex='-1'
+                    >
+                      External Tracking
+                    </span>
+                    <span
+                      className={classes.header}
+                      style={{
+                        display: 'block',
+                        paddingRight: 10,
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                      }}
+                      onClick={e => this.onViewPatientDocumentClick(info.id)}
+                      tabIndex='-1'
+                    >
+                      Patient Documents
                     </span>
                   </GridItem>
                 </GridContainer>
@@ -1318,13 +1383,16 @@ class Banner extends PureComponent {
           />
         </CommonModal>
         <CommonModal
-          open={this.state.showExaminationDetailsModal}
-          title='Examination Details'
-          onClose={this.closeExaminationDetails}
+          open={this.state.showExternalTrackingModal}
+          title='External Tracking'
+          onClose={this.closeExternalTracking}
           maxWidth='lg'
-          fullHeight
         >
-          <PatientResults patient={patient} patientProfileFK={entity.id} />
+          <PatientResults
+            patient={patient}
+            patientProfileFK={entity.id}
+            defaultActiveKey='1'
+          />
         </CommonModal>
       </Paper>
     )
