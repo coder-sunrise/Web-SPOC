@@ -9,6 +9,7 @@ import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 const defaultPatientEntity = {
   effectiveStartDate: moment().formatUTC(),
   effectiveEndDate: moment('2099-12-31').formatUTC(),
+  patientAccountNoTypeFK: 1, //SG Pink NRIC
   patientAccountNo: '',
   patientEmergencyContact: [],
   patientScheme: [],
