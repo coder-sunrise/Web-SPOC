@@ -869,7 +869,7 @@ class Banner extends PureComponent {
           </span>
         </Col>
         <Col flex='auto' className={contentClass}>
-          <span>{info.spokenLanguage ? g6PD.spokenLanguage : '-'}</span>
+          <span>{info.spokenLanguage ? info.spokenLanguage : '-'}</span>
         </Col>
       </Row>
     )
@@ -1010,7 +1010,7 @@ class Banner extends PureComponent {
           </span>
         </Col>
         <Col flex='auto' className={contentClass}>
-          <span>{info.referralSource ? g6PD.referralSource : '-'}</span>
+          <span>{info.referralSource ? info.referralSource : '-'}</span>
         </Col>
       </Row>
     )
