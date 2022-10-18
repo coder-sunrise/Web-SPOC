@@ -14,17 +14,18 @@ const styles = theme => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingConsumableUOM, global }) => ({
-  settingConsumableUOM,
+@connect(({ settingSalesType, global }) => ({
+  settingSalesType,
+  global,
   mainDivHeight: global.mainDivHeight,
 }))
-@withSettingBase({ modelName: 'settingConsumableUOM' })
-class ConsumableUOM extends PureComponent {
+@withSettingBase({ modelName: 'salesType' })
+class SalesType extends PureComponent {
   state = {}
 
   componentDidMount() {
     this.props.dispatch({
-      type: 'settingConsumableUOM/query',
+      type: 'settingSalesType/query',
       payload: {
         isActive: true,
       },
@@ -33,36 +34,30 @@ class ConsumableUOM extends PureComponent {
 
   toggleModal = () => {
     this.props.dispatch({
-      type: 'settingConsumableUOM/updateState',
+      type: 'settingSalesType/updateState',
       payload: {
-        showModal: !this.props.settingConsumableUOM.showModal,
+        showModal: !this.props.settingSalesType.showModal,
       },
     })
   }
 
   render() {
-    const { settingConsumableUOM, mainDivHeight = 700 } = this.props
+    const { settingSalesType, mainDivHeight = 700 } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    let height =
-      mainDivHeight - 120 - ($('.filterConsumableUOMBar').height() || 0)
+    let height = mainDivHeight - 120 - ($('.filterSalesTypeBar').height() || 0)
     if (height < 300) height = 300
     return (
       <CardContainer hideHeader>
-        <div className='filterConsumableUOMBar'>
+        <div className='filterSalesTypeBar'>
           <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />
-
         <CommonModal
-          open={settingConsumableUOM.showModal}
-          observe='ConsumableUOMDetail'
-          title={
-            settingConsumableUOM.entity
-              ? 'Edit Ophthalmic Product UOM'
-              : 'Add Ophthalmic Product UOM'
-          }
+          open={settingSalesType?.showModal}
+          observe='SalesTypeDetail'
+          title={settingSalesType.entity ? 'Edit Sales Type' : 'Add Sales Type'}
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}
@@ -75,4 +70,4 @@ class ConsumableUOM extends PureComponent {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(ConsumableUOM)
+export default withStyles(styles, { withTheme: true })(SalesType)

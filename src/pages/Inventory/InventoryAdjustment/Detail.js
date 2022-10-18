@@ -223,18 +223,13 @@ class Detail extends PureComponent {
   state = {
     type: undefined,
     ConsumableItemList: [],
-    MedicationItemList: [],
-    VaccinationItemList: [],
 
     filterConsumableItemList: [],
-    filterMedicationItemList: [],
-    filterVaccinationItemList: [],
 
     selectedItem: null,
     selectedBatch: null,
     inventoryAdjustmentItems: [],
 
-    stockVaccination: [], // vaccination
     stockConsumable: [], // consumable
 
     filterStockConsumable: [], // consumable
@@ -263,7 +258,9 @@ class Detail extends PureComponent {
       {
         columnName: 'inventoryTypeFK',
         type: 'select',
-        options: [{ value: INVENTORY_TYPE.CONSUMABLE, name: 'Consumable' }],
+        options: [
+          { value: INVENTORY_TYPE.CONSUMABLE, name: 'Ophthalmic Product' },
+        ],
         disabled: true,
       },
       {
@@ -778,7 +775,7 @@ class Detail extends PureComponent {
                             options={[
                               {
                                 value: INVENTORY_TYPE.CONSUMABLE,
-                                name: 'Consumable',
+                                name: 'Ophthalmic Product',
                               },
                             ]}
                             onChange={this.inventoryTypeChanged}

@@ -38,14 +38,6 @@ const iconStyle = {
 
 const menus = [
   {
-    id: 1,
-    label: 'Claim History',
-    Icon: ArrowForwardIosOutlinedIcon,
-    access: ['patientdatabase.patientprofiledetails.claimhistory'],
-    cmt: 12,
-    style: iconStyle,
-  },
-  {
     id: 2,
     label: 'Patient Account',
     access: [

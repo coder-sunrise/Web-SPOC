@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import { FormattedMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
-import { summaryCommentGroup } from '@/utils/codes'
+import { status } from '@/utils/codes'
 import {
   withFormikExtend,
   FastField,
@@ -12,14 +12,15 @@ import {
   TextField,
   ProgressButton,
   Select,
-  CodeSelect,
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingSummaryComment }) =>
-    settingSummaryComment.filter || {},
+  mapPropsToValues: ({ settingSalesType }) => ({
+    ...(settingSalesType?.filter || {}),
+    isActive: true,
+  }),
   handleSubmit: () => {},
-  displayName: 'SummaryCommentFilter',
+  displayName: 'SalesTypeFilter',
 })
 class Filter extends PureComponent {
   render() {
@@ -35,39 +36,35 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={3}>
+          <GridItem xs={6} md={2}>
             <FastField
-              name='summaryCommentCategoryFK'
-              render={args => (
-                <CodeSelect
-                  label='Category'
-                  code='ctsummarycommentcategory'
-                  {...args}
-                />
-              )}
+              name='isActive'
+              render={args => {
+                return <Select label='Status' options={status} {...args} />
+              }}
             />
           </GridItem>
+        </GridContainer>
+
+        <GridContainer>
           <GridItem>
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
                 icon={<Search />}
                 onClick={() => {
-                  const {
-                    codeDisplayValue,
-                    summaryCommentCategoryFK,
-                  } = this.props.values
-                  const { clinicSettings } = this.props
-                  const { secondaryPrintoutLanguage = '' } = clinicSettings
+                  const { codeDisplayValue, isActive } = this.props.values
                   this.props.dispatch({
-                    type: 'settingSummaryComment/query',
+                    type: 'settingSalesType/query',
                     payload: {
-                      summaryCommentCategoryFK,
-                      apiCriteria: {
-                        Language: secondaryPrintoutLanguage,
-                        Key: 'displayValue',
-                        SearchValue: codeDisplayValue,
-                      },
+                      isActive,
+                      group: [
+                        {
+                          code: codeDisplayValue,
+                          displayValue: codeDisplayValue,
+                          combineCondition: 'or',
+                        },
+                      ],
                     },
                   })
                 }}
@@ -79,7 +76,7 @@ class Filter extends PureComponent {
                 color='primary'
                 onClick={() => {
                   this.props.dispatch({
-                    type: 'settingSummaryComment/updateState',
+                    type: 'settingSalesType/updateState',
                     payload: {
                       entity: undefined,
                     },

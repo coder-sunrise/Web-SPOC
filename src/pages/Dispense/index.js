@@ -145,7 +145,6 @@ class Dispense extends PureComponent {
             editingOrder={
               editingOrder || visit.visitPurposeFK === VISIT_TYPE.OTC
             }
-            onSelectPreOrder={this.onSelectPreOrder}
             extraCmt={this.getExtraComponent}
             isRetail={visit.visitPurposeFK === VISIT_TYPE.OTC}
           />

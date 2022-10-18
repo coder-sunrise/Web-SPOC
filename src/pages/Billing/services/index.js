@@ -24,8 +24,3 @@ export const queryList = (params) =>
     // isCancelled: false,
   })
 
-export const savePackageAcknowledge = (payload) => {
-  const { invoiceFK } = payload
-  return request(`${url}/savePackageAcknowledge/${invoiceFK}`, { method: 'PUT', body: payload })
-}
- 

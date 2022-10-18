@@ -14,12 +14,12 @@ class Grid extends PureComponent {
       type: 'settingConsumableGroup/updateState',
       payload: {
         showModal: true,
-        entity: list.find((o) => o.id === row.id),
+        entity: list.find(o => o.id === row.id),
       },
     })
   }
 
-  render () {
+  render() {
     const { height } = this.props
     return (
       <CommonTableGrid
@@ -51,14 +51,14 @@ class Grid extends PureComponent {
           },
           {
             columnName: 'description',
-            render: (row) => {
+            render: row => {
               return <p>{row.description === null ? '-' : row.description}</p>
             },
           },
           {
             columnName: 'sortOrder',
             width: 120,
-            render: (row) => {
+            render: row => {
               return <p>{row.sortOrder === null ? '-' : row.sortOrder}</p>
             },
           },
@@ -66,9 +66,12 @@ class Grid extends PureComponent {
             columnName: 'action',
             width: 100,
             align: 'center',
-            render: (row) => {
+            render: row => {
               return (
-                <Tooltip title='Edit Consumable Category' placement='bottom'>
+                <Tooltip
+                  title='Edit Ophthalmic Product Category'
+                  placement='bottom'
+                >
                   <Button
                     size='sm'
                     onClick={() => {

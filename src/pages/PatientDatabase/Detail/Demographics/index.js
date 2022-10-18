@@ -338,7 +338,12 @@ class Demographic extends PureComponent {
                 <FastField
                   name='languageFK'
                   render={args => (
-                    <CodeSelect label='Language' code='ctLanguage' {...args} />
+                    <CodeSelect
+                      label='Spoken Language'
+                      code='ctLanguage'
+                      localFilter={item => ![5, 6, 9, 11].includes(item?.id)}
+                      {...args}
+                    />
                   )}
                 />
               </GridItem>
@@ -564,24 +569,26 @@ class Demographic extends PureComponent {
                   )}
                 />
               </GridItem>
-              <GridItem xs={12}>
-                <Field
-                  name='translationLinkFK'
-                  render={args => {
-                    return (
-                      <CodeSelect
-                        label='Preferred Printout Language'
-                        code='ctlanguage'
-                        localFilter={item =>
-                          item.code === primaryPrintoutLanguage ||
-                          item.code === secondaryPrintoutLanguage
-                        }
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
+              {false ?? (
+                <GridItem xs={12}>
+                  <Field
+                    name='translationLinkFK'
+                    render={args => {
+                      return (
+                        <CodeSelect
+                          label='Preferred Printout Language'
+                          code='ctlanguage'
+                          localFilter={item =>
+                            item.code === primaryPrintoutLanguage ||
+                            item.code === secondaryPrintoutLanguage
+                          }
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+              )}
               <GridItem xs={12}>
                 <ReferralCard
                   dispatch={dispatch}

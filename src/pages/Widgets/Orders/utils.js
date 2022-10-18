@@ -86,21 +86,8 @@ const GetOrderItemAccessRight = (from = 'Consultation', accessRight) => {
   return editAccessRight
 }
 
-const ReplaceCertificateTeplate = (templateContent, newVaccination) => {
-  const templateReg = /<a.*?data-value="(.*?)".*?<\/a>/gm
-  let msg = htmlDecodeByRegExp(templateContent)
-  const match = msg.match(templateReg) || []
-  match.forEach(s => {
-    const value = s.match(/data-value="(.*?)"/)[1]
-    const m = tagList.find(o => o.value === value)
-    if (m && m.getter) msg = msg.replace(s, m.getter(newVaccination))
-  })
-  return msg
-}
-
 export {
   getCautionAlertContent,
   openCautionAlertPrompt,
   GetOrderItemAccessRight,
-  ReplaceCertificateTeplate,
 }

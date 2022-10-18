@@ -1,22 +1,22 @@
 import React, { PureComponent } from 'react'
-
+import Edit from '@material-ui/icons/Edit'
 import { CommonTableGrid, Button, Tooltip } from '@/components'
 import { status } from '@/utils/codes'
-import Edit from '@material-ui/icons/Edit'
 
 class Grid extends PureComponent {
   editRow = (row, e) => {
-    const { dispatch, settingConsumableUOM } = this.props
+    if (row.isUserMaintainable) {
+      const { dispatch, settingSalesType } = this.props
 
-    const { list } = settingConsumableUOM
-
-    dispatch({
-      type: 'settingConsumableUOM/updateState',
-      payload: {
-        showModal: true,
-        entity: list.find(o => o.id === row.id),
-      },
-    })
+      const { list } = settingSalesType
+      dispatch({
+        type: 'settingSalesType/updateState',
+        payload: {
+          showModal: true,
+          entity: list.find(o => o.id === row.id),
+        },
+      })
+    }
   }
 
   render() {
@@ -24,7 +24,7 @@ class Grid extends PureComponent {
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
-        type='settingConsumableUOM'
+        type='settingSalesType'
         onRowDoubleClick={this.editRow}
         TableProps={{
           height,
@@ -33,7 +33,6 @@ class Grid extends PureComponent {
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },
           { name: 'description', title: 'Description' },
-          { name: 'sortOrder', title: 'Sort Order' },
           { name: 'isActive', title: 'Status' },
           {
             name: 'action',
@@ -47,22 +46,15 @@ class Grid extends PureComponent {
             type: 'select',
             options: status,
             align: 'center',
-            width: 120,
-          },
-          {
-            columnName: 'sortOrder',
-            width: 120,
-            render: row => {
-              return <p>{row.sortOrder === null ? '-' : row.sortOrder}</p>
-            },
+            width: 100,
           },
           {
             columnName: 'action',
-            width: 100,
+            sortingEnabled: false,
             align: 'center',
             render: row => {
               return (
-                <Tooltip title='Edit Ophthalmic Product UOM' placement='bottom'>
+                <Tooltip title='Edit Sales Type'>
                   <Button
                     size='sm'
                     onClick={() => {
@@ -70,7 +62,7 @@ class Grid extends PureComponent {
                     }}
                     justIcon
                     color='primary'
-                    style={{ marginRight: 0 }}
+                    disabled={!row.isUserMaintainable}
                   >
                     <Edit />
                   </Button>

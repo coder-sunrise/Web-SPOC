@@ -1,15 +1,12 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import service from '../services'
-import { getTranslationValue } from '@/utils/utils'
 
 export default createListViewModel({
-  namespace: 'settingSummaryComment',
-  config: {
-    codetable: {
-      message: 'Summary Comment Updated',
-      code: 'ctsummarycomment',
-    },
+  namespace: 'settingSalesType',
+  codetable: {
+    message: 'Sales Type updated',
+    code: 'ctsalestype',
   },
   param: {
     service,
@@ -28,6 +25,21 @@ export default createListViewModel({
         const { pathname, search, query = {} } = loct
       })
     },
+    effects: {},
+    reducers: {
+      queryDone(st, { payload }) {
+        const { data } = payload
 
+        return {
+          ...st,
+          list: data.data.map(o => {
+            return {
+              ...o,
+              effectiveDates: [o.effectiveStartDate, o.effectiveEndDate],
+            }
+          }),
+        }
+      },
+    },
   },
 })

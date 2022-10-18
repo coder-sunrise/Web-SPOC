@@ -23,11 +23,7 @@ import {
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
 // common utils
 import { roundTo, getUniqueId } from '@/utils/utils'
-import {
-  INVOICE_PAYER_TYPE,
-  PACKAGE_SIGNATURE_CHECK_OPTION,
-  INVOICE_REPORT_TYPES,
-} from '@/utils/constants'
+import { INVOICE_PAYER_TYPE, INVOICE_REPORT_TYPES } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import Authorized from '@/utils/Authorized'
 // sub component
@@ -128,14 +124,6 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
 
   const generateFromTransaction = item => {
     const groupName = 'NormalDispense'
-    if (item.isPreOrder) {
-      orderItems.push({
-        ...defaultItem(item, groupName),
-        groupNumber: 1,
-        groupRowSpan: 1,
-      })
-      return
-    }
 
     if (item.dispenseItem.length) {
       item.dispenseItem.forEach((di, index) => {
@@ -271,7 +259,6 @@ class Billing extends Component {
     },
     selectedDrugs: [],
     isUpdatedAppliedInvoicePayerInfo: false,
-    isConsumedPackage: false,
     hasNewSignature: false,
   }
 
@@ -338,21 +325,6 @@ class Billing extends Component {
         code: 'ctservice',
       },
     })
-    if (query.vid) {
-      const { invoice } = billing.entity || billing.default
-      const { invoiceItems } = invoice
-
-      if (invoiceItems && invoiceItems.length > 0) {
-        const consumedItems = invoiceItems.filter(
-          i => i.isPackage && i.packageConsumeQuantity > 0,
-        )
-        if (consumedItems.length > 0) {
-          this.setState({
-            isConsumedPackage: true,
-          })
-        }
-      }
-    }
   }
 
   onPrintRef = ref => {
@@ -633,9 +605,6 @@ class Billing extends Component {
 
     if (
       invoiceItems.find(item => {
-        if ((item.isPreOrder && !item.isChargeToday) || item.hasPaid) {
-          return false
-        }
         let totalClaim = 0
         invoicePayer.forEach(payer => {
           const selectInfo = (payer.invoicePayerItem || []).find(
@@ -923,21 +892,6 @@ class Billing extends Component {
     return showRefreshOrder
   }
 
-  updateSignature = signature => {
-    const { dispatch, values, patient } = this.props
-    const { thumbnail } = signature
-
-    dispatch({
-      type: 'billing/savePackageAcknowledge',
-      payload: {
-        visitId: values.visitId,
-        invoiceFK: values.invoice.id,
-        signatureName: patient.name,
-        signature: thumbnail,
-      },
-    })
-  }
-
   updateInvoiceSignature = signature => {
     const { dispatch, values, patient, setFieldValue } = this.props
     const { thumbnail } = signature
@@ -1006,14 +960,6 @@ class Billing extends Component {
       isEnableVisitationInvoiceReport = false,
       autoPrintOnCompletePayment = false,
     } = clinicSettings
-    let packageDrawdownSignatureSrc
-    if (
-      values.packageRedeemAcknowledge &&
-      values.packageRedeemAcknowledge.signature !== '' &&
-      values.packageRedeemAcknowledge.signature !== undefined
-    ) {
-      packageDrawdownSignatureSrc = `${base64Prefix}${values.packageRedeemAcknowledge.signature}`
-    }
     let invoiceSignatureSrc
     if (
       values?.invoice?.signature &&
@@ -1025,10 +971,7 @@ class Billing extends Component {
 
     return (
       <LoadingWrapper loading={loading} text='Getting billing info...'>
-        <PatientBanner
-          from='Billing'
-          // activePreOrderItem={patient?.listingPreOrderItem?.filter(item => !item.isDeleted) || []}
-        />
+        <PatientBanner from='Billing' />
         <div className={classes.accordionContainer}>
           <LoadingWrapper linear loading={dispenseLoading}>
             <Accordion
@@ -1297,27 +1240,6 @@ class Billing extends Component {
             showTopDivider={false}
             reportID={reportPayload.reportID}
             reportParameters={reportPayload.reportParameters}
-          />
-        </CommonModal>
-        <CommonModal
-          open={this.state.isShowAcknowledge}
-          title='Package Acknowledge'
-          observe='PackageAcknowledge'
-          onClose={() => {
-            this.setState({
-              isShowAcknowledge: false,
-            })
-          }}
-        >
-          <Signature
-            signatureName={patient.name}
-            updateSignature={this.updateSignature}
-            image={packageDrawdownSignatureSrc}
-            isEditable={
-              packageDrawdownSignatureSrc === '' ||
-              packageDrawdownSignatureSrc === undefined
-            }
-            signatureNameLabel='Patient Name'
           />
         </CommonModal>
         <CommonModal

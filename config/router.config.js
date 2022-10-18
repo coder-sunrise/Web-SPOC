@@ -572,18 +572,6 @@ const _routes = [
             authority: ['report.finance.paymentcollectionsummary'],
           },
           {
-            path: '/report/wiprevenue',
-            name: 'wiprevenue',
-            component: './Report/WIPRevenue',
-            authority: ['report.finance.wiprevenuereport'],
-          },
-          {
-            path: '/report/saleslistingbyperformer',
-            name: 'saleslistingbyperformer',
-            component: './Report/SalesListingByPerformer',
-            authority: ['report.finance.saleslistingbyperformerreport'],
-          },
-          {
             path: '/report/xeroinvoicesreport',
             name: 'xeroinvoicesreport',
             component: './Report/XeroInvoicesReport',
@@ -839,6 +827,12 @@ const _routes = [
             name: 'casetype',
             component: './Setting/CaseType',
             authority: ['settings.clinicsetting.casetype'],
+          },
+          {
+            path: '/setting/salestype',
+            name: 'salestype',
+            component: './Setting/SalesType',
+            authority: ['settings.clinicsetting.salestype'],
           },
           {
             path: '/setting/casedescription',

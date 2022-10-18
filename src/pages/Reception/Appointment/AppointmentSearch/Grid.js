@@ -136,7 +136,6 @@ class Grid extends PureComponent {
           { name: 'duration', title: 'Duration' },
           { name: 'resource', title: 'Resource' },
           { name: 'appointmentTypeFK', title: 'Appt Type' },
-          { name: 'roomFk', title: 'Room' },
           {
             name: 'rescheduleReason',
             title: 'Reason',
@@ -173,7 +172,8 @@ class Grid extends PureComponent {
             columnName: 'appointmentDate',
             type: 'date',
             width: 100,
-            render: row => `${moment(row.appointmentDate).format('DD MMM YYYY')}`,
+            render: row =>
+              `${moment(row.appointmentDate).format('DD MMM YYYY')}`,
           },
           {
             columnName: 'apptTime',
@@ -209,12 +209,6 @@ class Grid extends PureComponent {
                 />
               )
             },
-          },
-          {
-            columnName: 'roomFk',
-            type: 'codeSelect',
-            code: 'ctroom',
-            sortingEnabled: false,
           },
           {
             columnName: 'rescheduleReason',

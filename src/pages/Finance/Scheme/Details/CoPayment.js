@@ -56,18 +56,6 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
         'ExactAmount',
       )
 
-      setFieldValue('itemGroupValueDto.medicationGroupValue.itemGroupValue', 0)
-      setFieldValue(
-        'itemGroupValueDto.medicationGroupValue.groupValueType',
-        'ExactAmount',
-      )
-
-      setFieldValue('itemGroupValueDto.vaccinationGroupValue.itemGroupValue', 0)
-      setFieldValue(
-        'itemGroupValueDto.vaccinationGroupValue.groupValueType',
-        'ExactAmount',
-      )
-
       setFieldValue('itemGroupValueDto.serviceGroupValue.itemGroupValue', 0)
       setFieldValue(
         'itemGroupValueDto.serviceGroupValue.groupValueType',
@@ -87,9 +75,7 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
 
       if (!values.id) setFieldValue('itemGroupValueDto', {})
       else {
-        setFieldValue('itemGroupValueDto.medicationGroupValue.isDeleted', true)
         setFieldValue('itemGroupValueDto.consumableGroupValue.isDeleted', true)
-        setFieldValue('itemGroupValueDto.vaccinationGroupValue.isDeleted', true)
         setFieldValue('itemGroupValueDto.serviceGroupValue.isDeleted', true)
         setFieldValue('itemGroupValueDto.orderSetGroupValue.isDeleted', true)
       }
@@ -146,33 +132,6 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
             'sub',
           )}
         />
-
-        <Field
-          name='itemGroupValueDto.medicationGroupValue.itemGroupValue'
-          render={CPNumber(
-            formatMessage({
-              id: 'finance.scheme.setting.medications',
-            }),
-            values.itemGroupValueDto &&
-              values.itemGroupValueDto.medicationGroupValue
-              ? values.itemGroupValueDto.medicationGroupValue.groupValueType
-              : 'ExactAmount',
-            'sub',
-          )}
-        />
-        <Field
-          name='itemGroupValueDto.vaccinationGroupValue.itemGroupValue'
-          render={CPNumber(
-            formatMessage({
-              id: 'finance.scheme.setting.vaccines',
-            }),
-            values.itemGroupValueDto &&
-              values.itemGroupValueDto.vaccinationGroupValue
-              ? values.itemGroupValueDto.vaccinationGroupValue.groupValueType
-              : 'ExactAmount',
-            'sub',
-          )}
-        />
         <Field
           name='itemGroupValueDto.serviceGroupValue.itemGroupValue'
           render={CPNumber(
@@ -186,20 +145,6 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
             'sub',
           )}
         />
-        {/* Commented Package Input - Need to re-test if enabling it back in the future */}
-        {/* <Field
-          name='itemGroupValueDto.packageGroupValue.itemGroupValue'
-          render={CPNumber(
-            formatMessage({
-              id: 'finance.scheme.setting.packages',
-            }),
-            values.itemGroupValueDto &&
-            values.itemGroupValueDto.packageGroupValue
-              ? values.itemGroupValueDto.packageGroupValue.groupValueType
-              : 'ExactAmount',
-            'sub',
-          )}
-        /> */}
         <p style={{ marginTop: theme.spacing(1) }}>&nbsp;</p>
       </GridItem>
       <GridItem xs={2}>
@@ -209,23 +154,9 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
           render={CPSwitch('sub')}
         />
         <Field
-          name='itemGroupValueDto.medicationGroupValue.groupValueType'
-          render={CPSwitch('sub')}
-        />
-        <Field
-          name='itemGroupValueDto.vaccinationGroupValue.groupValueType'
-          render={CPSwitch('sub')}
-        />
-        <Field
           name='itemGroupValueDto.serviceGroupValue.groupValueType'
           render={CPSwitch('sub')}
         />
-        {/* Commented Package Input - Need to re-test if enabling it back in the future */}
-        {/* 
-        <Field
-          name='itemGroupValueDto.orderSetGroupValue.groupValueType'
-          render={CPSwitch('sub')} 
-        /> */}
       </GridItem>
     </GridContainer>
   )

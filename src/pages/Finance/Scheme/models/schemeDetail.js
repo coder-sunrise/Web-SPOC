@@ -31,62 +31,10 @@ export default createFormViewModel({
         overalCoPaymentValueType: 'Percentage',
         patientMinCoPaymentAmount: 0,
         // coverageMaxCap: 0,
-        itemGroupMaxCapacityDto: {
-          // consumableMaxCapacity: {
-          //   maxCapValue: 0,
-          // },
-          // medicationMaxCapacity: {
-          //   maxCapValue: 0,
-          // },
-          // vaccinationMaxCapacity: {
-          //   maxCapValue: 0,
-          // },
-          // serviceMaxCapacity: {
-          //   maxCapValue: 0,
-          // },
-          // packageMaxCapacity: {
-          //   maxCapValue: 0,
-          // },
-        },
+        itemGroupMaxCapacityDto: {},
         overalCoPaymentValue: 100,
-        itemGroupValueDto: {
-          // consumableGroupValue: {
-          //   itemGroupValue: 0,
-          //   groupValueType: 'ExactAmount',
-          // },
-          // medicationGroupValue: {
-          //   itemGroupValue: 0,
-          //   groupValueType: 'ExactAmount',
-          // },
-          // vaccinationGroupValue: {
-          //   itemGroupValue: 0,
-          //   groupValueType: 'ExactAmount',
-          // },
-          // serviceGroupValue: {
-          //   itemGroupValue: 0,
-          //   groupValueType: 'ExactAmount',
-          // },
-          // packageGroupValue: {
-          //   itemGroupValue: 0,
-          //   groupValueType: 'ExactAmount',
-          // },
-        },
-        // consumableValueDto: [],
-        // medicationValueDto: [],
-        // vaccinationValueDto: [],
-        // serviceValueDto: [],
-        // packageValueDto: [],
-
+        itemGroupValueDto: {},
         rows: [],
-        // packageValueDto: [
-        //   {
-        //     id: 1,
-        //     itemValueType: 'ExactAmount',
-        //     itemValue: 788,
-        //     unitPrice: 5,
-        //     inventoryPackageFK: 1,
-        //   },
-        // ],
       },
     },
     subscriptions: ({ dispatch, history }) => {

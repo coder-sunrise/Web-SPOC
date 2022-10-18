@@ -92,10 +92,7 @@ class SystemSetting extends PureComponent {
         (accessRight && accessRight.rights === 'hidden') ||
         accessRight.rights === 'disable'
       )
-        return [..._result]
-
-      if (m.text === 'Package' && !settings.isEnablePackage) return [..._result]
-
+        return [..._result] 
       return [..._result, { ...m, rights: accessRight.rights }]
     }
 
@@ -104,7 +101,7 @@ class SystemSetting extends PureComponent {
         .reduce(filterByAccessRight, [])
         .filter(m => {
           return (
-            m.text.toLocaleLowerCase().indexOf(searchText) >= 0 || !searchText
+            m.text?.toLocaleLowerCase().indexOf(searchText) >= 0 || !searchText
           )
         })
 

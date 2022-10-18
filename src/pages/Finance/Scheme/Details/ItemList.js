@@ -25,11 +25,11 @@ const ItemList = ({
   theme,
   // ...props
 }) => {
-  function callback (key) {
+  function callback(key) {
     console.log('key', key)
   }
 
-  const addItemToRows = (obj) => {
+  const addItemToRows = obj => {
     const newRows = values.rows
     newRows.push(obj)
     setFieldValue('rows', newRows)
@@ -40,23 +40,15 @@ const ItemList = ({
     setFieldValue('tempSelectedItemTotalPrice', '')
   }
 
-  const [
-    itemList,
-    setItemList,
-  ] = useState(values.rows)
+  const [itemList, setItemList] = useState(values.rows)
 
-  useEffect(
-    () => {
-      console.log('set item list')
-      setItemList(values.rows)
-    },
-    [
-      values,
-    ],
-  )
+  useEffect(() => {
+    console.log('set item list')
+    setItemList(values.rows)
+  }, [values])
 
-  const onClickAdd = (type) => {
-    const itemFieldName = InventoryTypes.filter((x) => x.ctName === type)[0]
+  const onClickAdd = type => {
+    const itemFieldName = InventoryTypes.filter(x => x.ctName === type)[0]
     let newItemRow = {
       uid: getUniqueId(),
       type: itemFieldName.value,
@@ -86,13 +78,13 @@ const ItemList = ({
     }
   }
 
-  const addContent = (type) => {
+  const addContent = type => {
     return (
       <GridContainer>
         <GridItem xs={8}>
           <FastField
             name='tempSelectedItemFK'
-            render={(args) => {
+            render={args => {
               return (
                 <CodeSelect
                   labelField='displayValue'
@@ -101,7 +93,7 @@ const ItemList = ({
                   }
                   onChange={(e, option) => onItemSelect(e, option, type)}
                   code={type}
-                  renderDropdown={(option) => {
+                  renderDropdown={option => {
                     let suffix = ''
                     if (type === 'ctservice') {
                       suffix = option.serviceCenter
@@ -131,8 +123,8 @@ const ItemList = ({
   }
 
   const onDeleteClick = useCallback(
-    (row) => {
-      const deletedRow = itemList.find((o) => o.itemFK === row.itemFK)
+    row => {
+      const deletedRow = itemList.find(o => o.itemFK === row.itemFK)
       console.log({ deletedRow, itemList, rows: values.rows, row })
       // if (deletedRow) {
       //   deletedRow.isDeleted = true
@@ -142,16 +134,13 @@ const ItemList = ({
       // )
       // setItemList(newRows)
     },
-    [
-      itemList,
-      values.rows,
-    ],
+    [itemList, values.rows],
   )
 
   const options = () => [
     {
       id: 2,
-      name: 'Consumable',
+      name: 'Ophthalmic Product',
       content: addContent('inventoryconsumable'),
     },
     {
@@ -167,7 +156,7 @@ const ItemList = ({
   ]
 
   const tableConfigs = {
-    getRowId: (r) => r.uid,
+    getRowId: r => r.uid,
     columns: [
       { name: 'type', title: 'Type' },
       { name: 'itemFK', title: 'Item' },
@@ -179,19 +168,19 @@ const ItemList = ({
   }
 
   const renderDeleteButton = useCallback(
-    (row) => {
+    row => {
       console.log({ row })
       return (
         <Popconfirm
           onConfirm={() => {
-            const deletedRow = itemList.find((o) => o.itemFK === row.itemFK)
+            const deletedRow = itemList.find(o => o.itemFK === row.itemFK)
             // console.log({ itemList })
             // onDeleteClick(row)
             if (deletedRow) {
               deletedRow.isDeleted = true
             }
             const newRows = itemList.filter(
-              (o) => o.isDeleted === false || o.isDeleted === undefined,
+              o => o.isDeleted === false || o.isDeleted === undefined,
             )
             setItemList(newRows)
             // dispatch({
@@ -210,10 +199,7 @@ const ItemList = ({
         </Popconfirm>
       )
     },
-    [
-      itemList,
-      values.rows,
-    ],
+    [itemList, values.rows],
   )
 
   return (
@@ -223,7 +209,7 @@ const ItemList = ({
       <CommonTableGrid
         rows={itemList}
         // {...tableConfigs}
-        getRowId={(r) => r.uid}
+        getRowId={r => r.uid}
         columns={[
           { name: 'type', title: 'Type' },
           { name: 'itemFK', title: 'Item' },
@@ -239,9 +225,9 @@ const ItemList = ({
           },
           {
             columnName: 'itemFK',
-            render: (row) => {
+            render: row => {
               const inventory = InventoryTypes.filter(
-                (x) => x.value === row.type,
+                x => x.value === row.type,
               )[0]
               const { ctName, itemFKName } = inventory
               return row.name ? row.name : ''
@@ -253,7 +239,7 @@ const ItemList = ({
           },
           {
             columnName: 'cpAmount',
-            render: (row) => {
+            render: row => {
               return (
                 <GridContainer>
                   <GridItem xs={8}>

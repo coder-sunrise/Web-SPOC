@@ -74,7 +74,7 @@ const AppNotificationList = ({
     dispatch({
       type: 'header/clearNotification',
       payload: {
-        type: Object.values(APPNOTIFICATION_SCHEMA).find(x => x.name === source).id,
+        type: Object.values(APPNOTIFICATION_SCHEMA).find(x => x.name === source)?.id,
       },
     })
   }
