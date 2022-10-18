@@ -440,6 +440,24 @@ class Banner extends PureComponent {
     return 12
   }
 
+  onViewExternalTrackingClick = () => {
+    const { dispatch, patient } = this.props
+    const { entity = {} } = patient
+    this.setState({ showExternalTrackingModal: true })
+  }
+  onViewPatientDocumentClick = patientProfileFK => {
+    history.push(
+      getAppendUrl({
+        md: 'pt',
+        cmt: 7,
+        pid: patientProfileFK,
+        v: Date.now(),
+      }),
+    )
+  }
+  closeExternalTracking = () => {
+    this.setState({ showExternalTrackingModal: false })
+  }
   expandOrCollespe = () => {
     this.setState({ isExpanded: !this.state.isExpanded })
     if (this.props.setPatientBannerHeight) {
@@ -560,8 +578,6 @@ class Banner extends PureComponent {
         {'( '}
         <span className={classes.part}>{info.patientReferenceNo}</span>
         {') '}
-        <span className={classes.part}>{info.patientAccountNo}</span>
-        {', '}
         <span className={classes.part}>
           {
             <CodeSelect
@@ -575,6 +591,8 @@ class Banner extends PureComponent {
         </span>
         {'/'}
         <span className={classes.part}>{year > 1 ? `${year}` : `${year}`}</span>
+        {', '}
+        <span className={classes.part}>{info.patientAccountNo}</span>
         {', '}
         <span className={classes.part}>
           <DatePicker
@@ -635,6 +653,30 @@ class Banner extends PureComponent {
           >
             <span>{this.getTagData()}</span>
           </Tooltip>
+        </Col>
+      </Row>
+    )
+    const spokenLanguage = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header} style={{ color: 'darkblue' }}>
+            Spoken Language:{' '}
+          </span>
+        </Col>
+        <Col flex='auto' className={contentClass}>
+          <span>{info.spokenLanguage ? info.spokenLanguage : '-'}</span>
+        </Col>
+      </Row>
+    )
+    const referralSource = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header} style={{ color: 'darkblue' }}>
+            Spoken Language:{' '}
+          </span>
+        </Col>
+        <Col flex='auto' className={contentClass}>
+          <span>{info.referralSource ? info.referralSource : '-'}</span>
         </Col>
       </Row>
     )
@@ -728,7 +770,7 @@ class Banner extends PureComponent {
       <Row wrap={false}>
         <Col flex='none'>
           <Tooltip title='Patient Request'>
-            <span className={classes.header}>Request: </span>
+            <span className={classes.header}>Patient Request: </span>
           </Tooltip>
         </Col>
         <Col flex='auto' className={contentClass}>
@@ -843,7 +885,9 @@ class Banner extends PureComponent {
                   <GridItem xs={6} md={4}>
                     {patientTag}
                   </GridItem>
-                  <GridItem xs={6} md={4}></GridItem>
+                  <GridItem xs={6} md={4}>
+                    {spokenLanguage}
+                  </GridItem>
                   <GridItem xs={6} md={4}>
                     {patientOS}
                   </GridItem>
@@ -851,13 +895,13 @@ class Banner extends PureComponent {
                     {patientSchemeDetails}
                   </GridItem>
                   <GridItem xs={6} md={4}>
+                    {referralSource}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
                     {patientRequest}
                   </GridItem>
                   <GridItem xs={6} md={4}></GridItem>
                   <GridItem xs={6} md={4}></GridItem>
-                  <GridItem xs={6} md={4}>
-                    -
-                  </GridItem>
                   <GridItem xs={6} md={4}></GridItem>
                 </GridContainer>
               </GridItem>
@@ -878,7 +922,34 @@ class Banner extends PureComponent {
                   ) : (
                     <GridItem xs={12} md={12}></GridItem>
                   )}
-                  <GridItem xs={12} md={12}></GridItem>
+                  <GridItem xs={12} md={12}>
+                    <span
+                      className={classes.header}
+                      style={{
+                        display: 'block',
+                        paddingRight: 10,
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                      }}
+                      onClick={e => this.onViewExternalTrackingClick()}
+                      tabIndex='-1'
+                    >
+                      External Tracking
+                    </span>
+                    <span
+                      className={classes.header}
+                      style={{
+                        display: 'block',
+                        paddingRight: 10,
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                      }}
+                      onClick={e => this.onViewPatientDocumentClick(info.id)}
+                      tabIndex='-1'
+                    >
+                      Patient Documents
+                    </span>
+                  </GridItem>
                 </GridContainer>
               </GridItem>
             </GridContainer>
@@ -944,15 +1015,19 @@ class Banner extends PureComponent {
           fullScreen
         >
           <CopayerDetails fromCommonModal />
-        </CommonModal> 
+        </CommonModal>
+
         <CommonModal
-          open={this.state.showExaminationDetailsModal}
-          title='Examination Details'
-          onClose={this.closeExaminationDetails}
+          open={this.state.showExternalTrackingModal}
+          title='External Tracking'
+          onClose={this.closeExternalTracking}
           maxWidth='lg'
-          fullHeight
         >
-          <PatientResults patient={patient} patientProfileFK={entity.id} />
+          <PatientResults
+            patient={patient}
+            patientProfileFK={entity.id}
+            defaultActiveKey='1'
+          />
         </CommonModal>
       </Paper>
     )

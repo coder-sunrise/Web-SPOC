@@ -35,10 +35,12 @@ const styles = () => ({})
 @connect(({ clinicSettings }) => ({ clinicSettings }))
 class PatientResult extends PureComponent {
   render() {
-    const { theme } = this.props
+    const { theme, defaultActiveKey } = this.props
+    const options = patientResultTabs(this.props)
+    const activeKey = options.length > 1 ? '1' : '0'
     return (
       <div style={{ minHeight: 500, height: '100%' }} className='fullHeightTab'>
-        <Tabs options={patientResultTabs(this.props)} />
+        <Tabs defaultActiveKey={defaultActiveKey} options={options} />
       </div>
     )
   }
