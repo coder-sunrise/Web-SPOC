@@ -141,7 +141,7 @@ const PatientInfoInput = ({
                   </Button>
                 </Authorized>
               )}
-              {hasActiveSession && containsPrimaryClinician && (
+              {hasActiveSession && (
                 <Authorized authority='queue.registervisit'>
                   <Button
                     size='sm'
