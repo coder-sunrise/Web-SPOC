@@ -4,7 +4,7 @@ import { CodeSelect } from '@/components'
 // medisys component
 import { DoctorLabel } from '@/components/_medisys'
 
-const DoctorProfileSelect = ({ label = 'Doctor', ...props }) => (
+const DoctorProfileSelect = ({ label = 'Optometrist', ...props }) => (
   <CodeSelect
     {...props}
     allowClear
