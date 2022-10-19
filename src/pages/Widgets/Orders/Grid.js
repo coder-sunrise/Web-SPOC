@@ -847,7 +847,7 @@ export default ({
               let displayText
 
               const itemType = orderItemTypes.find(
-                t => t.type.toUpperCase() === (otype.name || '').toUpperCase(),
+                t => t.type.toUpperCase() === (otype.type || '').toUpperCase(),
               )
               texts = [
                 otype.name,

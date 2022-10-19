@@ -1462,7 +1462,7 @@ const visitDoctorConsultationStatusColor = [
 ]
 
 const orderItemTypes = [
-  { type: 'Ophthalmic Product', displayValue: 'Con' },
+  { type: 'Consumable', displayValue: 'Con' },
   { type: 'Service', displayValue: 'Svc' },
 ]
 

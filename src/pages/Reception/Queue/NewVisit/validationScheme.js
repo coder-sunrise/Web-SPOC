@@ -139,6 +139,9 @@ const schemaVisit = {
   [FormField['visit.doctorProfileFk']]: Yup.string().required(
     'Must select an assigned doctor',
   ),
+  [FormField['visit.salesType']]: Yup.number().required(
+    'Must select a sales type',
+  ),
   referralSourceFK: Yup.number().when('referredBy', {
     is: val => val === 'Company',
     then: Yup.number().required(),
