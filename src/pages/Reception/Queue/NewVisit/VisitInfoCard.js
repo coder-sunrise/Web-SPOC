@@ -325,21 +325,30 @@ const VisitInfoCard = ({
         </GridItem>
         <GridItem xs md={2}>
           <Field
+            name={FormField['visit.salesType']}
+            render={args => (
+              <CodeSelect
+                disabled={notWaiting || isReadOnly}
+                label={formatMessage({
+                  id: 'reception.queue.visitRegistration.salesType',
+                })}
+                code='ctSalesType'
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem xs md={2}>
+          <Field
             name={FormField['visit.doctorProfileFk']}
             render={args => (
               <DoctorProfileSelect
                 disabled={isPrimaryDoctorConsultated || isReadOnly}
                 authority='none'
                 onChange={(v, op = {}) => handleDoctorChange(v, op)}
-                label={
-                  visitType === VISIT_TYPE.OTC
-                    ? formatMessage({
-                        id: 'reception.queue.visitRegistration.attendantDoctor',
-                      })
-                    : formatMessage({
-                        id: 'reception.queue.visitRegistration.doctor',
-                      })
-                }
+                label={formatMessage({
+                  id: 'reception.queue.visitRegistration.doctor',
+                })}
                 {...args}
               />
             )}
@@ -541,7 +550,7 @@ const VisitInfoCard = ({
             />
           </Authorized>
         </GridItem>
-        <GridItem xs md={12}>
+        <GridItem xs md={6}>
           <div style={{ position: 'relative' }}>
             <Field
               name={FormField['visit.visitRemarks']}

@@ -13,6 +13,7 @@ import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
 
 const orderTypes = [
   {
+    type: 'Consumable',
     name: 'Ophthalmic Product',
     value: ORDER_TYPES.CONSUMABLE,
     prop: 'corConsumable',
@@ -21,6 +22,7 @@ const orderTypes = [
     component: props => <Consumable {...props} />,
   },
   {
+    type: 'Service',
     name: 'Service',
     value: ORDER_TYPES.SERVICE,
     prop: 'corService',
