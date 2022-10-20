@@ -23,9 +23,10 @@ class VisitTypeSelect extends React.Component {
         const visitTypeSetting = JSON.parse(
           clinicSettings.settings.visitTypeSetting,
         )
-        var newVisitType = getMappedVisitType(result, visitTypeSetting).filter(
-          vt => vt.isEnabled === 'true',
-        )
+        var newVisitType = getMappedVisitType(result, visitTypeSetting)
+        // .filter(
+        //   vt => vt.isEnabled === 'true',
+        // )
         this.setState({
           ctVisitpurpose: newVisitType,
         })
