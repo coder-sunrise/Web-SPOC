@@ -5,7 +5,7 @@
   "private": false,
   "scripts": {
     "presite": "node ./scripts/generateMock.js && cd functions && npm install",
-    "start": "cross-env APP_TYPE=site PORT=8000 umi dev",
+    "start": "cross-env APP_TYPE=site PORT=9000 umi dev",
     "start:no-mock": "cross-env MOCK=none HTTPS=true PORT=44385 umi dev",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 umi build",
     "build:prod": "cross-env NODE_OPTIONS=--max_old_space_size=8192 UMI_ENV=prod umi build",
