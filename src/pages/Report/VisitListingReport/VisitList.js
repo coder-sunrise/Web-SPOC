@@ -16,7 +16,7 @@ class VisitList extends PureComponent {
         id: `VisitListingDetails-${index}-${item.visitDate}`,
       }))
     }
-    const VisitListingColumns = [ 
+    const VisitListingColumns = [
       { name: 'visitDate', title: 'Date' },
       { name: 'patientReferenceNo', title: 'Ref. No.' },
       { name: 'patientNRIC', title: 'Acc. No.' },
@@ -166,3 +166,4 @@ class VisitList extends PureComponent {
   }
 }
 export default VisitList
+ 
