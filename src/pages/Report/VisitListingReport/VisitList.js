@@ -21,9 +21,12 @@ class VisitList extends PureComponent {
       { name: 'patientReferenceNo', title: 'Ref. No.' },
       { name: 'patientNRIC', title: 'Acc. No.' },
       { name: 'patientName', title: 'Patient Name' },
-      { name: 'copayer', title: 'Co-Payer' },
-      { name: 'invoiceNo', title: 'Invoice No.' },
+      { name: 'salesType', title: 'Sales Type' },
+      { name: 'queueStatus', title: 'Q.Status' },
+      { name: 'studentOptometrist', title: 'Student Optometrist' },
       { name: 'doctorName', title: 'Optometrist' },
+      { name: 'invoiceNo', title: 'Invoice No.' },
+      { name: 'copayer', title: 'Co-Payer' },
       { name: 'visitRemarks', title: 'Remarks' },
     ]
 
@@ -162,30 +165,30 @@ class VisitList extends PureComponent {
         },
       }
 
-      if (
-        reportDatas.VisitListingInfo[0]['isGroupByQueueStatus'] ||
-        reportDatas.VisitListingInfo[0]['isGroupByStudentOptometrist']
-      ) {
-        afterGroupingVisitListingColumns = [
-          [
-            {
-              prop: 'isGroupByQueueStatus',
-              col: {
-                name: 'queueStatus',
-                title: 'Queue Status',
-              },
-            },
-            {
-              prop: 'isGroupByStudentOptometrist',
-              col: {
-                name: 'studentOptometrist',
-                title: 'Student Optometrist',
-              },
-            },
-          ].find(item => reportDatas.VisitListingInfo[0][item.prop])?.col,
-          ...VisitListingColumns,
-        ]
-      }
+      // if (
+      //   reportDatas.VisitListingInfo[0]['isGroupByQueueStatus'] ||
+      //   reportDatas.VisitListingInfo[0]['isGroupByStudentOptometrist']
+      // ) {
+      //   afterGroupingVisitListingColumns = [
+      //     [
+      //       {
+      //         prop: 'isGroupByQueueStatus',
+      //         col: {
+      //           name: 'queueStatus',
+      //           title: 'Queue Status',
+      //         },
+      //       },
+      //       {
+      //         prop: 'isGroupByStudentOptometrist',
+      //         col: {
+      //           name: 'studentOptometrist',
+      //           title: 'Student Optometrist',
+      //         },
+      //       },
+      //     ].find(item => reportDatas.VisitListingInfo[0][item.prop])?.col,
+      //     ...VisitListingColumns,
+      //   ]
+      // }
     }
     return (
       <ReportDataGrid
