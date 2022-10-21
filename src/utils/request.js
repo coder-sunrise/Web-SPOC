@@ -18,11 +18,11 @@ import {
 export const baseUrl = process.env.url
 
 const uatUrl = 'https://semr2uat2010.emr.com.sg'
-const localApiUrl = 'http://localhost:55314'
+const localApiUrl = 'http://localhost:52314'
 let dynamicURL = baseUrl
 // let dynamicURL = 'http://semr2-dev-api.ap-southeast-1.elasticbeanstalk.com'
 // if (process.env.NODE_ENV === 'development')
-//   dynamicURL = 'http://localhost:55314'
+//   dynamicURL = 'http://localhost:52314'
 
 // const codeMessage = {
 //   200: '服务器成功返回请求的数据。',
@@ -69,7 +69,7 @@ export function updateAPIType(type) {
   if (type === 'PROD') {
     dynamicURL = baseUrl
   } else {
-    dynamicURL = 'localhost:8000'
+    dynamicURL = 'localhost:9000'
   }
 }
 

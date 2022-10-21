@@ -156,11 +156,9 @@ export const formikMapPropsToValues = ({
     let visitPurposeFK = clinicSettings.defaultVisitType
     let roomAssignmentFK
     let consReady
+    let resourceRoomFK
     let currentVisitOrderTemplateFK
     if (clinicInfo) {
-      // doctorProfile = doctorProfiles.find(
-      //   (item) => item.doctorMCRNo === clinicInfo.primaryMCRNO,
-      // )
       doctorProfileFK = clinicInfo.primaryRegisteredDoctorFK
     }
 
@@ -197,7 +195,7 @@ export const formikMapPropsToValues = ({
       }),
       {},
     )
-    const { location } = history  
+    const { location } = history
     const { visitOrderTemplateFK, visitEyeRefractionForm } = visitEntries
 
     if (!visitEntries.id) {
@@ -218,6 +216,9 @@ export const formikMapPropsToValues = ({
       if (appointment && appointment.appointments.length) {
         currentVisitOrderTemplateFK =
           appointment.appointments[0].visitOrderTemplateFK
+        resourceRoomFK =
+          appointment.appointments[0].appointments_Resources[0].calendarResource
+            ?.resourceDto?.roomFK
       }
     } else {
       currentVisitOrderTemplateFK = visitOrderTemplateFK
@@ -259,7 +260,7 @@ export const formikMapPropsToValues = ({
       queueNo: qNo,
       visitPurposeFK: 2,
       consReady,
-      roomFK: roomAssignmentFK || roomFK,
+      roomFK: resourceRoomFK || roomAssignmentFK || roomFK,
       visitStatus: VISIT_STATUS.WAITING,
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
       doctorProfileFK,
