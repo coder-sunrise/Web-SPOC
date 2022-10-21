@@ -19,6 +19,7 @@ import {
   GridContainer,
   GridItem,
   TextField,
+  Checkbox,
   WarningSnackbar,
   withFormikExtend,
   notification,
@@ -29,11 +30,7 @@ import {
   MobileNumberInput,
 } from '@/components/_medisys'
 // utils
-import {
-  NOTIFICATION_TYPE,
-  NOTIFICATION_STATUS,
-  CLINICAL_ROLE,
-} from '@/utils/constants'
+import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
 import * as queueServices from '@/services/queue'
 import clinicServices from '@/services/clinicInfo'
@@ -102,7 +99,7 @@ const styles = theme => ({
       //       if (val === undefined) return false
       //       return (
       //         ctRole.find(item => item.id === parseInt(val, 10))
-      //           .clinicalRoleName === 'Doctor' ||
+      //           .clinicalRoleName === 'Optometrist' ||
       //         ctRole.find(item => item.id === parseInt(val, 10))
       //           .clinicalRoleName === 'Doctor Owner'
       //       )
@@ -182,7 +179,7 @@ const styles = theme => ({
     const { dispatch, ctRole, currentUser, onConfirm } = props
     const { effectiveDates, role: roleFK, ...restValues } = values
     const role = ctRole.find(item => item.id === roleFK)
-    const isDoctor = role && role.clinicalRoleName === 'Doctor'
+    const isDoctor = role && role.clinicalRoleName === 'Optometrist'
     const doctorProfile = _.isEmpty(restValues.doctorProfile)
       ? undefined
       : {
@@ -242,7 +239,7 @@ class UserProfileForm extends React.PureComponent {
   }
 
   handleResetPassword = async () => {
-    const { values,dispatch } = this.props
+    const { values, dispatch } = this.props
     const { userProfile } = values
     const payload = {
       userName: userProfile.userName,
@@ -256,8 +253,8 @@ class UserProfileForm extends React.PureComponent {
           message: 'Password reset to default password successfully.',
         })
         dispatch({
-          type:'settingUserProfile/fetchUserProfileByID',
-          payload:{id:values.id} 
+          type: 'settingUserProfile/fetchUserProfileByID',
+          payload: { id: values.id },
         })
       } else {
         notification.error({
@@ -316,8 +313,8 @@ class UserProfileForm extends React.PureComponent {
       const oldRole = ctRole.find(item => item.id === _oldRole)
       const currentSelectedRole = ctRole.find(item => item.id === role)
       if (
-        oldRole.clinicalRoleName === 'Doctor' &&
-        currentSelectedRole.clinicalRoleName !== 'Doctor'
+        oldRole.clinicalRoleName === 'Optometrist' &&
+        currentSelectedRole.clinicalRoleName !== 'Optometrist'
       ) {
         notification.warn({
           message:
@@ -352,7 +349,7 @@ class UserProfileForm extends React.PureComponent {
         const effectiveEndDate = moment(effectiveDates[1])
         const deactivating = today.isSameOrAfter(effectiveEndDate)
         const isPrimaryClinician =
-          currentSelectedRole.clinicalRoleName === 'Doctor'
+          currentSelectedRole.clinicalRoleName === 'Optometrist'
             ? parseInt(doctorProfile?.id, 10) ===
               parseInt(primaryRegisteredDoctorFK, 10)
             : false
@@ -383,6 +380,7 @@ class UserProfileForm extends React.PureComponent {
       hasActiveSession,
       height,
       ctRole,
+      initialValues,
       setFieldValue,
     } = this.props
     const {
@@ -406,7 +404,14 @@ class UserProfileForm extends React.PureComponent {
     )
     const canEditDoctorMCR =
       currentClinicalRole !== undefined &&
-      currentClinicalRole.clinicalRoleName === 'Doctor'
+      currentClinicalRole.clinicalRoleName === 'Optometrist'
+    const isStudentOrOptometrist =
+      currentClinicalRole !== undefined &&
+      (currentClinicalRole.clinicalRoleName === 'Optometrist' ||
+        currentClinicalRole.clinicalRoleName === 'Student') &&
+      values.role
+    console.log(currentClinicalRole)
+    const isAssignedCalendarResource = initialValues.isCalendarResource
     return (
       <LoadingWrapper loading={isValidating}>
         <React.Fragment>
@@ -483,7 +488,10 @@ class UserProfileForm extends React.PureComponent {
                         localFilter={item => {
                           if (
                             _oldRole &&
-                            currentClinicalRole?.clinicalRoleName === 'Doctor'
+                            (currentClinicalRole?.clinicalRoleName ===
+                              'Optometrist' ||
+                              currentClinicalRole?.clinicalRoleName ===
+                                'Student')
                           ) {
                             return (
                               item.clinicalRoleName ===
@@ -494,11 +502,18 @@ class UserProfileForm extends React.PureComponent {
                         }}
                         disabled={isMyAccount}
                         onChange={(val, option) => {
+                          if (values.id && values.isCalendarResource) {
+                            return
+                          }
+                          if (!option) {
+                            setFieldValue('isCalendarResource', null)
+                            return
+                          }
                           if (
-                            option.clinicalRoleName !== 'Doctor' &&
-                            specialtyFK
+                            option.clinicalRoleName !== 'Student' ||
+                            option.clinicalRoleName !== 'Optometrist'
                           ) {
-                            setFieldValue('specialtyFK', null)
+                            setFieldValue('isCalendarResource', null)
                           }
                         }}
                       />
@@ -507,12 +522,37 @@ class UserProfileForm extends React.PureComponent {
                 </GridItem>
                 <GridItem md={6}>
                   {_oldRole &&
-                    currentClinicalRole?.clinicalRoleName === 'Doctor' && (
+                    currentClinicalRole?.clinicalRoleName === 'Student' && (
                       <div style={{ marginTop: 20 }}>
-                        Current user can switch to any user group under doctor
+                        Current user can switch to any user group under student
                         clinical role
                       </div>
                     )}
+                  {_oldRole &&
+                    currentClinicalRole?.clinicalRoleName === 'Optometrist' && (
+                      <div style={{ marginTop: 20 }}>
+                        Current user can switch to any user group under
+                        optometrist clinical role
+                      </div>
+                    )}
+                </GridItem>
+                <GridItem md={12}>
+                  <Field
+                    name='isCalendarResource'
+                    render={args => {
+                      return (
+                        <Checkbox
+                          {...args}
+                          disabled={
+                            !isStudentOrOptometrist ||
+                            (values.id && isAssignedCalendarResource)
+                          }
+                          simple
+                          label='Add user to appointment calendar resource'
+                        />
+                      )
+                    }}
+                  />
                 </GridItem>
               </GridContainer>
 
@@ -547,7 +587,7 @@ class UserProfileForm extends React.PureComponent {
                     </div>
                   </Tooltip>
                 </GridItem>
-                <GridItem md={6}>
+                {/* <GridItem md={6}>
                   <Tooltip
                     title='Short Name will display in system for other users to identify.'
                     placement='bottom-start'
@@ -580,7 +620,7 @@ class UserProfileForm extends React.PureComponent {
                       />
                     </div>
                   </Tooltip>
-                </GridItem>
+                </GridItem> */}
                 <GridItem md={6}>
                   <FastField
                     name='userAccountNo'
@@ -641,7 +681,7 @@ class UserProfileForm extends React.PureComponent {
                     )}
                   />
                 </GridItem>
-                <GridItem md={6}>
+                {/* <GridItem md={6}>
                   <Field
                     name='specialtyFK'
                     render={args => (
@@ -653,7 +693,7 @@ class UserProfileForm extends React.PureComponent {
                       />
                     )}
                   />
-                </GridItem>
+                </GridItem> */}
                 <GridItem md={6}>
                   <FastField
                     name='designation'
