@@ -16,16 +16,14 @@ class VisitList extends PureComponent {
         id: `VisitListingDetails-${index}-${item.visitDate}`,
       }))
     }
-    const VisitListingColumns = [
+    const VisitListingColumns = [ 
       { name: 'visitDate', title: 'Date' },
       { name: 'patientReferenceNo', title: 'Ref. No.' },
       { name: 'patientNRIC', title: 'Acc. No.' },
       { name: 'patientName', title: 'Patient Name' },
       { name: 'copayer', title: 'Co-Payer' },
-      { name: 'visitPurpose', title: 'Visit Purpose' },
       { name: 'invoiceNo', title: 'Invoice No.' },
       { name: 'doctorName', title: 'Doctor' },
-      { name: 'diagnosis', title: 'Diagnosis' },
       { name: 'visitRemarks', title: 'Remarks' },
     ]
 
@@ -39,25 +37,8 @@ class VisitList extends PureComponent {
       { columnName: 'patientNRIC', sortingEnabled: false, width: 100 },
       { columnName: 'patientName', sortingEnabled: false },
       { columnName: 'copayer', sortingEnabled: false },
-      { columnName: 'visitPurpose', sortingEnabled: false },
       { columnName: 'invoiceNo', sortingEnabled: false, width: 100 },
       { columnName: 'doctorName', sortingEnabled: false },
-      {
-        columnName: 'diagnosis',
-        sortingEnabled: false,
-        render: row => {
-          return (
-            <div
-              style={{
-                wordWrap: 'break-word',
-                whiteSpace: 'pre-wrap',
-              }}
-            >
-              {row.diagnosis}
-            </div>
-          )
-        },
-      },
       { columnName: 'visitRemarks', sortingEnabled: false, width: 180 },
     ]
     const SummaryRow = p => {

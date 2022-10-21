@@ -10,6 +10,7 @@ import {
   RadioGroup,
   SizeContainer,
   Select,
+  LocalSearchSelect,
 } from '@/components'
 // medisys components
 import { DoctorProfileSelect } from '@/components/_medisys'
@@ -17,6 +18,7 @@ import service from '@/services/patient'
 import Call from '@material-ui/icons/Call'
 import ReportDateRangePicker from '../ReportDateRangePicker'
 import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
+import { useTheme } from '@material-ui/styles'
 
 const { queryList, query } = service
 const FilterBar = ({
@@ -26,6 +28,7 @@ const FilterBar = ({
   ctcopayer = [],
   classes,
 }) => {
+  const theme = useTheme()
   const selectPatientProfile = args => {
     const { disabled } = args
     return (
@@ -78,7 +81,7 @@ const FilterBar = ({
   return (
     <SizeContainer size='sm'>
       <GridContainer>
-        <GridContainer alignItems='center'>
+        <GridContainer alignItems='center' justify-content='flex-start'>
           <GridItem xs md={4}>
             <Field
               disabled
@@ -87,6 +90,26 @@ const FilterBar = ({
             />
           </GridItem>
           <ReportDateRangePicker />
+          <GridItem md={2}>
+            <FastField
+              name='doctorIDs'
+              render={args => (
+                <DoctorProfileSelect
+                  label='Queue Status'
+                  mode='multiple'
+                  {...args}
+                  allValue={-99}
+                  allValueOption={{
+                    id: -99,
+                    clinicianProfile: {
+                      name: 'All',
+                    },
+                  }}
+                  labelField='clinicianProfile.name'
+                />
+              )}
+            />
+          </GridItem>
           <GridItem md={2}>
             <Button
               color='primary'
@@ -98,28 +121,12 @@ const FilterBar = ({
           </GridItem>
           <GridItem md={12} />
           <GridItem md={2}>
-            <Field
-              name='visitPurposeIDS'
-              render={args => (
-                <CodeSelect
-                  {...args}
-                  options={[
-                    { id: 0, displayValue: 'None' },
-                    ..._.sortBy(visitOrderTemplateOptions, 'displayValue'),
-                  ]}
-                  labelField='displayValue'
-                  mode='multiple'
-                  label='Visit Purpose'
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem md={2}>
             <FastField
               name='doctorIDs'
               render={args => (
                 <DoctorProfileSelect
                   mode='multiple'
+                  label='Student Optometrist'
                   {...args}
                   allValue={-99}
                   allValueOption={{
@@ -164,16 +171,20 @@ const FilterBar = ({
                   defaultValue='3'
                   options={[
                     {
-                      value: 'VisitPurpose',
-                      label: 'Visit Purpose',
+                      value: 'QueueStatus',
+                      label: 'Queue Status',
                     },
                     {
-                      value: 'Doctor',
-                      label: 'Doctor',
+                      value: 'StudentOptometrist',
+                      label: 'Student Optometrist',
+                    },
+                    {
+                      value: 'Optometrist',
+                      label: 'Optometrist',
                     },
                     {
                       value: 'Copayer',
-                      label: 'Co-Payer',
+                      label: 'Co-payer',
                     },
                     {
                       value: 'None',
