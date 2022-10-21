@@ -440,6 +440,7 @@ export default createListViewModel({
 
           let newVisitType = [-99, ...activeVisitType]
           let doctor = []
+          let room = []
           if (data) {
             let user = JSON.parse(
               sessionStorage.getItem('user') || localStorage.getItem('user'),
@@ -457,6 +458,7 @@ export default createListViewModel({
             const queue = queueFilterBar?.value || {}
             const { visitType } = queue
             doctor = queue.doctor || []
+            room = queue.room || []
 
             if (visitType) {
               newVisitType = visitType.filter(
@@ -471,6 +473,7 @@ export default createListViewModel({
                 ...queue,
                 visitType: newVisitType,
                 doctor: doctor,
+                room: room,
               },
             }
             if (
@@ -484,6 +487,7 @@ export default createListViewModel({
                   ...queue,
                   visitType: newVisitType,
                   doctor: doctor,
+                  room: room,
                 },
                 selfOnly: queue.selfOnly,
               }
@@ -499,6 +503,7 @@ export default createListViewModel({
                 queueFilterBar: {
                   visitType: newVisitType,
                   doctor: doctor,
+                  room: room,
                 },
               },
             })

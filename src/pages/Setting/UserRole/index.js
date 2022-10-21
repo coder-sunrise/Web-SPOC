@@ -173,8 +173,12 @@ class UserRole extends React.Component {
     const { showUserProfileForm, openPopper } = this.state
     let height = mainDivHeight - 120 - ($('.filterUserRoleBar').height() || 0)
     if (height < 300) height = 300
- 
-    let filterArray = [CLINICAL_ROLE.DOCTOR, CLINICAL_ROLE.OTHERS] 
+
+    let filterArray = [
+      CLINICAL_ROLE.DOCTOR,
+      CLINICAL_ROLE.OTHERS,
+      CLINICAL_ROLE.STUDENT,
+    ]
 
     return (
       <CardContainer hideHeader>

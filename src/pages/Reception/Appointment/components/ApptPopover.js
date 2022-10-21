@@ -171,9 +171,6 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
           />
         </GridItem>
         <GridItem md={12}>
-          <TextField disabled label='Visit Purpose' value={visitPurposeValue} />
-        </GridItem>
-        <GridItem md={12}>
           <TextField
             disabled
             multiline

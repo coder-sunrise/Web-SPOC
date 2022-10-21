@@ -649,7 +649,11 @@ class Main extends React.Component {
     } = values
 
     const isEdit = !!id
-    let filterArray = [CLINICAL_ROLE.DOCTOR, CLINICAL_ROLE.OTHERS]
+    let filterArray = [
+      CLINICAL_ROLE.DOCTOR,
+      CLINICAL_ROLE.OTHERS,
+      CLINICAL_ROLE.STUDENT,
+    ]
     return (
       <React.Fragment>
         <GridContainer

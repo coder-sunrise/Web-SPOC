@@ -4,7 +4,7 @@ import { CodeSelect } from '@/components'
 // medisys component
 import { DoctorLabel } from '@/components/_medisys'
 
-const DoctorProfileSelect = ({ label = 'Doctor', ...props }) => (
+const DoctorProfileSelect = ({ label = 'Optometrist', ...props }) => (
   <CodeSelect
     {...props}
     allowClear
@@ -14,7 +14,7 @@ const DoctorProfileSelect = ({ label = 'Doctor', ...props }) => (
       'clinicianProfile.isActive': true,
     }}
     labelField='clinicianProfile.name'
-    renderDropdown={(option) => <DoctorLabel doctor={option} />}
+    renderDropdown={option => <DoctorLabel doctor={option} />}
   />
 )
 
