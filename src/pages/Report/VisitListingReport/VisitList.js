@@ -23,7 +23,7 @@ class VisitList extends PureComponent {
       { name: 'patientName', title: 'Patient Name' },
       { name: 'copayer', title: 'Co-Payer' },
       { name: 'invoiceNo', title: 'Invoice No.' },
-      { name: 'doctorName', title: 'Doctor' },
+      { name: 'doctorName', title: 'Optometrist' },
       { name: 'visitRemarks', title: 'Remarks' },
     ]
 
@@ -96,13 +96,16 @@ class VisitList extends PureComponent {
         },
       },
     }
-
+    let afterGroupingVisitListingColumns = VisitListingColumns
     if (
       reportDatas.VisitListingInfo &&
       reportDatas.VisitListingInfo.length > 0 &&
       (reportDatas.VisitListingInfo[0].isGroupByDoctor ||
         reportDatas.VisitListingInfo[0].isGroupByVisitPurpose ||
-        reportDatas.VisitListingInfo[0].isGroupByCopayer)
+        reportDatas.VisitListingInfo[0].isGroupByCopayer ||
+        reportDatas.VisitListingInfo[0].isGroupByOptometrist ||
+        reportDatas.VisitListingInfo[0].isGroupByStudentOptometrist ||
+        reportDatas.VisitListingInfo[0].isGroupByQueueStatus)
     ) {
       FuncProps = {
         pager: false,
@@ -146,11 +149,42 @@ class VisitList extends PureComponent {
                   { prop: 'isGroupByDoctor', columnName: 'doctorName' },
                   { prop: 'isGroupByVisitPurpose', columnName: 'visitPurpose' },
                   { prop: 'isGroupByCopayer', columnName: 'copayer' },
+                  { prop: 'isGroupByOptometrist', columnName: 'doctorName' },
+                  {
+                    prop: 'isGroupByStudentOptometrist',
+                    columnName: 'studentOptometrist',
+                  },
+                  { prop: 'isGroupByQueueStatus', columnName: 'queueStatus' },
                 ].find(g => reportDatas.VisitListingInfo[0][g.prop]).columnName,
               },
             ],
           },
         },
+      }
+
+      if (
+        reportDatas.VisitListingInfo[0]['isGroupByQueueStatus'] ||
+        reportDatas.VisitListingInfo[0]['isGroupByStudentOptometrist']
+      ) {
+        afterGroupingVisitListingColumns = [
+          [
+            {
+              prop: 'isGroupByQueueStatus',
+              col: {
+                name: 'queueStatus',
+                title: 'Queue Status',
+              },
+            },
+            {
+              prop: 'isGroupByStudentOptometrist',
+              col: {
+                name: 'studentOptometrist',
+                title: 'Student Optometrist',
+              },
+            },
+          ].find(item => reportDatas.VisitListingInfo[0][item.prop])?.col,
+          ...VisitListingColumns,
+        ]
       }
     }
     return (
@@ -158,7 +192,7 @@ class VisitList extends PureComponent {
         data={(listData || []).map(o => {
           return { ...o, visitDate: moment(o.visitDate).format('DD MMM YYYY') }
         })}
-        columns={VisitListingColumns}
+        columns={afterGroupingVisitListingColumns}
         columnExtensions={VisitListingColumnsExtensions}
         FuncProps={FuncProps}
       />
@@ -166,4 +200,3 @@ class VisitList extends PureComponent {
   }
 }
 export default VisitList
- 

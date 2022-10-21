@@ -19,6 +19,7 @@ import Call from '@material-ui/icons/Call'
 import ReportDateRangePicker from '../ReportDateRangePicker'
 import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
 import { useTheme } from '@material-ui/styles'
+import { VISIT_STATUS } from '@/utils/constants'
 
 const { queryList, query } = service
 const FilterBar = ({
@@ -89,14 +90,45 @@ const FilterBar = ({
               render={selectPatientProfile}
             />
           </GridItem>
-          <ReportDateRangePicker />
           <GridItem md={2}>
             <FastField
-              name='doctorIDs'
+              name='queueStatus'
               render={args => (
-                <DoctorProfileSelect
+                <CodeSelect
+                  {...args}
                   label='Queue Status'
                   mode='multiple'
+                  options={VISIT_STATUS}
+                  labelField='displayValue'
+                  valueField='displayValue'
+                  allValue={'All'}
+                  allValueOption={{
+                    id: -99,
+                    code: 'ALL',
+                    displayValue: 'All',
+                  }}
+                />
+              )}
+            />
+          </GridItem>
+          <ReportDateRangePicker />
+          <GridItem md={2}>
+            <Button
+              color='primary'
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
+              Generate Report
+            </Button>
+          </GridItem>
+          <GridItem md={12} />
+          <GridItem md={2}>
+            <FastField
+              name='StudentOptometristIDs'
+              render={args => (
+                <DoctorProfileSelect
+                  mode='multiple'
+                  label='Student Optometrist'
                   {...args}
                   allValue={-99}
                   allValueOption={{
@@ -111,22 +143,11 @@ const FilterBar = ({
             />
           </GridItem>
           <GridItem md={2}>
-            <Button
-              color='primary'
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-            >
-              Generate Report
-            </Button>
-          </GridItem>
-          <GridItem md={12} />
-          <GridItem md={2}>
             <FastField
               name='doctorIDs'
               render={args => (
                 <DoctorProfileSelect
                   mode='multiple'
-                  label='Student Optometrist'
                   {...args}
                   allValue={-99}
                   allValueOption={{
@@ -202,4 +223,3 @@ const FilterBar = ({
 }
 
 export default FilterBar
- 

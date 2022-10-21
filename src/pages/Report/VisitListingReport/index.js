@@ -41,6 +41,9 @@ class VisitListing extends ReportBase {
       groupByVisitPurpose: params.groupBy === 'VisitPurpose',
       groupByDoctor: params.groupBy === 'Doctor',
       groupByCopayer: params.groupBy === 'Copayer',
+      groupByQueueStatus: params.groupBy === 'QueueStatus',
+      groupByOptometrist: params.groupBy === 'Optometrist',
+      groupByStudentOptometrist: params.groupBy === 'StudentOptometrist',
     }
   }
 
