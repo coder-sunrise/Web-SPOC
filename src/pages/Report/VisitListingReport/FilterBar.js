@@ -29,7 +29,6 @@ const FilterBar = ({
   ctcopayer = [],
   classes,
 }) => {
-  const theme = useTheme()
   const selectPatientProfile = args => {
     const { disabled } = args
     return (
