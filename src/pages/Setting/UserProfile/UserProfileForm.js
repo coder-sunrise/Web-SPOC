@@ -506,14 +506,14 @@ class UserProfileForm extends React.PureComponent {
                             return
                           }
                           if (!option) {
-                            setFieldValue('isCalendarResource', null)
+                            setFieldValue('isCalendarResource', false)
                             return
                           }
                           if (
                             option.clinicalRoleName !== 'Student' ||
                             option.clinicalRoleName !== 'Optometrist'
                           ) {
-                            setFieldValue('isCalendarResource', null)
+                            setFieldValue('isCalendarResource', false)
                           }
                         }}
                       />
