@@ -36,7 +36,6 @@ import {
 import Authorized from '@/utils/Authorized'
 import UserRoleForm from './UserRoleForm'
 import { dummyData, UserRoleTableConfig } from './const'
-import { CLINICAL_ROLE } from '@/utils/constants'
 
 const styles = theme => ({
   verticalSpacing: {
@@ -173,8 +172,6 @@ class UserRole extends React.Component {
     const { showUserProfileForm, openPopper } = this.state
     let height = mainDivHeight - 120 - ($('.filterUserRoleBar').height() || 0)
     if (height < 300) height = 300
- 
-    let filterArray = [CLINICAL_ROLE.DOCTOR, CLINICAL_ROLE.OTHERS] 
 
     return (
       <CardContainer hideHeader>
@@ -197,9 +194,6 @@ class UserRole extends React.Component {
                     label='Clinical Role'
                     code='ltclinicalrole'
                     labelField='displayValue'
-                    localFilter={item => {
-                      return filterArray.includes(item.id)
-                    }}
                   />
                 )}
               />
