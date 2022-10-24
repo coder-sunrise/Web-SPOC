@@ -371,7 +371,6 @@ class Form extends React.PureComponent {
 
   onConfirmCreatePatient = () => {
     const { patientProfile, dispatch } = this.props
-    console.log(patientProfile)
     const { id, name, contact, patientAccountNo } = patientProfile
     const payload = {
       id,
@@ -1053,7 +1052,6 @@ class Form extends React.PureComponent {
   shouldDisableButtonAction = () => {
     const { values } = this.props
     const { isDataGridValid } = this.state
-    console.log(values, isDataGridValid)
     if (
       !isDataGridValid ||
       !values.patientName ||

@@ -307,7 +307,6 @@ export const mapPropsToValues = ({
       } = viewingAppointment
 
       if (patientProfile) {
-        console.log(patientProfile)
         const { name, patientAccountNo: accNo, contactNumbers } = patientProfile
         const _mobileContact = contactNumbers.find(
           item => item.numberTypeFK === 1,

@@ -219,10 +219,20 @@ export const formikMapPropsToValues = ({
         resourceRoomFK =
           appointment.appointments[0].appointments_Resources[0].calendarResource
             ?.resourceDto?.roomFK
+        if (
+          appointment.appointments[0].appointments_Resources[0].calendarResource
+            .resourceType === 'Doctor'
+        ) {
+          doctorProfileFK =
+            appointment.appointments[0].appointments_Resources[0]
+              .calendarResource.clinicianProfileDto.doctorProfileFK
+        }
       }
-    } else {
-      currentVisitOrderTemplateFK = visitOrderTemplateFK
     }
+    /**else {
+          currentVisitOrderTemplateFK = visitOrderTemplateFK
+        }  */
+
     // const isVisitOrderTemplateActive = (
     //   visitRegistration.visitOrderTemplateOptions || []
     // )
