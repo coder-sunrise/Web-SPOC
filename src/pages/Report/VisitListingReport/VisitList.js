@@ -23,7 +23,7 @@ class VisitList extends PureComponent {
       { name: 'patientName', title: 'Patient Name' },
       { name: 'salesType', title: 'Sales Type' },
       { name: 'queueStatus', title: 'Q.Status' },
-      { name: 'studentOptometrist', title: 'Student Optometrist' },
+      { name: 'studentOptometrist', title: 'S.Optometrist' },
       { name: 'doctorName', title: 'Optometrist' },
       { name: 'invoiceNo', title: 'Invoice No.' },
       { name: 'copayer', title: 'Co-Payer' },
