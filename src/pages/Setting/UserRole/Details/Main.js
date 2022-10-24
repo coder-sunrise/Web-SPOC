@@ -649,12 +649,6 @@ class Main extends React.Component {
     } = values
 
     const isEdit = !!id
-    let filterArray = [
-      CLINICAL_ROLE.DOCTOR,
-      CLINICAL_ROLE.OTHERS,
-      CLINICAL_ROLE.OPTOMETRIST,
-      CLINICAL_ROLE.STUDENT_OPTOMETRIST,
-    ]
     return (
       <React.Fragment>
         <GridContainer
@@ -750,9 +744,9 @@ class Main extends React.Component {
                     code='ltclinicalrole'
                     labelField='displayValue'
                     disabled={isEdit}
-                    localFilter={item => {
-                      return filterArray.includes(item.id)
-                    }}
+                    // localFilter={item => {
+                    //   return filterArray.includes(item.id)
+                    // }}
                     onChange={this.handleSearch}
                   />
                 )}
