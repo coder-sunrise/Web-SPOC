@@ -102,8 +102,7 @@ export const INVOICE_PAYER_TYPE = {
 export const CLINICAL_ROLE = {
   DOCTOR: 1,
   OTHERS: 2,
-  NURSE: 6,
-  PRO: 7,
+  STUDENT: 3,
   OPTOMETRIST: 9,
   STUDENT_OPTOMETRIST: 10,
 }
