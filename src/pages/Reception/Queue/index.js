@@ -889,8 +889,7 @@ class Queue extends React.Component {
       refreshInfo,
     } = this.state
     const { sessionInfo, error, queueFilterBar = {} } = queueLog
-    const { visitType = [] } = queueFilterBar
-    const { doctor = [] } = queueFilterBar
+    const { doctor = [], visitType = [], room = [] } = queueFilterBar
     const { sessionNo, isClinicSessionClosed } = sessionInfo
     const { oriQCallList } = queueCalling
     const openQueueDisplayAccessRight = Authorized.check('openqueuedisplay')
@@ -915,42 +914,7 @@ class Queue extends React.Component {
                     style={{
                       display: 'inline-block',
                       position: 'absolute',
-                      right: 700,
-                      width: 200,
-                    }}
-                  >
-                    <p style={{ fontWeight: 400, fontSize: '0.8rem' }}>
-                      Now Serving:
-                    </p>
-                    <Tooltip
-                      title={
-                        queueCallList?.[0]
-                          ? `${queueCallList?.[0]?.qNo}.0 (${queueCallList?.[0]?.patientName})`
-                          : '-'
-                      }
-                    >
-                      <p
-                        style={{
-                          color: '#1890f8',
-                          textOverflow: 'ellipsis',
-                          overflow: 'hidden',
-                          whiteSpace: 'nowrap',
-                          marginTop: -5,
-                          fontSize: '0.9rem',
-                          width: 200,
-                        }}
-                      >
-                        {queueCallList?.[0]
-                          ? `${queueCallList?.[0]?.qNo}.0 (${queueCallList?.[0]?.patientName})`
-                          : '-'}
-                      </p>
-                    </Tooltip>
-                  </div>
-                  <div
-                    style={{
-                      display: 'inline-block',
-                      position: 'absolute',
-                      right: 620,
+                      right: 450,
                     }}
                   >
                     <p style={{ fontWeight: 400, fontSize: '0.8rem' }}>
@@ -1044,6 +1008,7 @@ class Queue extends React.Component {
                 searchQuery={search}
                 visitType={visitType}
                 doctor={doctor}
+                room={room}
               />
               <RightClickContextMenu
                 onMenuItemClick={this.onMenuItemClick}

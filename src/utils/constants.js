@@ -100,10 +100,10 @@ export const INVOICE_PAYER_TYPE = {
 }
 
 export const CLINICAL_ROLE = {
-         DOCTOR: 1,
-         OTHERS: 2,
-         STUDENT: 3,
-       }
+  DOCTOR: 1,
+  OTHERS: 2,
+  STUDENT: 3,
+}
 
 export const UNFIT_TYPE = {
   1: 'Unfit for Work',

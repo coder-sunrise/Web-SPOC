@@ -8,40 +8,44 @@ export const formatAppointmentTimes = (values = []) =>
 // moment(value, 'HH:mm:ss').format(dateTimeFormat)
 
 export const filterData = (
-         filter,
-         data = [],
-         searchQuery = '',
-         visitType = [],
-         doctor = [],
-       ) => {
-         let newData = data.filter(eachRow => {
-           return (
-             filterMap[filter].includes(eachRow.visitStatus) &&
-             (searchQuery === '' ||
-               (eachRow.patientName || '')
-                 .toLowerCase()
-                 .indexOf(searchQuery.toLowerCase()) >= 0 ||
-               (eachRow.patientReferenceNo || '')
-                 .toLowerCase()
-                 .indexOf(searchQuery.toLowerCase()) >= 0 ||
-               (eachRow.patientAccountNo || '')
-                 .toLowerCase()
-                 .indexOf(searchQuery.toLowerCase()) >= 0 ||
-               (eachRow.patientMobile || '')
-                 .toLowerCase()
-                 .indexOf(searchQuery.toLowerCase()) >= 0) &&
-             (visitType.length === 0 ||
-               visitType.indexOf(-99) >= 0 ||
-               visitType.indexOf(eachRow.visitPurposeFK) >= 0) &&
-             (doctor.length === 0 ||
-               doctor.indexOf(-99) >= 0 ||
-               eachRow.visitDoctor.find(
-                 doc => doctor.indexOf(doc.doctorProfileFK) > -1,
-               ))
-           )
-         })
-         return newData
-       }
+  filter,
+  data = [],
+  searchQuery = '',
+  visitType = [],
+  doctor = [],
+  room = [],
+) => {
+  let newData = data.filter(eachRow => {
+    return (
+      filterMap[filter].includes(eachRow.visitStatus) &&
+      (searchQuery === '' ||
+        (eachRow.patientName || '')
+          .toLowerCase()
+          .indexOf(searchQuery.toLowerCase()) >= 0 ||
+        (eachRow.patientReferenceNo || '')
+          .toLowerCase()
+          .indexOf(searchQuery.toLowerCase()) >= 0 ||
+        (eachRow.patientAccountNo || '')
+          .toLowerCase()
+          .indexOf(searchQuery.toLowerCase()) >= 0 ||
+        (eachRow.patientMobile || '')
+          .toLowerCase()
+          .indexOf(searchQuery.toLowerCase()) >= 0) &&
+      (visitType.length === 0 ||
+        visitType.indexOf(-99) >= 0 ||
+        visitType.indexOf(eachRow.visitPurposeFK) >= 0) &&
+      (doctor.length === 0 ||
+        doctor.indexOf(-99) >= 0 ||
+        eachRow.visitDoctor.find(
+          doc => doctor.indexOf(doc.doctorProfileFK) > -1,
+        )) &&
+      (room.length === 0 ||
+        room.indexOf(-99) >= 0 ||
+        room.indexOf(eachRow.roomFK) >= 0)
+    )
+  })
+  return newData
+}
 
 export const filterDoctorBlock = data => {
   return data.filter(
