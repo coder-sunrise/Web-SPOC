@@ -105,6 +105,36 @@ const Detail = ({
                   }}
                 />
               </GridItem>
+              <GridItem>
+                <FastField
+                  name='availableOpts'
+                  render={args => (
+                    <CheckboxGroup
+                      vertical
+                      simple
+                      valueField='id'
+                      textField='name'
+                      options={[
+                        {
+                          id: 'orderable',
+                          name: 'Orderable',
+                          tooltip:
+                            'Item is orderable and dispensable to patient',
+                          disabled:
+                            hasActiveSession &&
+                            consumableDetail.entity?.id &&
+                            consumableDetail.entity?.isActive &&
+                            consumableDetail.entity?.orderable,
+                          layoutConfig: {
+                            style: {},
+                          },
+                        },
+                      ]}
+                      {...args}
+                    />
+                  )}
+                />
+              </GridItem>
             </GridContainer>
           </GridItem>
           <GridItem xs={12} md={2} />

@@ -76,7 +76,6 @@ import { getClinicianProfile } from '../../ConsultationDocument/utils'
       primaryPrintoutLanguage = 'EN',
       secondaryPrintoutLanguage = '',
     } = clinicSettings
-    const { corVitalSign = [] } = orders
     const { doctorprofile } = codetable
     const { entity: visitEntity } = visitRegistration
     const clinicianProfile = getClinicianProfile(codetable, visitEntity)

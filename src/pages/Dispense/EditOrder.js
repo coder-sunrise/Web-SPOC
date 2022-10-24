@@ -33,10 +33,7 @@ import Authorized from '@/utils/Authorized'
 import { sendNotification } from '@/utils/realtime'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
 import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
-import {
-  visitBasicExaminationsSchema,
-  eyeExaminationsSchema,
-} from '@/pages/Reception/Queue/NewVisit/validationScheme'
+import { eyeExaminationsSchema } from '@/pages/Reception/Queue/NewVisit/validationScheme'
 import { showEyeExaminations } from '../Widgets/PatientHistory/config'
 
 const discardConsultation = async ({
@@ -109,9 +106,6 @@ const styles = () => ({})
         then: Yup.string().required(),
       }),
     }),
-    corPatientNoteVitalSign: Yup.array()
-      .compact(v => v.isDeleted)
-      .of(visitBasicExaminationsSchema),
     corEyeExaminations: Yup.array()
       .compact(v => v.isDeleted)
       .of(eyeExaminationsSchema),
@@ -315,7 +309,6 @@ class EditOrder extends Component {
     const orderWidget = widgets.find(o => o.id === '5')
     const cdWidget = widgets.find(o => o.id === '3')
     const formsWidget = widgets.find(o => o.id === '12')
-    const basicExaminationsWidget = widgets.find(o => o.id === '7')
     const eyeExaminationsWidget = widgets.find(o => o.id === '23')
     const Order = orderWidget.component
     const ConsultationDocument = cdWidget.component
@@ -324,10 +317,6 @@ class EditOrder extends Component {
     )
     const Forms = formsWidget.component
     const formAccessRight = Authorized.check(formsWidget.accessRight)
-    const BasicExaminations = basicExaminationsWidget.component
-    const basicExaminationsAccessRight = Authorized.check(
-      basicExaminationsWidget.accessRight,
-    )
     const EyeExaminations = eyeExaminationsWidget.component
     const eyeExaminationsAccessRight = Authorized.check(
       eyeExaminationsWidget.accessRight,
@@ -462,17 +451,6 @@ class EditOrder extends Component {
                     </span>
                   </h5>
                   <ConsultationDocument forDispense />
-                </div>
-              )}
-            {basicExaminationsAccessRight &&
-              basicExaminationsAccessRight.rights !== 'hidden' && (
-                <div>
-                  <h5>
-                    <span style={{ display: 'inline-block' }}>
-                      Basic Examinations
-                    </span>
-                  </h5>
-                  <BasicExaminations />
                 </div>
               )}
             {eyeExaminationsAccessRight &&

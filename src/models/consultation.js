@@ -51,7 +51,6 @@ export default createFormViewModel({
     state: {
       default: {
         corAttachment: [],
-        corPatientNoteVitalSign: [],
         corEyeExaminations: [],
       },
       selectedWidgets: ['1'],
@@ -480,8 +479,7 @@ export default createFormViewModel({
             })),
             entity: undefined,
             isGSTInclusive: data.isGstInclusive,
-            gstValue: data.gstValue, 
-            corVitalSign: data.corPatientNoteVitalSign || [],
+            gstValue: data.gstValue,
           },
         })
 
@@ -514,15 +512,6 @@ export default createFormViewModel({
             rows: _.sortBy(data.corDiagnosis, 'sequence'),
           },
         })
-
-        const corPatientNoteVitalSign = (data.corPatientNoteVitalSign || [])
-          .length
-          ? data.corPatientNoteVitalSign
-          : [{}]
-        data.corPatientNoteVitalSign = corPatientNoteVitalSign.map(vs => ({
-          ...vs,
-          visitPurposeFK: data.visitPurposeFK,
-        }))
 
         data.corEyeExaminations = (data.corEyeExaminations || []).length
           ? data.corEyeExaminations
