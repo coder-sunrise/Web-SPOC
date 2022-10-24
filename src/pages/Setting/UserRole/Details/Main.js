@@ -569,7 +569,7 @@ class Main extends React.Component {
                     <div
                       style={{
                         marginTop: 5,
-                        marginLeft: item.level > 1 ? 10 * (item.level - 1) : 0,
+                        marginLeft: item.grade > 1 ? 10 * (item.grade - 1) : 0,
                         color: this.isParentSelect(
                           item.clientAccessRightFK,
                           item.module,
