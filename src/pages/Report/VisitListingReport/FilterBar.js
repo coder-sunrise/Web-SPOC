@@ -165,18 +165,15 @@ const FilterBar = ({
               name='copayerIDs'
               render={args => (
                 <CodeSelect
-                  {...args}
                   title='Copayers that patient visit claimed'
-                  options={[
-                    { id: 0, displayValue: 'None' },
-                    ..._.sortBy(ctcopayer, 'displayValue'),
-                  ]}
+                  code='ctcopayer'
                   labelField='displayValue'
                   mode='multiple'
                   label='Co-Payers'
-                  renderDropdown={option => {
-                    return <CopayerDropdownOption option={option} />
-                  }}
+                  renderDropdown={option => (
+                    <CopayerDropdownOption option={option} />
+                  )}
+                  {...args}
                 />
               )}
             />
