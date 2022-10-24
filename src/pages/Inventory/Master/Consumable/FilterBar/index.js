@@ -244,6 +244,29 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                   Add New
                 </Button>
               )}
+              <Button color='primary' onClick={onExportClick}>
+                <ImportExport />
+                Export
+              </Button>
+              {ableToViewByAuthority('inventorymaster.consumable') && (
+                <span>
+                  <input
+                    style={{ display: 'none' }}
+                    type='file'
+                    accept={allowedFiles}
+                    id='importMedicationFile'
+                    ref={inputEl}
+                    multiple={false}
+                    onChange={onFileChange}
+                    onClick={clearValue}
+                  />
+
+                  <Button color='primary' onClick={onImportClick}>
+                    <AttachFile />
+                    Import
+                  </Button>
+                </span>
+              )}
             </div>
           </LoadingWrapper>
         </GridItem>
