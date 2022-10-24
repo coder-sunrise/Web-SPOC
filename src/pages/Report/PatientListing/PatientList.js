@@ -19,7 +19,7 @@ class PatientList extends PureComponent {
       { name: 'patientReferenceNo', title: 'Reference No.' },
       { name: 'patientAccountNo', title: 'Acc. No.' },
       { name: 'patientName', title: 'Patient Name' },
-      { name: 'doctorName', title: 'Last Visit Doctor' },
+      { name: 'doctorName', title: 'Last Visit Optometrist' },
       { name: 'lastVisitDate', title: 'Last Visit Date' },
       { name: 'vC_Gender', title: 'Gender' },
       { name: 'vC_AgeInYear', title: 'Age' },
