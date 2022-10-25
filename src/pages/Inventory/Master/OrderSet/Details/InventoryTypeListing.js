@@ -514,7 +514,7 @@ const InventoryTypeListing = ({
 
   const consumableEditingProps = {
     messages: {
-      deleteCommand: 'Delete consumable',
+      deleteCommand: 'Delete ophthalmic product',
     },
     showAddCommand: true,
     onAddedRowsChange: onAddedRowsChange('consumable'),

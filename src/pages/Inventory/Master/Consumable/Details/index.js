@@ -165,6 +165,7 @@ export default compose(
           .trim()
           .required(),
       }),
+      code: Yup.string().required(),
       displayValue: Yup.string().required(),
       revenueCategoryFK: Yup.string().required(),
       effectiveDates: Yup.array()

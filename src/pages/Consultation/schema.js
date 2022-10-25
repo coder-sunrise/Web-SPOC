@@ -1,13 +1,7 @@
 import Yup from '@/utils/yup'
-import {
-  visitBasicExaminationsSchema,
-  eyeExaminationsSchema,
-} from '@/pages/Reception/Queue/NewVisit/validationScheme'
+import { eyeExaminationsSchema } from '@/pages/Reception/Queue/NewVisit/validationScheme'
 import { hasValue } from '../Widgets/PatientHistory/config'
 const schema = Yup.object().shape({
-  corPatientNoteVitalSign: Yup.array()
-    .compact(v => v.isDeleted)
-    .of(visitBasicExaminationsSchema),
   corEyeExaminations: Yup.array()
     .compact(v => v.isDeleted)
     .of(eyeExaminationsSchema),

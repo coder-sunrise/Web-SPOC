@@ -13,7 +13,6 @@ const LowStockInfo = ({
   codetable,
   visitRegistration = {},
   patient = {},
-  corVitalSign = [],
   right = -5,
   style = {
     position: 'absolute',
