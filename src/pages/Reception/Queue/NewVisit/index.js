@@ -283,30 +283,6 @@ class NewVisit extends PureComponent {
 
     const { doctorProfileFK, visitDoctor = [] } = values
 
-    if (
-      visitDoctor.find(
-        x => !x.isDeleted && x.doctorProfileFK === doctorProfileFK,
-      )
-    ) {
-      notification.error({
-        message: 'Primary doctor and reporting doctor cannot be the same.',
-      })
-      return
-    }
-
-    if (
-      visitDoctor.filter(x => !x.isDeleted).length !==
-      _.uniqBy(
-        visitDoctor.filter(x => !x.isDeleted),
-        'doctorProfileFK',
-      ).length
-    ) {
-      notification.error({
-        message: 'Can not select duplicate doctor.',
-      })
-      return
-    }
-
     if (Object.keys(errors).length > 0) return handleSubmit()
 
     const alreadyRegisteredVisit = list.reduce(

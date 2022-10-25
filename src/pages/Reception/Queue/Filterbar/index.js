@@ -111,10 +111,7 @@ const Filterbar = props => {
             <FastField
               name='doctor'
               render={args => (
-                <Tooltip
-                  placement='right'
-                  title='Filter by primary doctor or reporting doctor.'
-                >
+                <Tooltip placement='right' title='Filter by optometrist.'>
                   <DoctorProfileSelect
                     mode='multiple'
                     {...args}
