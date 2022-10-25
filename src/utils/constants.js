@@ -1010,4 +1010,4 @@ export const VISIT_STATUS = [
     code: 'VERIFIED',
     displayValue: 'Verified',
   },
-]
+] 
