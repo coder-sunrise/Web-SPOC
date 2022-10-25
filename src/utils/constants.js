@@ -103,6 +103,8 @@ export const CLINICAL_ROLE = {
   DOCTOR: 1,
   OTHERS: 2,
   STUDENT: 3,
+  OPTOMETRIST: 9,
+  STUDENT_OPTOMETRIST: 10,
 }
 
 export const UNFIT_TYPE = {
