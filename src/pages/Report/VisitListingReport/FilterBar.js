@@ -10,7 +10,6 @@ import {
   RadioGroup,
   SizeContainer,
   Select,
-  LocalSearchSelect,
 } from '@/components'
 // medisys components
 import { DoctorProfileSelect } from '@/components/_medisys'
@@ -18,7 +17,6 @@ import service from '@/services/patient'
 import Call from '@material-ui/icons/Call'
 import ReportDateRangePicker from '../ReportDateRangePicker'
 import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
-import { useTheme } from '@material-ui/styles'
 import { VISIT_STATUS } from '@/utils/constants'
 
 const { queryList, query } = service
