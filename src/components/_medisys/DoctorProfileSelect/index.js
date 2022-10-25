@@ -14,7 +14,7 @@ const DoctorProfileSelect = ({ label = 'Optometrist', ...props }) => (
       'clinicianProfile.isActive': true,
     }}
     labelField='clinicianProfile.name'
-    renderDropdown={(option) => <DoctorLabel doctor={option} />}
+    renderDropdown={option => <DoctorLabel doctor={option} />}
   />
 )
 

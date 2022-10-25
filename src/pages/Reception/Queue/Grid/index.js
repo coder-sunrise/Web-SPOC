@@ -64,6 +64,7 @@ class Grid extends React.Component {
     if (this.props.mainDivHeight !== nextProps.mainDivHeight) return true
     if (this.props.searchQuery !== nextProps.searchQuery) return true
     if (this.props.visitType !== nextProps.visitType) return true
+    if (this.props.room !== nextProps.room) return true
     if (this.props.doctor !== nextProps.doctor) return true
 
     if (
@@ -103,11 +104,20 @@ class Grid extends React.Component {
       queueList = [],
       visitType = [],
       doctor = [],
+      room = [],
     } = this.props
     const user = JSON.parse(
       sessionStorage.getItem('user') || localStorage.getItem('user'),
     )
+    const roomLocalIdentityID = localStorage.getItem('roomLocalIdentityID')
     const { clinicianProfile } = user.data
+    const clinicRoleFK = clinicianProfile.userProfile.role?.clinicRoleFK
+    const selectRoom =
+      clinicRoleFK === 3
+        ? roomLocalIdentityID
+          ? [parseInt(roomLocalIdentityID, 10)]
+          : [-100]
+        : room
     if (filter === StatusIndicator.APPOINTMENT) {
       let result = calendarEvents
       if (selfOnly) {
@@ -116,12 +126,16 @@ class Grid extends React.Component {
             ? item.clinicianProfileFk === clinicianProfile.id
             : true,
         )
-      }
-      if (doctor.length > 0) {
+      } else if (doctor.length > 0 && doctor.indexOf(-99) < 0) {
         result = result.filter(
           item => doctor.indexOf(item.doctorProfileFK) > -1,
         )
       }
+
+      if (selectRoom.length > 0 && selectRoom.indexOf(-99) < 0) {
+        result = result.filter(item => selectRoom.indexOf(item.roomFk) >= 0)
+      }
+
       if (searchQuery) {
         result = result.filter(
           item =>
@@ -162,8 +176,7 @@ class Grid extends React.Component {
           : true
       })
     }
-
-    return filterData(filter, data, searchQuery, visitType, doctor)
+    return filterData(filter, data, searchQuery, visitType, doctor, selectRoom)
   }
 
   getActionButton = row => (
@@ -297,6 +310,12 @@ class Grid extends React.Component {
               TableProps={TableProps}
               rows={queueListingData}
               forceRender
+              defaultHiddenColumns={[
+                'queueNo',
+                'patientAccountNo',
+                'timeOut',
+                'invoiceNo',
+              ]}
               columnExtensions={[
                 ...queueColumns,
                 {
@@ -353,6 +372,7 @@ class Grid extends React.Component {
               TableProps={TableProps}
               rows={queueListingData}
               forceRender
+              defaultHiddenColumns={['patientAccountNo']}
               columnExtensions={[
                 ...ApptColumnExtensions,
                 {

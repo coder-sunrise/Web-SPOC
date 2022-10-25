@@ -145,6 +145,7 @@ class CommonTableGrid extends PureComponent {
       FuncProps = {},
       columns = [],
       identifier,
+      defaultHiddenColumns = [],
     } = props
     // console.log(props)
     this.gridId = `view-${uniqueGid++}`
@@ -152,7 +153,9 @@ class CommonTableGrid extends PureComponent {
     this.hashCode =
       identifier || generateHashCode(JSON.stringify(columns.map(o => o.name)))
     const { gridSetting = [] } = JSON.parse(localStorage.getItem('user'))
-    const gs = gridSetting.find(o => o.Identifier === this.hashCode) || {}
+    const gs = gridSetting.find(o => o.Identifier === this.hashCode) || {
+      HiddenColumns: defaultHiddenColumns,
+    }
     if (gs.ColumnsOrder && gs.ColumnsOrder.length !== columns.length) {
       gs.ColumnsOrder = columns.map(o => o.name)
     }
@@ -798,7 +801,7 @@ class CommonTableGrid extends PureComponent {
 
   renderColumnChooser = ({ onToggle }) => {
     const { state, props } = this
-    const { classes } = props
+    const { classes, defaultHiddenColumns } = props
     return (
       <div className='grid-setting-popover'>
         <Popper
@@ -811,7 +814,7 @@ class CommonTableGrid extends PureComponent {
                   enableTableForceRender()
                   const gridSetting = {
                     ...state.gridSetting,
-                    HiddenColumns: [],
+                    HiddenColumns: defaultHiddenColumns,
                     ColumnsOrder: undefined,
                   }
                   this.setState({

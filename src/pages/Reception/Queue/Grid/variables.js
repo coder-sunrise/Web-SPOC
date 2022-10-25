@@ -69,7 +69,7 @@ export const AppointmentTableConfig = {
     { name: 'patientName', title: 'Patient Name' },
     { name: 'patientAccountNo', title: 'Acc. No.' },
     { name: 'gender/age', title: 'Gender / Age' },
-    { name: 'doctorName', title: 'Doctor' },
+    { name: 'doctorName', title: 'Optometrist' },
     { name: 'appointmentTime', title: 'Appt. Time' },
     { name: 'roomNo', title: 'Room No.' },
     { name: 'remarks', title: 'Remarks' },
@@ -168,16 +168,18 @@ export const QueueTableConfig = {
       title: 'Cons. Ready',
       fullTitle: 'Ready for Consultation',
     },
+    { name: 'salesType', title: 'Sales Type' },
     { name: 'patientReferenceNo', title: 'Ref. No.' },
     { name: 'patientName', title: 'Patient Name' },
-    { name: 'orderCreateTime', title: 'Order Created Time' },
     { name: 'patientAccountNo', title: 'Acc. No.' },
     { name: 'gender/age', title: 'Gender / Age' },
-    { name: 'doctor', title: 'Doctor' },
-    { name: 'appointmentTime', title: 'Appt. Time' },
+    { name: 'doctor', title: 'Optometrist' },
     { name: 'roomNo', title: 'Room No.' },
+    { name: 'apptType', title: 'Appt. Type' },
+    { name: 'appointmentTime', title: 'Appt. Time' },
     { name: 'remarks', title: 'Remarks' },
     { name: 'timeIn', title: 'Time In' },
+    { name: 'orderCreateTime', title: 'Order Created Time' },
     { name: 'timeOut', title: 'Time Out' },
     { name: 'invoiceNo', title: 'Invoice No' },
     { name: 'invoiceStatus', title: 'Invoice Status' },
@@ -417,6 +419,14 @@ export const QueueColumnExtensions = props => {
           <span>-</span>
         )
       },
+    },
+    {
+      columnName: 'salesType',
+      width: 120,
+    },
+    {
+      columnName: 'apptType',
+      width: 120,
     },
   ]
 }

@@ -21,6 +21,7 @@ import {
   ProgressButton,
   VisitTypeSelect,
   Tooltip,
+  CodeSelect,
 } from '@/components'
 // sub component
 import Authorized from '@/utils/Authorized'
@@ -64,7 +65,6 @@ const Filterbar = props => {
     })
   }
   const clinicRoleFK = user.clinicianProfile.userProfile.role?.clinicRoleFK
-  const servePatientRight = Authorized.check('queue.servepatient')
   // const { currentFilter } = queueLog
   return (
     <div className='div-reception-header'>
@@ -107,6 +107,44 @@ const Filterbar = props => {
                 </Tooltip>
               )}
             />
+
+            {clinicRoleFK !== 3 && (
+              <FastField
+                name='room'
+                render={args => (
+                  <Tooltip placement='right' title='Filter by room.'>
+                    <CodeSelect
+                      style={{
+                        width: 160,
+                        marginRight: 10,
+                      }}
+                      code='ctRoom'
+                      label='Room'
+                      mode='multiple'
+                      maxTagPlaceholder='Room'
+                      maxTagCount={0}
+                      all={-99}
+                      onChange={(v, op = {}) => {
+                        dispatch({
+                          type: 'queueLog/saveUserPreference',
+                          payload: {
+                            userPreferenceDetails: {
+                              value: {
+                                room: v,
+                              },
+                              Identifier: 'Queue',
+                            },
+                            itemIdentifier: 'Queue',
+                            type: '9',
+                          },
+                        })
+                      }}
+                      {...args}
+                    />
+                  </Tooltip>
+                )}
+              />
+            )}
 
             <FastField
               name='doctor'
@@ -219,10 +257,7 @@ const Filterbar = props => {
                 </Button>
               </Authorized>
 
-              {((clinicRoleFK === 1 && !hideSelfOnlyFilter) ||
-                (clinicRoleFK === 6 &&
-                  servePatientRight &&
-                  servePatientRight.rights !== 'hidden')) && (
+              {clinicRoleFK === 1 && !hideSelfOnlyFilter && (
                 <div className={classes.switch}>
                   <Checkbox
                     label='My Patient'
@@ -261,12 +296,12 @@ const connectedFilterbar = connect(({ queueLog, user, loading }) => ({
 const FilterbarWithFormik = withFormik({
   enableReinitialize: true,
   mapPropsToValues: ({ queueLog }) => {
-    const { visitType } = queueLog.queueFilterBar || {}
-    const { doctor } = queueLog.queueFilterBar || {}
+    const { visitType, doctor, room } = queueLog.queueFilterBar || {}
     return {
       search: '',
       visitType: visitType || [],
       doctor: doctor || [],
+      room: room || [],
     }
   },
   handleSubmit: ({ search }, { props }) => {
