@@ -212,7 +212,7 @@ export default createListViewModel({
               calendarResourceFK: item.calendarResourceFK,
               appointmentTypeFK: item.appointmentTypeFK,
               startTime: item.startTime,
-              endTime: item.endTime, 
+              endTime: item.endTime,
               sortOrder: item.sortOrder,
             }))
 
@@ -507,7 +507,7 @@ export default createListViewModel({
       *getPublicHolidayList({ payload }, { call, put }) {
         const result = yield call(phServices.queryList, {
           isActive: true,
-          lgteql_startDate: payload.start,
+          lgteql_endDate: payload.start,
           pagesize: 999,
         })
 
@@ -597,7 +597,7 @@ export default createListViewModel({
           apptDateTo: end,
           doctor: doctor.join(),
           appStatus: [
-            APPOINTMENT_STATUS.CONFIRMED, 
+            APPOINTMENT_STATUS.CONFIRMED,
             APPOINTMENT_STATUS.TURNEDUP,
             APPOINTMENT_STATUS.RESCHEDULED,
             APPOINTMENT_STATUS.PFA_RESCHEDULED,
@@ -616,6 +616,12 @@ export default createListViewModel({
           put({ type: 'getCalendarList', payload: getCalendarListPayload }),
           put({
             type: 'doctorBlock/query',
+            payload: {
+              lgteql_startDateTime: start,
+            },
+          }),
+          put({
+            type: 'roomBlock/query',
             payload: {
               lgteql_startDateTime: start,
             },
@@ -673,6 +679,12 @@ export default createListViewModel({
           put({ type: 'getCalendarList', payload: getCalendarListPayload }),
           put({
             type: 'doctorBlock/query',
+            payload: {
+              lgteql_startDateTime: start,
+            },
+          }),
+          put({
+            type: 'roomBlock/query',
             payload: {
               lgteql_startDateTime: start,
             },

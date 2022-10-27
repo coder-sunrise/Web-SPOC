@@ -29,6 +29,7 @@ const FormFooter = ({
   handleSaveDraftClick,
   handleConfirmClick,
   handleValidateClick,
+  conflicts = [],
   id,
 }) => {
   const isNew = appointmentStatusFK === undefined || !id
@@ -44,6 +45,8 @@ const FormFooter = ({
   }
 
   const confirmBtnText = isNew ? ButtonText.ADD : ButtonText.EDIT
+  const isExistsPreventConflict =
+    conflicts.filter(conflict => conflict.isPrevent).length > 0
   return (
     <SizeContainer size='md'>
       <div className={classnames(classes.footer)}>
@@ -57,16 +60,22 @@ const FormFooter = ({
             {ButtonText.CANCEL_APPOINTMENT}
           </Button>
         </Authorized>
-        <Button
+        {/* <Button
           disabled={disabledCheckAvailability || isTurnedUp || isCancelled}
           color='success'
           onClick={handleValidateClick}
         >
           {ButtonText.CHECK}
-        </Button>
+        </Button> */}
         <Authorized authority='appointment.appointmentdetails'>
           <Button
-            disabled={disabled || isTurnedUp || isCancelled || !patientIsActive}
+            disabled={
+              disabled ||
+              isTurnedUp ||
+              isCancelled ||
+              !patientIsActive ||
+              isExistsPreventConflict
+            }
             onClick={handleConfirmClick}
             color='primary'
           >
