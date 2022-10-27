@@ -407,8 +407,7 @@ class UserProfileForm extends React.PureComponent {
       currentClinicalRole.clinicalRoleName === 'Optometrist'
     const isStudentOrOptometrist =
       currentClinicalRole !== undefined &&
-      (currentClinicalRole.clinicalRoleName === 'Optometrist' ||
-        currentClinicalRole.clinicalRoleName === 'Student') &&
+      currentClinicalRole.clinicalRoleName === 'Optometrist' &&
       values.role
     console.log(currentClinicalRole)
     const isAssignedCalendarResource = initialValues.isCalendarResource
@@ -509,10 +508,7 @@ class UserProfileForm extends React.PureComponent {
                             setFieldValue('isCalendarResource', false)
                             return
                           }
-                          if (
-                            option.clinicalRoleName !== 'Student' ||
-                            option.clinicalRoleName !== 'Optometrist'
-                          ) {
+                          if (option.clinicalRoleName !== 'Optometrist') {
                             setFieldValue('isCalendarResource', false)
                           }
                         }}

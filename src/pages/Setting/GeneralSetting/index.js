@@ -262,21 +262,6 @@ class GeneralSetting extends PureComponent {
 
     const { visitTypeSetting } = clinicSettings.settings
     const { ctvisitpurpose = [] } = codetable
-
-    let visitTypeSettingsObj = undefined
-    let visitPurpose = undefined
-    if (visitTypeSetting) {
-      try {
-        visitTypeSettingsObj = JSON.parse(visitTypeSetting)
-      } catch {}
-    }
-    if ((ctvisitpurpose || []).length > 0) {
-      visitPurpose = getMappedVisitType(
-        ctvisitpurpose,
-        visitTypeSettingsObj,
-      ).filter(vstType => vstType['isEnabled'] === 'true')
-    }
-
     const {
       hasActiveSession,
       autoPrintOnSignOff,
@@ -391,8 +376,7 @@ class GeneralSetting extends PureComponent {
                   <CodeSelect
                     label='Default Visit Type'
                     {...args}
-                    code='ctVisitpurpose'
-                    options={visitPurpose || []}
+                    options={ctvisitpurpose || []}
                     disabled={!!hasActiveSession}
                     allowClear={false}
                   />
