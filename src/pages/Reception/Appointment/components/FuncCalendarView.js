@@ -286,6 +286,7 @@ const CalendarView = ({
   onUpdateEvent,
   apptTimeSlotDuration = 15,
   allResources = [],
+  roomBlocks = [],
 }) => {
   changeTimeRulerExtentPixel(apptTimeRulerExtent)
 
@@ -295,9 +296,9 @@ const CalendarView = ({
     return true
   }
   const _eventColors = event => {
-    const { isDoctorBlock } = event.data
+    const { isDoctorBlock, isRoomBlock } = event.data
 
-    if (isDoctorBlock) {
+    if (isDoctorBlock || isRoomBlock) {
       event.element.style.backgroundColor = doctorEventColorOpts.value
       return
     }
@@ -389,6 +390,22 @@ const CalendarView = ({
     return false
   }
 
+  const checkIsTodayPublicHoliday = currentTime => {
+    const currentDate = moment(currentTime)
+
+    const holidays = publicHolidays.filter(item => {
+      const startDate = moment(item.startDate)
+      const endDate = moment(item.endDate)
+      if (currentDate.isBetween(startDate, endDate, 'days', '[]')) {
+        return true
+      }
+      return false
+    })
+    const holidayLabel = holidays.length > 0 ? holidays[0].displayValue : ''
+
+    return { isPublicHoliday: holidays.length > 0, holidayLabel }
+  }
+
   const eventList = useMemo(() => {
     return calendarEvents.reduce((events, appointment) => {
       const {
@@ -446,7 +463,7 @@ const CalendarView = ({
           item.resourceType === CALENDAR_RESOURCE.DOCTOR
             ? `Doctor-${item.resourceFK}`
             : `Resource-${item.resourceFK}`,
-        IsReadonly: isReadonly(appointment),
+        isReadonly: isReadonly(appointment),
         appointmentDate: appointmentDate,
         visitPurposeValue: visitPurposeValue,
       }))
@@ -469,48 +486,24 @@ const CalendarView = ({
             EndTime: moment(item.endDateTime).toDate(),
             resourceFK: `Doctor-${item.doctor.clinicianProfile.id}`,
           })),
+          ...roomBlocks.map(item => ({
+            ...item,
+            isRoomBlock: true,
+            resourceId: item.room.calendarResourceFK,
+            start: moment(item.startDateTime).toDate(),
+            end: moment(item.endDateTime).toDate(),
+            StartTime: moment(item.startDateTime).toDate(),
+            EndTime: moment(item.endDateTime).toDate(),
+            resourceFK: `Resource-${item.room.resourceFK}`,
+          })),
         ],
         calendarView === CALENDAR_VIEWS.DAY,
         ctcalendarresource,
       ),
-    [calendarView, filter, doctorBlocks, eventList],
+    [calendarView, filter, doctorBlocks, roomBlocks, eventList],
   )
 
   const cellDoubleClick = props => {
-    const resource = resources[props.groupIndex]
-    if (resource.resourceType === CALENDAR_RESOURCE.RESOURCE) {
-      const dailyCapacity = resource.calendarResourceDailyCapacity || []
-      const startTime = moment(props.startTime).format(timeFormat24Hour)
-      const hour = Math.floor(apptTimeSlotDuration / 60)
-      const minute = apptTimeSlotDuration % 60
-      const endTime = moment(props.startTime)
-        .add(hour, 'hour')
-        .add(minute, 'minute')
-        .format(timeFormat24Hour)
-      for (let index = 0; index < dailyCapacity.length; index++) {
-        if (
-          ((startTime >= dailyCapacity[index].startTime &&
-            startTime < dailyCapacity[index].endTime) ||
-            (endTime > dailyCapacity[index].startTime &&
-              endTime <= dailyCapacity[index].endTime) ||
-            (startTime < dailyCapacity[index].startTime &&
-              endTime > dailyCapacity[index].endTime)) &&
-          dailyCapacity[index].maxCapacity <= dailyCapacity[index].usedSlot
-        ) {
-          dispatch({
-            type: 'global/updateAppState',
-            payload: {
-              openConfirm: true,
-              isInformType: true,
-              openConfirmText: 'OK',
-              openConfirmContent: `${resource.name} reach maximum booking in this time slot. Please select another time.`,
-            },
-          })
-          props.cancel = true
-          return
-        }
-      }
-    }
     handleSelectSlot({
       start: props.startTime,
       end: props.endTime,
@@ -521,79 +514,20 @@ const CalendarView = ({
   }
 
   const renderCell = event => {
-    if (event.elementType === 'dateHeader') {
-      const resource = resources[event.groupIndex]
-      if (resource && resource.resourceType === CALENDAR_RESOURCE.RESOURCE) {
-        const dailyCapacity = _.orderBy(
-          resource.calendarResourceDailyCapacity.filter(
-            c =>
-              moment(c.dailyDate).format('DD MMM YYYY') ===
-              moment(event.date).format('DD MMM YYYY'),
-          ),
-          ['startTime'],
-          ['asc'],
-        )
-        if (dailyCapacity.length) {
-          const tooltip = dailyCapacity
-            .map(c => {
-              const startTime = moment(
-                new Date(`${moment().format('DD MMM YYYY')} ${c.startTime}`),
-              ).format(timeFormat24Hour)
-              const endTime = moment(
-                new Date(`${moment().format('DD MMM YYYY')} ${c.endTime}`),
-              ).format(timeFormat24Hour)
-              return `${startTime} - ${endTime} Maximum slot: ${
-                c.maxCapacity
-              } Balance slot: ${c.maxCapacity -
-                c.usedSlot}\r\nRemarks: ${c.remarks || '-'}`
-            })
-            .join('\r\n')
-          const maxSlot = dailyCapacity.map(c => c.maxCapacity).join(', ')
-          const balanceSlot = dailyCapacity
-            .map(c => {
-              const balance = c.maxCapacity - c.usedSlot
-              return `<span style="color:${
-                balance > 0 ? 'black' : 'red'
-              }">${balance}</span>`
-            })
-            .join(', ')
-          event.element.innerHTML = `<div style="position:relative;">${event.element.innerHTML}<div title="${tooltip}" style="position:absolute;right:0px;top:0px;color:black;font-size:14px;">Max: ${maxSlot} Bal: ${balanceSlot}</div></div>`
-        }
-      }
-    } else if (event.elementType === 'monthCells') {
-      let tooltip
-      let resourceList
-      const newAllResources = _.orderBy(
-        allResources || [],
-        ['sortOrder', source => source.name.toUpperCase()],
-        ['asc'],
-      )
-      newAllResources.map(item => {
-        const dailyCapacitys = (
-          item.calendarResourceDailyCapacity || []
-        ).filter(
-          c =>
-            moment(c.dailyDate).format('DD MMM YYYY') ===
-            moment(event.date).format('DD MMM YYYY'),
-        )
-        if (dailyCapacitys.length) {
-          const bgResourceColor = item.resourceDto?.balanceTagColorHex
-          const totalMaxCapacity = _.sumBy(dailyCapacitys, 'maxCapacity')
-          const totalUsedSlot = _.sumBy(dailyCapacitys, 'usedSlot')
-          const totalBalCapacity = totalMaxCapacity - totalUsedSlot
-          tooltip = `${tooltip ? `${tooltip} \n` : ''}${
-            item.name
-          } bal.: ${totalBalCapacity}`
-          resourceList = `${resourceList ? resourceList : ''}<div style="${
-            resourceList ? 'border-left:1px solid #ccc;' : ''
-          }display:inline-block;padding:0px 4px;background-color:${bgResourceColor ||
-            'white'};color:${
-            bgResourceColor ? 'white' : 'black'
-          };font-size:15px;">${totalBalCapacity}</div>`
-        }
-      })
-      if (resourceList) {
-        event.element.innerHTML = `<div style="position:relative;">${event.element.innerHTML}<div title="${tooltip}" style="position:absolute;right:2px;top:-2px;border:1px solid #ccc;">${resourceList}</div></div>`
+    if (event.elementType === 'monthCells') {
+      const { isPublicHoliday, holidayLabel } =
+        publicHolidays.length > 0
+          ? checkIsTodayPublicHoliday(event.date)
+          : { isPublicHoliday: false, holidayLabel: '' }
+
+      if (isPublicHoliday) {
+        const isToday =
+          moment(event.date).format('DD MMM YYYY') ===
+          moment().format('DD MMM YYYY')
+        const holidayDiv = `<div style="padding-top:25px"><div style="height:103.6px; background-color:#7d7d7d; color:white; fontSize: 14px; text-align:center;">${holidayLabel}</div></div>`
+        event.element.innerHTML = `<div>${holidayDiv}<div style="margin-top:${
+          isToday ? '-130.6px' : '-128.6px'
+        }">${event.element.innerHTML}</div></div>`
       }
     }
   }
@@ -640,7 +574,14 @@ const CalendarView = ({
         resourceTitleAccessor='calendarResourceName'
         eventAction={eventAction}
         dragStart={e => {
-          //e.navigation.enable = true
+          if (e.data.isReadonly || e.data.isRoomBlock) {
+            e.cancel = true
+          }
+        }}
+        resizeStart={e => {
+          if (e.data.isReadonly || e.data.isRoomBlock) {
+            e.cancel = true
+          }
         }}
         dragStop={e => {
           if (
@@ -765,12 +706,20 @@ const CalendarView = ({
 }
 
 const _CalendarView = connect(
-  ({ calendar, codetable, loading, doctorBlock, clinicSettings }) => ({
+  ({
+    calendar,
+    codetable,
+    loading,
+    doctorBlock,
+    clinicSettings,
+    roomBlock,
+  }) => ({
     displayDate: calendar.currentViewDate,
     calendarView: calendar.calendarView,
     calendarEvents: calendar.list || [],
     publicHolidays: calendar.publicHolidayList,
     doctorBlocks: doctorBlock.list || [],
+    roomBlocks: roomBlock.list || [],
     appointmentTypes: codetable.ctappointmenttype || [],
     loading: loading.models.calendar,
     apptTimeIntervel: clinicSettings.settings.apptTimeIntervel,

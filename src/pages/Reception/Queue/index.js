@@ -255,6 +255,9 @@ class Queue extends React.Component {
               ...DefaultPatientProfile.contact.mobileContactNumber,
               number: row.patientContactNo,
             },
+            contactEmailAddress: {
+              emailAddress: row.patientEmail,
+            },
           },
         },
       })

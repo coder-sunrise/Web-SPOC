@@ -39,7 +39,6 @@ const isTimeChange = (from, to) => {
 }
 
 export const AppointmentDataColumn = [
-  { name: 'conflicts', title: ' ' },
   { name: 'calendarResourceFK', title: 'Resource' },
   { name: 'appointmentTypeFK', title: 'Appointment Type' },
   { name: 'startTime', title: 'Time From' },
@@ -136,22 +135,6 @@ export const AppointmentDataColExtensions = (apptTimeIntervel, disabled) => [
           </div>
         </div>
       )
-    },
-  },
-  {
-    columnName: 'conflicts',
-    // type: 'error',
-    editingEnabled: false,
-    sortingEnabled: false,
-    disabled: true,
-    align: 'center',
-    width: 40,
-    render: row => {
-      if (row.conflicts && row.conflicts.length > 0) {
-        return <ErrorPopover errors={row.conflicts} />
-      }
-
-      return null
     },
   },
 ]

@@ -18,7 +18,7 @@ import {
 } from './variables'
 import ErrorPopover from './ErrorPopover'
 import { CALENDAR_RESOURCE } from '@/utils/constants'
-import { NavigateBeforeSharp } from '@material-ui/icons'
+import { NavigateBeforeSharp, ReportProblem } from '@material-ui/icons'
 
 const styles = () => ({
   container: {
@@ -75,14 +75,14 @@ class AppointmentDataGrid extends React.Component {
       apptTimeIntervel,
       disabled,
     ).map(column => {
-      if (column.columnName === 'isPrimaryClinician') {
+      /* if (column.columnName === 'isPrimaryClinician') {
         return {
           ...column,
           checkedValue: true,
           uncheckedValue: false,
           onChange: this.onRadioChange,
         }
-      }
+      } */
 
       if (column.type === 'time') {
         return {
@@ -205,6 +205,7 @@ class AppointmentDataGrid extends React.Component {
       handleEditingRowsChange,
       editingRows,
       selectedSlot,
+      conflicts = [],
     } = this.props
 
     const tempColumnExtensions = this.getColumnExtensions()
@@ -233,33 +234,25 @@ class AppointmentDataGrid extends React.Component {
             columnExtensions={tempColumnExtensions}
             FuncProps={funcProps}
             EditingProps={{
-              messages: {
-                deleteCommand: 'Delete appointment slot',
-              },
-              // showAddCommand: !disabled,
-              showDeleteCommand:
-                data.filter(item => !item.isDeleted).length > 1,
+              showCommandColumn: false,
               onCommitChanges: handleCommitChanges,
-              onAddedRowsChange: rows => {
-                const primaryDoctor = data.find(
-                  d => !d.isDeleted && d.isPrimaryClinician,
-                )
-                if (primaryDoctor) {
-                  rows.forEach(r => {
-                    r.appointmentFK = primaryDoctor.appointmentFK
-                    r.appointmentTypeFK = primaryDoctor.appointmentTypeFK
-                    r.apptDurationHour = primaryDoctor.apptDurationHour
-                    r.apptDurationMinute = primaryDoctor.apptDurationMinute
-                    r.startTime = primaryDoctor.startTime
-                    r.endTime = primaryDoctor.endTime
-                  })
-                }
-                return rows
-              },
             }}
             schema={validationSchema}
           />
         )}
+        <div>
+          {conflicts.map(conflict => (
+            <div style={{ margin: '4px 0px' }}>
+              <ReportProblem
+                style={{
+                  color: conflict.isPrevent ? 'orange' : 'darkblue',
+                  marginRight: 6,
+                }}
+              />
+              {conflict.conflictContent}
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
