@@ -18,7 +18,7 @@ import {
 } from './variables'
 import ErrorPopover from './ErrorPopover'
 import { CALENDAR_RESOURCE } from '@/utils/constants'
-import { NavigateBeforeSharp, ReportProblem } from '@material-ui/icons'
+import { NavigateBeforeSharp } from '@material-ui/icons'
 
 const styles = () => ({
   container: {
@@ -205,7 +205,6 @@ class AppointmentDataGrid extends React.Component {
       handleEditingRowsChange,
       editingRows,
       selectedSlot,
-      conflicts = [],
     } = this.props
 
     const tempColumnExtensions = this.getColumnExtensions()
@@ -240,19 +239,6 @@ class AppointmentDataGrid extends React.Component {
             schema={validationSchema}
           />
         )}
-        <div>
-          {conflicts.map(conflict => (
-            <div style={{ margin: '4px 0px' }}>
-              <ReportProblem
-                style={{
-                  color: conflict.isPrevent ? 'orange' : 'darkblue',
-                  marginRight: 6,
-                }}
-              />
-              {conflict.conflictContent}
-            </div>
-          ))}
-        </div>
       </div>
     )
   }

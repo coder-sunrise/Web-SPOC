@@ -623,7 +623,13 @@ class Form extends React.PureComponent {
       if (validate && response) {
         const conflicts = [...response]
         if (response.length > 0) {
-          this.setState({ conflicts: response[0].conflicts || [] })
+          this.setState({
+            conflicts: _.orderBy(
+              response[0].conflicts || [],
+              ['isPrevent'],
+              ['desc'],
+            ),
+          })
         } else {
           this.setState({ conflicts: [] })
         }
@@ -1277,7 +1283,6 @@ class Form extends React.PureComponent {
                     editingRows={editingRows}
                     selectedSlot={selectedSlot}
                     checkAddResource={this.checkAddResource}
-                    conflicts={this.state.conflicts}
                   />
                 </GridItem>
                 <GridItem xs md={12}>

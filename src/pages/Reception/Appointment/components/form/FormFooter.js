@@ -7,6 +7,7 @@ import { Button, GridContainer, GridItem, SizeContainer } from '@/components'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 import style from './style'
+import { ReportProblem } from '@material-ui/icons'
 
 const ButtonText = {
   DELETE: 'Delete',
@@ -82,6 +83,24 @@ const FormFooter = ({
             {confirmBtnText}
           </Button>
         </Authorized>
+      </div>
+      {conflicts.length > 0 && <h4>Appointment Conflicts:</h4>}
+      <div>
+        {conflicts.map(conflict => (
+          <div
+            style={{ margin: '4px 0px', position: 'relative', paddingLeft: 24 }}
+          >
+            <div style={{ position: 'absolute', top: 0, left: 0 }}>
+              <ReportProblem
+                style={{
+                  color: conflict.isPrevent ? 'orange' : '#4255bd',
+                  marginRight: 6,
+                }}
+              />
+            </div>
+            <div>{conflict.conflictContent}</div>
+          </div>
+        ))}
       </div>
     </SizeContainer>
   )
