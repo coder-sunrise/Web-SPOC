@@ -95,7 +95,7 @@ export default {
   'reception.queue.dispense.serviceItem.instructions': 'Instructions',
   'reception.queue.dispense.serviceItem.remarks': 'Remarks',
 
-  'reception.queue.dispense.consumableItem.consumable': 'Ophthalmic Product',
+  'reception.queue.dispense.consumableItem.consumable': 'Product',
   'reception.queue.dispense.consumableItem.remarks': 'Remarks',
 
   'reception.queue.dispense.orderSetItem.orderSet': 'Order Set',

@@ -140,7 +140,7 @@ const ItemList = ({
   const options = () => [
     {
       id: 2,
-      name: 'Ophthalmic Product',
+      name: 'Product',
       content: addContent('inventoryconsumable'),
     },
     {

@@ -117,13 +117,13 @@ export const menuData = [
   {
     authority: 'settings.clinicsetting.consumableuom',
     title: 'Clinic Setting',
-    text: 'Ophthalmic Product UOM',
+    text: 'Product UOM',
     url: '/setting/consumableuom',
   },
   {
     authority: 'settings.clinicsetting.consumablecategory',
     title: 'Clinic Setting',
-    text: 'Ophthalmic Product Category',
+    text: 'Product Category',
     url: '/setting/consumablegroup',
   },
   {
