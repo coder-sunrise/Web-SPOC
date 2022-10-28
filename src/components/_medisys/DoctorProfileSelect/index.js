@@ -32,7 +32,7 @@ const DoctorProfileSelect = ({
         case 'opto':
           return clinicRoleFK == 1
         default:
-          break
+          return clinicRoleFK == 1 || clinicRoleFK == 3
       }
     }}
     renderDropdown={option => <DoctorLabel doctor={option} />}
