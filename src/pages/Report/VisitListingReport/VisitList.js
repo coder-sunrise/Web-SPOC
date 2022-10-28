@@ -164,31 +164,6 @@ class VisitList extends PureComponent {
           },
         },
       }
-
-      // if (
-      //   reportDatas.VisitListingInfo[0]['isGroupByQueueStatus'] ||
-      //   reportDatas.VisitListingInfo[0]['isGroupByStudentOptometrist']
-      // ) {
-      //   afterGroupingVisitListingColumns = [
-      //     [
-      //       {
-      //         prop: 'isGroupByQueueStatus',
-      //         col: {
-      //           name: 'queueStatus',
-      //           title: 'Queue Status',
-      //         },
-      //       },
-      //       {
-      //         prop: 'isGroupByStudentOptometrist',
-      //         col: {
-      //           name: 'studentOptometrist',
-      //           title: 'Student Optometrist',
-      //         },
-      //       },
-      //     ].find(item => reportDatas.VisitListingInfo[0][item.prop])?.col,
-      //     ...VisitListingColumns,
-      //   ]
-      // }
     }
     return (
       <ReportDataGrid

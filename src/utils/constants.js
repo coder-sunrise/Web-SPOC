@@ -965,46 +965,16 @@ export const APPOINTMENT_STAGE_COLOR = [
 export const VISIT_STATUS = [
   {
     id: 1,
-    code: 'UPCOMING_APPT',
-    displayValue: 'Upcoming Appt.',
-  },
-  {
-    id: 2,
-    code: 'IN_CONS',
-    displayValue: 'In Cons',
-  },
-  {
-    id: 3,
-    code: 'PAUSED',
-    displayValue: 'Paused',
-  },
-  {
-    id: 4,
-    code: 'DISPENSE',
-    displayValue: 'Dispense',
-  },
-  {
-    id: 5,
-    code: 'BILLING',
-    displayValue: 'Billing',
-  },
-  {
-    id: 6,
-    code: 'ORDER_UPDATED',
-    displayValue: 'Order Updated',
-  },
-  {
-    id: 7,
     code: 'COMPLETED',
     displayValue: 'Completed',
   },
   {
-    id: 8,
+    id: 2,
     code: 'UNGRADED',
     displayValue: 'Ungraded',
   },
   {
-    id: 9,
+    id: 3,
     code: 'VERIFIED',
     displayValue: 'Verified',
   },
