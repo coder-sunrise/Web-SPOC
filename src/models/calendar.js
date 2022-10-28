@@ -212,7 +212,7 @@ export default createListViewModel({
               calendarResourceFK: item.calendarResourceFK,
               appointmentTypeFK: item.appointmentTypeFK,
               startTime: item.startTime,
-              endTime: item.endTime, 
+              endTime: item.endTime,
               sortOrder: item.sortOrder,
             }))
 
@@ -563,6 +563,9 @@ export default createListViewModel({
       },
       *navigateCalendar({ payload }, { all, select, put }) {
         const calendarState = yield select(state => state.calendar)
+        const {
+          filters: { filterByApptType = [] },
+        } = yield select(state => state.appointment)
         const { date, view, doctor = [] } = payload
         const targetDate =
           date !== undefined ? date : calendarState.currentViewDate
@@ -597,7 +600,7 @@ export default createListViewModel({
           apptDateTo: end,
           doctor: doctor.join(),
           appStatus: [
-            APPOINTMENT_STATUS.CONFIRMED, 
+            APPOINTMENT_STATUS.CONFIRMED,
             APPOINTMENT_STATUS.TURNEDUP,
             APPOINTMENT_STATUS.RESCHEDULED,
             APPOINTMENT_STATUS.PFA_RESCHEDULED,
@@ -606,6 +609,7 @@ export default createListViewModel({
             APPOINTMENT_STATUS.PFA_NOSHOW,
           ].join(),
           dob: null,
+          appType: filterByApptType.join(),
         }
         // const getCalendarListPayload = {
         //   apptDateFrom: start,
@@ -675,6 +679,15 @@ export default createListViewModel({
             type: 'doctorBlock/query',
             payload: {
               lgteql_startDateTime: start,
+            },
+          }),
+          put({
+            type: 'appointment/updateState',
+            payload: {
+              filters: {
+                filterByDoctor: doctor,
+                filterByApptType: appType,
+              },
             },
           }),
         ])
