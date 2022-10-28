@@ -5,7 +5,7 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { ReportDataGrid } from '@/components/_medisys'
 
 class PatientList extends PureComponent {
-  render () {
+  render() {
     let listData = []
     const { reportDatas } = this.props
     if (!reportDatas) return null
@@ -35,16 +35,16 @@ class PatientList extends PureComponent {
       { columnName: 'patientReferenceNo', sortingEnabled: false },
       { columnName: 'patientAccountNo', sortingEnabled: false },
       { columnName: 'patientName', sortingEnabled: false },
-      { columnName: 'doctorName', sortingEnabled: false },
+      { columnName: 'doctorName', sortingEnabled: false, width: 180 },
       { columnName: 'vC_Gender', sortingEnabled: false },
       { columnName: 'vC_AgeInYear', sortingEnabled: false },
       { columnName: 'vC_Nationality', sortingEnabled: false },
       { columnName: 'vC_MobileNo', sortingEnabled: false },
       { columnName: 'vC_EmailAddress', sortingEnabled: false },
     ]
-    const SummaryRow = (p) => {
+    const SummaryRow = p => {
       const { children } = p
-      let countCol = children.find((c) => {
+      let countCol = children.find(c => {
         return (
           c.props.tableColumn.column &&
           c.props.tableColumn.column.name === 'patientReferenceNo'
@@ -145,9 +145,7 @@ class PatientList extends PureComponent {
         grouping: true,
         groupingConfig: {
           state: {
-            grouping: [
-              { columnName: 'doctorName' },
-            ],
+            grouping: [{ columnName: 'doctorName' }],
           },
         },
       }

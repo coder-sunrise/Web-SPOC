@@ -16,12 +16,15 @@ import { DoctorProfileSelect } from '@/components/_medisys'
 import service from '@/services/patient'
 import Call from '@material-ui/icons/Call'
 import ReportDateRangePicker from '../ReportDateRangePicker'
+import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
+import { VISIT_STATUS } from '@/utils/constants'
 
 const { queryList, query } = service
 const FilterBar = ({
   handleSubmit,
   isSubmitting,
   visitOrderTemplateOptions = [],
+  ctcopayer = [],
   classes,
 }) => {
   const selectPatientProfile = args => {
@@ -76,12 +79,33 @@ const FilterBar = ({
   return (
     <SizeContainer size='sm'>
       <GridContainer>
-        <GridContainer alignItems='center'>
+        <GridContainer alignItems='center' justify-content='flex-start'>
           <GridItem xs md={4}>
             <Field
               disabled
               name='patientProfileID'
               render={selectPatientProfile}
+            />
+          </GridItem>
+          <GridItem md={2}>
+            <FastField
+              name='queueStatus'
+              render={args => (
+                <CodeSelect
+                  {...args}
+                  label='Queue Status'
+                  mode='multiple'
+                  options={VISIT_STATUS}
+                  labelField='displayValue'
+                  valueField='displayValue'
+                  allValue={'All'}
+                  allValueOption={{
+                    id: -99,
+                    code: 'ALL',
+                    displayValue: 'All',
+                  }}
+                />
+              )}
             />
           </GridItem>
           <ReportDateRangePicker />
@@ -96,15 +120,22 @@ const FilterBar = ({
           </GridItem>
           <GridItem md={12} />
           <GridItem md={2}>
-            <Field
-              name='visitPurposeIDS'
+            <FastField
+              name='studentOptometristIDs'
               render={args => (
-                <CodeSelect
-                  {...args}
-                  options={[{ id: 0, displayValue: 'None' }, ...visitOrderTemplateOptions]}
-                  labelField='displayValue'
+                <DoctorProfileSelect
                   mode='multiple'
-                  label='Visit Purpose'
+                  label='Student Optometrist'
+                  clinicRole='stu'
+                  {...args}
+                  allValue={-99}
+                  allValueOption={{
+                    id: -99,
+                    clinicianProfile: {
+                      name: 'All',
+                    },
+                  }}
+                  labelField='clinicianProfile.name'
                 />
               )}
             />
@@ -117,6 +148,7 @@ const FilterBar = ({
                   mode='multiple'
                   {...args}
                   allValue={-99}
+                  clinicRole='opto'
                   allValueOption={{
                     id: -99,
                     clinicianProfile: {
@@ -124,6 +156,24 @@ const FilterBar = ({
                     },
                   }}
                   labelField='clinicianProfile.name'
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={2}>
+            <FastField
+              name='copayerIDs'
+              render={args => (
+                <CodeSelect
+                  title='Copayers that patient visit claimed'
+                  code='ctcopayer'
+                  labelField='displayValue'
+                  mode='multiple'
+                  label='Co-Payers'
+                  renderDropdown={option => (
+                    <CopayerDropdownOption option={option} />
+                  )}
+                  {...args}
                 />
               )}
             />
@@ -138,12 +188,20 @@ const FilterBar = ({
                   defaultValue='3'
                   options={[
                     {
-                      value: 'VisitPurpose',
-                      label: 'Visit Purpose',
+                      value: 'QueueStatus',
+                      label: 'Queue Status',
                     },
                     {
-                      value: 'Doctor',
-                      label: 'Doctor',
+                      value: 'StudentOptometrist',
+                      label: 'Student Optometrist',
+                    },
+                    {
+                      value: 'Optometrist',
+                      label: 'Optometrist',
+                    },
+                    {
+                      value: 'Copayer',
+                      label: 'Co-payer',
                     },
                     {
                       value: 'None',
