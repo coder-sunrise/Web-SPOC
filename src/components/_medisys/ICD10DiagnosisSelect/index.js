@@ -209,7 +209,7 @@ const ICD10DiagnosisSelect = ({
           )}
         </div>
       )}
-      {clinicSettings.isEnableJapaneseICD10Diagnosis === true && (
+      {false && clinicSettings.isEnableJapaneseICD10Diagnosis === true && (
         <div
           style={{
             ...filterStyle,

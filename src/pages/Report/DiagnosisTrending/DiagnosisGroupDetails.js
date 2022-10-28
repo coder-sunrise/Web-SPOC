@@ -40,8 +40,7 @@ class DiagnosisGroupDetails extends PureComponent {
       DiagnosisDetailsColumns = [
         { name: 'groupName', title: 'Date' },
         { name: 'diagnosisCode', title: 'Diagnosis Code' },
-        { name: 'diagnosisName', title: 'Diagnosis Name (EN)' },
-        { name: 'diagnosisJpnName', title: 'Diagnosis Name (JP)' },
+        { name: 'diagnosisName', title: 'Diagnosis Name' },
         { name: 'patientCount', title: 'Patients' },
         { name: 'visitCount', title: 'Visits' },
       ]
@@ -50,7 +49,6 @@ class DiagnosisGroupDetails extends PureComponent {
       { columnName: 'groupName', sortingEnabled: false },
       { columnName: 'diagnosisCode', sortingEnabled: false },
       { columnName: 'diagnosisName', sortingEnabled: false },
-      { columnName: 'diagnosisJpnName', sortingEnabled: false },
       { columnName: 'patientCount', sortingEnabled: false },
       { columnName: 'visitCount', sortingEnabled: false },
     ]

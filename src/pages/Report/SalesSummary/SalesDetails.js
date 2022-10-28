@@ -11,7 +11,7 @@ class SalesDetails extends PureComponent {
     if (!reportDatas)
       return null
     let SalesSummaryDetailsCols = [
-      { name: 'doctorName', title: 'Doctor Name' },
+      { name: 'doctorName', title: 'Optometrist Name' },
       { name: 'salesDate', title: 'Date' },
       { name: 'visit', title: 'Visit' },
     ]
