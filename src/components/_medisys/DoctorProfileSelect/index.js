@@ -6,7 +6,7 @@ import { DoctorLabel } from '@/components/_medisys'
 
 const DoctorProfileSelect = ({
   label = 'Optometrist',
-  clinicRole = 'all',
+  clinicRole = 'opto',
   ...props
 }) => (
   <CodeSelect
