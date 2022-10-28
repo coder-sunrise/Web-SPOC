@@ -126,25 +126,6 @@ const widgets = [
     },
   },
   {
-    id: '7',
-    name: 'Basic Examinations',
-    shortName: 'Basic Exam.',
-    accessRight: 'queue.consultation.widgets.vitalsign',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/VitalSign'),
-      loading: Loading,
-    }),
-    model: 'patientVitalSign',
-    associatedProps: ['corPatientNoteVitalSign'],
-    layoutConfig: {
-      minW: 12,
-      minH: 10,
-      style: {
-        padding: '5px',
-      },
-    },
-  },
-  {
     id: '23',
     name: 'Eye Examinations',
     shortName: 'Eye Exam.',

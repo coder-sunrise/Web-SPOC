@@ -252,7 +252,7 @@ const getOrdersData = val => {
     primaryPrintoutLanguage = 'EN',
     secondaryPrintoutLanguage = '',
   } = clinicSettings
-  const { corVitalSign = [], rows } = orders
+  const { rows } = orders
 
   return data
 }

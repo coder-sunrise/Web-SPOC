@@ -81,13 +81,7 @@ const itemSchema = Yup.object().shape({
 
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
-    displayValue: Yup.string()
-      .test(
-        'len',
-        'Service name cannot exceed 40 characters.',
-        val => val && val.length <= 40,
-      )
-      .required(),
+    displayValue: Yup.string().required(),
     serviceCategoryFK: Yup.string().required(),
     revenueCategoryFK: Yup.string().required(),
     effectiveDates: Yup.array()
@@ -163,7 +157,6 @@ class Detail extends PureComponent {
       { name: 'serviceCenterFK', title: 'Service Center' },
       { name: 'costPrice', title: 'Cost' },
       { name: 'unitPrice', title: 'Selling Price/Unit' },
-      { name: 'isTrackResults', title: 'Track Results' },
       { name: 'isDefault', title: 'Default' },
     ],
     columnExtensions: [
@@ -185,13 +178,6 @@ class Detail extends PureComponent {
       },
       { columnName: 'costPrice', type: 'number', currency: true, width: 110 },
       { columnName: 'unitPrice', type: 'number', currency: true, width: 160 },
-      {
-        columnName: 'isTrackResults',
-        type: 'checkbox',
-        checkedValue: true,
-        width: 135,
-        uncheckedValue: false,
-      },
       {
         columnName: 'isDefault',
         type: 'radio',

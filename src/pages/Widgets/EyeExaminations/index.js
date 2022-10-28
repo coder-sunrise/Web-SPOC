@@ -18,8 +18,7 @@ const styles = theme => ({
   },
 })
 
-@connect(({ patientVitalSign, patient }) => ({
-  patientVitalSign,
+@connect(({ patient }) => ({
   patientInfo: patient.entity || {},
 }))
 class index extends PureComponent {
