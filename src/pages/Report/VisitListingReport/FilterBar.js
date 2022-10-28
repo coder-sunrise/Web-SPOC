@@ -121,11 +121,12 @@ const FilterBar = ({
           <GridItem md={12} />
           <GridItem md={2}>
             <FastField
-              name='StudentOptometristIDs'
+              name='studentOptometristIDs'
               render={args => (
                 <DoctorProfileSelect
                   mode='multiple'
                   label='Student Optometrist'
+                  clinicRole='stu'
                   {...args}
                   allValue={-99}
                   allValueOption={{
@@ -147,6 +148,7 @@ const FilterBar = ({
                   mode='multiple'
                   {...args}
                   allValue={-99}
+                  clinicRole='opto'
                   allValueOption={{
                     id: -99,
                     clinicianProfile: {
