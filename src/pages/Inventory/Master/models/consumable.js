@@ -45,7 +45,10 @@ export default createListViewModel({
       },
 
       *import({ payload }, { call }) {
-        const result = yield call(service.import, { content: payload.content })
+        const result = yield call(service.import, {
+          content: payload.content,
+          isOverwrite: payload.importOverwrite,
+        })
         if (result === false) return false
         return result
       },
