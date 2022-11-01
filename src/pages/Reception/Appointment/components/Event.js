@@ -14,6 +14,7 @@ import { CALENDAR_VIEWS } from '@/utils/constants'
 import customDropdownStyle from '@/assets/jss/material-dashboard-pro-react/components/customDropdownStyle'
 import ApptPopover from './ApptPopover'
 import DoctorBlockPopover from './DoctorBlockPopover'
+import RoomBlockPopover from './RoomBlockPopover'
 
 const style = theme => ({
   ...customDropdownStyle(theme),
@@ -82,6 +83,7 @@ class Event extends React.PureComponent {
       patientProfile,
       start,
       end,
+      room,
     } = event
     let { patientName, patientAccountNo, patientContactNo } = event
     if (patientProfile) {
@@ -107,6 +109,9 @@ class Event extends React.PureComponent {
         : ''
       subtitle = ''
     }
+    if (room) {
+      title = room.resourceName
+    }
 
     const monthViewClass = classnames({
       [classes.baseContainer]: true,
@@ -122,6 +127,8 @@ class Event extends React.PureComponent {
 
     if (event.isDoctorBlock)
       OverlayComponent = <DoctorBlockPopover popoverEvent={event} />
+    if (event.isRoomBlock)
+      OverlayComponent = <RoomBlockPopover popoverEvent={event} />
 
     const { stage, stageColorHex } = event
     const showStage = stage && stage.trim() !== ''

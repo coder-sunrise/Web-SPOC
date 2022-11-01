@@ -265,6 +265,12 @@ class Appointment extends React.PureComponent {
         lgteql_startDateTime: startOfMonth,
       },
     })
+    dispatch({
+      type: 'roomBlock/query',
+      payload: {
+        lgteql_startDateTime: startOfMonth,
+      },
+    })
 
     dispatch({
       type: 'calendar/updateState',

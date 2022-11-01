@@ -250,7 +250,7 @@ class Detail extends PureComponent {
       <React.Fragment>
         <GridContainer
           style={{
-            height: 700,
+            //height: 700,
             alignItems: 'start',
             overflowY: 'scroll',
           }}
@@ -330,7 +330,7 @@ class Detail extends PureComponent {
                 />
               </GridItem>
             </GridContainer>
-            <GridContainer>
+            {/*  <GridContainer>
               <GridItem md={8}>
                 <div style={{ position: 'relative' }}>
                   <h5 style={{ fontWeight: 400, margin: '8px 6px -4px 6px' }}>
@@ -582,7 +582,7 @@ class Detail extends PureComponent {
                   />
                 </div>
               </GridItem>
-            </GridContainer>
+            </GridContainer> */}
           </div>
         </GridContainer>
         {footer &&
@@ -593,7 +593,7 @@ class Detail extends PureComponent {
               disabled: false,
             },
           })}
-        <CommonModal
+        {/* <CommonModal
           open={this.state.showDailyManagementModal}
           observe='DailyResourceManagement'
           title={'Daily Resource Management'}
@@ -603,7 +603,7 @@ class Detail extends PureComponent {
           onConfirm={this.toggleModal}
         >
           <DailyResourceManagement {...this.props} />
-        </CommonModal>
+        </CommonModal> */}
       </React.Fragment>
     )
   }
