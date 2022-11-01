@@ -163,13 +163,13 @@ class EmergencyContactGrid extends PureComponent {
       )
     ) {
       notification.warn({
-        message: 'This contact person already existed',
+        message: 'This family member already existed',
       })
       return
     }
     if (o.id === values.id) {
       notification.warn({
-        message: 'Can not add this patient himself as contact person',
+        message: 'Can not add this patient himself as family member',
       })
       return
     }

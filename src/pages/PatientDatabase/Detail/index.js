@@ -282,18 +282,19 @@ class PatientDetail extends PureComponent {
       }
     }
 
-    const emergencyContactAccessRight = Authorized.check(
-      'patientdatabase.patientprofiledetails.emergencycontact',
+    const familyMembersAccessRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.familymembers',
     )
-    if (emergencyContactAccessRight) {
-      const hiddenEmergencyContactByAccessRight =
-        emergencyContactAccessRight.rights === 'hidden'
-      if (hiddenEmergencyContactByAccessRight) {
+    if (familyMembersAccessRight) {
+      const hiddenFamilyMembersByAccessRight =
+        familyMembersAccessRight.rights === 'hidden' ||
+        familyMembersAccessRight.rights === 'disable'
+      if (hiddenFamilyMembersByAccessRight) {
         this.widgets = this.widgets.filter(t => t.id !== '2')
       }
     }
     const { clinicSettings } = this.props
- 
+
     const viewPatientResultsRight = Authorized.check(
       'patientdatabase.patientprofiledetails.patientresults',
     ) || { rights: 'hidden' }
