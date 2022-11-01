@@ -387,19 +387,6 @@ export const widgets = (
     }),
   },
   {
-    id: WIDGETS_ID.INVOICE,
-    name: 'Invoice',
-    authority: 'queue.consultation.widgets.order',
-    component: Loadable({
-      loader: () => import('./Invoice'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
-  {
     id: WIDGETS_ID.CONSULTATION_DOCUMENT,
     name: 'Consultation Document',
     authority: 'queue.consultation.widgets.consultationdocument',
