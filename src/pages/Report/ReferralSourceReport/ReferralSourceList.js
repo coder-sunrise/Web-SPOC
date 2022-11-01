@@ -22,7 +22,7 @@ class ReferralSourceList extends PureComponent {
       { name: 'visitDate', title: 'Visit Date' },
       { name: 'patientReferenceNo', title: 'Patient ID' },
       { name: 'patientName', title: 'Patient' },
-      { name: 'doctorName', title: 'Doctor' },
+      { name: 'doctorName', title: 'Optometrist' },
       { name: 'nextApptDate', title: 'Next Appt.' },
       { name: 'invoiceNo', title: 'Invoice No.' },
       { name: 'invoiceAmount', title: 'Invoice Amount' },

@@ -18,7 +18,7 @@ class InvoiceList extends PureComponent {
     const InvoiceListingCols = [
       { name: 'invoiceDate', title: 'Date' },
       { name: 'invoiceNo', title: 'Invoice No.' },
-      { name: 'doctorName', title: 'Doctor' },
+      { name: 'doctorName', title: 'Optometrist' },
       { name: 'patientName', title: 'Patient Name' },
       { name: 'invoiceAmt', title: 'Amount(Bef. GST)' },
       { name: 'gstAmt', title: 'GST' },

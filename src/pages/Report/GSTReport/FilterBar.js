@@ -23,7 +23,9 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={2}>
             <FastField
               name='isGroupByDoctor'
-              render={(args) => <Checkbox {...args} label='Group By Doctor' />}
+              render={args => (
+                <Checkbox {...args} label='Group By Optometrist' />
+              )}
             />
           </GridItem>
           <GridItem md={3}>
@@ -39,7 +41,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={4}>
             <FastField
               name='doctorIDs'
-              render={(args) => (
+              render={args => (
                 <DoctorProfileSelect
                   mode='multiple'
                   {...args}

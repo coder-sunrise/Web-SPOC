@@ -47,7 +47,7 @@ class OutstandingList extends PureComponent {
     const OutstandingPaymentDetailsCols = [
       { name: 'date', title: 'Date' },
       { name: 'invoiceno', title: 'Invoice No.' },
-      { name: 'doctor', title: 'Doctor Name' },
+      { name: 'doctor', title: 'Optometrist Name' },
       { name: 'patientAccountNo', title: 'Acc. No.' },
       { name: 'patientname', title: 'Patient Name' },
       { name: 'invoiceamt', title: 'Invoice Amt.' },

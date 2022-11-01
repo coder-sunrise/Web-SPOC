@@ -30,8 +30,6 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                     options={[
                       { name: 'All', value: 'ALL' },
                       { name: 'Dispense', value: 'DISPENSE' },
-                      { name: 'Purchasing and Receiving', value: 'PODO' },
-                      { name: 'Receiving Goods', value: 'RG' },
                       { name: 'Inventory Adjustment', value: 'INVENTORYADJ' },
                       { name: 'Credit Note', value: 'CREDITNOTE' },
                     ]}

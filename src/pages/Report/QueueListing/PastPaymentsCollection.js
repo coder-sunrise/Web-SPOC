@@ -29,7 +29,7 @@ const PastPaymentsCollection = ({ reportDatas, isCompany }) => {
 
   let invoiceNoTitle = 'Invoice No.'
   let payerNameTitle = 'Payer Name'
-  let doctorNameTitle = 'Doctor'
+  let doctorNameTitle = 'Optometrist'
   let invoiceDateTitle = 'Invoice Date'
   if (isCompany) {
     invoiceNoTitle = 'Statement No. / Invoice No.'
