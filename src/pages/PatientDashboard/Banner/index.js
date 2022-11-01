@@ -672,7 +672,7 @@ class Banner extends PureComponent {
       <Row wrap={false}>
         <Col flex='none'>
           <span className={classes.header} style={{ color: 'darkblue' }}>
-            Spoken Language:{' '}
+            Referral Source:{' '}
           </span>
         </Col>
         <Col flex='auto' className={contentClass}>
