@@ -507,7 +507,7 @@ export default createListViewModel({
       *getPublicHolidayList({ payload }, { call, put }) {
         const result = yield call(phServices.queryList, {
           isActive: true,
-          lgteql_startDate: payload.start,
+          lgteql_endDate: payload.start,
           pagesize: 999,
         })
 
@@ -624,6 +624,21 @@ export default createListViewModel({
               lgteql_startDateTime: start,
             },
           }),
+          put({
+            type: 'roomBlock/query',
+            payload: {
+              lgteql_startDateTime: start,
+            },
+          }),
+          put({
+            type: 'appointment/updateState',
+            payload: {
+              filters: {
+                filterByDoctor: doctor,
+                filterByApptType: appType,
+              },
+            },
+          }),
         ])
       },
       *updateAppointmentLinking({ payload }, { call, put }) {
@@ -682,12 +697,9 @@ export default createListViewModel({
             },
           }),
           put({
-            type: 'appointment/updateState',
+            type: 'roomBlock/query',
             payload: {
-              filters: {
-                filterByDoctor: doctor,
-                filterByApptType: appType,
-              },
+              lgteql_startDateTime: start,
             },
           }),
         ])
