@@ -961,3 +961,21 @@ export const APPOINTMENT_STAGE_COLOR = [
     color: '#00B853',
   },
 ]
+
+export const VISIT_STATUS = [
+  {
+    id: 1,
+    code: 'COMPLETED',
+    displayValue: 'Completed',
+  },
+  {
+    id: 2,
+    code: 'UNGRADED',
+    displayValue: 'Ungraded',
+  },
+  {
+    id: 3,
+    code: 'VERIFIED',
+    displayValue: 'Verified',
+  },
+]

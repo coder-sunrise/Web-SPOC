@@ -107,21 +107,44 @@ const gridValidationSchema = Yup.object().shape({
   mapPropsToValues,
 })
 class Form extends React.PureComponent {
-  state = {
-    submitCount: this.props.commitCount,
-    showPatientProfile: false,
-    showSearchPatientModal: false,
-    showDeleteConfirmationModal: false,
-    showRescheduleForm: false,
-    datagrid:
-      this.props.values && this.props.values.currentAppointment
-        ? this.props.values.currentAppointment.appointments_Resources
-        : [],
-    showSeriesUpdateConfirmation: false,
-    tempNewAppointmentStatusFK: -1,
-    isDataGridValid: this.props.values.id !== undefined,
-    editingRows: [],
-    hasActiveSession: false,
+  constructor(props) {
+    super(props)
+    const { values, dispatch, setFieldValue } = props
+    Promise.all([
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'ltappointmentstatus' },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'ltcancelreasontype' },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'ctresource' },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'ctcalendarresource' },
+      }),
+    ])
+    this.state = {
+      submitCount: this.props.commitCount,
+      showPatientProfile: false,
+      showSearchPatientModal: false,
+      showDeleteConfirmationModal: false,
+      showRescheduleForm: false,
+      datagrid:
+        this.props.values && this.props.values.currentAppointment
+          ? this.props.values.currentAppointment.appointments_Resources
+          : [],
+      showSeriesUpdateConfirmation: false,
+      tempNewAppointmentStatusFK: -1,
+      isDataGridValid: this.props.values.id !== undefined,
+      editingRows: [],
+      hasActiveSession: false,
+      conflicts: [],
+    }
   }
 
   componentDidMount = async () => {
@@ -154,24 +177,6 @@ class Form extends React.PureComponent {
     }
 
     this.checkHasActiveSession()
-    Promise.all([
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: { code: 'ltappointmentstatus' },
-      }),
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: { code: 'ltcancelreasontype' },
-      }),
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: { code: 'ctresource' },
-      }),
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: { code: 'ctcalendarresource' },
-      }),
-    ])
 
     if (values && values.patientProfileFK) {
       this.refreshPatient(values.patientProfileFK)
@@ -184,6 +189,8 @@ class Form extends React.PureComponent {
       if (values.isUpdated) {
         setFieldValue('isUpdated', false)
       }
+
+      this.onValidateClick()
     }, 500)
   }
 
@@ -264,13 +271,15 @@ class Form extends React.PureComponent {
       ...patientProfileDefaultValue,
       name: values.patientName,
       callingName: values.patientName,
-      email: values.email,
       contact: {
         ...patientProfileDefaultValue.contact,
         mobileContactNumber: {
           ...patientProfileDefaultValue.contact.mobileContactNumber,
           number: values.patientContactNo,
           countryCodeFK: values.countryCodeFK,
+        },
+        contactEmailAddress: {
+          emailAddress: values.email,
         },
       },
     }
@@ -350,7 +359,7 @@ class Form extends React.PureComponent {
     })
     this.refreshPatient(id)
     if (!autoPopulate) this.toggleSearchPatientModal()
-
+    this.onValidateClick()
     return true
   }
 
@@ -440,7 +449,7 @@ class Form extends React.PureComponent {
     return endResult
   }
 
-  onCommitChanges = ({ rows, deleted, ...restProps }) => {
+  onCommitChanges = ({ rows, deleted, changed, ...restProps }) => {
     const { setFieldValue } = this.props
     setFieldValue('_fakeField', 'fakeValue')
     if (deleted) {
@@ -500,9 +509,24 @@ class Form extends React.PureComponent {
           this.updateEnableRecurrence()
         },
       )
+
+      if (changed) {
+        const keys = Object.keys(changed)
+        if (keys.length) {
+          const updateData = changed[Object.keys(changed)[0]]
+          if (
+            Object.keys(updateData).find(
+              key =>
+                ['calendarResourceFK', 'startTime', 'endTime'].indexOf(key) >=
+                0,
+            )
+          ) {
+            this.onValidateClick()
+          }
+        }
+      }
       return updatedRows
     }
-
     return rows
   }
 
@@ -598,33 +622,17 @@ class Form extends React.PureComponent {
       })
       if (validate && response) {
         const conflicts = [...response]
-
-        this.setState(
-          preState => ({
-            submitCount: preState.submitCount + 1,
-            datagrid: preState.datagrid.reduce(
-              (data, d) => [
-                ...data,
-                {
-                  ...d,
-                  conflicts:
-                    conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
-                      ? conflicts[d.sortOrder].conflicts
-                      : undefined,
-                },
-              ],
-              [],
+        if (response.length > 0) {
+          this.setState({
+            conflicts: _.orderBy(
+              response[0].conflicts || [],
+              ['isPrevent'],
+              ['desc'],
             ),
-          }),
-          () => {
-            this.props.dispatch({
-              type: 'global/updateState',
-              payload: {
-                commitCount: this.state.submitCount + 1,
-              },
-            })
-          },
-        )
+          })
+        } else {
+          this.setState({ conflicts: [] })
+        }
         return conflicts
       }
       if (!validate && response) {
@@ -1259,7 +1267,10 @@ class Form extends React.PureComponent {
                   values={values}
                   // onVisitPurposeSelected={this.onVisitPurposeSelected}
                   patientProfile={patientProfile}
-                  getClinicoperationhour={this.getClinicoperationhour}
+                  getClinicoperationhour={() => {
+                    this.getClinicoperationhour()
+                    this.onValidateClick()
+                  }}
                 />
                 <GridItem xs md={12} className={classes.verticalSpacing}>
                   <AppointmentDataGrid
@@ -1340,6 +1351,7 @@ class Form extends React.PureComponent {
                     handleSaveDraftClick={this.onSaveDraftClick}
                     handleConfirmClick={this.onConfirmClick}
                     handleValidateClick={this.onValidateClick}
+                    conflicts={this.state.conflicts}
                   />
                 </GridItem>
               </GridItem>

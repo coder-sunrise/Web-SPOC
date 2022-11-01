@@ -131,7 +131,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, setFieldValue, values }) => {
                   options={[
                     {
                       value: 'Doctor',
-                      label: 'Doctor',
+                      label: 'Optometrist',
                     },
                     {
                       value: 'None',

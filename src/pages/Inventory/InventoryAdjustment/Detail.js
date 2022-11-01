@@ -258,9 +258,7 @@ class Detail extends PureComponent {
       {
         columnName: 'inventoryTypeFK',
         type: 'select',
-        options: [
-          { value: INVENTORY_TYPE.CONSUMABLE, name: 'Ophthalmic Product' },
-        ],
+        options: [{ value: INVENTORY_TYPE.CONSUMABLE, name: 'Product' }],
         disabled: true,
       },
       {
@@ -775,7 +773,7 @@ class Detail extends PureComponent {
                             options={[
                               {
                                 value: INVENTORY_TYPE.CONSUMABLE,
-                                name: 'Ophthalmic Product',
+                                name: 'Product',
                               },
                             ]}
                             onChange={this.inventoryTypeChanged}

@@ -514,7 +514,7 @@ const InventoryTypeListing = ({
 
   const consumableEditingProps = {
     messages: {
-      deleteCommand: 'Delete consumable',
+      deleteCommand: 'Delete product',
     },
     showAddCommand: true,
     onAddedRowsChange: onAddedRowsChange('consumable'),
@@ -558,7 +558,7 @@ const InventoryTypeListing = ({
         >
           <Authorized authority='inventorymaster.orderset.consumable'>
             <InventoryType
-              title='Ophthalmic Product'
+              title='Product'
               inventoryTypeProps={consumableProps}
               schema={consumableSchema}
               rows={consumableRows}

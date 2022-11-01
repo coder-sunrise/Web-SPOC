@@ -9,6 +9,8 @@ import { status } from '@/utils/codes'
 import { LoadingWrapper } from '@/components/_medisys'
 import { downloadFile } from '@/services/file'
 import { convertToBase64, ableToViewByAuthority } from '@/utils/utils'
+import MenuItem from '@material-ui/core/MenuItem'
+import Menu from '@material-ui/core/Menu'
 
 import {
   GridContainer,
@@ -55,6 +57,9 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
   const [loadingText, setLoadingText] = useState('')
 
   const inputEl = useRef(null)
+  const [anchorEl, setAnchorEl] = useState(null)
+  const [importOverwrite, setImportOverwrite] = useState(false)
+  const [confirmImportOption, setConfirmImportOption] = useState(false)
 
   const onExportClick = async () => {
     setExporting(true)
@@ -64,7 +69,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
       type: 'consumable/export',
     }).then(result => {
       if (result) {
-        downloadFile(result, 'Consumable.xlsx')
+        downloadFile(result, 'Product.xlsx')
       }
 
       setExporting(false)
@@ -119,6 +124,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
           type: 'consumable/import',
           payload: {
             ...selectedFiles[0],
+            importOverwrite,
           },
         }).then(result => {
           if (result && result.byteLength === 0) {
@@ -147,6 +153,26 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
     }
   }
 
+  const handleMenuClick = event => {
+    setAnchorEl(event.currentTarget)
+    setConfirmImportOption(true)
+  }
+
+  const handleMenuClose = () => {
+    setAnchorEl(null)
+    setConfirmImportOption(false)
+  }
+
+  const handleMenuItemClick = value => {
+    setImportOverwrite(value == 1)
+    onImportClick()
+    handleMenuClose()
+  }
+
+  const importOptions = [
+    { name: 'Overwrite', value: 1 },
+    { name: 'Normal', value: 2 },
+  ]
   return (
     <div className={classes.filterBar}>
       <GridContainer>
@@ -243,6 +269,57 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                   <Add />
                   Add New
                 </Button>
+              )}
+              <Button color='primary' onClick={onExportClick}>
+                <ImportExport />
+                Export
+              </Button>
+              {ableToViewByAuthority('inventorymaster.consumable') && (
+                <span>
+                  <input
+                    style={{ display: 'none' }}
+                    type='file'
+                    accept={allowedFiles}
+                    id='importMedicationFile'
+                    ref={inputEl}
+                    multiple={false}
+                    onChange={onFileChange}
+                    onClick={clearValue}
+                  />
+
+                  <Button
+                    color='primary'
+                    aria-haspopup='true'
+                    aria-expanded={confirmImportOption}
+                    onClick={handleMenuClick}
+                  >
+                    <AttachFile />
+                    Import
+                  </Button>
+
+                  <Menu
+                    id='pp-positioned-menu'
+                    aria-labelledby='pp-positioned-button'
+                    disableAutoFocusItem
+                    anchorEl={anchorEl}
+                    open={confirmImportOption}
+                    onClose={handleMenuClose}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'left',
+                    }}
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'left',
+                    }}
+                  >
+                    {importOptions.map(x => (
+                      <MenuItem onClick={() => handleMenuItemClick(x.value)}>
+                        {x.name}
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </span>
               )}
             </div>
           </LoadingWrapper>

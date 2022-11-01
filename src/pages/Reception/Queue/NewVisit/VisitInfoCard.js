@@ -201,7 +201,6 @@ const VisitInfoCard = ({
       setFieldValue(FormField['visit.consReady'], false)
     }
     setFieldValue(FormField['visit.isDoctorInCharge'], true)
-    setFieldValue('visitBasicExaminations[0].visitPurposeFK', v)
     if (currentVisitTemplate) {
       handleVisitOrderTemplateChange(v, currentVisitTemplate)
     }

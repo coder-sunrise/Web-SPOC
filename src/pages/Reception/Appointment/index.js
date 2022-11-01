@@ -113,6 +113,9 @@ class Appointment extends React.PureComponent {
     const endOfMonth = moment()
       .endOf('day')
       .formatUTC(false)
+    const filterTemplate = await dispatch({
+      type: 'appointment/getFilterTemplate',
+    })
 
     dispatch({
       type: 'calendar/query',
@@ -122,6 +125,17 @@ class Appointment extends React.PureComponent {
           isCancelled: false,
           apptDateFrom: startOfMonth,
           apptDateTo: endOfMonth,
+          appType: filterTemplate?.currentFilterTemplate?.filterByApptType.join(),
+        },
+      },
+    })
+    dispatch({
+      type: 'appointment/updateState',
+      payload: {
+        filters: {
+          filterByDoctor: filterTemplate?.currentFilterTemplate?.filterByDoctor,
+          filterByApptType:
+            filterTemplate?.currentFilterTemplate?.filterByApptType,
         },
       },
     })
@@ -138,9 +152,6 @@ class Appointment extends React.PureComponent {
     })
 
     let filter //= this.state.filter
-    const filterTemplate = await dispatch({
-      type: 'appointment/getFilterTemplate',
-    })
     if (filterTemplate) {
       const { currentFilterTemplate } = filterTemplate
       if (currentFilterTemplate) {
@@ -261,6 +272,12 @@ class Appointment extends React.PureComponent {
     })
     dispatch({
       type: 'doctorBlock/query',
+      payload: {
+        lgteql_startDateTime: startOfMonth,
+      },
+    })
+    dispatch({
+      type: 'roomBlock/query',
       payload: {
         lgteql_startDateTime: startOfMonth,
       },

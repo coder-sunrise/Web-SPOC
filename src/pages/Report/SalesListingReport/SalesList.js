@@ -20,7 +20,7 @@ class SalesList extends PureComponent {
     }
 
     const SalesDetailsCols = [
-      { name: 'doctorName', title: 'Doctor' },
+      { name: 'doctorName', title: 'Optometrist' },
       { name: 'date', title: 'Date' },
       { name: 'patientID', title: 'Patient ID' },
       { name: 'patientName', title: 'Patient Name' },

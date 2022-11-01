@@ -220,6 +220,9 @@ class Banner extends PureComponent {
   }
 
   getSchemeList = schemeDataList => {
+    const chasOrMedisave = (schemeDataList || []).filter(
+      o => o.schemeTypeFK <= 6 || this.isMedisave(o.schemeTypeFK),
+    )
     const { patient, clinicSettings } = this.props
     const { entity } = patient
     const { patientScheme } = entity
@@ -230,9 +233,157 @@ class Banner extends PureComponent {
         patientScheme.find(
           ps => ps.coPaymentSchemeFK === s.coPaymentSchemeFK,
         ) || {}
-      return <span style={{ paddingRight: 5 }}></span>
+      return (
+        <span style={{ paddingRight: 5 }}>
+          {chasOrMedisave &&
+          chasOrMedisave.find(list => s.schemeTypeFK === list.schemeTypeFK) ? (
+            <Popover
+              icon={null}
+              content={
+                <div>
+                  <div>
+                    {s.coPaymentSchemeFK ||
+                    schemeDataList.filter(p =>
+                      this.isMedisave(p.schemeTypeFK),
+                    )[0] === s
+                      ? s.copaymentSchemeName
+                      : s.schemeTypeName}
+                    <span style={{ bottom: -2 }}>
+                      {s.schemeTypeFK <= 6 && (
+                        <IconButton onClick={this.refreshChasBalance}>
+                          <Refresh />
+                        </IconButton>
+                      )}
+                      {this.isMedisave(s.schemeTypeFK) &&
+                        schemeDataList.filter(p =>
+                          this.isMedisave(p.schemeTypeFK),
+                        )[0] === s && (
+                          <IconButton onClick={this.refreshMedisaveBalance}>
+                            <Refresh />
+                          </IconButton>
+                        )}
+                    </span>
+                  </div>
+                  {s.schemeType && (
+                    <div style={{ marginTop: 15 }}>{s.schemeType}</div>
+                  )}
+                  {this.isMedisave(s.schemeTypeFK) && (
+                    <div>
+                      Payer: {s.payerName} ({s.payerAccountNo})
+                    </div>
+                  )}
+                  {s.validFrom && (
+                    <div>
+                      Validity:{' '}
+                      {s.validFrom ? (
+                        <DatePicker
+                          text
+                          format={dateFormatLong}
+                          value={s.validFrom}
+                        />
+                      ) : (
+                        ''
+                      )}
+                      &nbsp;-&nbsp;
+                      {s.validTo ? (
+                        <DatePicker
+                          text
+                          format={dateFormatLong}
+                          value={s.validTo}
+                        />
+                      ) : (
+                        ''
+                      )}
+                    </div>
+                  )}
+                  {s.schemeTypeFK !== 15 ? (
+                    <div>
+                      Balance: <NumberInput text currency value={s.balance} />
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                  {s.schemeTypeFK <= 6 ? (
+                    <div>
+                      Patient Acute Visit Balance:{' '}
+                      <NumberInput
+                        text
+                        currency
+                        value={s.acuteVisitPatientBalance}
+                      />
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                  {s.schemeTypeFK <= 6 ? (
+                    <div>
+                      Patient Acute Clinic Balance:{' '}
+                      <NumberInput
+                        text
+                        currency
+                        value={s.acuteVisitClinicBalance}
+                      />
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                </div>
+              }
+              trigger='click'
+              placement='bottom'
+            >
+              <Link>
+                <span
+                  style={{
+                    color: scheme.isExpired ? 'red' : 'black',
+                    textDecoration: 'underline',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {s.copaymentSchemeName || s.schemeTypeName}
+                  {s.validTo
+                    ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`
+                    : ' (Exp: -)'}
+                  {i < arr.length - 1 ? ',' : ''}
+                </span>
+              </Link>
+            </Popover>
+          ) : (
+            <span
+              style={{
+                cursor: 'pointer',
+                color: scheme.isExpired
+                  ? 'red'
+                  : scheme.schemeTypeFK === SCHEME_TYPE.INSURANCE
+                  ? `#${schemeInsuranceDisplayColorCode}`
+                  : 'black',
+                textDecoration: 'underline',
+                wordBreak: 'break-word',
+              }}
+              onClick={e => {
+                const editDetailAccessRight = Authorized.check(
+                  'copayer.copayerdetails',
+                ) || {
+                  rights: 'hidden',
+                }
+                if (editDetailAccessRight.rights === 'hidden') return
+                if (scheme.copayerFK) {
+                  this.openScheme(scheme.copayerFK)
+                }
+              }}
+            >
+              {s.copaymentSchemeName || s.schemeTypeName}
+              {s.validTo
+                ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`
+                : ' (Exp: -)'}
+              {i < arr.length - 1 ? ',' : ''}
+            </span>
+          )}
+        </span>
+      )
     })
   }
+
   getTagData = () => {
     const { patient } = this.props
     const { entity } = patient
@@ -251,6 +402,11 @@ class Banner extends PureComponent {
     return '-'
   }
 
+  isMedisave = schemeTypeFK => {
+    if (schemeTypeFK) return [12, 13, 14].indexOf(schemeTypeFK) >= 0
+    return false
+  }
+
   getSchemeDetails = schemeData => {
     const { refreshedSchemeData } = this.state
 
@@ -260,8 +416,8 @@ class Banner extends PureComponent {
     ) {
       return { ...refreshedSchemeData }
     }
-
     // Scheme Balance
+    schemeData.patientSchemeBalance = schemeData.patientSchemeBalance || []
     const balance =
       schemeData.patientSchemeBalance.length <= 0
         ? undefined
@@ -335,8 +491,6 @@ class Banner extends PureComponent {
       !_.isEmpty(this.state.refreshedSchemePayerData.payerBalanceList) &&
       this.state.refreshedSchemePayerData.isSuccessful === true
     ) {
-      // return { ...this.state.refreshedSchemePayerData }
-
       const refreshData = this.state.refreshedSchemePayerData.payerBalanceList.find(
         row => row.schemePayerFK === schemePayer.id,
       )
@@ -521,6 +675,25 @@ class Banner extends PureComponent {
 
     // get scheme details based on scheme type
     const schemeDataList = []
+    const notMedisaveSchemes =
+      entity.patientScheme && entity.patientScheme.length > 0
+        ? entity.patientScheme.filter(
+            o => !this.isMedisave(o.schemeTypeFK) && o.isSchemeActive,
+          )
+        : null
+
+    if (notMedisaveSchemes !== null)
+      notMedisaveSchemes.forEach(row => {
+        schemeDataList.push(this.getSchemeDetails(row))
+      })
+    const medisaveSchemePayers =
+      entity.schemePayer && entity.schemePayer.length > 0
+        ? entity.schemePayer
+        : null
+    if (medisaveSchemePayers !== null)
+      medisaveSchemePayers.forEach(row => {
+        schemeDataList.push(this.getSchemePayerDetails(row))
+      })
 
     const persistentDiagnosis =
       isEnableJapaneseICD10Diagnosis === true &&
@@ -672,7 +845,7 @@ class Banner extends PureComponent {
       <Row wrap={false}>
         <Col flex='none'>
           <span className={classes.header} style={{ color: 'darkblue' }}>
-            Spoken Language:{' '}
+            Referral Source:{' '}
           </span>
         </Col>
         <Col flex='auto' className={contentClass}>
@@ -732,10 +905,6 @@ class Banner extends PureComponent {
           </span>
         </Col>
         <Col flex='auto' className={contentClass}>
-          {/* <LoadingWrapper
-            loading={refreshingBalance}
-            text='Retrieving balance...'
-          > */}
           <Tooltip
             enterDelay={100}
             style={{ width: 300 }}

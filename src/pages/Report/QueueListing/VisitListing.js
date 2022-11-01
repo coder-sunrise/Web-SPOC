@@ -43,7 +43,7 @@ const VisitListing = ({ reportDatas, classes }) => {
     { name: 'queueNo', title: 'Queue No.' },
     { name: 'patientName', title: 'Patient Name' },
     { name: 'patientReferenceNo', title: 'Ref No.' },
-    { name: 'doctorName', title: 'Doctor' },
+    { name: 'doctorName', title: 'Optometrist' },
     { name: 'timeIn', title: 'Time In' },
     { name: 'timeOut', title: 'Time Out' },
     { name: 'visitType', title: 'Visit Type' },

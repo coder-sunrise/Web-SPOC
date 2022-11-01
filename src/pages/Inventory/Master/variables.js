@@ -15,7 +15,7 @@ export const InventoryMasterOption = props => {
   const Tabs = [
     {
       id: '1',
-      name: 'Ophthalmic Product',
+      name: 'Product',
       authority: 'inventorymaster.consumable',
       content: addContent(2, props),
       component: Consumable,

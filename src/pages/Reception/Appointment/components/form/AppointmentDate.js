@@ -43,7 +43,7 @@ const AppointmentDate = ({
         />
       </GridItem>
 
-      <GridItem xs md={3}>
+      <GridItem xs md={2}>
         <TextField
           label='Appointment Status'
           value={status?.name || ''}
@@ -51,7 +51,7 @@ const AppointmentDate = ({
         />
       </GridItem>
 
-      <GridItem xs md={3}>
+      <GridItem xs md={5}>
         <FastField
           name='bookedByUser'
           render={args => <TextField label='Booked By' disabled {...args} />}

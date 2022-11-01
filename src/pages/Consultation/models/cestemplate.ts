@@ -46,7 +46,6 @@ export default createListViewModel({
         const consultation = yield select(st => st.consultation)
         const { entity } = consultation
         const cloneEntity = _.cloneDeep(entity)
-        delete cloneEntity.corPatientNoteVitalSign
         delete cloneEntity.visitConsultationTemplate
         delete cloneEntity.concurrencyToken
 
@@ -62,7 +61,6 @@ export default createListViewModel({
         const consultation = yield select(st => st.consultation)
         const { entity } = consultation
         const cloneEntity = _.cloneDeep(entity)
-        delete cloneEntity.corPatientNoteVitalSign
         delete cloneEntity.visitConsultationTemplate
         delete cloneEntity.concurrencyToken
 

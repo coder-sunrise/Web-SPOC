@@ -23,7 +23,6 @@ import { locationQueryParameters } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import PatientInfoCard from './PatientInfoCard'
 import VisitInfoCard from './VisitInfoCard'
-// import VitalSignCard from './VitalSignCard'
 import ReferralCard from './ReferralCard'
 import EyeVisualAcuityCard from './EyeVisualAcuityCard'
 import RefractionFormCard from './RefractionFormCard'
@@ -284,30 +283,6 @@ class NewVisit extends PureComponent {
 
     const { doctorProfileFK, visitDoctor = [] } = values
 
-    if (
-      visitDoctor.find(
-        x => !x.isDeleted && x.doctorProfileFK === doctorProfileFK,
-      )
-    ) {
-      notification.error({
-        message: 'Primary doctor and reporting doctor cannot be the same.',
-      })
-      return
-    }
-
-    if (
-      visitDoctor.filter(x => !x.isDeleted).length !==
-      _.uniqBy(
-        visitDoctor.filter(x => !x.isDeleted),
-        'doctorProfileFK',
-      ).length
-    ) {
-      notification.error({
-        message: 'Can not select duplicate doctor.',
-      })
-      return
-    }
-
     if (Object.keys(errors).length > 0) return handleSubmit()
 
     const alreadyRegisteredVisit = list.reduce(
@@ -434,12 +409,6 @@ class NewVisit extends PureComponent {
       codetable,
     } = this.props
 
-    const vitalAccessRight = Authorized.check(
-      'queue.registervisit.vitalsign',
-    ) || { rights: 'hidden' }
-    const vitalSignEditAccessRight =
-      vitalAccessRight.rights === 'readwrite' ||
-      vitalAccessRight.rights === 'enable'
     if (expandRefractionForm) {
       let div = $(this.myRef.current).find('div[aria-expanded]:eq(1)')
       if (div.attr('aria-expanded') === 'false') div.click()
@@ -555,24 +524,6 @@ class NewVisit extends PureComponent {
                       </GridItem>
                     </Authorized.Context.Provider>
                     <React.Fragment>
-                      {/* <GridItem xs={12} className={classes.row}>
-                        <Authorized.Context.Provider
-                          value={{
-                            rights: isBasicExaminationDisabled
-                              ? 'disable'
-                              : 'enable',
-                          }}
-                        >
-                          <VitalSignCard
-                            {...this.props}
-                            disabled={
-                              !vitalSignEditAccessRight ||
-                              visitMode === 'view' ||
-                              values.isDoctorConsulted
-                            }
-                          />
-                        </Authorized.Context.Provider>
-                      </GridItem> */}
                       <GridItem xs={12} className={classes.row}>
                         <CommonCard title='Referral'>
                           <ReferralCard

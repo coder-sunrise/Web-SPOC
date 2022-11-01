@@ -22,11 +22,13 @@ import {
 import Authorized from '@/utils/Authorized'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 import Warining from '@material-ui/icons/Error'
+import { formConfigs } from '@/pages/Widgets/ClinicalNotes/config'
 
 import {
   getAppendUrl,
   navigateDirtyCheck,
   commonDataReaderTransform,
+  getUniqueId,
 } from '@/utils/utils'
 import {
   cleanConsultation,
@@ -501,7 +503,31 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
         })
       }
     }
-    return consultation.entity || consultation.default
+    if (consultation.entity) {
+      let newEntity = { ...consultation.entity }
+      let selectForms = []
+      if (consultation.entity.versionNumber === 2) {
+        selectForms = consultation.default.selectForms
+        newEntity.corPatientHistoryEntity = {}
+        newEntity.corVisionRefractionEntity = {
+          presentSpectacles: [{ uid: getUniqueId() }],
+        }
+        newEntity.corPreliminaryAssessmentEntity = {}
+        newEntity.corAnteriorEyeExaminationEntity = {}
+        newEntity.corPosteriorEyeExaminationEntity = {}
+      } else {
+        formConfigs.forEach(form => {
+          if (newEntity[form.prop] && newEntity[form.prop].length > 0) {
+            newEntity[form.prefixProp] = { ...newEntity[form.prop][0] }
+            selectForms.push(form.id)
+          }
+        })
+      }
+      newEntity.selectForms = selectForms
+
+      return newEntity
+    }
+    return consultation.default
   },
   validationSchema: schema,
   enableReinitialize: false,

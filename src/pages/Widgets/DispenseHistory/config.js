@@ -10,7 +10,7 @@ export const WIDGETS_ID = {
 export const widgets = props => [
   {
     id: WIDGETS_ID.CONSUMABLE,
-    name: 'Ophthalmic Product',
+    name: 'Product',
     authority: undefined,
     component: Loadable({
       loader: () => import('./Consumable'),

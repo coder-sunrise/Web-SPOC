@@ -368,7 +368,7 @@ export const countryCodes = [
 export const podoOrderType = [
   {
     value: 2,
-    name: 'Ophthalmic Product',
+    name: 'Product',
     prop: 'purchaseOrderConsumableItem',
     itemFKName: 'inventoryConsumableFK',
     ctName: 'inventoryconsumable',
@@ -382,7 +382,7 @@ export const podoOrderType = [
 export const rgType = [
   {
     value: 2,
-    name: 'Ophthalmic Product',
+    name: 'Product',
     prop: 'receivingGoodsConsumableItem',
     itemFKName: 'inventoryConsumableFK',
     ctName: 'inventoryconsumable',
@@ -439,7 +439,7 @@ const loadFromCodesConfig = {
 export const InventoryTypes = [
   {
     value: 2,
-    name: 'Ophthalmic Product',
+    name: 'Product',
     prop: 'consumableValueDto',
     itemFKName: 'inventoryConsumableFK',
     ctName: 'inventoryconsumable',
@@ -1369,7 +1369,7 @@ const queueItemStatus = [
 const orderItemCategory = [
   {
     value: 'Consumable',
-    name: 'Ophthalmic Product',
+    name: 'Product',
   },
   {
     value: 'Service',

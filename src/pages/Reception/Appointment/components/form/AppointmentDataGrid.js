@@ -75,14 +75,14 @@ class AppointmentDataGrid extends React.Component {
       apptTimeIntervel,
       disabled,
     ).map(column => {
-      if (column.columnName === 'isPrimaryClinician') {
+      /* if (column.columnName === 'isPrimaryClinician') {
         return {
           ...column,
           checkedValue: true,
           uncheckedValue: false,
           onChange: this.onRadioChange,
         }
-      }
+      } */
 
       if (column.type === 'time') {
         return {
@@ -233,29 +233,8 @@ class AppointmentDataGrid extends React.Component {
             columnExtensions={tempColumnExtensions}
             FuncProps={funcProps}
             EditingProps={{
-              messages: {
-                deleteCommand: 'Delete appointment slot',
-              },
-              // showAddCommand: !disabled,
-              showDeleteCommand:
-                data.filter(item => !item.isDeleted).length > 1,
+              showCommandColumn: false,
               onCommitChanges: handleCommitChanges,
-              onAddedRowsChange: rows => {
-                const primaryDoctor = data.find(
-                  d => !d.isDeleted && d.isPrimaryClinician,
-                )
-                if (primaryDoctor) {
-                  rows.forEach(r => {
-                    r.appointmentFK = primaryDoctor.appointmentFK
-                    r.appointmentTypeFK = primaryDoctor.appointmentTypeFK
-                    r.apptDurationHour = primaryDoctor.apptDurationHour
-                    r.apptDurationMinute = primaryDoctor.apptDurationMinute
-                    r.startTime = primaryDoctor.startTime
-                    r.endTime = primaryDoctor.endTime
-                  })
-                }
-                return rows
-              },
             }}
             schema={validationSchema}
           />

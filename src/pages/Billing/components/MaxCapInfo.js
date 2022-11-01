@@ -60,7 +60,7 @@ const MaxCapInfo = ({ classes, claimableSchemes = [], copaymentSchemeFK }) => {
 
     if (isConsumableCoverageMaxCapCheckRequired)
       categoriesMaxCap.push({
-        type: 'Ophthalmic Product',
+        type: 'Product',
         value: consumableCoverageMaxCap,
       })
 

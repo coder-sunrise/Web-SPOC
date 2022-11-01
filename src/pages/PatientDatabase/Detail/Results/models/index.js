@@ -11,22 +11,7 @@ export default createListViewModel({
       list: [],
     },
     subscriptions: {},
-    effects: {
-      *queryBasicDataList({ payload }, { call, put }) {
-        const response = yield call(service.queryBasicDataList, {
-          ...payload,
-          pagesize: 10,
-        })
-        return response
-      },
-      *queryExaminationsList({ payload }, { call, put }) {
-        const response = yield call(service.queryExaminationsList, {
-          ...payload,
-          pagesize: 10,
-        })
-        return response
-      },
-    },
+    effects: {},
     reducers: {},
   },
 })
