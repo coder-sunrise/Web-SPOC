@@ -563,6 +563,9 @@ export default createListViewModel({
       },
       *navigateCalendar({ payload }, { all, select, put }) {
         const calendarState = yield select(state => state.calendar)
+        const {
+          filters: { filterByApptType = [] },
+        } = yield select(state => state.appointment)
         const { date, view, doctor = [] } = payload
         const targetDate =
           date !== undefined ? date : calendarState.currentViewDate
@@ -606,6 +609,7 @@ export default createListViewModel({
             APPOINTMENT_STATUS.PFA_NOSHOW,
           ].join(),
           dob: null,
+          appType: filterByApptType.join(),
         }
         // const getCalendarListPayload = {
         //   apptDateFrom: start,
@@ -624,6 +628,15 @@ export default createListViewModel({
             type: 'roomBlock/query',
             payload: {
               lgteql_startDateTime: start,
+            },
+          }),
+          put({
+            type: 'appointment/updateState',
+            payload: {
+              filters: {
+                filterByDoctor: doctor,
+                filterByApptType: appType,
+              },
             },
           }),
         ])
