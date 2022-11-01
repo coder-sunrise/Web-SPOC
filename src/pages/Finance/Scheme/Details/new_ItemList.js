@@ -161,7 +161,7 @@ class ItemList extends React.Component {
           options={[
             {
               id: 2,
-              name: 'Ophthalmic Product',
+              name: 'Product',
               content: this.addContent('inventoryconsumable'),
             },
             {
