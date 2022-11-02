@@ -10,6 +10,7 @@ import moment from 'moment'
 import { getUniqueId, getTranslationValue } from '@/utils/utils'
 import { ORDER_TYPES } from '@/utils/constants'
 import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
+import { formConfigs } from '@/pages/Widgets/ClinicalNotes/config'
 
 const orderTypes = [
   {
@@ -182,6 +183,7 @@ const convertToConsultation = (
     }
   })
 
+  values = convertClinicalNotesForms(values)
   values = convertEyeForms(values)
 
   const formRows = forms.rows
@@ -199,6 +201,36 @@ const convertToConsultation = (
     ...values,
     isGSTInclusive,
   }
+}
+
+const convertClinicalNotesForms = values => {
+  formConfigs.forEach(form => {
+    //check list any old item
+    if (values[form.prop] && values[form.prop].length > 0) {
+      //unticked form
+      if (!values[form.prefixProp]) {
+        values[form.prop][0].isDeleted = true
+      } else {
+        //add new after unticked
+        if (!values[form.prefixProp].id) {
+          values[form.prop][0].isDeleted = true
+          values[form.prop].push({ ...values[form.prefixProp] })
+        }
+        //update old item
+        else {
+          values[form.prop][0] = {
+            ...values[form.prop][0],
+            ...values[form.prefixProp],
+          }
+        }
+      }
+    }
+    //fist add
+    else if (values[form.prefixProp]) {
+      values[form.prop].push(values[form.prefixProp])
+    }
+  })
+  return values
 }
 
 const cleanConsultation = values => {

@@ -39,7 +39,12 @@ const PatientHistory = props => {
         <FastField
           name={`${prefixProp}.personalOcularHealth`}
           render={args => (
-            <TextField label='Personal Ocular Health' {...args} />
+            <TextField
+              label='Personal Ocular Health'
+              multiline
+              maxLength={500}
+              {...args}
+            />
           )}
         />
       </GridItem>
@@ -47,7 +52,12 @@ const PatientHistory = props => {
         <FastField
           name={`${prefixProp}.personalGeneralHealth`}
           render={args => (
-            <TextField label='Personal General Health' {...args} />
+            <TextField
+              label='Personal General Health'
+              multiline
+              maxLength={500}
+              {...args}
+            />
           )}
         />
       </GridItem>
@@ -55,20 +65,39 @@ const PatientHistory = props => {
         <FastField
           name={`${prefixProp}.allergies`}
           render={args => (
-            <TextField label='Medications, Allergies' {...args} />
+            <TextField
+              label='Medications, Allergies'
+              multiline
+              maxLength={500}
+              {...args}
+            />
           )}
         />
       </GridItem>
       <GridItem md={12}>
         <FastField
           name={`${prefixProp}.familyOcularHealth`}
-          render={args => <TextField label='Family Ocular Health' {...args} />}
+          render={args => (
+            <TextField
+              label='Family Ocular Health'
+              multiline
+              maxLength={500}
+              {...args}
+            />
+          )}
         />
       </GridItem>
       <GridItem md={12}>
         <FastField
           name={`${prefixProp}.familyGeneralHealth`}
-          render={args => <TextField label='Family General Health' {...args} />}
+          render={args => (
+            <TextField
+              label='Family General Health'
+              multiline
+              maxLength={500}
+              {...args}
+            />
+          )}
         />
       </GridItem>
       <GridItem md={12}>
