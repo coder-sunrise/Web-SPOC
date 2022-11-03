@@ -12,7 +12,7 @@ const styles = theme => ({
   },
   checkFormLabel: {
     display: 'inline-block',
-    maxWidth: 180,
+    maxWidth: 170,
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -71,15 +71,23 @@ const ClinicalNotes = props => {
 
   const clickScrollTo = formID => {
     let height = 0
-    selectForms
-      .filter(selectForm => selectForm < formID)
-      .forEach(selectForm => {
-        const formHeight = $(`.from${selectForm}`).height() || 0
+    let totalHeight = 0
+    selectForms.forEach(selectForm => {
+      const formHeight = $(`.from${selectForm}`).height() || 0
+      if (selectForm < formID) {
         height = height + formHeight
-      })
+      }
+      totalHeight = totalHeight + formHeight
+    })
 
     const formDiv = document.getElementById('ClinicalNoteForms')
-    formDiv.scrollTo({ top: height })
+    if (height === 0) {
+      formDiv.scrollTo({ top: 0 })
+      return
+    }
+    const diffHeight =
+      (formDiv.scrollHeight - totalHeight) * (height / totalHeight)
+    formDiv.scrollTo({ top: height + diffHeight })
   }
 
   const formHeight = () => {
@@ -93,7 +101,7 @@ const ClinicalNotes = props => {
         {fromTypes().map(formType => {
           return (
             <div
-              style={{ width: 220, display: 'inline-block', margin: '4px 0px' }}
+              style={{ width: 200, display: 'inline-block', margin: '4px 0px' }}
             >
               <div className={classes.checkFormCheckBox}>
                 <Popover
@@ -170,7 +178,11 @@ const ClinicalNotes = props => {
       </div>
       <div
         id='ClinicalNoteForms'
-        style={{ maxHeight: formHeight(), overflow: 'auto' }}
+        style={{
+          maxHeight: formHeight(),
+          overflow: 'auto',
+          borderTop: '1px solid #CCCCCC',
+        }}
       >
         {selectForms.map(selectForm => {
           const formTemplate = formConfigs.find(form => form.id === selectForm)
