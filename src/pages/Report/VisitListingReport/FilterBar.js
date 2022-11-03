@@ -20,13 +20,7 @@ import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
 import { VISIT_STATUS } from '@/utils/constants'
 
 const { queryList, query } = service
-const FilterBar = ({
-  handleSubmit,
-  isSubmitting,
-  visitOrderTemplateOptions = [],
-  ctcopayer = [],
-  classes,
-}) => {
+const FilterBar = ({ handleSubmit, isSubmitting, ctcopayer = [], classes }) => {
   const selectPatientProfile = args => {
     const { disabled } = args
     return (

@@ -80,20 +80,6 @@ class Grid extends React.Component {
     return false
   }
 
-  onRowDoubleClick = row => {
-    const { visitStatus, visitPurposeFK = VISIT_TYPE.BF } = row
-    const isWaiting = visitStatus === VISIT_STATUS.WAITING
-    const {
-      clinicianProfile: { doctorProfile },
-    } = this.props.user.data
-    const retailVisits = [VISIT_TYPE.OTC, VISIT_TYPE.BF]
-    if (!doctorProfile || retailVisits.includes(visitPurposeFK)) return false
-
-    if (isWaiting) this.props.onMenuItemClick(row, '5') // start consultation context menu id = 5
-
-    return true
-  }
-
   computeQueueListingData = () => {
     const {
       calendarEvents = [],
@@ -216,12 +202,7 @@ class Grid extends React.Component {
 
     switch (visitStatus) {
       case VISIT_STATUS.WAITING:
-        if (
-          visitPurposeFK === VISIT_TYPE.OTC ||
-          visitPurposeFK === VISIT_TYPE.BF
-        )
-          id = '1'
-        else id = '5'
+        id = '1'
         break
       case VISIT_STATUS.IN_CONS:
         id = '6'
@@ -238,13 +219,18 @@ class Grid extends React.Component {
         break
       case VISIT_STATUS.DISPENSE:
       case VISIT_STATUS.ORDER_UPDATED:
-        id = '1'
-        break
       case VISIT_STATUS.BILLING:
       case VISIT_STATUS.COMPLETED:
+      //case VISIT_STATUS.IN_CONS:
+      case VISIT_STATUS.UNGRADED:
+      case VISIT_STATUS.VERIFIED:
       case VISIT_STATUS.PAYMENT_REQUESTED:
       case VISIT_STATUS.PAYMENT_FAILED:
-        id = '1.1'
+        if (!row.isFinalized) {
+          id = '1'
+        } else {
+          id = '1.1'
+        }
         break
       case VISIT_STATUS.EQ_PENDING:
         id = '12'
@@ -361,7 +347,6 @@ class Grid extends React.Component {
                 },
               ]}
               FuncProps={FuncConfig}
-              onRowDoubleClick={this.onRowDoubleClick}
               onContextMenu={this.props.onContextMenu}
               {...queueConfig}
             />
@@ -410,7 +395,6 @@ class Grid extends React.Component {
                 },
               ]}
               FuncProps={FuncConfig}
-              onRowDoubleClick={this.onRowDoubleClick}
               {...AppointmentTableConfig}
             />
           )}

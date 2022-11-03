@@ -56,10 +56,10 @@ const ActionButton = ({ row, onClick }) => {
   // const isStatusDispense = row.visitStatus === VISIT_STATUS.DISPENSE
 
   const isStatusCompleted = [
-    VISIT_STATUS.BILLING,
     VISIT_STATUS.COMPLETED,
-    VISIT_STATUS.DISPENSE,
-    VISIT_STATUS.ORDER_UPDATED,
+    VISIT_STATUS.IN_CONS,
+    VISIT_STATUS.UNGRADED,
+    VISIT_STATUS.VERIFIED,
   ].includes(row.visitStatus)
 
   const user = useSelector(st => st.user)
@@ -70,7 +70,7 @@ const ActionButton = ({ row, onClick }) => {
       : true
 
   const isRetailVisit = row.visitPurposeFK === VISIT_TYPE.OTC
-  const isBillFirstVisit = row.visitPurposeFK === VISIT_TYPE.BF 
+  const isBillFirstVisit = row.visitPurposeFK === VISIT_TYPE.BF
 
   const enableDispense = () => {
     const consDispense = [
@@ -119,17 +119,17 @@ const ActionButton = ({ row, onClick }) => {
           case 1: // dispense
             return {
               ...opt,
-              disabled: !enableDispense(),
+              disabled: row.isFinalized,
             }
           case 1.1: // billing
-            return { ...opt, disabled: !enableBilling }
+            return { ...opt, disabled: !row.isFinalized }
           case 2: // delete visit
             return { ...opt, disabled: !isStatusWaiting }
           case 5: // start consultation
             return {
               ...opt,
               disabled: isStatusInProgress,
-              hidden: !isStatusWaiting || isRetailVisit || isBillFirstVisit,
+              hidden: true,
             }
           case 6: // resume consultation
             return {
@@ -146,7 +146,7 @@ const ActionButton = ({ row, onClick }) => {
           case 10: // forms
             return {
               ...opt,
-              hidden: isRetailVisit,
+              hidden: true,
             }
           default:
             return { ...opt }

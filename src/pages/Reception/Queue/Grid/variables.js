@@ -17,7 +17,6 @@ import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE } from '@/utils/constants'
 import DoctorConsultationStatus from './DoctorConsultationStatus'
-import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 
 const compareString = (a, b) => a.localeCompare(b)
 const compareDoctor = (a, b) => {
@@ -190,7 +189,6 @@ export const QueueTableConfig = {
     { name: 'invoiceOutstanding', title: 'Patient O/S' },
     { name: 'patientScheme', title: 'Scheme' },
     { name: 'patientMobile', title: 'Phone' },
-    { name: 'visitOrderTemplate', title: 'Visit Purpose' },
     { name: 'action', title: 'Action' },
   ],
   leftColumns: ['visitStatus', 'queueNo', 'patientName'],
@@ -405,20 +403,6 @@ export const QueueColumnExtensions = props => {
       },
       sortingEnabled: false,
       width: 280,
-    },
-    {
-      columnName: 'visitOrderTemplate',
-      width: 180,
-      render: row => {
-        return row.visitOrderTemplate ? (
-          <VisitOrderTemplateIndicateString
-            oneline
-            visitOrderTemplateDetails={row.visitOrderTemplate}
-          ></VisitOrderTemplateIndicateString>
-        ) : (
-          <span>-</span>
-        )
-      },
     },
     {
       columnName: 'salesType',

@@ -81,10 +81,10 @@ const ContextMenu = ({
   const isBillFirstVisit = row.visitPurposeFK === VISIT_TYPE.BF
 
   const isStatusCompleted = [
-    VISIT_STATUS.BILLING,
     VISIT_STATUS.COMPLETED,
-    VISIT_STATUS.DISPENSE,
-    VISIT_STATUS.ORDER_UPDATED,
+    VISIT_STATUS.IN_CONS,
+    VISIT_STATUS.UNGRADED,
+    VISIT_STATUS.VERIFIED,
   ].includes(row.visitStatus)
 
   const user = useSelector(st => st.user)
@@ -169,12 +169,12 @@ const ContextMenu = ({
         case 1: // dispense
           return {
             ...opt,
-            disabled: !row.patientIsActive || !enableDispense(),
+            disabled: !row.patientIsActive || row.isFinalized,
           }
         case 1.1: // billing
           return {
             ...opt,
-            disabled: !row.patientIsActive || !enableBilling || isDisabled,
+            disabled: !row.patientIsActive || !row.isFinalized || isDisabled,
           }
         case 2: // delete visit
           return { ...opt, disabled: !row.patientIsActive || !isStatusWaiting }
@@ -182,7 +182,7 @@ const ContextMenu = ({
           return {
             ...opt,
             disabled: !row.patientIsActive || isStatusInProgress || isDisabled,
-            hidden: !isStatusWaiting || isRetailVisit || isBillFirstVisit,
+            hidden: true,
           }
         case 6: // resume consultation
           return {
@@ -200,7 +200,7 @@ const ContextMenu = ({
           return {
             ...opt,
             disabled: !row.patientIsActive,
-            hidden: isRetailVisit,
+            hidden: true,
           }
         default:
           return { ...opt }

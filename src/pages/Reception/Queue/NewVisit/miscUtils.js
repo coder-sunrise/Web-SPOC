@@ -3,7 +3,6 @@ import { bool } from 'prop-types'
 import _ from 'lodash'
 import { cleanFields } from '@/pages/Consultation/utils'
 import { VISIT_TYPE, VISITDOCTOR_CONSULTATIONSTATUS } from '@/utils/constants'
-import { visitOrderTemplateItemTypes } from '@/utils/codes'
 import { notification } from '@/components'
 import { VISIT_STATUS } from '../variables'
 import { roundTo } from '@/utils/utils'
@@ -106,22 +105,6 @@ const convertEyeForms = values => {
   return values
 }
 
-const getVisitOrderTemplateTotal = (vType, template) => {
-  let activeItemTotal = 0
-  visitOrderTemplateItemTypes.forEach(type => {
-    if (vType === VISIT_TYPE.OTC && type.id === 3) return
-    const currentTypeItems = template.visitOrderTemplateItemDtos.filter(
-      itemType => itemType.inventoryItemTypeFK === type.id,
-    )
-    currentTypeItems.map(item => {
-      if (item[type.dtoName].isActive === true) {
-        activeItemTotal += item.totalAftAdj || 0
-      }
-    })
-  })
-  return activeItemTotal
-}
-
 export const getMCReportLanguage = (patient, clinicSettings) => {
   const {
     primaryPrintoutLanguage = 'EN',
@@ -157,7 +140,6 @@ export const formikMapPropsToValues = ({
     let roomAssignmentFK
     let consReady
     let resourceRoomFK
-    let currentVisitOrderTemplateFK
     if (clinicInfo) {
       doctorProfileFK = clinicInfo.primaryRegisteredDoctorFK
     }
@@ -195,7 +177,7 @@ export const formikMapPropsToValues = ({
       {},
     )
     const { location } = history
-    const { visitOrderTemplateFK, visitEyeRefractionForm } = visitEntries
+    const { visitEyeRefractionForm } = visitEntries
 
     if (!visitEntries.id) {
       if (doctorProfile) {
@@ -213,8 +195,6 @@ export const formikMapPropsToValues = ({
         }
       }
       if (appointment && appointment.appointments.length) {
-        currentVisitOrderTemplateFK =
-          appointment.appointments[0].visitOrderTemplateFK
         resourceRoomFK =
           appointment.appointments[0].appointments_Resources[0].calendarResource
             ?.resourceDto?.roomFK
@@ -228,15 +208,6 @@ export const formikMapPropsToValues = ({
         }
       }
     }
-    /**else {
-          currentVisitOrderTemplateFK = visitOrderTemplateFK
-        }  */
-
-    // const isVisitOrderTemplateActive = (
-    //   visitRegistration.visitOrderTemplateOptions || []
-    // )
-    //   .map(option => option.id)
-    //   .includes(currentVisitOrderTemplateFK)
 
     let newFormData
     if (visitEyeRefractionForm && visitEyeRefractionForm.formData) {
@@ -274,12 +245,6 @@ export const formikMapPropsToValues = ({
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
       doctorProfileFK,
       ...visitEntries,
-      // visitOrderTemplateFK: isVisitOrderTemplateActive
-      //   ? currentVisitOrderTemplateFK
-      //   : undefined,
-      // visitOrderTemplateTotal: !visitEntries.id
-      //   ? undefined
-      //   : visitEntries.visitOrderTemplateTotal,
       visitEyeRefractionForm: {
         ...visitEyeRefractionForm,
         formData: newFormData,
@@ -312,13 +277,7 @@ export const formikHandleSubmit = (
   values,
   { props, resetForm, setSubmitting },
 ) => {
-  const {
-    queueNo,
-    visitAttachment,
-    referralBy = [],
-    visitOrderTemplate,
-    ...restValues
-  } = values
+  const { queueNo, visitAttachment, referralBy = [], ...restValues } = values
   const {
     history,
     dispatch,

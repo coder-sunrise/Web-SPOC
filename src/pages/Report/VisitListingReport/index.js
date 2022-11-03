@@ -49,31 +49,6 @@ class VisitListing extends ReportBase {
 
   componentDidMount = async () => {
     const { dispatch } = this.props
-    const response = await dispatch({
-      type: 'visitRegistration/getVisitOrderTemplateListForDropdown',
-      payload: {
-        pagesize: 9999,
-      },
-    })
-    if (response) {
-      const { data } = response
-      const templateOptions = data
-        .filter(template => template.isActive)
-        .map(template => {
-          return {
-            ...template,
-            value: template.id,
-            name: template.displayValue,
-          }
-        })
-
-      dispatch({
-        type: 'visitRegistration/updateState',
-        payload: {
-          visitOrderTemplateOptions: templateOptions,
-        },
-      })
-    }
     await dispatch({
       type: 'codetable/fetchCodes',
       payload: {
@@ -83,16 +58,11 @@ class VisitListing extends ReportBase {
   }
 
   renderFilterBar = (handleSubmit, isSubmitting) => {
-    const {
-      visitRegistration: { visitOrderTemplateOptions = [] },
-      ctcopayer,
-      classes,
-    } = this.props
+    const { ctcopayer, classes } = this.props
     return (
       <FilterBar
         handleSubmit={handleSubmit}
         isSubmitting={isSubmitting}
-        visitOrderTemplateOptions={visitOrderTemplateOptions}
         ctcopayer={ctcopayer}
         classes={classes}
       />

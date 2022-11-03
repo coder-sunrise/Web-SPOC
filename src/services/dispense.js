@@ -58,25 +58,6 @@ const fns = {
     })
     return r
   },
-
-  queryAddOrderDetails: async ({ invoiceId, isInitialLoading }) => {
-    const r = await request(
-      `${url}/retailOrder/${invoiceId}?isInitialLoading=${isInitialLoading ||
-        false}`,
-      {
-        method: 'GET',
-      },
-    )
-    return r
-  },
-  saveAddOrderDetails: async params => {
-    const r = await request(`${url}/retailOrder/${params.id}`, {
-      method: 'PUT',
-      body: params,
-    })
-    return r
-  },
-  removeAddOrderDetails: params => service.remove(`${url}/retailOrder`, params),
   removeBillFirstVisit: params =>
     service.remove(`${url}/billFirstOrder`, params),
 }

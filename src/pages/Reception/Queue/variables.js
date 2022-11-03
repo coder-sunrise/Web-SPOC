@@ -30,6 +30,8 @@ export const VISIT_STATUS = {
   ORDER_UPDATED: 'Order Updated',
   COMPLETED: 'Completed',
   UPCOMING_APPT: 'Upcoming Appt.',
+  UNGRADED: 'Ungraded',
+  VERIFIED: 'Verified',
 }
 
 export const filterMap = {

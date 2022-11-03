@@ -15,7 +15,6 @@ export const constructPayload = values => {
     invoicePayer = [],
     invoicePayment = [],
     mode,
-    visitOrderTemplateFK,
     signatureName,
     signature,
   } = values
@@ -141,7 +140,6 @@ export const constructPayload = values => {
     mode,
     concurrencyToken,
     visitId,
-    visitOrderTemplateFK,
     visitStatus,
     invoicePayment: invoicePayment
       .filter(item => {

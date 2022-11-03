@@ -85,7 +85,6 @@ const ApplyClaims = ({
     invoicePayer: payerList,
     claimableSchemes,
     visitPurposeFK = 1,
-    visitOrderTemplateFK,
   } = values
 
   const [showErrorPrompt, setShowErrorPrompt] = useState(false)
@@ -1021,7 +1020,6 @@ const ApplyClaims = ({
               tempInvoicePayer={tempInvoicePayer}
               isUpdatedAppliedInvoicePayerInfo={checkUpdatedAppliedInvoicePayerInfo()}
               showRefreshOrder={showRefreshOrder}
-              visitOrderTemplateFK={visitOrderTemplateFK}
             />
           )
         })}

@@ -55,7 +55,6 @@ export default createFormViewModel({
             type: 'updateState',
             payload: {
               fromAppt: query.apptid ? true : false,
-              visitOrderTemplateFK: query.visitOrderTemplateFK,
             },
           })
           if (query.apptid) {
@@ -77,7 +76,7 @@ export default createFormViewModel({
                 },
               })
             })
-          } 
+          }
           if (query.visitMode) {
             dispatch({
               type: 'updateState',
@@ -100,9 +99,8 @@ export default createFormViewModel({
             'refno',
             'new',
             'type',
-            'apptid', 
+            'apptid',
             'visitMode',
-            'visitOrderTemplateFK',
           ]),
         )
         yield put({
@@ -207,39 +205,6 @@ export default createFormViewModel({
               patientInfo: 'Failed to retrieve patient info',
             },
           })
-        }
-      },
-      *getVisitOrderTemplateList({ payload }, { call, put }) {
-        try {
-          const response = yield call(service.queryVisitOrderTemplate, payload)
-          const { data } = response
-          return data
-        } catch (error) {
-          yield put({
-            type: 'updateErrorState',
-            payload: {
-              patientInfo: 'Failed to retrieve visit purposes',
-            },
-          })
-          return false
-        }
-      },
-      *getVisitOrderTemplateListForDropdown({ payload }, { call, put }) {
-        try {
-          const response = yield call(
-            service.queryVisitOrderTemplateForDropdown,
-            payload,
-          )
-          const { data } = response
-          return data
-        } catch (error) {
-          yield put({
-            type: 'updateErrorState',
-            payload: {
-              patientInfo: 'Failed to retrieve visit purposes',
-            },
-          })
-          return false
         }
       },
       *getBizSession({ payload }, { call, put }) {

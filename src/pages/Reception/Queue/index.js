@@ -533,9 +533,6 @@ class Queue extends React.Component {
         break
       case '1': {
         // dispense
-        const isInitialLoading =
-          row.visitPurposeFK === VISIT_TYPE.OTC &&
-          row.visitStatus === VISIT_STATUS.WAITING
         const version = Date.now()
         dispatch({
           type: `dispense/start`,
@@ -554,7 +551,7 @@ class Queue extends React.Component {
               },
             })
             history.push(
-              `/reception/queue/dispense?isInitialLoading=${isInitialLoading}&qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
+              `/reception/queue/dispense?qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
             )
           }
         })

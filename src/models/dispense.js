@@ -331,39 +331,6 @@ export default createFormViewModel({
           history.push('/reception/queue')
         }
       },
-
-      *queryAddOrderDetails({ payload }, { call, put }) {
-        const response = yield call(service.queryAddOrderDetails, {
-          invoiceId: payload.invoiceId,
-          isInitialLoading: payload.isInitialLoading,
-        })
-
-        if (response.status === '200') {
-          yield put({
-            type: 'getAddOrderDetails',
-            payload: response,
-          })
-          return response.data
-        }
-        return false
-      },
-
-      *saveAddOrderDetails({ payload }, { call }) {
-        const response = yield call(service.saveAddOrderDetails, payload)
-        if (response === 204) {
-          notification.success({ message: 'Saved' })
-          return true
-        }
-        return false
-      },
-
-      *removeAddOrderDetails({ payload }, { call, select }) {
-        const visitRegistration = yield select(state => state.visitRegistration)
-        const { entity } = visitRegistration
-
-        const response = yield call(service.removeAddOrderDetails, payload)
-        return response === 204
-      },
       *discardBillOrder({ payload }, { call, select }) {
         const visitRegistration = yield select(state => state.visitRegistration)
         const { entity } = visitRegistration
@@ -411,13 +378,6 @@ export default createFormViewModel({
     reducers: {
       incrementLoadCount(state) {
         return { ...state, loadCount: state.loadCount + 1 }
-      },
-      getAddOrderDetails(state, { payload }) {
-        const { data } = payload
-        return {
-          ...state,
-          addOrderDetails: data,
-        }
       },
     },
   },

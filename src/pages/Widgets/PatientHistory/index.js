@@ -682,25 +682,23 @@ class PatientHistory extends Component {
               marginRight: 6,
             }}
           >
-            {!isNurseNote &&
-              settings.showConsultationVersioning &&
-              !isRetailVisit && (
-                <Tooltip title='View History'>
-                  <span
-                    className='material-icons'
-                    style={{ color: 'gray' }}
-                    onClick={event => {
-                      event.stopPropagation()
-                      this.setState({
-                        showHistoryDetails: true,
-                        selectHistory: { ...row },
-                      })
-                    }}
-                  >
-                    history
-                  </span>
-                </Tooltip>
-              )}
+            {!isNurseNote && settings.showConsultationVersioning && (
+              <Tooltip title='View History'>
+                <span
+                  className='material-icons'
+                  style={{ color: 'gray' }}
+                  onClick={event => {
+                    event.stopPropagation()
+                    this.setState({
+                      showHistoryDetails: true,
+                      selectHistory: { ...row },
+                    })
+                  }}
+                >
+                  history
+                </span>
+              </Tooltip>
+            )}
           </div>
         </div>
       </div>
@@ -779,7 +777,6 @@ class PatientHistory extends Component {
       referralRemarks: history.referralRemarks,
       visitPurposeFK: history.visitPurposeFK,
       patientGender: history.patientGender,
-      visitOrderTemplateDetails: history.visitOrderTemplateDetails,
     }
     let visitDetails = {
       visitDate: history.visitDate,

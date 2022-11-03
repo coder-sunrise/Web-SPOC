@@ -31,7 +31,6 @@ class InvoiceDetails extends Component {
   state = {
     showReport: false,
     showVisitInvoiceReport: false,
-    showPrintInvoiceMenu: false,
     invoiceReportType: '',
   }
 
@@ -70,50 +69,17 @@ class InvoiceDetails extends Component {
             marginBottom: 10,
           }}
         >
-          <Popover
-            icon={null}
-            trigger='click'
-            placement='right'
-            visible={this.state.showPrintInvoiceMenu}
-            onVisibleChange={() => {
-              if (!values.visitOrderTemplateFK) {
-                this.toggleReport(INVOICE_REPORT_TYPES.INDIVIDUALINVOICE)
-              } else {
-                this.setState(preState => {
-                  return {
-                    showPrintInvoiceMenu: !preState.showPrintInvoiceMenu,
-                  }
-                })
-              }
+          <Button
+            size='sm'
+            color='primary'
+            icon
+            onClick={() => {
+              this.toggleReport(INVOICE_REPORT_TYPES.INDIVIDUALINVOICE)
             }}
-            content={
-              <MenuList
-                role='menu'
-                onClick={() => this.setState({ showPrintInvoiceMenu: false })}
-              >
-                <MenuItem
-                  onClick={() =>
-                    this.toggleReport(INVOICE_REPORT_TYPES.SUMMARYINVOICE)
-                  }
-                >
-                  Summary Invoice
-                </MenuItem>
-
-                <MenuItem
-                  onClick={() =>
-                    this.toggleReport(INVOICE_REPORT_TYPES.INDIVIDUALINVOICE)
-                  }
-                >
-                  Individual Invoice
-                </MenuItem>
-              </MenuList>
-            }
           >
-            <Button size='sm' color='primary' icon>
-              <Printer />
-              Print Invoice
-            </Button>
-          </Popover>
+            <Printer />
+            Print Invoice
+          </Button>
           {isEnableVisitationInvoiceReport && (
             <Button
               size='sm'
