@@ -189,7 +189,7 @@ class PatientHistory extends Component {
       loadVisits: [],
       totalVisits: 0,
       currentHeight: window.innerHeight,
-      isLoadingData: true,
+      isLoadingData: undefined,
       currentOrders: [],
       showActualizationHistory: false,
     }
@@ -243,7 +243,7 @@ class PatientHistory extends Component {
         this.setState({ selectCategories }, () => {
           setFieldValue('selectCategories', selectCategories)
         })
-        this.queryVisitHistory(5)
+        // this.queryVisitHistory(5)
       })
     })
   }
@@ -2223,7 +2223,13 @@ class PatientHistory extends Component {
                 </Collapse>
               </div>
             ) : (
-              <p>{isLoadingData ? 'Loading' : 'No Visit Record Found'}</p>
+              <p>
+                {isLoadingData
+                  ? 'Loading'
+                  : isLoadingData === undefined
+                  ? ''
+                  : 'No Visit Record Found'}
+              </p>
             )}
             <div
               style={{

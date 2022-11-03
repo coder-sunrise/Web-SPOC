@@ -1,15 +1,14 @@
 import { useState } from 'react'
 import Authorized from '@/utils/Authorized'
-import { Drawer } from '@material-ui/core'
+import { Drawer } from 'antd'
 import Accessibility from '@material-ui/icons/Accessibility'
 import { Button } from '@/components'
 import PatientHistoryDrawer from './PatientHistoryDrawer'
 
 const ViewPatientHistory = ({ top = '220px' }) => {
-  const [
-    openPatientHistoryDrawer,
-    setOpenPatientHistoryDrawer,
-  ] = useState(false)
+  const [openPatientHistoryDrawer, setOpenPatientHistoryDrawer] = useState(
+    false,
+  )
 
   const togglePatientHistoryDrawer = () => {
     setOpenPatientHistoryDrawer(!openPatientHistoryDrawer)
@@ -57,7 +56,10 @@ const ViewPatientHistory = ({ top = '220px' }) => {
         }}
       </Authorized>
       <Drawer
-        anchor='right'
+        width='auto'
+        closable={false}
+        placement='right'
+        bodyStyle={{ padding: 0 }}
         open={openPatientHistoryDrawer}
         onClose={togglePatientHistoryDrawer}
       >
