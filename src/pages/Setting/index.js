@@ -130,7 +130,6 @@ class SystemSetting extends PureComponent {
                       [classes.baseBtn]: true,
                     })}
                     variant='outlined'
-                    // disabled={disabled}
                     onClick={() => {
                       this.props.history.push(item.url)
                     }}
@@ -141,7 +140,9 @@ class SystemSetting extends PureComponent {
                       {item?.textExtension && (
                         <>
                           <br />
-                          <span>{item?.textExtension}</span>
+                          <span style={{ fontSize: '0.95rem' }}>
+                            {item?.textExtension}
+                          </span>
                         </>
                       )}
                     </span>

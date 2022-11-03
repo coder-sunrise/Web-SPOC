@@ -284,4 +284,11 @@ export const menuData = [
     textExtension: '(Anterior Eye Examination)',
     url: '/setting/gradingchart',
   },
+  {
+    authority: 'settings.clinicsetting.instrument',
+    title: 'Clinic Setting',
+    text: 'Instrument',
+    textExtension: '(Posterior Eye Examination)',
+    url: '/setting/instrument',
+  },
 ]
