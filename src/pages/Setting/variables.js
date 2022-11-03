@@ -277,4 +277,11 @@ export const menuData = [
     text: 'Credit Facility',
     url: '/setting/creditfacility',
   },
+  {
+    authority: 'settings.clinicsetting.gradingchart',
+    title: 'Clinic Setting',
+    text: 'Grading Chart',
+    textExtension: '(Anterior Eye Examination)',
+    url: '/setting/gradingchart',
+  },
 ]

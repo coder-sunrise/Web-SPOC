@@ -882,6 +882,12 @@ const _routes = [
             component: './Setting/Resource',
             authority: ['settings.clinicsetting.resource'],
           },
+          {
+            path: '/setting/gradingchart',
+            name: 'gradingchart',
+            component: './Setting/GradingChart',
+            authority: ['settings.clinicsetting.gradingchart'],
+          },
         ],
       },
       // Settings

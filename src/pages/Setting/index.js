@@ -92,7 +92,7 @@ class SystemSetting extends PureComponent {
         (accessRight && accessRight.rights === 'hidden') ||
         accessRight.rights === 'disable'
       )
-        return [..._result] 
+        return [..._result]
       return [..._result, { ...m, rights: accessRight.rights }]
     }
 
@@ -136,7 +136,15 @@ class SystemSetting extends PureComponent {
                     }}
                   >
                     <ListAlt />
-                    <span>{item.text}</span>
+                    <span>
+                      <span>{item.text}</span>
+                      {item?.textExtension && (
+                        <>
+                          <br />
+                          <span>{item?.textExtension}</span>
+                        </>
+                      )}
+                    </span>
                   </Button>
                 </GridItem>
               )
@@ -154,7 +162,7 @@ class SystemSetting extends PureComponent {
     })
     return menusKeys
   }
-  
+
   setActivePanelKey = activeKeys => {
     const { dispatch, systemSetting } = this.props
     const { filterValues } = systemSetting

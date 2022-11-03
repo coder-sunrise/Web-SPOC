@@ -157,6 +157,7 @@ export default {
   'menu.setting.tag': 'Tag',
   'menu.setting.checklist': 'Checklist',
   'menu.setting.resource': 'Resource',
+  'menu.setting.gradingchart': 'Grading Chart',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',
