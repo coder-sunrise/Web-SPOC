@@ -11,6 +11,7 @@ import { getUniqueId, getTranslationValue } from '@/utils/utils'
 import { ORDER_TYPES } from '@/utils/constants'
 import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
 import { formConfigs } from '@/pages/Widgets/ClinicalNotes/config'
+import { getIn, setIn } from 'formik'
 
 const orderTypes = [
   {
@@ -204,32 +205,40 @@ const convertToConsultation = (
 }
 
 const convertClinicalNotesForms = values => {
+  let anyChange = false
   formConfigs.forEach(form => {
+    var list = getIn(values, form.prop)
+    var entity = getIn(values, form.prefixProp)
+    var oldList = list?.map(x => ({ ...x }))
     //check list any old item
-    if (values[form.prop] && values[form.prop].length > 0) {
+    if (list && list.length > 0) {
       //unticked form
-      if (!values[form.prefixProp]) {
-        values[form.prop][0].isDeleted = true
+      if (!entity) {
+        list[0].isDeleted = true
       } else {
         //add new after unticked
-        if (!values[form.prefixProp].id) {
-          values[form.prop][0].isDeleted = true
-          values[form.prop].push({ ...values[form.prefixProp] })
+        if (!entity.id) {
+          list[0].isDeleted = true
+          list.push({ ...entity })
         }
         //update old item
         else {
-          values[form.prop][0] = {
-            ...values[form.prop][0],
-            ...values[form.prefixProp],
+          list[0] = {
+            ...list[0],
+            ...entity,
           }
         }
       }
     }
     //fist add
-    else if (values[form.prefixProp]) {
-      values[form.prop].push(values[form.prefixProp])
+    else if (entity) {
+      list.push(entity)
+    }
+    if (!anyChange && !_.isEqual(list, oldList)) {
+      anyChange = true
     }
   })
+  if (anyChange) values.corDoctorNote.lastChangeDate = moment()
   return values
 }
 

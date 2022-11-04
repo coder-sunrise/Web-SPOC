@@ -61,6 +61,7 @@ import styles from './style'
 import { getRawData } from '@/services/report'
 import * as config from '@/utils/config'
 import './Main.css'
+import { getIn, setIn } from 'formik'
 
 const discardMessage = 'Discard consultation?'
 const onPageLeaveMessage = 'Do you want to save consultation notes?'
@@ -260,14 +261,12 @@ const saveConsultation = ({
         forms,
       },
     )
-    if (!newValues.corDoctorNote.length) {
-      newValues.corDoctorNote = [{}]
+    if (!newValues.corDoctorNote) {
+      newValues.corDoctorNote = {}
     }
 
-    newValues.corDoctorNote.forEach(note => {
-      note.signedByUserFK = user.data.id
-      note.signedDate = moment()
-    })
+    newValues.corDoctorNote.signedByUserFK = user.data.id
+    newValues.corDoctorNote.signedDate = moment()
 
     newValues.corScribbleNotes.forEach(
       note => (note.signedByUserFK = user.data.id),
@@ -379,14 +378,12 @@ const pauseConsultation = async ({
     },
   )
 
-  if (!newValues.corDoctorNote.length) {
-    newValues.corDoctorNote = [{}]
+  if (!newValues.corDoctorNote) {
+    newValues.corDoctorNote = {}
   }
 
-  newValues.corDoctorNote.forEach(note => {
-    note.signedByUserFK = user.data.id
-    note.signedDate = moment()
-  })
+  newValues.corDoctorNote.signedByUserFK = user.data.id
+  newValues.corDoctorNote.signedDate = moment()
 
   newValues.corScribbleNotes.forEach(
     note => (note.signedByUserFK = user.data.id),
@@ -426,11 +423,11 @@ const pauseConsultation = async ({
 }
 
 const saveDraftDoctorNote = ({ values, visitRegistration }) => {
-  const { corDoctorNote = [] } = values
+  const { corDoctorNote = {} } = values
   const { entity: visit = {} } = visitRegistration
   const { id } = visit
   const payload = {
-    ...(corDoctorNote.length ? corDoctorNote[0] : {}),
+    ...(corDoctorNote || {}),
     visitFK: id,
     clinicalObjectRecordFK: values.id,
   }
@@ -508,17 +505,11 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
       let selectForms = []
       if (consultation.entity.versionNumber === 2) {
         selectForms = consultation.default.selectForms
-        newEntity.corPatientHistoryEntity = {}
-        newEntity.corVisionRefractionEntity = {
-          presentSpectacles: [{ uid: getUniqueId() }],
-        }
-        newEntity.corPreliminaryAssessmentEntity = {}
-        newEntity.corAnteriorEyeExaminationEntity = {}
-        newEntity.corPosteriorEyeExaminationEntity = {}
       } else {
         formConfigs.forEach(form => {
-          if (newEntity[form.prop] && newEntity[form.prop].length > 0) {
-            newEntity[form.prefixProp] = { ...newEntity[form.prop][0] }
+          var list = getIn(newEntity, form.prop)
+          if (list && list.length > 0) {
+            newEntity = setIn(newEntity, form.prefixProp, { ...list[0] })
             selectForms.push(form.id)
           }
         })
@@ -1190,29 +1181,26 @@ class Main extends React.Component {
     mergeArrayProps.forEach(p => {
       exist[p] = [...currentValue[p], ...v[p]]
     })
-    if (v.corDoctorNote && v.corDoctorNote.length > 0) {
-      if (exist.corDoctorNote && exist.corDoctorNote.length > 0) {
+    if (v.corDoctorNote) {
+      if (exist.corDoctorNote) {
         const {
           chiefComplaints = '',
           clinicianNote = '',
           plan = '',
-        } = exist.corDoctorNote[0]
+        } = exist.corDoctorNote
 
         if (chiefComplaints)
-          exist.corDoctorNote[0].chiefComplaints = `${chiefComplaints}<br/>${v.corDoctorNote[0].chiefComplaints}`
+          exist.corDoctorNote.chiefComplaints = `${chiefComplaints}<br/>${v.corDoctorNote.chiefComplaints}`
         else
-          exist.corDoctorNote[0].chiefComplaints =
-            v.corDoctorNote[0].chiefComplaints
+          exist.corDoctorNote.chiefComplaints = v.corDoctorNote.chiefComplaints
 
         if (clinicianNote)
-          exist.corDoctorNote[0].clinicianNote = `${clinicianNote}<br/>${v.corDoctorNote[0].clinicianNote}`
-        else
-          exist.corDoctorNote[0].clinicianNote =
-            v.corDoctorNote[0].clinicianNote
+          exist.corDoctorNote.clinicianNote = `${clinicianNote}<br/>${v.corDoctorNote.clinicianNote}`
+        else exist.corDoctorNote.clinicianNote = v.corDoctorNote.clinicianNote
 
         if (plan)
-          exist.corDoctorNote[0].plan = `${plan}<br/>${v.corDoctorNote[0].plan}`
-        else exist.corDoctorNote[0].plan = v.corDoctorNote[0].plan
+          exist.corDoctorNote.plan = `${plan}<br/>${v.corDoctorNote.plan}`
+        else exist.corDoctorNote.plan = v.corDoctorNote.plan
       } else {
         exist.corDoctorNote = [...v.corDoctorNote]
       }
