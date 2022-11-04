@@ -36,6 +36,7 @@ import {
   convertConsultationDocument,
   isPharmacyOrderUpdated,
   getOrdersData,
+  convertClinicalNotesForms,
 } from '@/pages/Consultation/utils'
 // import model from '@/pages/Widgets/Orders/models'
 import {
@@ -423,7 +424,7 @@ const pauseConsultation = async ({
 }
 
 const saveDraftDoctorNote = ({ values, visitRegistration }) => {
-  const { corDoctorNote = {} } = values
+  const { corDoctorNote = {} } = convertClinicalNotesForms(values)
   const { entity: visit = {} } = visitRegistration
   const { id } = visit
   const payload = {
@@ -503,9 +504,7 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
     if (consultation.entity) {
       let newEntity = { ...consultation.entity }
       let selectForms = []
-      if (consultation.entity.versionNumber === 2) {
-        selectForms = consultation.default.selectForms
-      } else {
+      if (newEntity.corDoctorNote) {
         formConfigs.forEach(form => {
           var list = getIn(newEntity, form.prop)
           if (list && list.length > 0) {
@@ -515,7 +514,6 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
         })
       }
       newEntity.selectForms = selectForms
-
       return newEntity
     }
     return consultation.default

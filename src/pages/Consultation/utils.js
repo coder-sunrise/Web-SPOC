@@ -305,4 +305,5 @@ export {
   convertConsultationDocument,
   cleanFields,
   getOrdersData,
+  convertClinicalNotesForms,
 }
