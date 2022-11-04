@@ -31,7 +31,7 @@ let _withFormikExtend = withFormikExtend({
   handleSubmit: (values, { props: { dispatch } }) => {
     let { codeDisplayValue, isActive } = values
     dispatch({
-      type: 'settingGradingChart/query',
+      type: 'settingInstrument/query',
       payload: {
         isActive,
         group: [
@@ -48,6 +48,7 @@ let _withFormikExtend = withFormikExtend({
 
 let Filter = props => {
   let { dispatch, handleSubmit, classes } = props
+  console.log(props)
   return (
     <div className={classes.filterBar}>
       <GridContainer>
@@ -84,7 +85,7 @@ let Filter = props => {
               color='primary'
               onClick={() => {
                 dispatch({
-                  type: 'settingGradingChart/updateState',
+                  type: 'settingInstrument/updateState',
                   payload: {
                     entity: undefined,
                     showModal: true,

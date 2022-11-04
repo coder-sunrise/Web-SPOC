@@ -158,6 +158,7 @@ export default {
   'menu.setting.checklist': 'Checklist',
   'menu.setting.resource': 'Resource',
   'menu.setting.gradingchart': 'Grading Chart',
+  'menu.setting.instrument': 'Instrument',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',
