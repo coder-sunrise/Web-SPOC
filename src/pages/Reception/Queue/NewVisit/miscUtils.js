@@ -238,7 +238,7 @@ export const formikMapPropsToValues = ({
 
     return {
       queueNo: qNo,
-      visitPurposeFK: 2,
+      visitPurposeFK: VISIT_TYPE.BF,
       consReady,
       roomFK: resourceRoomFK || roomAssignmentFK || roomFK,
       visitStatus: VISIT_STATUS.WAITING,

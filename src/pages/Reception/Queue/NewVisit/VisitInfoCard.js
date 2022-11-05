@@ -140,7 +140,7 @@ const VisitInfoCard = ({
   const handleVisitTypeChange = (v, op) => {
     const { values, dispatch } = restProps
     setFieldValue(FormField['visit.visitType'], v)
-    if (v !== 1) {
+    if (v === VISIT_TYPE.OTC) {
       setFieldValue(FormField['visit.consReady'], false)
     }
     setFieldValue(FormField['visit.isDoctorInCharge'], true)
