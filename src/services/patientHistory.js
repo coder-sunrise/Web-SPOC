@@ -13,10 +13,6 @@ const fns = {
   query: params => {
     return service.query(url, params)
   },
-
-  queryRetailHistory: params => {
-    return service.query(`${url}/Retail`, params)
-  },
   queryDispenseHistory: params => {
     return service.query(`${url}/Dispense`, params)
   },

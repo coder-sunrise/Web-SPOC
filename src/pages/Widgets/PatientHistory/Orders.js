@@ -6,7 +6,6 @@ import { Tooltip } from '@/components'
 import { FileCopySharp } from '@material-ui/icons'
 import { orderItemTypes } from '@/utils/codes'
 import * as WidgetConfig from './config'
-import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 
 const wrapCellTextStyle = {
   wordWrap: 'break-word',
@@ -50,12 +49,7 @@ const showCurrency = (value = 0) => {
   )
 }
 export default ({ current, classes, isFullScreen = true }) => {
-  const {
-    isFromEditOrder,
-    editDispenseType,
-    editDispenseReason,
-    visitOrderTemplateDetails,
-  } = current
+  const { isFromEditOrder, editDispenseType, editDispenseReason } = current
   return (
     <div style={{ marginBottom: 8, marginTop: 8 }}>
       <Table
@@ -144,7 +138,9 @@ export default ({ current, classes, isFullScreen = true }) => {
                   </div>
                 }
               >
-                <div style={wrapCellTextStyle}>{text}</div>
+                <div style={wrapCellTextStyle} className='threeline_textblock'>
+                  {text}
+                </div>
               </Tooltip>
             ),
           },
@@ -274,12 +270,6 @@ export default ({ current, classes, isFullScreen = true }) => {
             )}
         </div>
       )}
-      <br />
-      <div>
-        <VisitOrderTemplateIndicateString
-          visitOrderTemplateDetails={visitOrderTemplateDetails}
-        ></VisitOrderTemplateIndicateString>
-      </div>
     </div>
   )
 }

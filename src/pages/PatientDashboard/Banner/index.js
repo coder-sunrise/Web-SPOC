@@ -19,7 +19,6 @@ import PatientStickyNotesBtn from '@/components/_medisys/PatientInfoSideBanner/P
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import { MoreButton, LoadingWrapper } from '@/components/_medisys'
 import PatientLabelBtn from '@/components/_medisys/PatientInfoSideBanner/PatientLabelBtn'
-import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 import {
   GridContainer,
   GridItem,
@@ -961,25 +960,6 @@ class Banner extends PureComponent {
         <Col flex='auto' className={contentClass}>
           {moment(visitRegistration?.entity?.visit?.visitDate).format(
             dateFormatLong,
-          )}
-        </Col>
-      </Row>
-    )
-    const visitPurposeElm = (
-      <Row wrap={false}>
-        <Col flex='none'>
-          <span className={classes.header}>Visit Purpose: </span>
-        </Col>
-        <Col flex='auto' className={contentClass}>
-          {visitRegistration?.entity?.visit?.visitOrderTemplateDetails ? (
-            <VisitOrderTemplateIndicateString
-              oneline
-              visitOrderTemplateDetails={
-                visitRegistration?.entity?.visit?.visitOrderTemplateDetails
-              }
-            ></VisitOrderTemplateIndicateString>
-          ) : (
-            <span>-</span>
           )}
         </Col>
       </Row>

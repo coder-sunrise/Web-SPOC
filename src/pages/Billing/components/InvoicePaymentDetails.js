@@ -30,7 +30,6 @@ const InvoicePaymentDetails = ({ invoice = {}, classes }) => {
   data = _.orderBy(
     data,
     [
-      'isVisitPurposeItem',
       x => (x.itemType || '').toLowerCase(),
       x => (x.itemName || '').toLowerCase(),
     ],
@@ -68,15 +67,6 @@ const InvoicePaymentDetails = ({ invoice = {}, classes }) => {
                       <Tooltip title={row.itemType}>
                         <span>{itemType?.displayValue}</span>
                       </Tooltip>
-                      <div>
-                        {row.isVisitPurposeItem && (
-                          <Tooltip title='Visit Purpose Item' placement='right'>
-                            <Tag style={{ marginRight: 0 }} color='blue'>
-                              V.P.
-                            </Tag>
-                          </Tooltip>
-                        )}
-                      </div>
                     </div>
                   </div>
                 )
@@ -85,6 +75,11 @@ const InvoicePaymentDetails = ({ invoice = {}, classes }) => {
             {
               dataIndex: 'itemDescription',
               title: 'Name',
+              render: (_, row) => (
+                <span className='threeline_textblock'>
+                  {row.itemDescription}
+                </span>
+              ),
             },
             {
               dataIndex: 'quantity',

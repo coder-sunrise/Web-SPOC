@@ -59,7 +59,6 @@ const PaymentCard = ({
   patientIsActive,
   hasActiveSession,
   isEnableWriteOffinInvoice,
-  visitOrderTemplateFK,
   isFromPastSession = false,
   actions: { handleVoidClick, handlePrinterClick, ...buttonActions },
 }) => {
@@ -153,7 +152,6 @@ const PaymentCard = ({
             readOnly={readOnly || !patientIsActive}
             hasActiveSession={hasActiveSession}
             handlePrinterClick={handlePrinterClick}
-            visitOrderTemplateFK={visitOrderTemplateFK}
             isFromPastSession={isFromPastSession}
             {...buttonActions}
           />

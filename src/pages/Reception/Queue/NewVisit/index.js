@@ -113,7 +113,6 @@ const getHeight = propsHeight => {
 class NewVisit extends PureComponent {
   state = {
     hasActiveSession: false,
-    currentVisitOrderTemplate: undefined,
   }
 
   constructor(props) {
@@ -123,31 +122,6 @@ class NewVisit extends PureComponent {
 
   componentDidMount = async () => {
     const { dispatch, patientInfo, values, visitRegistration } = this.props
-    // const response = await dispatch({
-    //   type: 'visitRegistration/getVisitOrderTemplateListForDropdown',
-    //   payload: {
-    //     pagesize: 9999,
-    //   },
-    // })
-    // if (response) {
-    //   const { data } = response
-    //   const templateOptions = data
-    //     .filter(template => template.isActive)
-    //     .map(template => {
-    //       return {
-    //         ...template,
-    //         value: template.id,
-    //         name: template.displayValue,
-    //       }
-    //     })
-
-    //   dispatch({
-    //     type: 'visitRegistration/updateState',
-    //     payload: {
-    //       visitOrderTemplateOptions: templateOptions,
-    //     },
-    //   })
-    // }
     this.setBannerHeight()
 
     const bizSession = await dispatch({
@@ -161,23 +135,6 @@ class NewVisit extends PureComponent {
       hasActiveSession: data.length > 0,
     })
     await this.getCodeTables()
-    setTimeout(() => {
-      if (
-        visitRegistration.visitOrderTemplateFK &&
-        visitRegistration.fromAppt
-      ) {
-        dispatch({
-          type: 'settingVisitOrderTemplate/queryOne',
-          payload: {
-            id: visitRegistration.visitOrderTemplateFK,
-          },
-        }).then(template => {
-          if (template) {
-            this.setState({ currentVisitOrderTemplate: template })
-          }
-        })
-      }
-    }, 200)
   }
 
   getCodeTables = async () => {
@@ -250,25 +207,6 @@ class NewVisit extends PureComponent {
         return [...attachments, { ...item }]
       }, [])
     setFieldValue('visitAttachment', updated)
-  }
-  getVisitOrderTemplateDetails = id => {
-    if (!id) {
-      this.setState({ currentVisitOrderTemplate: undefined })
-      return
-    }
-    if (this.state.currentVisitOrderTemplate?.id === id) return
-    this.props
-      .dispatch({
-        type: 'settingVisitOrderTemplate/queryOne',
-        payload: {
-          id: id,
-        },
-      })
-      .then(template => {
-        if (template) {
-          this.setState({ currentVisitOrderTemplate: template })
-        }
-      })
   }
 
   validatePatient = () => {
@@ -392,12 +330,7 @@ class NewVisit extends PureComponent {
       theme,
       queueLog: { list = [] } = { list: [] },
       loading,
-      visitRegistration: {
-        errorState,
-        visitOrderTemplateOptions,
-        expandRefractionForm,
-        visitMode,
-      },
+      visitRegistration: { errorState, expandRefractionForm, visitMode },
       values,
       global,
       isSubmitting,
@@ -509,16 +442,9 @@ class NewVisit extends PureComponent {
                           )}
                           isReadOnly={isReadOnly}
                           handleUpdateAttachments={this.updateAttachments}
-                          getVisitOrderTemplateDetails={
-                            this.getVisitOrderTemplateDetails
-                          }
-                          currentVisitTemplate={
-                            this.state.currentVisitOrderTemplate
-                          }
                           attachments={values.visitAttachment}
                           visitType={values.visitPurposeFK}
                           dispatch={dispatch}
-                          visitOrderTemplateOptions={visitOrderTemplateOptions}
                           {...this.props}
                         />
                       </GridItem>

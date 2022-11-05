@@ -64,9 +64,8 @@ const InvoiceSummary = ({
 
   const [showError, setShowError] = useState(false)
   const [showAddPaymentMenu, setShowAddPaymentMenu] = useState(false)
-  const [showPrintInvoiceMenu, setShowPrintInvoiceMenu] = useState(false)
 
-  const { invoicePayment, invoice, patientID, visitOrderTemplateFK } = values
+  const { invoicePayment, invoice, patientID } = values
   const {
     gstValue,
     gstAmount,
@@ -219,60 +218,20 @@ const InvoiceSummary = ({
               />
             </GridItem>
             <GridItem md={3}>
-              <span>
-                <Popover
-                  icon={null}
-                  trigger='click'
-                  placement='right'
-                  visible={showPrintInvoiceMenu}
-                  onVisibleChange={() => {
-                    if (visitOrderTemplateFK) {
-                      setShowPrintInvoiceMenu(!showPrintInvoiceMenu)
-                    } else {
-                      handlePrintInvoiceClick(
-                        INVOICE_REPORT_TYPES.INDIVIDUALINVOICE,
-                      )
-                    }
-                  }}
-                  content={
-                    <MenuList
-                      role='menu'
-                      onClick={() => setShowPrintInvoiceMenu(false)}
-                    >
-                      {visitOrderTemplateFK && (
-                        <MenuItem
-                          onClick={() =>
-                            handlePrintInvoiceClick(
-                              INVOICE_REPORT_TYPES.SUMMARYINVOICE,
-                            )
-                          }
-                        >
-                          Summary Invoice
-                        </MenuItem>
-                      )}
-                      <MenuItem
-                        onClick={() =>
-                          handlePrintInvoiceClick(
-                            INVOICE_REPORT_TYPES.INDIVIDUALINVOICE,
-                          )
-                        }
-                      >
-                        Individual Invoice
-                      </MenuItem>
-                    </MenuList>
-                  }
-                >
-                  <Button
-                    color='primary'
-                    simple
-                    size='sm'
-                    className={classes.invoiceButton}
-                    disabled={disabled}
-                  >
-                    Print Invoice
-                  </Button>
-                </Popover>
-              </span>
+              <Button
+                color='primary'
+                simple
+                size='sm'
+                className={classes.invoiceButton}
+                disabled={disabled}
+                onClick={() => {
+                  handlePrintInvoiceClick(
+                    INVOICE_REPORT_TYPES.INDIVIDUALINVOICE,
+                  )
+                }}
+              >
+                Print Invoice
+              </Button>
             </GridItem>
 
             <GridItem md={5}>

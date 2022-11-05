@@ -149,33 +149,7 @@ class Form extends React.PureComponent {
 
   componentDidMount = async () => {
     const { values, dispatch, setFieldValue } = this.props
-    const response = await dispatch({
-      type: 'visitRegistration/getVisitOrderTemplateListForDropdown',
-      payload: {
-        pagesize: 9999,
-      },
-    })
-    if (response) {
-      const { data } = response
-      const templateOptions = data
-        .filter(template => template.isActive)
-        .map(template => {
-          return {
-            ...template,
-            value: template.id,
-            name: template.displayValue,
-          }
-        })
-
-      dispatch({
-        type: 'visitRegistration/updateState',
-        payload: {
-          visitOrderTemplateOptions: templateOptions,
-        },
-      })
-      this.setBannerHeight()
-    }
-
+    this.setBannerHeight()
     this.checkHasActiveSession()
 
     if (values && values.patientProfileFK) {
@@ -989,56 +963,6 @@ class Form extends React.PureComponent {
   //   return false
   // }
 
-  onVisitPurposeSelected = template => {
-    const { datagrid } = this.state
-    _.remove(datagrid, n => {
-      return n.id < 0 && n.templateFK
-    })
-    if (!template) {
-      return
-    }
-    const primaryResrouce = datagrid.find(x => x.isPrimaryClinician)
-    let sortOrder = _.maxBy(datagrid, 'sortOrder')?.sortOrder || 0
-    const { ctresource = [], ctcalendarresource = [] } = this.props.codetable
-    template.visitOrderTemplate_Resources.forEach(temp => {
-      sortOrder++
-      const resource = ctresource.find(
-        x => x.id === temp.resourceFK && x.isActive,
-      )
-      if (!resource) return
-      const calendarResource = ctcalendarresource.find(
-        source => source.id === resource.calendarResourceFK && source.isActive,
-      )
-      if (!calendarResource) return
-      console.log(datagrid)
-      if (
-        datagrid.find(
-          res =>
-            res.calendarResourceFK === calendarResource.id && !res.isDeleted,
-        )
-      ) {
-        // Skip the active resources
-        return
-      }
-      const newResource = {
-        templateFK: template.id,
-        appointmentTypeFK: primaryResrouce?.appointmentTypeFK,
-        apptDurationHour: primaryResrouce?.apptDurationHour,
-        apptDurationMinute: primaryResrouce?.apptDurationMinute,
-        calendarResourceFK: calendarResource.id,
-        calendarResource: calendarResource
-          ? { ...calendarResource }
-          : undefined,
-        isPrimaryClinician: false,
-        sortOrder: sortOrder,
-        id: getUniqueNumericId(),
-        startTime: primaryResrouce?.startTime,
-        endTime: primaryResrouce?.endTime,
-      }
-      datagrid.push(newResource)
-    })
-    this.validateDataGrid()
-  }
   onViewPatientProfile = () => {
     const { values, history } = this.props
     history.push(
@@ -1170,7 +1094,6 @@ class Form extends React.PureComponent {
       height,
       onHistoryRowSelected,
       patientProfile,
-      visitRegistration: { visitOrderTemplateOptions = [] },
       dispatch,
       setFieldValue,
       handleCopyAppointmentClick,
@@ -1258,14 +1181,11 @@ class Form extends React.PureComponent {
                   appointmentStatusFK={currentAppointment.appointmentStatusFk}
                   values={values}
                   hasActiveSession={this.state.hasActiveSession}
-                  // containsPrimaryClinician={this.containsPrimaryClinician()}
                 />
                 <AppointmentDateInput
                   disabled={_disableAppointmentDate}
-                  // visitOrderTemplateOptions={visitOrderTemplateOptions}
                   patientProfileFK={values.patientProfileFK}
                   values={values}
-                  // onVisitPurposeSelected={this.onVisitPurposeSelected}
                   patientProfile={patientProfile}
                   getClinicoperationhour={() => {
                     this.getClinicoperationhour()

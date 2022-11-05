@@ -9,7 +9,6 @@ import { VISIT_TYPE } from '@/utils/constants'
 import AmountSummary from './AmountSummary'
 import tablestyles from './PatientHistoryStyle.less'
 import { mergeClasses } from '@material-ui/styles'
-import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 const numberstyle = {
   color: 'darkBlue',
   fontWeight: 500,
@@ -133,7 +132,9 @@ const baseColumns = (classes, isFullScreen) => {
             </div>
           }
         >
-          <div style={wrapCellTextStyle}>{text}</div>
+          <div style={wrapCellTextStyle} className='threeline_textblock'>
+            {text}
+          </div>
         </Tooltip>
       ),
     },
@@ -240,11 +241,6 @@ export default ({ current, theme, isFullScreen = true, classes }) => {
                   />
                 </div>
               )}
-              <div>
-                <VisitOrderTemplateIndicateString
-                  visitOrderTemplateDetails={current.visitOrderTemplateDetails}
-                ></VisitOrderTemplateIndicateString>
-              </div>
             </div>
           )}
         </GridItem>

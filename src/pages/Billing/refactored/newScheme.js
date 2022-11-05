@@ -105,7 +105,6 @@ const Scheme = ({
   clinicSettings = {},
   isUpdatedAppliedInvoicePayerInfo,
   showRefreshOrder,
-  visitOrderTemplateFK,
 }) => {
   const {
     name,
@@ -290,8 +289,8 @@ const Scheme = ({
                 columnExtensions={columnExtensions}
                 rows={_.orderBy(
                   invoicePayerItem,
-                  ['isVisitPurposeItem', 'itemType', 'itemName'],
-                  ['desc', 'asc', 'asc'],
+                  ['itemType', 'itemName'],
+                  ['asc', 'asc'],
                 )}
                 schema={validationSchema}
               />
@@ -318,8 +317,8 @@ const Scheme = ({
                 ]}
                 rows={_.orderBy(
                   invoicePayerItem,
-                  ['isVisitPurposeItem', 'itemType', 'itemName'],
-                  ['desc', 'asc', 'asc'],
+                  ['itemType', 'itemName'],
+                  ['asc', 'asc'],
                 )}
               />
             )}
@@ -425,22 +424,6 @@ const Scheme = ({
                       role='menu'
                       onClick={() => setShowPrintInvoiceMenu(false)}
                     >
-                      {visitOrderTemplateFK && (
-                        <MenuItem
-                          onClick={() =>
-                            onPrinterClick(
-                              'TaxInvoice',
-                              undefined,
-                              companyFK,
-                              id,
-                              index,
-                              INVOICE_REPORT_TYPES.SUMMARYINVOICE,
-                            )
-                          }
-                        >
-                          Summary Invoice
-                        </MenuItem>
-                      )}
                       <MenuItem
                         onClick={() =>
                           onPrinterClick(

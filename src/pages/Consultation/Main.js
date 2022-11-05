@@ -238,7 +238,6 @@ const saveConsultation = ({
   } = props
   const { entity: vistEntity = {} } = visitRegistration
   const { visit = {} } = vistEntity
-  const { visitPurposeFK = VISIT_TYPE.BF } = visit
 
   let settings = JSON.parse(localStorage.getItem('clinicSettings'))
   const { diagnosisDataSource } = settings
@@ -357,7 +356,6 @@ const pauseConsultation = async ({
   } = rest
   const { entity: vistEntity = {} } = visitRegistration
   const { visit = {} } = vistEntity
-  const { visitPurposeFK = VISIT_TYPE.BF } = visit
   let settings = JSON.parse(localStorage.getItem('clinicSettings'))
   const { diagnosisDataSource } = settings
   const newValues = convertToConsultation(
@@ -842,10 +840,7 @@ class Main extends React.Component {
       const { rows, _originalRows } = orders
       const { entity: vistEntity = {} } = visitRegistration
       const { visit = {} } = vistEntity
-      const {
-        visitPurposeFK = VISIT_TYPE.BF,
-        visitStatus = VISIT_STATUS.DISPENSE,
-      } = visit
+      const { visitStatus = VISIT_STATUS.DISPENSE } = visit
 
       const isModifiedOrder = _.isEqual(
         rows.filter(i => !(i.id === undefined && i.isDeleted)),
@@ -858,11 +853,7 @@ class Main extends React.Component {
         return
       }
 
-      if (
-        visitPurposeFK === VISIT_TYPE.BF &&
-        visitStatus === VISIT_STATUS.BILLING &&
-        isModifiedOrder
-      ) {
+      if (visitStatus === VISIT_STATUS.BILLING && isModifiedOrder) {
         dispatch({
           type: 'global/updateState',
           payload: {

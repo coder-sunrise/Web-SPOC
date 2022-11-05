@@ -30,13 +30,6 @@ export const ApplyClaimsColumnExtension = [
       return (
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <span>{row.itemType}</span>
-          {row.isVisitPurposeItem && (
-            <Tooltip title='Visit Purpose Item' placement='right'>
-              <Tag style={{ marginRight: 0 }} color='blue'>
-                V.P.
-              </Tag>
-            </Tooltip>
-          )}
         </div>
       )
     },
@@ -98,13 +91,6 @@ export const CoPayerColExtensions = [
       return (
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <span>{row.itemType}</span>
-          {row.isVisitPurposeItem && (
-            <Tooltip title='Visit Purpose Item' placement='right'>
-              <Tag style={{ marginRight: 0 }} color='blue'>
-                V.P.
-              </Tag>
-            </Tooltip>
-          )}
         </div>
       )
     },

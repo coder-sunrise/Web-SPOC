@@ -6,8 +6,6 @@ export default {
   'visit.isDoctorInCharge': 'isDoctorInCharge',
   'visit.visitRemarks': 'visitRemarks',
   'visit.roomFK': 'roomFK',
-  'visit.visitOrderTemplateFK': 'visitOrderTemplateFK',
-  'visit.VisitOrderTemplateTotal': 'visitOrderTemplateTotal',
   'visit.salesPersonUserFK': 'salesPersonUserFK',
   'visit.consReady': 'consReady',
 

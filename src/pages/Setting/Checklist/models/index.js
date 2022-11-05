@@ -27,7 +27,6 @@ export default createListViewModel({
         const {
           effectiveStartDate,
           effectiveEndDate,
-          visitOrderTemplateItemDtos,
           ...restValues
         } = payload.data
         return {

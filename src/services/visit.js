@@ -3,8 +3,6 @@ import * as service from '@/services/common'
 
 const patientApiUrl = '/api/patient'
 const queueApiUrl = '/api/queue'
-const visitOrderTemplateUrl = '/api/visitOrderTemplate'
-const visitOrderTemplateUrlForDropdown = '/api/visitOrderTemplate/simple'
 const bizSessionAPIURL = '/api/bizsession'
 
 // export async function fetchPatientInfoByPatientID (patientID) {
@@ -40,12 +38,6 @@ export const saveVisit = async visitInfo => {
   const response = await axiosRequest(`/api/queue/${id}`, options)
   return response
 }
-
-export const queryVisitOrderTemplate = params =>
-  service.queryList(visitOrderTemplateUrl, params)
-
-export const queryVisitOrderTemplateForDropdown = params =>
-  service.queryList(visitOrderTemplateUrlForDropdown, params)
 
 export const queryReferralList = async () => {
   const response = await axiosRequest(`/api/ReferralSource`)

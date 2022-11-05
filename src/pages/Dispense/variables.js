@@ -318,7 +318,7 @@ export const DispenseItemsColumns1 = (viewOnly = false, onValueChange) => {
                 </div>
               }
             >
-              <span>{row.name}</span>
+              <span className='threeline_textblock'>{row.name}</span>
             </Tooltip>
             <div style={{ position: 'absolute', top: 0, right: '-10px' }}>
               {lowStockIndicator(
@@ -1218,7 +1218,7 @@ export const ServiceColumns1 = (
                   whiteSpace: 'pre-wrap',
                 }}
               >
-                {row.description}
+                <span className='threeline_textblock'>{row.description}</span>
                 <div style={{ position: 'relative', top: 2 }}>
                   {lowStockIndicator(row, 'itemFK')}
                 </div>
@@ -1360,6 +1360,9 @@ export const OtherOrdersColumns1 = onPrint => [
     key: 'description',
     title: 'Name',
     width: 700,
+    render: (_, row) => (
+      <span className='threeline_textblock'>{row.description}</span>
+    ),
   },
   { dataIndex: 'remarks', key: 'remarks', title: 'Remarks', width: 700 },
   {

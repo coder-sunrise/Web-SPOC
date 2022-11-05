@@ -219,17 +219,6 @@ export const menuData = [
     url: '/setting/documenttemplate',
   },
   {
-    authority: 'settings.templates.visitordertemplate',
-    title: 'Templates',
-    text: 'Visit Purpose',
-    url: '/setting/visitordertemplate',
-  },
-  // {
-  //   title: 'Contact',
-  //   text: 'Co-Payer',
-  //   url: '/setting/company/1',
-  // },
-  {
     authority: 'settings.contact.supplier',
     title: 'Contact',
     text: 'Supplier',

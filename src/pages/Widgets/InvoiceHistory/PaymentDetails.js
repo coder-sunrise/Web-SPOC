@@ -446,7 +446,6 @@ class PaymentDetails extends Component {
                     readOnly={readOnly}
                     hasActiveSession={hasActiveSession}
                     patientIsActive={patientIsActive}
-                    visitOrderTemplateFK={invoiceDetail?.visitOrderTemplateFK}
                     isFromPastSession={isClinicSessionClosed}
                   />
                 )

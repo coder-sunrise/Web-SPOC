@@ -47,7 +47,7 @@ export default ({ classes, current, fieldName = '', isFullScreen = true }) => {
                   </div>
                 }
               >
-                <div>{row.description}</div>
+                <div className='threeline_textblock'>{row.description}</div>
               </Tooltip>
             </div>
           </div>

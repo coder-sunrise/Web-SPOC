@@ -133,7 +133,7 @@ class PatientDashboard extends PureComponent {
     const { entity } = visitRegistration
     if (!entity) return null
     const { visit = {}, queueNo } = entity
-    const { visitPurposeFK = VISIT_TYPE.BF, roomFK, doctorProfileFK } = visit
+    const { roomFK, doctorProfileFK } = visit
 
     return (
       visit.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
@@ -165,10 +165,7 @@ class PatientDashboard extends PureComponent {
                     <ProgressButton
                       color='primary'
                       onClick={this.startConsultation}
-                      disabled={
-                        visitPurposeFK === VISIT_TYPE.OTC ||
-                        visitPurposeFK === VISIT_TYPE.BF
-                      }
+                      disabled={true}
                       round
                       justIcon
                       icon={<PlayArrow />}
