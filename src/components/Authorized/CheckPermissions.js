@@ -19,7 +19,6 @@ const checkSinglePermission = (
   Exception,
 ) => {
   let match = null
-
   const r = currentAuthority.filter(o => o.name === authority)
   if (r.length > 0) {
     match = r.find(
@@ -52,7 +51,9 @@ const checkSinglePermission = (
 
     match = r.find(o => ['readonly', 'disable'].indexOf(o.rights) >= 0)
     if (match) {
-      match.rights = HiddenWhenDisable.some(a => a === match.name) ? 'hidden' : 'disable'
+      match.rights = HiddenWhenDisable.some(a => a === match.name)
+        ? 'hidden'
+        : 'disable'
 
       if (type === 'decorator') return match
 
@@ -93,6 +94,9 @@ const checkSinglePermission = (
     // }
 
     // return null
+  }
+  if (r.length === 0) {
+    return { rights: 'hidden' }
   }
   // console.log(authority)
   return typeof Exception === 'function' && type !== 'decorator'
