@@ -10,6 +10,8 @@ import moment from 'moment'
 import { getUniqueId, getTranslationValue } from '@/utils/utils'
 import { ORDER_TYPES } from '@/utils/constants'
 import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
+import { formConfigs } from '@/pages/Widgets/ClinicalNotes/config'
+import { getIn, setIn } from 'formik'
 
 const orderTypes = [
   {
@@ -182,6 +184,7 @@ const convertToConsultation = (
     }
   })
 
+  values = convertClinicalNotesForms(values)
   values = convertEyeForms(values)
 
   const formRows = forms.rows
@@ -199,6 +202,44 @@ const convertToConsultation = (
     ...values,
     isGSTInclusive,
   }
+}
+
+const convertClinicalNotesForms = values => {
+  let anyChange = false
+  formConfigs.forEach(form => {
+    var list = getIn(values, form.prop)
+    var entity = getIn(values, form.prefixProp)
+    var oldList = list?.map(x => ({ ...x }))
+    //check list any old item
+    if (list && list.length > 0) {
+      //unticked form
+      if (!entity) {
+        list[0].isDeleted = true
+      } else {
+        //add new after unticked
+        if (!entity.id) {
+          list[0].isDeleted = true
+          list.push({ ...entity })
+        }
+        //update old item
+        else {
+          list[0] = {
+            ...list[0],
+            ...entity,
+          }
+        }
+      }
+    }
+    //fist add
+    else if (entity) {
+      list.push(entity)
+    }
+    if (!anyChange && !_.isEqual(list, oldList)) {
+      anyChange = true
+    }
+  })
+  if (anyChange) values.corDoctorNote.lastChangeDate = moment()
+  return values
 }
 
 const cleanConsultation = values => {
@@ -264,4 +305,5 @@ export {
   convertConsultationDocument,
   cleanFields,
   getOrdersData,
+  convertClinicalNotesForms,
 }

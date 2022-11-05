@@ -19,7 +19,7 @@ const PatientHistory = props => {
       </GridItem>
       <GridItem md={12}>
         <FastField
-          name={`${prefixProp}.reason`}
+          name={`${prefixProp}.subject`}
           render={args => (
             <MultipleTextField
               label=''
@@ -39,7 +39,12 @@ const PatientHistory = props => {
         <FastField
           name={`${prefixProp}.personalOcularHealth`}
           render={args => (
-            <TextField label='Personal Ocular Health' {...args} />
+            <TextField
+              label='Personal Ocular Health'
+              multiline
+              maxLength={500}
+              {...args}
+            />
           )}
         />
       </GridItem>
@@ -47,7 +52,12 @@ const PatientHistory = props => {
         <FastField
           name={`${prefixProp}.personalGeneralHealth`}
           render={args => (
-            <TextField label='Personal General Health' {...args} />
+            <TextField
+              label='Personal General Health'
+              multiline
+              maxLength={500}
+              {...args}
+            />
           )}
         />
       </GridItem>
@@ -55,20 +65,70 @@ const PatientHistory = props => {
         <FastField
           name={`${prefixProp}.allergies`}
           render={args => (
-            <TextField label='Medications, Allergies' {...args} />
+            <TextField
+              label='Medications, Allergies'
+              multiline
+              maxLength={500}
+              {...args}
+            />
           )}
         />
       </GridItem>
       <GridItem md={12}>
         <FastField
           name={`${prefixProp}.familyOcularHealth`}
-          render={args => <TextField label='Family Ocular Health' {...args} />}
+          render={args => (
+            <TextField
+              label='Family Ocular Health'
+              multiline
+              maxLength={500}
+              {...args}
+            />
+          )}
         />
       </GridItem>
       <GridItem md={12}>
         <FastField
           name={`${prefixProp}.familyGeneralHealth`}
-          render={args => <TextField label='Family General Health' {...args} />}
+          render={args => (
+            <TextField
+              label='Family General Health'
+              multiline
+              maxLength={500}
+              {...args}
+            />
+          )}
+        />
+      </GridItem>
+      <GridItem md={12}>
+        <span style={{ fontWeight: 500, fontSize: '1rem', marginRight: 8 }}>
+          Visual Requirements
+        </span>
+      </GridItem>
+      <GridItem md={12}>
+        <FastField
+          name={`${prefixProp}.refraction`}
+          render={args => (
+            <TextField
+              label='Refraction / Optical Appliances Hx'
+              multiline
+              maxLength={500}
+              {...args}
+            />
+          )}
+        />
+      </GridItem>
+      <GridItem md={12}>
+        <FastField
+          name={`${prefixProp}.visualTasks`}
+          render={args => (
+            <TextField
+              label='Visual Tasks'
+              multiline
+              maxLength={500}
+              {...args}
+            />
+          )}
         />
       </GridItem>
       <GridItem md={12}>

@@ -67,14 +67,14 @@ const loadFromCodesConfig = {
   },
   loadFromCodes: [
     {
-      value: 'corDoctorNote[0].note',
+      value: 'corDoctorNote.note',
       name: 'Clinical Notes',
     },
     {
-      value: 'corDoctorNote[0].chiefComplaints',
+      value: 'corDoctorNote.chiefComplaints',
       name: 'Chief Complaints',
     },
-    { value: 'corDoctorNote[0].plan', name: 'Plan' },
+    { value: 'corDoctorNote.plan', name: 'Plan' },
     {
       value: 'corDiagnosis',
       name: 'Diagnosis',
