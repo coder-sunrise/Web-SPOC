@@ -888,6 +888,12 @@ const _routes = [
             component: './Setting/Instrument',
             authority: ['settings.clinicsetting.instrument'],
           },
+          {
+            path: '/setting/typeoftest',
+            name: 'typeoftest',
+            component: './Setting/TypeOfTest',
+            authority: ['settings.clinicsetting.typeoftest'],
+          },
         ],
       },
       // Settings
