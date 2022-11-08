@@ -233,7 +233,7 @@ const convertClinicalNotesForms = values => {
     //fist add
     else if (entity) {
       list.push(entity)
-      setIn(values, form.prop, list)
+      values = setIn(values, form.prop, list)
     }
     if (!anyChange && !_.isEqual(list, oldList)) {
       anyChange = true
