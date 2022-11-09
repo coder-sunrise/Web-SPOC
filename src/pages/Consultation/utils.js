@@ -207,9 +207,9 @@ const convertToConsultation = (
 const convertClinicalNotesForms = values => {
   let anyChange = false
   formConfigs.forEach(form => {
-    var list = getIn(values, form.prop)
+    var list = getIn(values, form.prop) || []
     var entity = getIn(values, form.prefixProp)
-    var oldList = list?.map(x => ({ ...x }))
+    var oldList = list.map(x => ({ ...x }))
     //check list any old item
     if (list && list.length > 0) {
       //unticked form
@@ -233,6 +233,7 @@ const convertClinicalNotesForms = values => {
     //fist add
     else if (entity) {
       list.push(entity)
+      values = setIn(values, form.prop, list)
     }
     if (!anyChange && !_.isEqual(list, oldList)) {
       anyChange = true
