@@ -267,6 +267,8 @@ const saveConsultation = ({
 
     newValues.corDoctorNote.signedByUserFK = user.data.id
     newValues.corDoctorNote.signedDate = moment()
+    if (!newValues.corDoctorNote.lastChangeDate)
+      newValues.corDoctorNote.lastChangeDate = moment()
 
     newValues.corScribbleNotes.forEach(
       note => (note.signedByUserFK = user.data.id),
@@ -383,6 +385,8 @@ const pauseConsultation = async ({
 
   newValues.corDoctorNote.signedByUserFK = user.data.id
   newValues.corDoctorNote.signedDate = moment()
+  if (!newValues.corDoctorNote.lastChangeDate)
+    newValues.corDoctorNote.lastChangeDate = moment()
 
   newValues.corScribbleNotes.forEach(
     note => (note.signedByUserFK = user.data.id),
@@ -508,6 +512,13 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
           if (list && list.length > 0) {
             newEntity = setIn(newEntity, form.prefixProp, { ...list[0] })
             selectForms.push(form.id)
+          }
+        })
+      } else {
+        selectForms = consultation.default.selectForms
+        formConfigs.forEach(form => {
+          if (selectForms.indexOf(form.id) > -1) {
+            newEntity = setIn(newEntity, form.prefixProp, {})
           }
         })
       }

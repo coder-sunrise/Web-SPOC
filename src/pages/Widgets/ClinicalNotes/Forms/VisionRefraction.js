@@ -8,7 +8,7 @@ import {
   Button,
   FieldArray,
 } from '@/components'
-import { FastField } from 'formik'
+import { FastField, getIn } from 'formik'
 import { Delete, Add } from '@material-ui/icons'
 import { getUniqueId } from '@/utils/utils'
 const VisionRefraction = props => {
@@ -40,7 +40,10 @@ const VisionRefraction = props => {
                 setCurrentArrayHelpers(arrayHelpers)
               }
               const presentSpectacles = (
-                arrayHelpers.form.values[prefixProp].presentSpectacles || []
+                getIn(
+                  arrayHelpers.form.values,
+                  `${prefixProp}.presentSpectacles`,
+                ) || []
               ).filter(val => !val.isDeleted)
               return presentSpectacles.map((val, activeIndex) => {
                 if (val && val.isDeleted) return null
