@@ -156,8 +156,9 @@ export default {
   'menu.setting.tag': 'Tag',
   'menu.setting.checklist': 'Checklist',
   'menu.setting.resource': 'Resource',
-  'menu.setting.gradingchart': 'Grading Chart',
-  'menu.setting.instrument': 'Instrument',
+  'menu.setting.gradingchart': 'Grading Chart (Anterior Eye Examination)',
+  'menu.setting.instrument': 'Instrument (Posterior Eye Examination)',
+  'menu.setting.typeoftest': 'Type Of Test (Investigative Tests)',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',
