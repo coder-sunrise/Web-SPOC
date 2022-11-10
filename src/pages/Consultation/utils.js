@@ -238,6 +238,12 @@ const convertClinicalNotesForms = values => {
     if (!anyChange && !_.isEqual(list, oldList)) {
       anyChange = true
     }
+
+    values = setIn(values, form.prefixProp, undefined)
+    list.forEach(item => {
+      item.rightScribbleNote = undefined
+      item.leftScribbleNote = undefined
+    })
   })
   if (anyChange) values.corDoctorNote.lastChangeDate = moment()
   return values

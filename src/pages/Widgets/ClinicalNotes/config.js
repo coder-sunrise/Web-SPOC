@@ -7,6 +7,7 @@ import {
 } from '@/utils/constants'
 import Loading from '@/components/PageLoading/index'
 import PosteriorEyeExamination from '@/assets/img/ClinicalNoteForm/PosteriorEyeExamination.jpg'
+import moment from 'moment'
 
 export const defaultConfigs = {
   fields: [
@@ -101,6 +102,23 @@ export const formConfigs = [
     }),
     prop: 'corDoctorNote.corAnteriorEyeExamination',
     prefixProp: 'corDoctorNote.corAnteriorEyeExaminationEntity',
+    cavanSize: { width: 600, height: 300 },
+    imageSize: { width: 250, height: 200 },
+    position: { left: 175, top: 50 },
+    thumbnailSize: { width: 300, height: 150 },
+    thumbnailDisplaySize: { width: 260, height: 130 },
+    defaultValue: {
+      lastUpdateDate: moment(),
+      rightScribbleNote: {
+        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.POSTERIOREYEEXAMINATION,
+        subject: 'Right Eye',
+      },
+      leftScribbleNote: {
+        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.POSTERIOREYEEXAMINATION,
+        subject: 'Left Eye',
+      },
+    },
+    defaultImage: PosteriorEyeExamination,
   },
   {
     id: CLINICALNOTE_FORM.POSTERIOREYEEXAMINATION,
@@ -111,16 +129,20 @@ export const formConfigs = [
     }),
     prop: 'corDoctorNote.corPosteriorEyeExamination',
     prefixProp: 'corDoctorNote.corPosteriorEyeExaminationEntity',
-    cavanSize: { width: 650, height: 360 },
-    thumbnailSize: { width: 275, height: 152 },
-    imageSize: { width: 250, height: 199 },
-    position: { left: 200, top: 80 },
+    cavanSize: { width: 600, height: 300 },
+    imageSize: { width: 250, height: 200 },
+    position: { left: 175, top: 50 },
+    thumbnailSize: { width: 300, height: 150 },
+    thumbnailDisplaySize: { width: 260, height: 130 },
     defaultValue: {
+      lastUpdateDate: moment(),
       rightScribbleNote: {
         thumbnail: CLINICALNOTE_FORMTHUMBNAIL.POSTERIOREYEEXAMINATION,
+        subject: 'Right Eye',
       },
       leftScribbleNote: {
         thumbnail: CLINICALNOTE_FORMTHUMBNAIL.POSTERIOREYEEXAMINATION,
+        subject: 'Left Eye',
       },
     },
     defaultImage: PosteriorEyeExamination,

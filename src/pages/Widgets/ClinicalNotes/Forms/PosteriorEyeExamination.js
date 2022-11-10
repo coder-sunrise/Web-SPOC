@@ -15,12 +15,12 @@ const PosteriorEyeExamination = props => {
     classes,
     editScribbleNote,
     values,
-    formId,
     defaultImage,
     cavanSize,
     imageSize,
     thumbnailSize,
     position,
+    thumbnailDisplaySize,
   } = props
   const base64Prefix = 'data:image/jpeg;base64,'
   return (
@@ -71,7 +71,6 @@ const PosteriorEyeExamination = props => {
                       prefixProp,
                       'rightScribbleNote',
                       'rightScribbleNoteFK',
-                      formId,
                       defaultImage,
                       cavanSize,
                       imageSize,
@@ -86,43 +85,32 @@ const PosteriorEyeExamination = props => {
               </div>
               <div
                 style={{
-                  width: 260,
+                  width: thumbnailDisplaySize.width + 6,
                   marginTop: 6,
                   position: 'relative',
-                  left: 'calc((100% -  260px) / 2)',
+                  left: `calc((100% - ${thumbnailDisplaySize.width}px - 6px) / 2)`,
                 }}
               >
                 <FastField
                   name={`${prefixProp}.rightScribbleNote`}
                   render={args => {
-                    let src
                     if (
-                      args.field.value?.thumbnail &&
-                      args.field.value?.thumbnail !== ''
+                      !args.field.value?.thumbnail ||
+                      args.field.value?.thumbnail === ''
                     ) {
-                      src = `${base64Prefix}${args.field.value.thumbnail}`
+                      return ''
                     }
+                    let src = `${base64Prefix}${args.field.value.thumbnail}`
                     return (
-                      <div
-                        style={{
-                          width: 253,
-                          height: 138,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          textAlign: 'center',
-                          backgroundColor: 'white',
-                          textAlign: 'center',
-                        }}
-                      >
-                        {src ? (
-                          <img
-                            src={src}
-                            alt={args.field.value.subject}
-                            style={{ maxHeight: 136, maxWidth: 250 }}
-                          />
-                        ) : (
-                          <span>No Image</span>
-                        )}
+                      <div>
+                        <img
+                          src={src}
+                          alt={args.field.value.subject}
+                          style={{
+                            maxHeight: thumbnailDisplaySize.height,
+                            maxWidth: thumbnailDisplaySize.width,
+                          }}
+                        />
                       </div>
                     )
                   }}
@@ -145,7 +133,6 @@ const PosteriorEyeExamination = props => {
                       prefixProp,
                       'leftScribbleNote',
                       'leftScribbleNoteFK',
-                      formId,
                       defaultImage,
                       cavanSize,
                       imageSize,
@@ -163,39 +150,29 @@ const PosteriorEyeExamination = props => {
                   width: 260,
                   marginTop: 6,
                   position: 'relative',
-                  left: 'calc((100% -  260px) / 2)',
+                  left: `calc((100% - ${thumbnailDisplaySize.width}px - 6px) / 2)`,
                 }}
               >
                 <FastField
                   name={`${prefixProp}.leftScribbleNote`}
                   render={args => {
-                    let src
                     if (
-                      args.field.value?.thumbnail &&
-                      args.field.value?.thumbnail !== ''
+                      !args.field.value?.thumbnail ||
+                      args.field.value?.thumbnail === ''
                     ) {
-                      src = `${base64Prefix}${args.field.value.thumbnail}`
+                      return ''
                     }
+                    const src = `${base64Prefix}${args.field.value.thumbnail}`
                     return (
-                      <div
-                        style={{
-                          width: 253,
-                          height: 138,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          textAlign: 'center',
-                          backgroundColor: 'white',
-                        }}
-                      >
-                        {src ? (
-                          <img
-                            src={src}
-                            alt={args.field.value.subject}
-                            style={{ maxHeight: 136, maxWidth: 250 }}
-                          />
-                        ) : (
-                          <span>No Image</span>
-                        )}
+                      <div>
+                        <img
+                          src={src}
+                          alt={args.field.value.subject}
+                          style={{
+                            maxHeight: thumbnailDisplaySize.height,
+                            maxWidth: thumbnailDisplaySize.width,
+                          }}
+                        />
                       </div>
                     )
                   }}
@@ -213,7 +190,7 @@ const PosteriorEyeExamination = props => {
                     maxLength={500}
                     {...args}
                     bordered={false}
-                    autoSize={{ minRows: 1, maxRows: 1 }}
+                    autoSize={{ minRows: 1 }}
                   />
                 )}
               />
@@ -230,7 +207,7 @@ const PosteriorEyeExamination = props => {
                     maxLength={500}
                     {...args}
                     bordered={false}
-                    autoSize={{ minRows: 1, maxRows: 1 }}
+                    autoSize={{ minRows: 1 }}
                   />
                 )}
               />
@@ -246,7 +223,7 @@ const PosteriorEyeExamination = props => {
                     maxLength={500}
                     {...args}
                     bordered={false}
-                    autoSize={{ minRows: 1, maxRows: 1 }}
+                    autoSize={{ minRows: 1 }}
                   />
                 )}
               />
@@ -263,7 +240,7 @@ const PosteriorEyeExamination = props => {
                     maxLength={500}
                     {...args}
                     bordered={false}
-                    autoSize={{ minRows: 1, maxRows: 1 }}
+                    autoSize={{ minRows: 1 }}
                   />
                 )}
               />
@@ -279,7 +256,7 @@ const PosteriorEyeExamination = props => {
                     maxLength={500}
                     {...args}
                     bordered={false}
-                    autoSize={{ minRows: 1, maxRows: 1 }}
+                    autoSize={{ minRows: 1 }}
                   />
                 )}
               />
@@ -296,7 +273,7 @@ const PosteriorEyeExamination = props => {
                     maxLength={500}
                     {...args}
                     bordered={false}
-                    autoSize={{ minRows: 1, maxRows: 1 }}
+                    autoSize={{ minRows: 1 }}
                   />
                 )}
               />
@@ -312,7 +289,7 @@ const PosteriorEyeExamination = props => {
                     maxLength={500}
                     {...args}
                     bordered={false}
-                    autoSize={{ minRows: 1, maxRows: 1 }}
+                    autoSize={{ minRows: 1 }}
                   />
                 )}
               />
@@ -329,7 +306,7 @@ const PosteriorEyeExamination = props => {
                     maxLength={500}
                     {...args}
                     bordered={false}
-                    autoSize={{ minRows: 1, maxRows: 1 }}
+                    autoSize={{ minRows: 1 }}
                   />
                 )}
               />
@@ -345,7 +322,7 @@ const PosteriorEyeExamination = props => {
                     maxLength={500}
                     {...args}
                     bordered={false}
-                    autoSize={{ minRows: 1, maxRows: 1 }}
+                    autoSize={{ minRows: 1 }}
                   />
                 )}
               />
@@ -362,7 +339,7 @@ const PosteriorEyeExamination = props => {
                     maxLength={500}
                     {...args}
                     bordered={false}
-                    autoSize={{ minRows: 1, maxRows: 1 }}
+                    autoSize={{ minRows: 1 }}
                   />
                 )}
               />
@@ -378,7 +355,7 @@ const PosteriorEyeExamination = props => {
                     maxLength={500}
                     {...args}
                     bordered={false}
-                    autoSize={{ minRows: 1, maxRows: 1 }}
+                    autoSize={{ minRows: 1 }}
                   />
                 )}
               />
@@ -395,7 +372,7 @@ const PosteriorEyeExamination = props => {
                     maxLength={500}
                     {...args}
                     bordered={false}
-                    autoSize={{ minRows: 1, maxRows: 1 }}
+                    autoSize={{ minRows: 1 }}
                   />
                 )}
               />
@@ -411,7 +388,7 @@ const PosteriorEyeExamination = props => {
                     maxLength={500}
                     {...args}
                     bordered={false}
-                    autoSize={{ minRows: 1, maxRows: 1 }}
+                    autoSize={{ minRows: 1 }}
                   />
                 )}
               />
@@ -428,7 +405,7 @@ const PosteriorEyeExamination = props => {
                     maxLength={500}
                     {...args}
                     bordered={false}
-                    autoSize={{ minRows: 1, maxRows: 1 }}
+                    autoSize={{ minRows: 1 }}
                   />
                 )}
               />
@@ -444,7 +421,7 @@ const PosteriorEyeExamination = props => {
                     maxLength={500}
                     {...args}
                     bordered={false}
-                    autoSize={{ minRows: 1, maxRows: 1 }}
+                    autoSize={{ minRows: 1 }}
                   />
                 )}
               />
@@ -454,14 +431,14 @@ const PosteriorEyeExamination = props => {
             </td>
             <td className={classes.cellStyle}>
               <FastField
-                name={`${prefixProp}.LeftFevea`}
+                name={`${prefixProp}.leftFevea`}
                 render={args => (
                   <MultipleTextField
                     label=''
                     maxLength={500}
                     {...args}
                     bordered={false}
-                    autoSize={{ minRows: 1, maxRows: 1 }}
+                    autoSize={{ minRows: 1 }}
                   />
                 )}
               />
@@ -477,7 +454,7 @@ const PosteriorEyeExamination = props => {
                     maxLength={500}
                     {...args}
                     bordered={false}
-                    autoSize={{ minRows: 1, maxRows: 1 }}
+                    autoSize={{ minRows: 1 }}
                   />
                 )}
               />
@@ -494,7 +471,7 @@ const PosteriorEyeExamination = props => {
                     maxLength={500}
                     {...args}
                     bordered={false}
-                    autoSize={{ minRows: 1, maxRows: 1 }}
+                    autoSize={{ minRows: 1 }}
                   />
                 )}
               />
@@ -510,7 +487,7 @@ const PosteriorEyeExamination = props => {
             <MultipleTextField
               label=''
               maxLength={2000}
-              autoSize={{ minRows: 3, maxRows: 3 }}
+              autoSize={{ minRows: 3 }}
               {...args}
             />
           )}

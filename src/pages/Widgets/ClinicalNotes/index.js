@@ -9,8 +9,9 @@ import {
   getUniqueId,
   getDefaultLayerContent,
 } from '@/utils/utils'
-import { CLINICALNOTE_FORM } from '@/utils/constants'
+import { CLINICALNOTE_FORM, SCRIBBLE_NOTE_TYPE } from '@/utils/constants'
 import { getIn, setIn } from 'formik'
+import moment from 'moment'
 import { formConfigs } from './config'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 
@@ -44,11 +45,13 @@ const styles = theme => ({
   cellStyle: {
     border: '1px solid #CCCC',
     padding: '0px 4px',
+    verticalAlign: 'top',
   },
   centerCellStyle: {
     border: '1px solid #CCCC',
-    padding: '0px 4px',
+    padding: '8px 4px 0px 4px',
     textAlign: 'center',
+    verticalAlign: 'top',
   },
 })
 
@@ -114,7 +117,6 @@ class ClinicalNotes extends PureComponent {
     prefixProp,
     scribbleNoteProp,
     scribbleNoteFKProp,
-    formId,
     defaultImage,
     cavanSize,
     imageSize,
@@ -162,6 +164,9 @@ class ClinicalNotes extends PureComponent {
       type: 'scriblenotes/updateState',
       payload: {
         showScribbleModal: !scriblenotes.showScribbleModal,
+        entity: undefined,
+        cavanSize: undefined,
+        thumbnailSize: undefined,
       },
     })
   }
@@ -171,6 +176,7 @@ class ClinicalNotes extends PureComponent {
     temp,
     thumbnail = null,
     origin = null,
+    isUpdated,
   }) => {
     const { dispatch } = this.props
     const { setFieldValue, values } = this.arrayHelpers?.form
@@ -183,7 +189,7 @@ class ClinicalNotes extends PureComponent {
         type: 'scriblenotes/upsert',
         payload: {
           id: preScriblenote.id,
-          scribbleNoteTypeFK: 1,
+          scribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.CLINICALNOTES,
           scribbleNoteLayers: temp.map(t => {
             return {
               ...t,
@@ -205,13 +211,14 @@ class ClinicalNotes extends PureComponent {
         })),
         thumbnail,
         origin,
+        lastUpdateDate: isUpdated ? moment() : preScriblenote.lastUpdateDate,
       })
     } else {
       const newData = {
         subject,
         thumbnail,
         origin,
-        scribbleNoteTypeFK: 1,
+        scribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.CLINICALNOTES,
         scribbleNoteTypeName: '',
         scribbleNoteLayers: temp,
       }
@@ -247,6 +254,7 @@ class ClinicalNotes extends PureComponent {
                 name: form.name,
                 prefixProp: form.prefixProp,
                 isSelected: values.selectForms.indexOf(form.id) >= 0,
+                defaultValue: form.defaultValue,
               }))
 
             return (
@@ -361,12 +369,14 @@ class ClinicalNotes extends PureComponent {
                           {...this.props}
                           prefixProp={formTemplate.prefixProp}
                           editScribbleNote={this.editScribbleNote}
-                          formId={formTemplate.id}
                           defaultImage={formTemplate.defaultImage}
                           cavanSize={formTemplate.cavanSize}
                           imageSize={formTemplate.imageSize}
                           thumbnailSize={formTemplate.thumbnailSize}
                           position={formTemplate.position}
+                          thumbnailDisplaySize={
+                            formTemplate.thumbnailDisplaySize
+                          }
                         />
                       </div>
                     )
@@ -394,7 +404,11 @@ class ClinicalNotes extends PureComponent {
             toggleScribbleModal={this.toggleScribbleModal}
             scribbleData={editScriblenotes?.selectedData}
             //deleteScribbleNote={deleteScribbleNote}
-            scribbleNoteType={scribbleTypes.find(x => x.typeFK === 1)?.type}
+            scribbleNoteType={
+              scribbleTypes.find(
+                x => x.typeFK === SCRIBBLE_NOTE_TYPE.CLINICALNOTES,
+              )?.type
+            }
           />
         </CommonModal>
       </div>

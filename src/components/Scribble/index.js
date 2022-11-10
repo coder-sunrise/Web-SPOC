@@ -360,6 +360,7 @@ let temp = null
       thumbnail: values.thumbnail,
       origin: values.origin,
       temp,
+      isUpdated: !_.isEmpty(window.dirtyForms['ScribbleNotePage']),
     }
     props.addScribble(payload)
     props.toggleScribbleModal()
