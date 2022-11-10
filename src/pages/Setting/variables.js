@@ -280,4 +280,11 @@ export const menuData = [
     textExtension: '(Posterior Eye Examination)',
     url: '/setting/instrument',
   },
+  {
+    authority: 'settings.clinicsetting.typeoftest',
+    title: 'Clinic Setting',
+    text: 'Type Of Test',
+    textExtension: '(Investigative Tests)',
+    url: '/setting/typeoftest',
+  },
 ]
