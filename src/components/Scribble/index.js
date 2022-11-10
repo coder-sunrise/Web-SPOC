@@ -544,8 +544,15 @@ class Scribble extends React.Component {
       await setTimeout(() => {
         // wait for 1 milli second for img to set src successfully
       }, 100)
-
-      const size = { width: 275, height: 150 }
+      const { scriblenotes } = this.props
+      const size = {
+        width: scriblenotes.thumbnailSize
+          ? scriblenotes.thumbnailSize.width
+          : 275,
+        height: scriblenotes.thumbnailSize
+          ? scriblenotes.thumbnailSize.height
+          : 150,
+      }
       let newWidth = size.width
       let newHeight = size.height
 
@@ -1447,8 +1454,16 @@ class Scribble extends React.Component {
                 }
                 onChange={this._onSketchChange}
                 forceValue
-                height={mainDivHeight - 100}
-                width={`calc(100vw - ${!isReadonly ? '320px' : '40px'})`}
+                height={
+                  scriblenotes.cavanSize
+                    ? scriblenotes.cavanSize.height
+                    : mainDivHeight - 100
+                }
+                width={
+                  scriblenotes.cavanSize
+                    ? scriblenotes.cavanSize.width
+                    : `calc(100vw - ${!isReadonly ? '320px' : '40px'})`
+                }
               />
             </div>
             {!isReadonly && (

@@ -52,7 +52,7 @@ export default createFormViewModel({
       default: {
         corAttachment: [],
         corEyeExaminations: [],
-        selectForms: [],
+        selectForms: [1, 2, 3, 4, 5],
       },
       selectedWidgets: ['1'],
       showSignOffModal: false,

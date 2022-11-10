@@ -1317,6 +1317,54 @@ export const convertToBase64 = file =>
     reader.onerror = error => reject(error)
   })
 
+export const getDefaultLayerContent = async (
+  imageName,
+  size = { width: 0, height: 0 },
+  positon = { left: 0, top: 0 },
+) => {
+  const imageResult = await fetch(imageName).then(response => response.blob())
+  const result = await convertToBase64(imageResult)
+  return JSON.stringify({
+    type: 'image',
+    version: '3.5.1',
+    originX: 'left',
+    originY: 'top',
+    left: positon.left,
+    top: positon.top,
+    width: size.width,
+    height: size.height,
+    fill: 'rgb(0,0,0)',
+    stroke: null,
+    strokeWidth: 0,
+    strokeDashArray: null,
+    strokeLineCap: 'butt',
+    strokeDashOffset: 0,
+    strokeLineJoin: 'miter',
+    strokeMiterLimit: 4,
+    scaleX: 1,
+    scaleY: 1,
+    angle: 0,
+    flipX: false,
+    flipY: false,
+    opacity: 1,
+    shadow: null,
+    visible: true,
+    clipTo: null,
+    backgroundColor: '',
+    fillRule: 'nonzero',
+    paintFirst: 'fill',
+    globalCompositeOperation: 'source-over',
+    transformMatrix: null,
+    skewX: 0,
+    skewY: 0,
+    crossOrigin: '',
+    cropX: 0,
+    cropY: 0,
+    src: `data:image/png;base64,${result}`,
+    filters: [],
+  })
+}
+
 const enableTableForceRender = (duration = 1000) => {
   window._forceTableUpdate = true
   setTimeout(() => {

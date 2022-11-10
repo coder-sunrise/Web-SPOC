@@ -1,6 +1,12 @@
 import Loadable from 'react-loadable'
-import { SCRIBBLE_NOTE_TYPE, CANNED_TEXT_TYPE } from '@/utils/constants'
+import {
+  SCRIBBLE_NOTE_TYPE,
+  CANNED_TEXT_TYPE,
+  CLINICALNOTE_FORM,
+  CLINICALNOTE_FORMTHUMBNAIL,
+} from '@/utils/constants'
 import Loading from '@/components/PageLoading/index'
+import PosteriorEyeExamination from '@/assets/img/ClinicalNoteForm/PosteriorEyeExamination.jpg'
 
 export const defaultConfigs = {
   fields: [
@@ -57,7 +63,7 @@ export const defaultConfigs = {
 
 export const formConfigs = [
   {
-    id: 1,
+    id: CLINICALNOTE_FORM.PATIENTHISTORY,
     name: 'Patient History',
     component: Loadable({
       loader: () => import('./Forms/PatientHistory'),
@@ -67,7 +73,7 @@ export const formConfigs = [
     prefixProp: 'corDoctorNote.corPatientHistoryEntity',
   },
   {
-    id: 2,
+    id: CLINICALNOTE_FORM.VISIONREFRACTION,
     name: 'Vision and Refraction',
     component: Loadable({
       loader: () => import('./Forms/VisionRefraction'),
@@ -77,7 +83,7 @@ export const formConfigs = [
     prefixProp: 'corDoctorNote.corVisionRefractionEntity',
   },
   {
-    id: 3,
+    id: CLINICALNOTE_FORM.PRELIMINARYASSESSMENT,
     name: 'Preliminary Assessment',
     component: Loadable({
       loader: () => import('./Forms/PreliminaryAssessment'),
@@ -87,7 +93,7 @@ export const formConfigs = [
     prefixProp: 'corDoctorNote.corPreliminaryAssessmentEntity',
   },
   {
-    id: 4,
+    id: CLINICALNOTE_FORM.ANTERIOREYEEXAMINATION,
     name: 'Anterior Eye Examination',
     component: Loadable({
       loader: () => import('./Forms/AnteriorEyeExamination'),
@@ -97,7 +103,7 @@ export const formConfigs = [
     prefixProp: 'corDoctorNote.corAnteriorEyeExaminationEntity',
   },
   {
-    id: 5,
+    id: CLINICALNOTE_FORM.POSTERIOREYEEXAMINATION,
     name: 'Posterior Eye Examination',
     component: Loadable({
       loader: () => import('./Forms/PosteriorEyeExamination'),
@@ -105,9 +111,22 @@ export const formConfigs = [
     }),
     prop: 'corDoctorNote.corPosteriorEyeExamination',
     prefixProp: 'corDoctorNote.corPosteriorEyeExaminationEntity',
+    cavanSize: { width: 650, height: 360 },
+    thumbnailSize: { width: 275, height: 152 },
+    imageSize: { width: 250, height: 199 },
+    position: { left: 200, top: 80 },
+    defaultValue: {
+      rightScribbleNote: {
+        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.POSTERIOREYEEXAMINATION,
+      },
+      leftScribbleNote: {
+        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.POSTERIOREYEEXAMINATION,
+      },
+    },
+    defaultImage: PosteriorEyeExamination,
   },
   {
-    id: 6,
+    id: CLINICALNOTE_FORM.MANAGEMENT,
     name: 'Management',
     component: Loadable({
       loader: () => import('./Forms/Management'),
@@ -117,7 +136,7 @@ export const formConfigs = [
     prefixProp: 'corDoctorNote.corManagementEntity',
   },
   {
-    id: 7,
+    id: CLINICALNOTE_FORM.CONTACTLENSFITTING,
     name: 'Contact Lens Fitting',
     component: Loadable({
       loader: () => import('./Forms/ContactLensFitting'),
@@ -127,7 +146,7 @@ export const formConfigs = [
     prefixProp: 'corDoctorNote.corContactLensFittingEntity',
   },
   {
-    id: 8,
+    id: CLINICALNOTE_FORM.BINOCULARVISION,
     name: 'Binocular Vision',
     component: Loadable({
       loader: () => import('./Forms/BinocularVision'),
@@ -137,7 +156,7 @@ export const formConfigs = [
     prefixProp: 'corDoctorNote.corBinocularVisionEntity',
   },
   {
-    id: 9,
+    id: CLINICALNOTE_FORM.PAEDIATRIC,
     name: 'Paediatric',
     component: Loadable({
       loader: () => import('./Forms/Paediatric'),
@@ -147,7 +166,7 @@ export const formConfigs = [
     prefixProp: 'corDoctorNote.corPaediatricEntity',
   },
   {
-    id: 10,
+    id: CLINICALNOTE_FORM.INVESTIGATIVETESTS,
     name: 'Investigative Tests',
     component: Loadable({
       loader: () => import('./Forms/InvestigativeTests'),
@@ -157,7 +176,7 @@ export const formConfigs = [
     prefixProp: 'corDoctorNote.corInvestigativeTestsEntity',
   },
   {
-    id: 11,
+    id: CLINICALNOTE_FORM.FOLLOWUP,
     name: 'Follow-Up',
     component: Loadable({
       loader: () => import('./Forms/FollowUp'),
