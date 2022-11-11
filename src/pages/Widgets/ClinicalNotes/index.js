@@ -211,7 +211,6 @@ class ClinicalNotes extends PureComponent {
         })),
         thumbnail,
         origin,
-        lastUpdateDate: isUpdated ? moment() : preScriblenote.lastUpdateDate,
       })
     } else {
       const newData = {
@@ -234,6 +233,10 @@ class ClinicalNotes extends PureComponent {
 
       setFieldValue(scribbleNoteFKProp, response.id)
       setFieldValue(scribbleNoteProp, { ...newData })
+    }
+
+    if (isUpdated) {
+      setFieldValue(`${editScriblenotes.prefixProp}.lastUpdateDate`, moment())
     }
   }
 
