@@ -26,8 +26,6 @@ import { render } from 'react-dom'
 import { getUniqueNumericId } from '@/utils/utils'
 import CoverTest from './components/CoverTest'
 
-// const { spacing } = useTheme()
-
 const _styles = withStyles(
   theme => ({
     gridItem: {
@@ -45,259 +43,261 @@ const _styles = withStyles(
   { withTheme: true },
 )
 
+const border = '1px solid rgb(217,217,217)'
+
 class Paediatric extends PureComponent {
   addCoverTest() {
-    this.arrayHelpers.push({
-      id: getUniqueNumericId(),
-      coverTestD: '',
-    })
+    let { prefixProp } = this.props
+    let { values, setFieldValue } = this.arrayHelpers.form
+    let oldCoverTestList = _.get(values, `${prefixProp}.coverTest`) || []
+
+    let newCoverTest = {
+      uid: getUniqueNumericId(),
+      withRx: false,
+      withoutRx: false,
+      coverTestD: undefined,
+      coverTestN: undefined,
+    }
+
+    setFieldValue(`${prefixProp}.coverTest`, [
+      ...oldCoverTestList,
+      newCoverTest,
+    ])
   }
   render() {
-    const {
+    let {
       prefixProp,
       classes,
       values,
       theme: { spacing },
     } = this.props
-    console.log(prefixProp)
+    console.log(this.props)
 
     return (
-      <>
-        <GridContainer>
-          <GridItem md={12}>
-            <div>
-              <span
-                style={{ fontWeight: 500, fontSize: '1rem', marginRight: 8 }}
-              >
-                Paediatric
-              </span>
-            </div>
-          </GridItem>
-          <GridItem md={12}>
-            <FieldArray
-              name={`${prefixProp}.coverTest`}
-              render={arrayHelpers => {
-                this.arrayHelpers = arrayHelpers
-                return (
-                  <div>
-                    {arrayHelpers.form.values.corDoctorNote.corPaediatricEntity.coverTest
-                      ?.filter(item => item.isDeleted !== true)
-                      .map((val, i) => {
-                        console.log(val)
-                        return (
-                          <CoverTest
-                            key={val.id}
-                            targetVal={val}
-                            index={i}
-                            arrayHelpers={arrayHelpers}
-                            propName={`${prefixProp}.coverTest`}
-                            {...this.props}
-                          />
-                        )
-                      })}
-                  </div>
-                )
-              }}
-            />
-          </GridItem>
-          {/* Add New */}
-          <GridItem
-            md={12}
-            style={{
-              height: spacing(5),
-              margin: spacing(1),
+      <GridContainer>
+        <GridItem md={12}>
+          <div>
+            <span style={{ fontWeight: 500, fontSize: '1rem', marginRight: 8 }}>
+              Paediatric
+            </span>
+          </div>
+        </GridItem>
+        <GridItem md={12}>
+          <FieldArray
+            name={`${prefixProp}.coverTest`}
+            render={arrayHelpers => {
+              this.arrayHelpers = arrayHelpers
+              let { values } = this.arrayHelpers.form
+              let coverTestList = _.get(values, `${prefixProp}.coverTest`) || []
+              return (
+                <div>
+                  {coverTestList
+                    .filter(item => item.isDeleted != true)
+                    .map((val, i) => {
+                      let index = coverTestList.findIndex(item =>
+                        val.id ? item.id == val.id : val.uid === item.uid,
+                      )
+                      return (
+                        <CoverTest
+                          border={border}
+                          targetVal={val}
+                          index={index}
+                          arrayHelpers={arrayHelpers}
+                          propName={`${prefixProp}.coverTest`}
+                          {...this.props}
+                        />
+                      )
+                    })}
+                </div>
+              )
+            }}
+          />
+        </GridItem>
+        {/* Add New */}
+        <GridItem
+          md={12}
+          style={{
+            height: spacing(5),
+            margin: spacing(1),
+          }}
+        >
+          <Button
+            color='primary'
+            size='sm'
+            onClick={() => {
+              this.addCoverTest()
             }}
           >
-            <Button
-              color='primary'
-              size='sm'
-              onClick={() => {
-                this.addCoverTest()
+            <Add />
+            Add New
+          </Button>
+        </GridItem>
+
+        {/* NPC */}
+        <GridItem md={12} className={classes.gridItem}>
+          <Grid container style={{ height: '100%' }}>
+            <Grid
+              md={4}
+              style={{
+                padding: spacing(1),
+                borderRight: border,
+                height: '100%',
               }}
             >
-              <Add />
-              Add New
-            </Button>
-          </GridItem>
-
-          {/* NPC */}
-          <GridItem md={12} className={classes.gridItem}>
-            <Grid container style={{ height: '100%' }}>
-              <Grid
-                md={4}
-                style={{
-                  padding: spacing(1),
-                  borderRight: '1px solid rgb(217,217,217) ',
-                  height: '100%',
-                }}
-              >
-                NPC*
-              </Grid>
-              <Grid md={8}>
-                <Field
-                  name={`${prefixProp}.npc`}
-                  render={args => (
-                    <MultipleTextField
-                      maxLength={2000}
-                      bordered={false}
-                      autoSize={true}
-                      placeholder=''
-                      onChange={e => {}}
-                      {...args}
-                    />
-                  )}
-                />
-              </Grid>
+              NPC*
             </Grid>
-          </GridItem>
-          {/* Ocular Motility */}
-          <GridItem
-            md={12}
-            className={classes.gridItem}
-            style={{ height: spacing(20) }}
-          >
-            <Grid container style={{ height: '100%' }}>
-              <Grid
-                md={4}
-                style={{
-                  padding: spacing(1),
-                  borderRight: '1px solid rgb(217,217,217) ',
-                }}
-              >
-                Ocular Motility*
-              </Grid>
-              <Grid md={8}>
-                <Button
-                  justIcon
-                  color='primary'
-                  style={{ marginTop: spacing(1), marginLeft: spacing(1) }}
-                  onClick={() => {
-                    window.g_app._store.dispatch({
-                      type: 'scriblenotes/updateState',
-                      payload: {
-                        entity: '',
-                        showScribbleModal: true,
-                        editEnable: false,
-                      },
-                    })
-                  }}
-                >
-                  <Edit />
-                </Button>
-              </Grid>
-            </Grid>
-          </GridItem>
-          {/* Stereopsis */}
-          <GridItem md={12} className={classes.gridItem}>
-            <Grid container style={{ height: '100%' }}>
-              <Grid
-                md={4}
-                style={{
-                  padding: spacing(1),
-                  borderRight: '1px solid rgb(217,217,217) ',
-                }}
-              >
-                Stereopsis*
-                <div>
-                  <FastField
-                    name={`${prefixProp}.stereopsisTOT`}
-                    render={args => (
-                      <TextField {...args} label='Type of test' />
-                    )}
+            <Grid md={8}>
+              <Field
+                name={`${prefixProp}.npc`}
+                render={args => (
+                  <MultipleTextField
+                    maxLength={2000}
+                    bordered={false}
+                    autoSize={true}
+                    {...args}
                   />
-                </div>
-              </Grid>
-              <Grid md={8}>
-                <Field
-                  name={`${prefixProp}.stereopsis`}
-                  render={args => (
-                    <MultipleTextField
-                      maxLength={2000}
-                      bordered={false}
-                      autoSize={true}
-                      placeholder=''
-                      onChange={e => {}}
-                      {...args}
-                    />
-                  )}
-                />
-              </Grid>
+                )}
+              />
             </Grid>
-          </GridItem>
-          {/* Colour Vision */}
-          <GridItem md={12} className={classes.gridItem}>
-            <Grid container style={{ height: '100%' }}>
-              <Grid
-                md={4}
-                style={{
-                  padding: spacing(1),
-                  borderRight: '1px solid rgb(217,217,217) ',
+          </Grid>
+        </GridItem>
+        {/* Ocular Motility */}
+        <GridItem
+          md={12}
+          className={classes.gridItem}
+          style={{ height: spacing(20) }}
+        >
+          <Grid container style={{ height: '100%' }}>
+            <Grid
+              md={4}
+              style={{
+                padding: spacing(1),
+                borderRight: border,
+              }}
+            >
+              Ocular Motility*
+            </Grid>
+            <Grid md={8}>
+              <Button
+                justIcon
+                color='primary'
+                style={{ marginTop: spacing(1), marginLeft: spacing(1) }}
+                onClick={() => {
+                  // window.g_app._store.dispatch({
+                  //   type: 'scriblenotes/updateState',
+                  //   payload: {
+                  //     entity: '123',
+                  //     showScribbleModal: true,
+                  //     editEnable: false,
+                  //   },
+                  // })
                 }}
               >
-                Colour Vision*
-                <div>
-                  <FastField
-                    name={`${prefixProp}.colourVisionTOT`}
-                    render={args => (
-                      <TextField {...args} label='Type of test' />
-                    )}
-                  />
-                </div>
-              </Grid>
-              <Grid md={8}>
-                <Field
-                  name={`${prefixProp}.colourVision`}
-                  render={args => (
-                    <MultipleTextField
-                      maxLength={2000}
-                      bordered={false}
-                      autoSize={true}
-                      placeholder=''
-                      onChange={e => {}}
-                      {...args}
-                    />
-                  )}
-                />
-              </Grid>
+                <Edit />
+              </Button>
             </Grid>
-          </GridItem>
-          {/* Axial Length */}
-          <GridItem md={12} className={classes.gridItem}>
-            <Grid container style={{ height: '100%' }}>
-              <Grid
-                md={4}
-                style={{
-                  padding: spacing(1),
-                  borderRight: '1px solid rgb(217,217,217) ',
-                }}
-              >
-                Axial Length*
-                <div>
-                  <FastField
-                    name={`${prefixProp}.axialLengthInstru`}
-                    render={args => <TextField {...args} label='Instrument' />}
-                  />
-                </div>
-              </Grid>
-              <Grid md={8}>
-                <Field
-                  name={`${prefixProp}.axialLength`}
-                  render={args => (
-                    <MultipleTextField
-                      maxLength={2000}
-                      bordered={false}
-                      autoSize={true}
-                      placeholder=''
-                      onChange={e => {}}
-                      {...args}
-                    />
-                  )}
+          </Grid>
+        </GridItem>
+        {/* Stereopsis */}
+        <GridItem md={12} className={classes.gridItem}>
+          <Grid container style={{ height: '100%' }}>
+            <Grid
+              md={4}
+              style={{
+                padding: spacing(1),
+                borderRight: border,
+              }}
+            >
+              Stereopsis*
+              <div>
+                <FastField
+                  name={`${prefixProp}.stereopsisTot`}
+                  render={args => <TextField {...args} label='Type of test' />}
                 />
-              </Grid>
+              </div>
             </Grid>
-          </GridItem>
-        </GridContainer>
-      </>
+            <Grid md={8}>
+              <Field
+                name={`${prefixProp}.stereopsis`}
+                render={args => (
+                  <MultipleTextField
+                    maxLength={2000}
+                    bordered={false}
+                    autoSize={true}
+                    {...args}
+                  />
+                )}
+              />
+            </Grid>
+          </Grid>
+        </GridItem>
+        {/* Colour Vision */}
+        <GridItem md={12} className={classes.gridItem}>
+          <Grid container style={{ height: '100%' }}>
+            <Grid
+              md={4}
+              style={{
+                padding: spacing(1),
+                borderRight: border,
+              }}
+            >
+              Colour Vision*
+              <div>
+                <FastField
+                  name={`${prefixProp}.colourVisionTot`}
+                  render={args => <TextField {...args} label='Type of test' />}
+                />
+              </div>
+            </Grid>
+            <Grid md={8}>
+              <Field
+                name={`${prefixProp}.colourVision`}
+                render={args => (
+                  <MultipleTextField
+                    maxLength={2000}
+                    bordered={false}
+                    autoSize={true}
+                    {...args}
+                  />
+                )}
+              />
+            </Grid>
+          </Grid>
+        </GridItem>
+        {/* Axial Length */}
+        <GridItem md={12} className={classes.gridItem}>
+          <Grid container style={{ height: '100%' }}>
+            <Grid
+              md={4}
+              style={{
+                padding: spacing(1),
+                borderRight: border,
+              }}
+            >
+              Axial Length*
+              <div>
+                <FastField
+                  name={`${prefixProp}.axialLengthInstrument`}
+                  render={args => <TextField {...args} label='Instrument' />}
+                />
+              </div>
+            </Grid>
+            <Grid md={8}>
+              <Field
+                name={`${prefixProp}.axialLength`}
+                render={args => (
+                  <MultipleTextField
+                    maxLength={2000}
+                    bordered={false}
+                    autoSize={true}
+                    {...args}
+                  />
+                )}
+              />
+            </Grid>
+          </Grid>
+        </GridItem>
+      </GridContainer>
     )
   }
 }

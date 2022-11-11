@@ -26,7 +26,7 @@ import { getUniqueNumericId } from '@/utils/utils'
 
 class CoverTest extends PureComponent {
   getPrefix() {
-    const { index, propName, arrayHelpers } = this.props
+    let { index, propName } = this.props
     let prefix = propName
     if (index >= 0) {
       prefix += `[${index}]`
@@ -34,24 +34,34 @@ class CoverTest extends PureComponent {
     prefix += '.'
     return prefix
   }
-  removeCoverTest() {
-    let { arrayHelpers, index, targetVal } = this.props
+
+  deleteCoverTest = () => {
     let {
-      form: { setFieldValue, values },
-    } = arrayHelpers
-    const coverTest = _.cloneDeep(
-      values.corDoctorNote.corPaediatricEntity.coverTest,
-    )
-    coverTest.find(item => item.id == targetVal.id).isDeleted = true
-    let newCoverTest = coverTest.filter(item => item.isDeleted !== true)
-    setFieldValue('corDoctorNote.corPaediatricEntity.coverTest', newCoverTest)
+      arrayHelpers: {
+        form: { values, setFieldValue },
+      },
+      targetVal,
+      propName,
+    } = this.props
+    let oldCoverTestList = _.get(values, propName) || []
+    let newCoverTestList = _.cloneDeep(oldCoverTestList)
+    newCoverTestList.map(item => {
+      if (item.isDeleted != true) {
+        item.id
+          ? (item.isDeleted = item.id == targetVal.id)
+          : (item.isDeleted = item.uid == targetVal.uid)
+      }
+    })
+    setFieldValue(propName, newCoverTestList)
   }
+
   render() {
     const {
       classes,
-      index,
+      border,
       arrayHelpers,
       theme: { spacing },
+      values,
     } = this.props
     let prefix = this.getPrefix()
     return (
@@ -60,14 +70,14 @@ class CoverTest extends PureComponent {
           container
           style={{
             height: spacing(18),
-            border: '1px solid rgb(217,217,217)',
+            border: border,
             marginTop: spacing(1),
           }}
         >
           <Grid
             md={4}
             style={{
-              borderRight: '1px solid rgb(217,217,217)',
+              borderRight: border,
               padding: spacing(1),
             }}
           >
@@ -92,13 +102,7 @@ class CoverTest extends PureComponent {
                 <Field
                   name={`${prefix}withoutRx`}
                   render={args => {
-                    return (
-                      <Checkbox
-                        onChange={e => {}}
-                        label='without Rx'
-                        {...args}
-                      />
-                    )
+                    return <Checkbox label='without Rx' {...args} />
                   }}
                 />
               </div>
@@ -108,7 +112,7 @@ class CoverTest extends PureComponent {
             <div
               style={{
                 height: '50%',
-                borderBottom: '1px solid rgb(217,217,217)',
+                borderBottom: border,
               }}
             >
               <div>
@@ -120,7 +124,6 @@ class CoverTest extends PureComponent {
                       bordered={false}
                       autoSize={true}
                       placeholder='D'
-                      onChange={e => {}}
                       {...args}
                     />
                   )}
@@ -137,7 +140,6 @@ class CoverTest extends PureComponent {
                       bordered={false}
                       autoSize={true}
                       placeholder='N'
-                      onChange={e => {}}
                       {...args}
                     />
                   )}
@@ -150,9 +152,8 @@ class CoverTest extends PureComponent {
           <Button
             color='danger'
             size='sm'
-            onClick={(a, b) => {
-              console.log(this.props)
-              this.removeCoverTest()
+            onClick={() => {
+              this.deleteCoverTest()
             }}
             justIcon
           >
