@@ -1,28 +1,12 @@
 import {
-  GridContainer,
-  GridItem,
-  TextField,
-  NumberInput,
-  RadioGroup,
   Button,
-  FieldArray,
   Field,
-  withFormikExtend,
   MultipleTextField,
   Checkbox,
 } from '@/components'
-import { FastField } from 'formik'
 import { PureComponent, useState } from 'react'
-import { Delete, Add } from '@material-ui/icons'
-import { getUniqueId } from '@/utils/utils'
-import { withStyles } from '@material-ui/core/styles'
-import { compose } from 'redux'
-import { useTheme } from '@material-ui/styles'
 import Grid from '@material-ui/core/Grid'
 import Close from '@material-ui/icons/Close'
-import { getIn, setIn } from 'formik'
-import { render } from 'react-dom'
-import { getUniqueNumericId } from '@/utils/utils'
 
 class CoverTest extends PureComponent {
   getPrefix() {
@@ -57,11 +41,8 @@ class CoverTest extends PureComponent {
 
   render() {
     const {
-      classes,
       border,
-      arrayHelpers,
       theme: { spacing },
-      values,
     } = this.props
     let prefix = this.getPrefix()
     return (

@@ -2,27 +2,18 @@ import {
   GridContainer,
   GridItem,
   TextField,
-  NumberInput,
-  RadioGroup,
   Button,
   FieldArray,
   Field,
-  withFormikExtend,
   MultipleTextField,
-  Checkbox,
 } from '@/components'
 import { FastField } from 'formik'
 import { PureComponent, useState } from 'react'
-import { Delete, Add } from '@material-ui/icons'
+import {  Add } from '@material-ui/icons'
 import Edit from '@material-ui/icons/Edit'
-import { getUniqueId } from '@/utils/utils'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
-import { useTheme } from '@material-ui/styles'
 import Grid from '@material-ui/core/Grid'
-import Close from '@material-ui/icons/Close'
-import { getIn, setIn } from 'formik'
-import { render } from 'react-dom'
 import { getUniqueNumericId } from '@/utils/utils'
 import CoverTest from './components/CoverTest'
 
@@ -68,7 +59,6 @@ class Paediatric extends PureComponent {
     let {
       prefixProp,
       classes,
-      values,
       theme: { spacing },
     } = this.props
     console.log(this.props)
