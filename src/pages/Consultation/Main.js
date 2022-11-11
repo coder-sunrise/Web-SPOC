@@ -270,6 +270,22 @@ const saveConsultation = ({
     if (!newValues.corDoctorNote.lastChangeDate)
       newValues.corDoctorNote.lastChangeDate = moment()
 
+    //handle corPaediatric Form
+    newValues.corDoctorNote.corPaediatric.at(
+      -1,
+    ).ocularMotilityScribbleNoteFK = 4
+    newValues.corDoctorNote.corPaediatric.at(-1).lastChangeDate = moment()
+    console.log(newValues.corDoctorNote.corPaediatric.length)
+    if (newValues.corDoctorNote.corPaediatric.length == 1) {
+      newValues.corDoctorNote.corPaediatric.at(-1).recordStatusFK = 1
+    } else if (newValues.corDoctorNote.corPaediatric.length > 1) {
+      newValues.corDoctorNote.corPaediatric.recordStatusFK = 2
+    } else if (newValues.corDoctorNote.corPaediatric.isDeleted == true) {
+      newValues.corDoctorNote.corPaediatric.recordStatusFK = 3
+    } else {
+      newValues.corDoctorNote.corPaediatric.recordStatusFK = 4
+    }
+
     newValues.corScribbleNotes.forEach(
       note => (note.signedByUserFK = user.data.id),
     )
