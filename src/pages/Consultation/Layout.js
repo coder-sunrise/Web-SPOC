@@ -55,8 +55,9 @@ const ResponsiveGridLayout = WidthProvider(Responsive)
 let lastActivedWidget = null
 
 const { Link } = Anchor
-@connect(({ diagnosis }) => ({
+@connect(({ diagnosis, scriblenotes }) => ({
   diagnosis,
+  scriblenotes,
 }))
 @control()
 class Layout extends PureComponent {
