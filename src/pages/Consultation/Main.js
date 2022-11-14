@@ -44,6 +44,8 @@ import {
   NOTIFICATION_TYPE,
   NOTIFICATION_STATUS,
   REPORT_ID,
+  CLINICALNOTE_FORM,
+  CLINICALNOTE_FORMTHUMBNAIL,
 } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { CallingQueueButton } from '@/components/_medisys'
@@ -526,7 +528,10 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
         formConfigs.forEach(form => {
           var list = getIn(newEntity, form.prop)
           if (list && list.length > 0) {
-            newEntity = setIn(newEntity, form.prefixProp, { ...list[0] })
+            newEntity = setIn(newEntity, form.prefixProp, {
+              ...(form.defaultValue || {}),
+              ...list[0],
+            })
             selectForms.push(form.id)
           }
         })
@@ -534,7 +539,9 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
         selectForms = consultation.default.selectForms
         formConfigs.forEach(form => {
           if (selectForms.indexOf(form.id) > -1) {
-            newEntity = setIn(newEntity, form.prefixProp, {})
+            newEntity = setIn(newEntity, form.prefixProp, {
+              ...(form.defaultValue || {}),
+            })
           }
         })
       }
