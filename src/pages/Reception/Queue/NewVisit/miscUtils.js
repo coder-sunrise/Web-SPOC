@@ -50,79 +50,6 @@ const mapAttachmentToUploadInput = (
         sortOrder: index,
       }
 
-const convertEyeForms = values => {
-  let { visitEyeRefractionForm = {}, visitEyeVisualAcuityTest } = values
-  const durtyFields = [
-    'isDeleted',
-    'isNew',
-    'IsSelected',
-    'rowIndex',
-    '_errors',
-  ]
-  if (
-    visitEyeRefractionForm.formData &&
-    typeof visitEyeRefractionForm.formData === 'object'
-  ) {
-    let { formData } = visitEyeRefractionForm
-    cleanFields(formData, [...durtyFields, 'OD', 'OS'])
-
-    values.visitEyeRefractionForm.formData = _.isEmpty(formData)
-      ? undefined
-      : JSON.stringify(formData)
-  }
-  if (typeof visitEyeVisualAcuityTest === 'object') {
-    const { visitEyeVisualAcuityTestForm: testForm } = visitEyeVisualAcuityTest
-    const clone = _.cloneDeep(testForm)
-    cleanFields(clone, durtyFields)
-
-    const newTestForm = testForm.reduce((p, c) => {
-      let newItem = clone.find(i => i.id === c.id)
-      if (!newItem) {
-        if (c.id > 0 && c.concurrencyToken && c.isDeleted === false) {
-          return [
-            ...p,
-            {
-              ...c,
-              isDeleted: true,
-            },
-          ]
-        }
-      } else {
-        return [
-          ...p,
-          {
-            ...newItem,
-            isDeleted: c.isDeleted,
-          },
-        ]
-      }
-
-      return p
-    }, [])
-    values.visitEyeVisualAcuityTest.visitEyeVisualAcuityTestForm = newTestForm
-  }
-
-  return values
-}
-
-export const getMCReportLanguage = (patient, clinicSettings) => {
-  const {
-    primaryPrintoutLanguage = 'EN',
-    secondaryPrintoutLanguage = '',
-  } = clinicSettings
-  const { printLanguageCode = '' } = patient
-  if (
-    printLanguageCode.trim().length &&
-    (printLanguageCode.toUpperCase() ===
-      primaryPrintoutLanguage.toUpperCase() ||
-      printLanguageCode.toUpperCase() ===
-        secondaryPrintoutLanguage.toUpperCase())
-  ) {
-    return printLanguageCode.toUpperCase()
-  }
-  return primaryPrintoutLanguage
-}
-
 export const formikMapPropsToValues = ({
   clinicInfo,
   queueLog,
@@ -177,7 +104,6 @@ export const formikMapPropsToValues = ({
       {},
     )
     const { location } = history
-    const { visitEyeRefractionForm } = visitEntries
 
     if (!visitEntries.id) {
       if (doctorProfile) {
@@ -209,13 +135,6 @@ export const formikMapPropsToValues = ({
       }
     }
 
-    let newFormData
-    if (visitEyeRefractionForm && visitEyeRefractionForm.formData) {
-      if (typeof visitEyeRefractionForm.formData === 'string')
-        newFormData = JSON.parse(visitEyeRefractionForm.formData)
-      else newFormData = visitEyeRefractionForm.formData
-    }
-
     let referralType = 'None'
     // Edit visit
     if (visitEntries.id) {
@@ -245,10 +164,6 @@ export const formikMapPropsToValues = ({
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
       doctorProfileFK,
       ...visitEntries,
-      visitEyeRefractionForm: {
-        ...visitEyeRefractionForm,
-        formData: newFormData,
-      },
       referredBy: referralType,
       referralRemarks: visitEntries.id
         ? visitEntries.referralRemarks
@@ -320,18 +235,6 @@ export const formikHandleSubmit = (
     _referralBy = referralBy[0]
   }
 
-  let { visitEyeRefractionForm = undefined } = convertEyeForms(restValues)
-
-  if (
-    visitEyeRefractionForm &&
-    visitEyeRefractionForm.formData &&
-    typeof visitEyeRefractionForm.formData === 'object'
-  ) {
-    visitEyeRefractionForm.formData = JSON.stringify(
-      visitEyeRefractionForm.formData,
-    )
-  }
-
   let newVisitDoctor = restValues.visitDoctor
     .filter(d => d.id > 0 || !d.isDeleted)
     .map((d, index) => {
@@ -383,7 +286,6 @@ export const formikHandleSubmit = (
       ...restValues, // override using formik values
       visitDoctor: newVisitDoctor,
       referralBy: _referralBy,
-      visitEyeRefractionForm,
     },
   }
 

@@ -24,28 +24,9 @@ class HistoryDetails extends PureComponent {
     this.widgets = WidgetConfig.widgets(
       props,
       props.scribbleNoteUpdateState,
-      this.getSelectNoteTypes,
     ).filter(o => {
-      if (o.id === WidgetConfig.WIDGETS_ID.DOCTORNOTE) {
-        return this.getSelectNoteTypes().length > 0
-      }
       return props.getCategoriesOptions().find(c => c.value === o.id)
     })
-  }
-
-  getSelectNoteTypes = () => {
-    return [
-      WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
-      WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
-      WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
-      WidgetConfig.WIDGETS_ID.PLAN,
-    ].filter(
-      n =>
-        this.props
-          .getCategoriesOptions()
-          .map(c => c.value)
-          .indexOf(n) >= 0,
-    )
   }
 
   componentWillMount() {
@@ -184,13 +165,7 @@ class HistoryDetails extends PureComponent {
   }
 
   detailPanel = () => {
-    const {
-      classes,
-      override = {},
-      patientHistory,
-      selectHistory,
-      getCategoriesOptions,
-    } = this.props
+    const { classes, override = {}, patientHistory, selectHistory } = this.props
     let visitDetails = {
       visitDate: selectHistory.visitDate,
       patientName: selectHistory.patientName,
@@ -229,21 +204,11 @@ class HistoryDetails extends PureComponent {
                   (_widget.id === WidgetConfig.WIDGETS_ID.ORDERS ||
                     _widget.id === WidgetConfig.WIDGETS_ID.INVOICE ||
                     _widget.id === WidgetConfig.WIDGETS_ID.VISITREMARKS ||
-                    _widget.id === WidgetConfig.WIDGETS_ID.REFERRAL ||
-                    _widget.id === WidgetConfig.WIDGETS_ID.ATTACHMENT) &&
+                    _widget.id === WidgetConfig.WIDGETS_ID.REFERRAL) &&
                   WidgetConfig.showWidget(current, _widget.id)
                 )
               }
-              return WidgetConfig.showWidget(
-                current,
-                _widget.id,
-                [
-                  WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
-                  WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
-                  WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
-                  WidgetConfig.WIDGETS_ID.PLAN,
-                ].filter(w => getCategoriesOptions().find(c => c.value === w)),
-              )
+              return WidgetConfig.showWidget(current, _widget.id)
             })
             .map(o => {
               const Widget = o.component

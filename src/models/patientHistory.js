@@ -4,32 +4,6 @@ import { formTypes } from '@/utils/codes'
 import { getUserPreference, saveUserPreference } from '@/services/user'
 import service from '../services/patientHistory'
 
-const ParseEyeFormData = response => {
-  const { corEyeRefractionForm = {}, corEyeExaminationForm = {} } = response
-  let refractionFormData = {}
-  let examinationFormData = {}
-  if (corEyeRefractionForm.formData) {
-    refractionFormData = JSON.parse(corEyeRefractionForm.formData)
-  }
-
-  if (corEyeExaminationForm.formData) {
-    examinationFormData = JSON.parse(corEyeExaminationForm.formData)
-  }
-
-  const newResponse = {
-    ...response,
-    corEyeRefractionForm: {
-      ...corEyeRefractionForm,
-      formData: refractionFormData,
-    },
-    corEyeExaminationForm: {
-      ...corEyeExaminationForm,
-      formData: examinationFormData,
-    },
-  }
-  return newResponse
-}
-
 export default createListViewModel({
   namespace: 'patientHistory',
   config: {
@@ -128,7 +102,7 @@ export default createListViewModel({
           return {
             list: (response.data.data || []).map(item => {
               if (item.isNurseNote) return item
-              let newEntity = ParseEyeFormData(item.patientHistoryDetail)
+              let newEntity = item.patientHistoryDetail
               newEntity = {
                 ...newEntity,
                 forms: newEntity.forms.map(o => {
@@ -257,12 +231,11 @@ export default createListViewModel({
     },
     reducers: {
       queryDone(st, { payload }) {
-        // const { data } = payload
         st.list = st.list.map(item => {
           if (!item.coHistory || item.coHistory.length === 0) return item
-          let newEntity = ParseEyeFormData(item.patientHistoryDetail)
+          let newEntity = item.patientHistoryDetail
           newEntity = {
-            ...newEntity,
+            ...item.patientHistoryDetail,
             forms: newEntity.forms.map(o => {
               return {
                 ...o,
@@ -282,10 +255,6 @@ export default createListViewModel({
         }
       },
       queryOneDone(st, { payload }) {
-        // const { data } = payload
-        const { entity } = st
-        st.entity = ParseEyeFormData(entity)
-
         st.entity = {
           ...st.entity,
           forms: st.entity.forms.map(o => {

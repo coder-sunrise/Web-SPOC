@@ -116,8 +116,6 @@ export default ({
 
     if (!row.isActive) return
 
-    if (row.type === ORDER_TYPES.TREATMENT && from !== 'EditOrder') return
-
     const editAccessRight = OrderItemAccessRight(row)
 
     const accessRight = Authorized.check(editAccessRight)
@@ -698,10 +696,7 @@ export default ({
                 qty = `${numeral(row.quantity || 0).format(
                   '0,0.0',
                 )} ${row.dispenseUOMDisplayValue || ''}`
-              } else if (
-                row.type === ORDER_TYPES.SERVICE ||
-                row.type === ORDER_TYPES.TREATMENT
-              ) {
+              } else if (row.type === ORDER_TYPES.SERVICE) {
                 qty = `${numeral(row.quantity || 0).format('0,0.0')}`
               } else if (row.type === ORDER_TYPES.CONSUMABLE) {
                 qty = `${numeral(row.quantity || 0).format('0,0.0')} ${
