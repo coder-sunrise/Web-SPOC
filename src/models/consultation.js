@@ -51,7 +51,6 @@ export default createFormViewModel({
     state: {
       default: {
         corAttachment: [],
-        corEyeExaminations: [],
         selectForms: [],
       },
       selectedWidgets: ['1'],
@@ -513,10 +512,6 @@ export default createFormViewModel({
             rows: _.sortBy(data.corDiagnosis, 'sequence'),
           },
         })
-
-        data.corEyeExaminations = (data.corEyeExaminations || []).length
-          ? data.corEyeExaminations
-          : [{}]
 
         let newResponse = ParseEyeFormData(data)
         const { corEyeRefractionForm, corEyeExaminationForm } = newResponse

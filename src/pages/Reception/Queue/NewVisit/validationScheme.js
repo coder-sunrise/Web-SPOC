@@ -8,31 +8,6 @@ export const reportingDoctorSchema = Yup.object().shape({
   doctorProfileFK: Yup.number().required(),
 })
 
-export const eyeExaminationsSchema = Yup.object().shape({
-  visionCorrectionMethod: Yup.string().when(
-    [
-      'rightCorrectedVision5',
-      'rightCorrectedVision50',
-      'leftCorrectedVision5',
-      'leftCorrectedVision50',
-    ],
-    (
-      rightCorrectedVision5,
-      rightCorrectedVision50,
-      leftCorrectedVision5,
-      leftCorrectedVision50,
-    ) => {
-      if (
-        hasValue(rightCorrectedVision5) ||
-        hasValue(rightCorrectedVision50) ||
-        hasValue(leftCorrectedVision5) ||
-        hasValue(leftCorrectedVision50)
-      )
-        return Yup.string().required()
-    },
-  ),
-})
-
 const schemaVisit = {
   [FormField['visit.queueNo']]: Yup.string().required(
     'Queue No cannot be blank',
