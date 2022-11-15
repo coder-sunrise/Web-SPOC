@@ -963,22 +963,22 @@ export const APPOINTMENT_STAGE_COLOR = [
 ]
 
 export const VISIT_STATUS = [
-  {
-    id: 1,
-    code: 'COMPLETED',
-    displayValue: 'Completed',
-  },
-  {
-    id: 2,
-    code: 'UNGRADED',
-    displayValue: 'Ungraded',
-  },
-  {
-    id: 3,
-    code: 'VERIFIED',
-    displayValue: 'Verified',
-  },
-]
+         {
+           id: 1,
+           code: 'COMPLETED',
+           displayValue: 'Completed',
+         },
+         {
+           id: 2,
+           code: 'UPGRADED',
+           displayValue: 'Upgraded',
+         },
+         {
+           id: 3,
+           code: 'VERIFIED',
+           displayValue: 'Verified',
+         },
+       ]
 
 export const CLINICALNOTE_FORM = {
   PATIENTHISTORY: 1,

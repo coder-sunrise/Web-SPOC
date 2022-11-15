@@ -19,6 +19,7 @@ const checkSinglePermission = (
   Exception,
 ) => {
   let match = null
+
   const r = currentAuthority.filter(o => o.name === authority)
   if (r.length > 0) {
     match = r.find(
@@ -94,9 +95,6 @@ const checkSinglePermission = (
     // }
 
     // return null
-  }
-  if (r.length === 0) {
-    return { rights: 'hidden' }
   }
   // console.log(authority)
   return typeof Exception === 'function' && type !== 'decorator'

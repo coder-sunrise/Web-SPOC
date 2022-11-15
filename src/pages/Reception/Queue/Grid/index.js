@@ -222,7 +222,7 @@ class Grid extends React.Component {
       case VISIT_STATUS.BILLING:
       case VISIT_STATUS.COMPLETED:
       //case VISIT_STATUS.IN_CONS:
-      case VISIT_STATUS.UNGRADED:
+      case VISIT_STATUS.UPGRADED:
       case VISIT_STATUS.VERIFIED:
       case VISIT_STATUS.PAYMENT_REQUESTED:
       case VISIT_STATUS.PAYMENT_FAILED:

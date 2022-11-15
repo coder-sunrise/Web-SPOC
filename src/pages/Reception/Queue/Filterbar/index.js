@@ -254,7 +254,7 @@ const Filterbar = props => {
                 </Button>
               </Authorized>
 
-              {clinicRoleFK === 1 && !hideSelfOnlyFilter && (
+              {/* {clinicRoleFK === 1 && !hideSelfOnlyFilter && (
                 <div className={classes.switch}>
                   <Checkbox
                     label='My Patient'
@@ -262,7 +262,7 @@ const Filterbar = props => {
                     checked={selfOnly}
                   />
                 </div>
-              )}
+              )} */}
             </div>
           </Fragment>
         </Col>

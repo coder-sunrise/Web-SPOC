@@ -247,7 +247,7 @@ class PatientDetail extends PureComponent {
       {
         id: '8',
         name: 'Admission',
-        access: 'demorights', // 'wardmanagement',
+        access: ['demorights'], // 'wardmanagement',
         component: Loadable({
           loader: () => import('./Admission'),
           render: (loaded, p) => {

@@ -16,6 +16,7 @@ import {
   filterMap,
   VISIT_STATUS,
 } from '../variables'
+import { CLINICAL_ROLE } from '@/utils/constants'
 
 const styles = theme => ({
   leftAlign: {
@@ -83,7 +84,7 @@ const ContextMenu = ({
   const isStatusCompleted = [
     VISIT_STATUS.COMPLETED,
     VISIT_STATUS.IN_CONS,
-    VISIT_STATUS.UNGRADED,
+    VISIT_STATUS.UPGRADED,
     VISIT_STATUS.VERIFIED,
   ].includes(row.visitStatus)
 
@@ -158,6 +159,13 @@ const ContextMenu = ({
       rights: 'hidden',
     }
 
+    let disableEditConsultation = false
+    if (
+      clinicRoleFK === CLINICAL_ROLE.STUDENT &&
+      [VISIT_STATUS.UPGRADED, VISIT_STATUS.VERIFIED].includes(row.visitStatus)
+    ) {
+      disableEditConsultation = true
+    }
     return ContextMenuOptions.map(opt => {
       const isDisabled = rights === 'disable'
       switch (opt.id) {
@@ -193,7 +201,11 @@ const ContextMenu = ({
         case 7: // edit consultation
           return {
             ...opt,
-            disabled: !row.patientIsActive || !isStatusCompleted || isDisabled,
+            disabled:
+              !row.patientIsActive ||
+              !isStatusCompleted ||
+              isDisabled ||
+              disableEditConsultation,
             hidden: hideEditConsultation,
           }
         case 10: // forms
