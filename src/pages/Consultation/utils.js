@@ -243,6 +243,7 @@ const convertClinicalNotesForms = values => {
     list.forEach(item => {
       item.rightScribbleNote = undefined
       item.leftScribbleNote = undefined
+      item.ocularMotilityScribbleNote = undefined
     })
   })
   if (anyChange) values.corDoctorNote.lastChangeDate = moment()

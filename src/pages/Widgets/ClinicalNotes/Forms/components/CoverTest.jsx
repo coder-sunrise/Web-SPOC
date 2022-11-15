@@ -1,12 +1,30 @@
-import {
-  Button,
-  Field,
-  MultipleTextField,
-  Checkbox,
-} from '@/components'
+import { Button, Field, MultipleTextField, Checkbox } from '@/components'
 import { PureComponent, useState } from 'react'
 import Grid from '@material-ui/core/Grid'
 import Close from '@material-ui/icons/Close'
+import { compose } from 'redux'
+import { withStyles } from '@material-ui/core/styles'
+
+const _styles = withStyles(
+  theme => ({
+    itemTable: {
+      width: '100%',
+      marginBottom: theme.spacing(1),
+      '& > tr > td': {
+        border: '1px solid #ccc',
+        height: theme.spacing(8),
+      },
+      '& > tr > td > div': {
+        height: '100%',
+        position: 'relative',
+      },
+      '& td[width="5%"]': {
+        textAlign: 'center',
+      },
+    },
+  }),
+  { withTheme: true },
+)
 
 class CoverTest extends PureComponent {
   getPrefix() {
@@ -41,62 +59,77 @@ class CoverTest extends PureComponent {
 
   render() {
     const {
-      border,
       theme: { spacing },
+      classes,
     } = this.props
     let prefix = this.getPrefix()
     return (
-      <div style={{ position: 'relative' }}>
-        <Grid
-          container
-          style={{
-            height: spacing(18),
-            border: border,
-            marginTop: spacing(1),
-          }}
-        >
-          <Grid
-            md={4}
-            style={{
-              borderRight: border,
-              padding: spacing(1),
-            }}
-          >
-            <div>
-              <p>CoverTest</p>
-              <p style={{ fontSize: '0.8rem' }}>
-                <em>(including its magnitude and direction)</em>
-              </p>
-            </div>
-            <div style={{ marginTop: spacing(2) }}>
-              <div style={{ display: 'inline-block' }}>
-                <Field
-                  name={`${prefix}withRx`}
-                  render={args => {
-                    return (
-                      <Checkbox onChange={e => {}} label='with Rx' {...args} />
-                    )
-                  }}
-                />
-              </div>
-              <div style={{ display: 'inline-block' }}>
-                <Field
-                  name={`${prefix}withoutRx`}
-                  render={args => {
-                    return <Checkbox label='without Rx' {...args} />
-                  }}
-                />
-              </div>
-            </div>
-          </Grid>
-          <Grid md={8}>
-            <div
-              style={{
-                height: '50%',
-                borderBottom: border,
-              }}
-            >
+      <div>
+        <table className={classes.itemTable}>
+          <tr>
+            <td rowspan='2' width='30%'>
               <div>
+                <div
+                  style={{ position: 'absolute', top: spacing(2), left: '5px' }}
+                >
+                  <p>CoverTest</p>
+                  <p style={{ fontSize: '0.8rem' }}>
+                    <em>(including its magnitude and direction)</em>
+                  </p>
+                </div>
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: spacing(10),
+                    left: '5px',
+                  }}
+                >
+                  <div style={{ display: 'inline-block' }}>
+                    <Field
+                      name={`${prefix}withRx`}
+                      render={args => {
+                        return (
+                          <Checkbox
+                            onChange={e => {}}
+                            label='with Rx'
+                            {...args}
+                          />
+                        )
+                      }}
+                    />
+                  </div>
+                  <div
+                    style={{ display: 'inline-block', marginLeft: spacing(3) }}
+                  >
+                    <Field
+                      name={`${prefix}withoutRx`}
+                      render={args => {
+                        return <Checkbox label='without Rx' {...args} />
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td width='5%'>D</td>
+            <td>
+              <div>
+                <Button
+                  color='danger'
+                  style={{
+                    position: 'absolute',
+                    top: '2px',
+                    right: '0',
+                    zIndex: '99',
+                  }}
+                  size='sm'
+                  onClick={() => {
+                    this.deleteCoverTest()
+                  }}
+                  justIcon
+                >
+                  <Close />
+                </Button>
                 <Field
                   name={`${prefix}coverTestD`}
                   render={args => (
@@ -104,14 +137,16 @@ class CoverTest extends PureComponent {
                       maxLength={2000}
                       bordered={false}
                       autoSize={true}
-                      placeholder='D'
                       {...args}
                     />
                   )}
                 />
               </div>
-            </div>
-            <div style={{ height: '50%' }}>
+            </td>
+          </tr>
+          <tr>
+            <td width='5%'>N</td>
+            <td>
               <div>
                 <Field
                   name={`${prefix}coverTestN`}
@@ -120,30 +155,17 @@ class CoverTest extends PureComponent {
                       maxLength={2000}
                       bordered={false}
                       autoSize={true}
-                      placeholder='N'
                       {...args}
                     />
                   )}
                 />
               </div>
-            </div>
-          </Grid>
-        </Grid>
-        <div style={{ position: 'absolute', top: spacing(1), right: '0' }}>
-          <Button
-            color='danger'
-            size='sm'
-            onClick={() => {
-              this.deleteCoverTest()
-            }}
-            justIcon
-          >
-            <Close />
-          </Button>
-        </div>
+            </td>
+          </tr>
+        </table>
       </div>
     )
   }
 }
 
-export default CoverTest
+export default compose(_styles)(CoverTest)

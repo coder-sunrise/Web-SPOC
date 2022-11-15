@@ -9,7 +9,7 @@ import {
 } from '@/components'
 import { FastField } from 'formik'
 import { PureComponent, useState } from 'react'
-import {  Add } from '@material-ui/icons'
+import { Add } from '@material-ui/icons'
 import Edit from '@material-ui/icons/Edit'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
@@ -19,22 +19,38 @@ import CoverTest from './components/CoverTest'
 
 const _styles = withStyles(
   theme => ({
-    gridItem: {
-      margin: theme.spacing(1),
-      border: '1px solid rgb(217,217,217)',
-      height: theme.spacing(10),
-    },
-    btnContainer: {
-      display: 'flex',
-      '& button': {
-        marginRight: '0px',
+    itemTable: {
+      width: '100%',
+      '& > tr > td': {
+        border: '1px solid #ccc',
+        height: theme.spacing(10),
       },
+      '& > tr > td > div': {
+        height: '100%',
+        position: 'relative',
+      },
+      '& td[width="5%"]': {
+        textAlign: 'center',
+      },
+    },
+    itemTitle: {
+      position: 'absolute',
+      top: '5px',
+      left: '5px',
+    },
+    itemTitleField: {
+      position: 'absolute',
+      bottom: '10px',
+      left: '5px',
+    },
+    gridItem: {
+      marginBottom: theme.spacing(1),
     },
   }),
   { withTheme: true },
 )
 
-const border = '1px solid rgb(217,217,217)'
+const base64Prefix = 'data:image/jpeg;base64,'
 
 class Paediatric extends PureComponent {
   addCoverTest() {
@@ -60,19 +76,28 @@ class Paediatric extends PureComponent {
       prefixProp,
       classes,
       theme: { spacing },
+      editScribbleNote,
+      defaultImage,
+      cavanSize,
+      imageSize,
+      thumbnailSize,
+      position,
+      thumbnailDisplaySize,
     } = this.props
-    console.log(this.props)
 
     return (
       <GridContainer>
-        <GridItem md={12}>
+        {/* Title */}
+        <GridItem md={12} className={classes.gridItem}>
           <div>
             <span style={{ fontWeight: 500, fontSize: '1rem', marginRight: 8 }}>
               Paediatric
             </span>
           </div>
         </GridItem>
-        <GridItem md={12}>
+
+        {/* CoverTest */}
+        <GridItem md={12} className={classes.gridItem}>
           <FieldArray
             name={`${prefixProp}.coverTest`}
             render={arrayHelpers => {
@@ -89,7 +114,6 @@ class Paediatric extends PureComponent {
                       )
                       return (
                         <CoverTest
-                          border={border}
                           targetVal={val}
                           index={index}
                           arrayHelpers={arrayHelpers}
@@ -103,14 +127,9 @@ class Paediatric extends PureComponent {
             }}
           />
         </GridItem>
+
         {/* Add New */}
-        <GridItem
-          md={12}
-          style={{
-            height: spacing(5),
-            margin: spacing(1),
-          }}
-        >
+        <GridItem md={12} className={classes.gridItem}>
           <Button
             color='primary'
             size='sm'
@@ -125,167 +144,213 @@ class Paediatric extends PureComponent {
 
         {/* NPC */}
         <GridItem md={12} className={classes.gridItem}>
-          <Grid container style={{ height: '100%' }}>
-            <Grid
-              md={4}
-              style={{
-                padding: spacing(1),
-                borderRight: border,
-                height: '100%',
-              }}
-            >
-              NPC*
-            </Grid>
-            <Grid md={8}>
-              <Field
-                name={`${prefixProp}.npc`}
-                render={args => (
-                  <MultipleTextField
-                    maxLength={2000}
-                    bordered={false}
-                    autoSize={true}
-                    {...args}
+          <table className={classes.itemTable}>
+            <tr>
+              <td width='30%'>
+                <div>
+                  <span className={classes.itemTitle}>NPC*</span>
+                </div>
+              </td>
+              <td width='70%'>
+                <div>
+                  <Field
+                    name={`${prefixProp}.npc`}
+                    render={args => (
+                      <MultipleTextField
+                        maxLength={2000}
+                        bordered={false}
+                        autoSize={true}
+                        {...args}
+                      />
+                    )}
                   />
-                )}
-              />
-            </Grid>
-          </Grid>
+                </div>
+              </td>
+            </tr>
+          </table>
         </GridItem>
+
         {/* Ocular Motility */}
-        <GridItem
-          md={12}
-          className={classes.gridItem}
-          style={{ height: spacing(20) }}
-        >
-          <Grid container style={{ height: '100%' }}>
-            <Grid
-              md={4}
-              style={{
-                padding: spacing(1),
-                borderRight: border,
-              }}
-            >
-              Ocular Motility*
-            </Grid>
-            <Grid md={8}>
-              <Button
-                justIcon
-                color='primary'
-                style={{ marginTop: spacing(1), marginLeft: spacing(1) }}
-                onClick={() => {
-                  // window.g_app._store.dispatch({
-                  //   type: 'scriblenotes/updateState',
-                  //   payload: {
-                  //     entity: '123',
-                  //     showScribbleModal: true,
-                  //     editEnable: false,
-                  //   },
-                  // })
-                }}
-              >
-                <Edit />
-              </Button>
-            </Grid>
-          </Grid>
+        <GridItem md={12} className={classes.gridItem}>
+          <table className={classes.itemTable}>
+            <tr>
+              <td width='30%'>
+                <div>
+                  <span className={classes.itemTitle}>Ocular Motility*</span>
+                </div>
+              </td>
+              <td width='70%'>
+                <div>
+                  <Button
+                    justIcon
+                    color='primary'
+                    style={{
+                      position: 'absolute',
+                      top: spacing(1),
+                      left: spacing(1),
+                    }}
+                    onClick={() => {
+                      editScribbleNote(
+                        prefixProp,
+                        'ocularMotilityScribbleNote',
+                        'ocularMotilityScribbleNoteFK',
+                        defaultImage,
+                        cavanSize,
+                        imageSize,
+                        thumbnailSize,
+                        position,
+                      )
+                    }}
+                  >
+                    <Edit />
+                  </Button>
+                  <div
+                    style={{
+                      width: thumbnailDisplaySize.width + 6,
+                      marginTop: 6,
+                      position: 'relative',
+                      left: `calc((100% - ${thumbnailDisplaySize.width}px - 6px) / 2)`,
+                      height: '120px',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <FastField
+                      name={`${prefixProp}.ocularMotilityScribbleNote`}
+                      render={args => {
+                        if (
+                          !args.field.value?.thumbnail ||
+                          args.field.value?.thumbnail === ''
+                        ) {
+                          return ''
+                        }
+                        let src = `${base64Prefix}${args.field.value.thumbnail}`
+                        return (
+                          <div style={{}}>
+                            <img
+                              src={src}
+                              alt={args.field.value.subject}
+                              style={{
+                                maxHeight: thumbnailDisplaySize.height,
+                                maxWidth: thumbnailDisplaySize.width,
+                              }}
+                            />
+                          </div>
+                        )
+                      }}
+                    />
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </table>
         </GridItem>
+
         {/* Stereopsis */}
         <GridItem md={12} className={classes.gridItem}>
-          <Grid container style={{ height: '100%' }}>
-            <Grid
-              md={4}
-              style={{
-                padding: spacing(1),
-                borderRight: border,
-              }}
-            >
-              Stereopsis*
-              <div>
-                <FastField
-                  name={`${prefixProp}.stereopsisTot`}
-                  render={args => <TextField {...args} label='Type of test' />}
-                />
-              </div>
-            </Grid>
-            <Grid md={8}>
-              <Field
-                name={`${prefixProp}.stereopsis`}
-                render={args => (
-                  <MultipleTextField
-                    maxLength={2000}
-                    bordered={false}
-                    autoSize={true}
-                    {...args}
+          <table className={classes.itemTable}>
+            <tr>
+              <td width='30%'>
+                <div>
+                  <span className={classes.itemTitle}>Stereopsis*</span>
+                  <div className={classes.itemTitleField}>
+                    <FastField
+                      name={`${prefixProp}.stereopsisTot`}
+                      render={args => (
+                        <TextField {...args} label='Type of test' />
+                      )}
+                    />
+                  </div>
+                </div>
+              </td>
+              <td width='70%'>
+                <div>
+                  <Field
+                    name={`${prefixProp}.stereopsis`}
+                    render={args => (
+                      <MultipleTextField
+                        maxLength={2000}
+                        bordered={false}
+                        autoSize={true}
+                        {...args}
+                      />
+                    )}
                   />
-                )}
-              />
-            </Grid>
-          </Grid>
+                </div>
+              </td>
+            </tr>
+          </table>
         </GridItem>
+
         {/* Colour Vision */}
         <GridItem md={12} className={classes.gridItem}>
-          <Grid container style={{ height: '100%' }}>
-            <Grid
-              md={4}
-              style={{
-                padding: spacing(1),
-                borderRight: border,
-              }}
-            >
-              Colour Vision*
-              <div>
-                <FastField
-                  name={`${prefixProp}.colourVisionTot`}
-                  render={args => <TextField {...args} label='Type of test' />}
-                />
-              </div>
-            </Grid>
-            <Grid md={8}>
-              <Field
-                name={`${prefixProp}.colourVision`}
-                render={args => (
-                  <MultipleTextField
-                    maxLength={2000}
-                    bordered={false}
-                    autoSize={true}
-                    {...args}
+          <table className={classes.itemTable}>
+            <tr>
+              <td width='30%'>
+                <div>
+                  <span className={classes.itemTitle}>Colour Vision*</span>
+                  <div className={classes.itemTitleField}>
+                    <FastField
+                      name={`${prefixProp}.colourVisionTot`}
+                      render={args => (
+                        <TextField {...args} label='Type of test' />
+                      )}
+                    />
+                  </div>
+                </div>
+              </td>
+              <td width='70%'>
+                <div>
+                  <Field
+                    name={`${prefixProp}.colourVision`}
+                    render={args => (
+                      <MultipleTextField
+                        maxLength={2000}
+                        bordered={false}
+                        autoSize={true}
+                        {...args}
+                      />
+                    )}
                   />
-                )}
-              />
-            </Grid>
-          </Grid>
+                </div>
+              </td>
+            </tr>
+          </table>
         </GridItem>
+
         {/* Axial Length */}
         <GridItem md={12} className={classes.gridItem}>
-          <Grid container style={{ height: '100%' }}>
-            <Grid
-              md={4}
-              style={{
-                padding: spacing(1),
-                borderRight: border,
-              }}
-            >
-              Axial Length*
-              <div>
-                <FastField
-                  name={`${prefixProp}.axialLengthInstrument`}
-                  render={args => <TextField {...args} label='Instrument' />}
-                />
-              </div>
-            </Grid>
-            <Grid md={8}>
-              <Field
-                name={`${prefixProp}.axialLength`}
-                render={args => (
-                  <MultipleTextField
-                    maxLength={2000}
-                    bordered={false}
-                    autoSize={true}
-                    {...args}
+          <table className={classes.itemTable}>
+            <tr>
+              <td width='30%'>
+                <div>
+                  <span className={classes.itemTitle}>Axial Length*</span>
+                  <div className={classes.itemTitleField}>
+                    <FastField
+                      name={`${prefixProp}.axialLengthInstrument`}
+                      render={args => (
+                        <TextField {...args} label='Instrument' />
+                      )}
+                    />
+                  </div>
+                </div>
+              </td>
+              <td width='70%'>
+                <div>
+                  <Field
+                    name={`${prefixProp}.axialLength`}
+                    render={args => (
+                      <MultipleTextField
+                        maxLength={2000}
+                        bordered={false}
+                        autoSize={true}
+                        {...args}
+                      />
+                    )}
                   />
-                )}
-              />
-            </Grid>
-          </Grid>
+                </div>
+              </td>
+            </tr>
+          </table>
         </GridItem>
       </GridContainer>
     )
