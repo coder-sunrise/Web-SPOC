@@ -272,6 +272,11 @@ const saveConsultation = ({
     if (!newValues.corDoctorNote.lastChangeDate)
       newValues.corDoctorNote.lastChangeDate = moment()
 
+    //handle corPaediatric Form
+    if (newValues.corDoctorNote.corPaediatric.length > 0) {
+      newValues.corDoctorNote.corPaediatric.at(-1).recordStatusFK = 1
+    }
+
     newValues.corScribbleNotes.forEach(
       note => (note.signedByUserFK = user.data.id),
     )
