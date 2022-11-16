@@ -49,13 +49,13 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                 />
               )}
             />
-            <div style={{ position: 'absolute', left: 280, top: 18 }}>
+            <div style={{ position: 'absolute', left: 310, top: 18 }}>
               <FastField
                 name='asAt'
                 render={args => <Checkbox {...args} label='As At' />}
               />
             </div>
-            <div style={{ position: 'absolute', left: 360, top: 16 }}>
+            <div style={{ position: 'absolute', left: 380, top: 16 }}>
               <Button
                 color='primary'
                 onClick={handleSubmit}
