@@ -254,6 +254,12 @@ const tenantCodesMap = new Map([
       sorting: [{ columnName: 'displayValue', direction: 'asc' }],
     },
   ],
+  [
+    'ctSalesType',
+    {
+      ...defaultParams,
+    },
+  ],
 ])
 
 // always get latest codetable
@@ -514,7 +520,6 @@ const getServices = data => {
         name: o[0].displayValue,
         isAutoDisplayInOrderCart: o[0].isAutoDisplayInOrderCart,
         serviceCategoryFK: o[0].serviceCategoryFK,
-        isNurseActualizable: o[0].isNurseActualizable,
         serviceCenters: o.map(m => {
           return {
             value: m.serviceCenterId,

@@ -23,12 +23,10 @@ export const WIDGETS_ID = {
   EXAMINATIONFORM: '15',
   REFRACTIONFORM: '16',
   VISITREMARKS: '17',
-  VITALSIGN: '18',
   REFERRAL: '19',
   CONSULTATION_DOCUMENT: '20',
   NURSENOTES: '21',
   DOCTORNOTE: '22',
-  EYEEXAMINATIONS: '23',
 }
 
 export const GPCategory = [
@@ -39,8 +37,6 @@ export const GPCategory = [
   WIDGETS_ID.DIAGNOSIS,
   WIDGETS_ID.VISITREMARKS,
   WIDGETS_ID.REFERRAL,
-  WIDGETS_ID.VITALSIGN,
-  WIDGETS_ID.EYEEXAMINATIONS,
   WIDGETS_ID.ORDERS,
   WIDGETS_ID.INVOICE,
   WIDGETS_ID.CONSULTATION_DOCUMENT,
@@ -60,8 +56,6 @@ export const EyeCategory = [
   WIDGETS_ID.EXAMINATIONFORM,
   WIDGETS_ID.VISITREMARKS,
   WIDGETS_ID.REFERRAL,
-  WIDGETS_ID.VITALSIGN,
-  WIDGETS_ID.EYEEXAMINATIONS,
   WIDGETS_ID.ORDERS,
   WIDGETS_ID.INVOICE,
   WIDGETS_ID.CONSULTATION_DOCUMENT,
@@ -148,18 +142,6 @@ export const categoryTypes = [
     value: WIDGETS_ID.REFERRAL,
     name: 'Referral',
     authority: '',
-  },
-  {
-    value: WIDGETS_ID.VITALSIGN,
-    name: 'Basic Examinations',
-    shortname: 'Basic Exam.',
-    authority: 'queue.consultation.widgets.vitalsign',
-  },
-  {
-    value: WIDGETS_ID.EYEEXAMINATIONS,
-    name: 'Eye Examinations',
-    shortname: 'Eye Exam.',
-    authority: 'queue.consultation.widgets.eyeexaminations',
   },
   {
     value: WIDGETS_ID.ORDERS,
@@ -343,33 +325,6 @@ export const widgets = (
       loading: Loading,
     }),
   },
-
-  {
-    id: WIDGETS_ID.VITALSIGN,
-    name: 'Basic Examinations',
-    authority: 'queue.consultation.widgets.vitalsign',
-    component: Loadable({
-      loader: () => import('./VitalSign'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: WIDGETS_ID.EYEEXAMINATIONS,
-    name: 'Eye Examinations',
-    authority: 'queue.consultation.widgets.eyeexaminations',
-    component: Loadable({
-      loader: () => import('./EyeExaminations'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
   {
     id: WIDGETS_ID.INTRA_ORAL,
     name: 'Intra Oral',
@@ -402,19 +357,6 @@ export const widgets = (
     authority: 'queue.consultation.widgets.order',
     component: Loadable({
       loader: () => import('./Orders'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: WIDGETS_ID.INVOICE,
-    name: 'Invoice',
-    authority: 'queue.consultation.widgets.order',
-    component: Loadable({
-      loader: () => import('./Invoice'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return <Cmpnet {...props} {...p} />
@@ -635,18 +577,6 @@ export const showWidget = (current, widgetId, selectNoteTypes = []) => {
       current.orders.filter(o => o.type === 'Treatment').length === 0)
   )
     return false
-  // check show vital sign
-  if (
-    widgetId === WIDGETS_ID.VITALSIGN &&
-    !showPatientNoteVitalSigns(current.patientNoteVitalSigns)
-  )
-    return false
-  // check show eye examinations
-  if (
-    widgetId === WIDGETS_ID.EYEEXAMINATIONS &&
-    !showEyeExaminations(current.corEyeExaminations)
-  )
-    return false
 
   // check show visit referral
   if (widgetId === WIDGETS_ID.REFERRAL) {
@@ -682,61 +612,4 @@ export const showNote = (
     return false
   }
   return true
-}
-
-const showPatientNoteVitalSigns = (patientNoteVitalSigns = []) => {
-  if (
-    patientNoteVitalSigns.find(
-      row =>
-        hasValue(row.temperatureC) ||
-        hasValue(row.bpSysMMHG) ||
-        hasValue(row.bpDiaMMHG) ||
-        hasValue(row.pulseRateBPM) ||
-        hasValue(row.saO2) ||
-        hasValue(row.weightKG) ||
-        hasValue(row.heightCM) ||
-        hasValue(row.bmi) ||
-        hasValue(row.bodyFatPercentage) ||
-        hasValue(row.degreeOfObesity) ||
-        hasValue(row.headCircumference) ||
-        hasValue(row.chestCircumference) ||
-        hasValue(row.waistCircumference) ||
-        hasValue(row.isPregnancy) ||
-        hasValue(row.hepetitisVaccinationA) ||
-        hasValue(row.hepetitisVaccinationB) ||
-        hasValue(row.isFasting) ||
-        hasValue(row.isSmoking) ||
-        hasValue(row.isAlcohol) ||
-        hasValue(row.isMensus),
-    )
-  )
-    return true
-  return false
-}
-
-export const showEyeExaminations = (corEyeExaminations = []) => {
-  if (
-    corEyeExaminations.find(
-      row =>
-        hasValue(row.visionCorrectionMethod) ||
-        hasValue(row.leftBareEye5) ||
-        hasValue(row.leftCorrectedVision5) ||
-        hasValue(row.leftBareEye50) ||
-        hasValue(row.leftCorrectedVision50) ||
-        hasValue(row.rightBareEye5) ||
-        hasValue(row.rightCorrectedVision5) ||
-        hasValue(row.rightBareEye50) ||
-        hasValue(row.rightCorrectedVision50) ||
-        hasValue(row.leftFirstResult) ||
-        hasValue(row.leftSecondResult) ||
-        hasValue(row.leftThirdResult) ||
-        hasValue(row.rightFirstResult) ||
-        hasValue(row.rightSecondResult) ||
-        hasValue(row.rightThirdResult) ||
-        hasValue(row.colorVisionTestResult) ||
-        (hasValue(row.remarks) && row.remarks.trim().length),
-    )
-  )
-    return true
-  return false
 }

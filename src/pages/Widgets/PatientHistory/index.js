@@ -30,7 +30,7 @@ import {
 import Authorized from '@/utils/Authorized'
 // utils
 import { findGetParameter, commonDataReaderTransform } from '@/utils/utils'
-import { VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
+import { VISIT_TYPE, CLINIC_TYPE, CLINICAL_ROLE } from '@/utils/constants'
 import { scribbleTypes } from '@/utils/codes'
 import { DoctorProfileSelect } from '@/components/_medisys'
 import withWebSocket from '@/components/Decorator/withWebSocket'
@@ -189,7 +189,7 @@ class PatientHistory extends Component {
       loadVisits: [],
       totalVisits: 0,
       currentHeight: window.innerHeight,
-      isLoadingData: true,
+      isLoadingData: undefined,
       currentOrders: [],
       showActualizationHistory: false,
     }
@@ -197,11 +197,6 @@ class PatientHistory extends Component {
 
   componentWillMount() {
     const { dispatch } = this.props
-
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: { code: 'ctg6pd' },
-    })
 
     dispatch({
       type: 'codetable/fetchCodes',
@@ -248,7 +243,7 @@ class PatientHistory extends Component {
         this.setState({ selectCategories }, () => {
           setFieldValue('selectCategories', selectCategories)
         })
-        this.queryVisitHistory(5)
+        // this.queryVisitHistory(5)
       })
     })
   }
@@ -446,6 +441,8 @@ class PatientHistory extends Component {
       visitStatus,
       isExistsVerifiedReport,
     } = row
+    const clinicRoleFK =
+      user.data.clinicianProfile.userProfile.role?.clinicRoleFK
     const { settings = [] } = clinicSettings
     const { patientID, ableToEditConsultation } = patientHistory
     const isRetailVisit = visitPurposeFK === VISIT_TYPE.OTC
@@ -581,6 +578,11 @@ class PatientHistory extends Component {
                         }}
                         size='sm'
                         justIcon
+                        disabled={
+                          clinicRoleFK === CLINICAL_ROLE.STUDENT &&
+                          (visitStatus === VISIT_STATUS.UPGRADED ||
+                            visitStatus === VISIT_STATUS.VERIFIED)
+                        }
                         onClick={event => {
                           event.stopPropagation()
                           const closeOtherPopup = () => {
@@ -687,25 +689,23 @@ class PatientHistory extends Component {
               marginRight: 6,
             }}
           >
-            {!isNurseNote &&
-              settings.showConsultationVersioning &&
-              !isRetailVisit && (
-                <Tooltip title='View History'>
-                  <span
-                    className='material-icons'
-                    style={{ color: 'gray' }}
-                    onClick={event => {
-                      event.stopPropagation()
-                      this.setState({
-                        showHistoryDetails: true,
-                        selectHistory: { ...row },
-                      })
-                    }}
-                  >
-                    history
-                  </span>
-                </Tooltip>
-              )}
+            {!isNurseNote && settings.showConsultationVersioning && (
+              <Tooltip title='View History'>
+                <span
+                  className='material-icons'
+                  style={{ color: 'gray' }}
+                  onClick={event => {
+                    event.stopPropagation()
+                    this.setState({
+                      showHistoryDetails: true,
+                      selectHistory: { ...row },
+                    })
+                  }}
+                >
+                  history
+                </span>
+              </Tooltip>
+            )}
           </div>
         </div>
       </div>
@@ -784,7 +784,6 @@ class PatientHistory extends Component {
       referralRemarks: history.referralRemarks,
       visitPurposeFK: history.visitPurposeFK,
       patientGender: history.patientGender,
-      visitOrderTemplateDetails: history.visitOrderTemplateDetails,
     }
     let visitDetails = {
       visitDate: history.visitDate,
@@ -904,31 +903,11 @@ class PatientHistory extends Component {
   getPatientInfo = () => {
     const {
       patient = {},
-      codetable: { ctg6pd = [], ctnationality = [], ctgender = [] },
+      codetable: { ctnationality = [], ctgender = [] },
     } = this.props
-    const {
-      name,
-      patientAccountNo,
-      nationalityFK,
-      dob,
-      patientAllergy,
-      genderFK,
-      patientAllergyMetaData,
-      patientMedicalHistory = {},
-    } = patient
-    const {
-      medicalHistory,
-      familyHistory,
-      socialHistory,
-    } = patientMedicalHistory
+    const { name, patientAccountNo, nationalityFK, dob, genderFK } = patient
     const gender = ctgender.find(o => o.id === genderFK)
     const nationality = ctnationality.find(o => o.id === nationalityFK)
-    let g6PD
-    let patientNoAllergies
-    if (patientAllergyMetaData.length > 0) {
-      g6PD = ctg6pd.find(o => o.id === patientAllergyMetaData[0].g6PDFK)
-      patientNoAllergies = patientAllergyMetaData[0].noAllergies
-    }
 
     let age = '0'
     const years = Math.floor(moment.duration(moment().diff(dob)).asYears())
@@ -939,7 +918,6 @@ class PatientHistory extends Component {
       age = `{${months} ${years > 1 ? 'months' : 'month'}}`
     }
 
-    const allergies = _.orderBy(patientAllergy, ['type'], ['asc'])
     return [
       {
         patientName: name,
@@ -947,15 +925,6 @@ class PatientHistory extends Component {
         patientNationality: nationality ? nationality.name : '',
         patientAge: age,
         patientSex: gender ? gender.name : '',
-        patientG6PD: g6PD ? g6PD.name : '',
-        patientAllergy: allergies.length
-          ? allergies.map(o => o.allergyName).join(', ')
-          : patientNoAllergies
-          ? 'NKDA'
-          : '',
-        patientSocialHistory: socialHistory,
-        patientFamilyHistory: familyHistory,
-        patientMajorInvestigation: medicalHistory,
       },
     ]
   }
@@ -1235,56 +1204,6 @@ class PatientHistory extends Component {
     return newNote
   }
 
-  showBasicExaminationsGeneral = (basicExaminations = []) => {
-    if (
-      basicExaminations.find(
-        row =>
-          WidgetConfig.hasValue(row.temperatureC) ||
-          WidgetConfig.hasValue(row.bpSysMMHG) ||
-          WidgetConfig.hasValue(row.bpDiaMMHG) ||
-          WidgetConfig.hasValue(row.pulseRateBPM) ||
-          WidgetConfig.hasValue(row.saO2) ||
-          WidgetConfig.hasValue(row.weightKG) ||
-          WidgetConfig.hasValue(row.heightCM) ||
-          WidgetConfig.hasValue(row.bmi),
-      )
-    )
-      return true
-    return false
-  }
-
-  showBasicExaminationsOther1 = (basicExaminations = []) => {
-    if (
-      basicExaminations.find(
-        row =>
-          WidgetConfig.hasValue(row.bodyFatPercentage) ||
-          WidgetConfig.hasValue(row.degreeOfObesity) ||
-          WidgetConfig.hasValue(row.headCircumference) ||
-          WidgetConfig.hasValue(row.chestCircumference) ||
-          WidgetConfig.hasValue(row.waistCircumference) ||
-          WidgetConfig.hasValue(row.isPregnancy),
-      )
-    )
-      return true
-    return false
-  }
-
-  showBasicExaminationsOther2 = (basicExaminations = []) => {
-    if (
-      basicExaminations.find(
-        row =>
-          WidgetConfig.hasValue(row.hepetitisVaccinationA) ||
-          WidgetConfig.hasValue(row.hepetitisVaccinationB) ||
-          WidgetConfig.hasValue(row.isFasting) ||
-          WidgetConfig.hasValue(row.isSmoking) ||
-          WidgetConfig.hasValue(row.isAlcohol) ||
-          WidgetConfig.hasValue(row.isMensus),
-      )
-    )
-      return true
-    return false
-  }
-
   printHandel = async () => {
     let reportContext = []
     const result = await getReportContext(68)
@@ -1325,11 +1244,9 @@ class PatientHistory extends Component {
     let eyeVisualAcuityTestForms = []
     let refractionFormTests = []
     let eyeExaminations = []
-    let vitalSign = []
     let orders = []
     let consultationDocument = []
     let doctorNote = []
-    let corEyeExaminations = []
 
     var printVisit = loadVisits.filter(visit =>
       selectItems.find(item => item === visit.currentId),
@@ -1410,12 +1327,6 @@ class PatientHistory extends Component {
         visitPurposeFK,
         current.isNurseNote,
       )
-      const isShowBasicExaminations = this.checkShowData(
-        WidgetConfig.WIDGETS_ID.VITALSIGN,
-        current,
-        visitPurposeFK,
-        isNurseNote,
-      )
       const isShowOrders = this.checkShowData(
         WidgetConfig.WIDGETS_ID.ORDERS,
         current,
@@ -1424,12 +1335,6 @@ class PatientHistory extends Component {
       )
       const isShowConsultationDocument = this.checkShowData(
         WidgetConfig.WIDGETS_ID.CONSULTATION_DOCUMENT,
-        current,
-        visitPurposeFK,
-        isNurseNote,
-      )
-      const isShowJGHEyeExaminations = this.checkShowData(
-        WidgetConfig.WIDGETS_ID.EYEEXAMINATIONS,
         current,
         visitPurposeFK,
         isNurseNote,
@@ -1444,10 +1349,8 @@ class PatientHistory extends Component {
         isShowEyeVisualAcuityTest ||
         isShowRefractionForm ||
         isShowEyeExaminations ||
-        isShowBasicExaminations ||
         isShowOrders ||
-        isShowConsultationDocument ||
-        isShowJGHEyeExaminations
+        isShowConsultationDocument
       ) {
         let referral = { isShowReferral: false }
         if (isShowReferral) {
@@ -1493,16 +1396,6 @@ class PatientHistory extends Component {
           ...restRefractionFormProps,
           ...eyeVisualAcuityTestDetails,
           patientGender: current.patientGender || '',
-          isShowBasicExaminations: isShowBasicExaminations,
-          isShowBasicExaminationsGeneral: this.showBasicExaminationsGeneral(
-            current.patientNoteVitalSigns,
-          ),
-          isShowBasicExaminationsOther1: this.showBasicExaminationsOther1(
-            current.patientNoteVitalSigns,
-          ),
-          isShowBasicExaminationsOther2: this.showBasicExaminationsOther2(
-            current.patientNoteVitalSigns,
-          ),
         })
 
         // treatment
@@ -1567,153 +1460,13 @@ class PatientHistory extends Component {
           )
         }
 
-        // Vital Sign
-        if (isShowBasicExaminations) {
-          vitalSign = vitalSign.concat(
-            current.patientNoteVitalSigns.map(o => {
-              return {
-                visitFK: current.currentId,
-                temperatureC: WidgetConfig.hasValue(o.temperatureC)
-                  ? `${numeral(o.temperatureC).format('0.0')} \u00b0C`
-                  : '-',
-                bpSysMMHG: WidgetConfig.hasValue(o.bpSysMMHG)
-                  ? `${numeral(o.bpSysMMHG).format('0')} mmHg`
-                  : '-',
-                bpDiaMMHG: WidgetConfig.hasValue(o.bpDiaMMHG)
-                  ? `${numeral(o.bpDiaMMHG).format('0')} mmHg`
-                  : '-',
-                pulseRateBPM: WidgetConfig.hasValue(o.pulseRateBPM)
-                  ? `${numeral(o.pulseRateBPM).format('0')} bpm`
-                  : '-',
-                weightKG: WidgetConfig.hasValue(o.weightKG)
-                  ? `${numeral(o.weightKG).format('0.0')} KG`
-                  : '-',
-                heightCM: WidgetConfig.hasValue(o.heightCM)
-                  ? `${numeral(o.heightCM).format('0.0')} CM`
-                  : '-',
-                bmi: WidgetConfig.hasValue(o.bmi)
-                  ? `${numeral(o.bmi).format('0.0')} kg/m\u00b2`
-                  : '-',
-                saO2: WidgetConfig.hasValue(o.saO2)
-                  ? `${numeral(o.saO2).format('0')} %`
-                  : '-',
-                bodyFatPercentage: WidgetConfig.hasValue(o.bodyFatPercentage)
-                  ? `${numeral(o.bodyFatPercentage).format('0.0')} %`
-                  : '-',
-                degreeOfObesity: WidgetConfig.hasValue(o.degreeOfObesity)
-                  ? `${numeral(o.degreeOfObesity).format('0.0')} %`
-                  : '-',
-                headCircumference: WidgetConfig.hasValue(o.headCircumference)
-                  ? `${numeral(o.headCircumference).format('0.0')} CM`
-                  : '-',
-                chestCircumference: WidgetConfig.hasValue(o.chestCircumference)
-                  ? `${numeral(o.chestCircumference).format('0.0')} CM`
-                  : '-',
-                waistCircumference:
-                  o.isChild || o.isPregnancy
-                    ? 'Not Available'
-                    : WidgetConfig.hasValue(o.waistCircumference)
-                    ? `${numeral(o.waistCircumference).format('0.0')} CM`
-                    : '-',
-                isPregnancy: WidgetConfig.getHistoryValueForBoolean(
-                  o.isPregnancy,
-                ),
-                hepetitisVaccinationA: WidgetConfig.getHistoryValueForBoolean(
-                  o.hepetitisVaccinationA,
-                ),
-                hepetitisVaccinationB: WidgetConfig.getHistoryValueForBoolean(
-                  o.hepetitisVaccinationB,
-                ),
-                isFasting: WidgetConfig.getHistoryValueForBoolean(o.isFasting),
-                isSmoking: WidgetConfig.getHistoryValueForBoolean(o.isSmoking),
-                isAlcohol: WidgetConfig.getHistoryValueForBoolean(o.isAlcohol),
-                isMensus: WidgetConfig.getHistoryValueForBoolean(o.isMensus),
-              }
-            }),
-          )
-        }
-
-        // JGH Eye Examinations
-        if (isShowJGHEyeExaminations) {
-          corEyeExaminations = corEyeExaminations.concat(
-            current.corEyeExaminations.map(o => {
-              return {
-                visitFK: current.currentId,
-                visionCorrectionMethod: o.visionCorrectionMethod || '',
-                rightBareEye5: WidgetConfig.hasValue(o.rightBareEye5)
-                  ? `${numeral(o.rightBareEye5).format('0.0')}`
-                  : '-',
-                rightCorrectedVision5: WidgetConfig.hasValue(
-                  o.rightCorrectedVision5,
-                )
-                  ? `${numeral(o.rightCorrectedVision5).format('0.0')}`
-                  : '-',
-                rightBareEye50: WidgetConfig.hasValue(o.rightBareEye50)
-                  ? `${numeral(o.rightBareEye50).format('0.0')}`
-                  : '-',
-                rightCorrectedVision50: WidgetConfig.hasValue(
-                  o.rightCorrectedVision50,
-                )
-                  ? `${numeral(o.rightCorrectedVision50).format('0.0')}`
-                  : '-',
-                leftBareEye5: WidgetConfig.hasValue(o.leftBareEye5)
-                  ? `${numeral(o.leftBareEye5).format('0.0')}`
-                  : '-',
-                leftCorrectedVision5: WidgetConfig.hasValue(
-                  o.leftCorrectedVision5,
-                )
-                  ? `${numeral(o.leftCorrectedVision5).format('0.0')}`
-                  : '-',
-                leftBareEye50: WidgetConfig.hasValue(o.leftBareEye50)
-                  ? `${numeral(o.leftBareEye50).format('0.0')}`
-                  : '-',
-                leftCorrectedVision50: WidgetConfig.hasValue(
-                  o.leftCorrectedVision50,
-                )
-                  ? `${numeral(o.leftCorrectedVision50).format('0.0')}`
-                  : '-',
-                rightFirstResult: WidgetConfig.hasValue(o.rightFirstResult)
-                  ? `${o.rightFirstResult}`
-                  : '-',
-                rightSecondResult: WidgetConfig.hasValue(o.rightSecondResult)
-                  ? `${o.rightSecondResult}`
-                  : '-',
-                rightThirdResult: WidgetConfig.hasValue(o.rightThirdResult)
-                  ? `${o.rightThirdResult}`
-                  : '-',
-                rightAverageResult: WidgetConfig.hasValue(o.rightAverageResult)
-                  ? `${numeral(o.rightAverageResult).format('0')}`
-                  : '-',
-                leftFirstResult: WidgetConfig.hasValue(o.leftFirstResult)
-                  ? `${o.leftFirstResult}`
-                  : '-',
-                leftSecondResult: WidgetConfig.hasValue(o.leftSecondResult)
-                  ? `${o.leftSecondResult}`
-                  : '-',
-                leftThirdResult: WidgetConfig.hasValue(o.leftThirdResult)
-                  ? `${o.leftThirdResult}`
-                  : '-',
-                leftAverageResult: WidgetConfig.hasValue(o.leftAverageResult)
-                  ? `${numeral(o.leftAverageResult).format('0')}`
-                  : '-',
-                colorVisionTestResult: o.colorVisionTestResult || '',
-                remarks:
-                  WidgetConfig.hasValue(o.remarks) && o.remarks.trim().length
-                    ? o.remarks
-                    : '-',
-              }
-            }),
-          )
-        }
-
         // orders
         if (isShowOrders) {
           orders = orders.concat(
             current.orders.map(o => {
               return {
                 visitFK: current.currentId,
-                type: o.isDrugMixture ? 'Drug Mixture' : o.type,
-                isDrugMixture: o.isDrugMixture,
+                type: o.type,
                 name: o.name,
                 description: o.description,
                 remarks: o.remarks,
@@ -1757,11 +1510,9 @@ class PatientHistory extends Component {
       EyeVisualAcuityTestForms: eyeVisualAcuityTestForms,
       RefractionFormTests: refractionFormTests,
       EyeExaminations: eyeExaminations,
-      VitalSign: vitalSign,
       Orders: orders,
       ConsultationDocument: consultationDocument,
       DoctorNote: doctorNote,
-      COREyeExaminations: corEyeExaminations,
       ReportContext: reportContext,
     }
     const payload1 = [
@@ -2394,7 +2145,13 @@ class PatientHistory extends Component {
                 </Collapse>
               </div>
             ) : (
-              <p>{isLoadingData ? 'Loading' : 'No Visit Record Found'}</p>
+              <p>
+                {isLoadingData
+                  ? 'Loading'
+                  : isLoadingData === undefined
+                  ? ''
+                  : 'No Visit Record Found'}
+              </p>
             )}
             <div
               style={{

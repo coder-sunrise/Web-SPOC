@@ -213,8 +213,6 @@ export default createListViewModel({
               appointmentTypeFK: item.appointmentTypeFK,
               startTime: item.startTime,
               endTime: item.endTime,
-              roomFk: item.roomFk,
-              isPrimaryClinician: item.isPrimaryClinician,
               sortOrder: item.sortOrder,
             }))
 
@@ -424,9 +422,8 @@ export default createListViewModel({
               return {
                 ...restApptData,
                 appointmentDate: appointmentDate,
-                appointmentStatusFk: APPOINTMENT_STATUS.DRAFT, //undefined is new, will updated to Darft
+                appointmentStatusFk: APPOINTMENT_STATUS.CONFIRMED, //undefined is new, will updated to Darft
                 isEditedAsSingleAppointment: false,
-                appointmentPreOrderItem: [],
                 appointments_Resources: [
                   ...apptResources.map((res, index) => {
                     const { id, appointmentFK, ...restResourceData } = res
@@ -510,7 +507,7 @@ export default createListViewModel({
       *getPublicHolidayList({ payload }, { call, put }) {
         const result = yield call(phServices.queryList, {
           isActive: true,
-          lgteql_startDate: payload.start,
+          lgteql_endDate: payload.start,
           pagesize: 999,
         })
 
@@ -566,6 +563,9 @@ export default createListViewModel({
       },
       *navigateCalendar({ payload }, { all, select, put }) {
         const calendarState = yield select(state => state.calendar)
+        const {
+          filters: { filterByApptType = [] },
+        } = yield select(state => state.appointment)
         const { date, view, doctor = [] } = payload
         const targetDate =
           date !== undefined ? date : calendarState.currentViewDate
@@ -601,8 +601,6 @@ export default createListViewModel({
           doctor: doctor.join(),
           appStatus: [
             APPOINTMENT_STATUS.CONFIRMED,
-            APPOINTMENT_STATUS.DRAFT,
-            // APPOINTMENT_STATUS.CANCELLED,
             APPOINTMENT_STATUS.TURNEDUP,
             APPOINTMENT_STATUS.RESCHEDULED,
             APPOINTMENT_STATUS.PFA_RESCHEDULED,
@@ -611,6 +609,7 @@ export default createListViewModel({
             APPOINTMENT_STATUS.PFA_NOSHOW,
           ].join(),
           dob: null,
+          appType: filterByApptType.join(),
         }
         // const getCalendarListPayload = {
         //   apptDateFrom: start,
@@ -623,6 +622,21 @@ export default createListViewModel({
             type: 'doctorBlock/query',
             payload: {
               lgteql_startDateTime: start,
+            },
+          }),
+          put({
+            type: 'roomBlock/query',
+            payload: {
+              lgteql_startDateTime: start,
+            },
+          }),
+          put({
+            type: 'appointment/updateState',
+            payload: {
+              filters: {
+                filterByDoctor: doctor,
+                filterByApptType: appType,
+              },
             },
           }),
         ])
@@ -664,7 +678,6 @@ export default createListViewModel({
           apptDateTo: end,
           appStatus: [
             APPOINTMENT_STATUS.CONFIRMED,
-            APPOINTMENT_STATUS.DRAFT,
             APPOINTMENT_STATUS.TURNEDUP,
             APPOINTMENT_STATUS.RESCHEDULED,
             APPOINTMENT_STATUS.PFA_RESCHEDULED,
@@ -679,6 +692,12 @@ export default createListViewModel({
           put({ type: 'getCalendarList', payload: getCalendarListPayload }),
           put({
             type: 'doctorBlock/query',
+            payload: {
+              lgteql_startDateTime: start,
+            },
+          }),
+          put({
+            type: 'roomBlock/query',
             payload: {
               lgteql_startDateTime: start,
             },

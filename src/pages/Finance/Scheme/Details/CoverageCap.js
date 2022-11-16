@@ -17,53 +17,26 @@ const CoverageCap = ({ values, theme, classes, setFieldValue }) => {
     if (target.value === 'sub') {
       setFieldValue('coverageMaxCap', undefined)
       setFieldValue(
-        'itemGroupMaxCapacityDto.medicationMaxCapacity.maxCapValue',
-        undefined,
-      )
-      setFieldValue(
         'itemGroupMaxCapacityDto.consumableMaxCapacity.maxCapValue',
-        undefined,
-      )
-      setFieldValue(
-        'itemGroupMaxCapacityDto.vaccinationMaxCapacity.maxCapValue',
         undefined,
       )
       setFieldValue(
         'itemGroupMaxCapacityDto.serviceMaxCapacity.maxCapValue',
         undefined,
       )
-      /* Commented Package Input - Need to re-test if enabling it back in the future */
-      // setFieldValue(
-      //   'itemGroupMaxCapacityDto.packageMaxCapacity.maxCapValue',
-      //   undefined,
-      // )
     }
 
     if (target.value === 'all') {
       if (!values.id) setFieldValue('itemGroupMaxCapacityDto', {})
       else {
         setFieldValue(
-          'itemGroupMaxCapacityDto.medicationMaxCapacity.isDeleted',
-          true,
-        )
-        setFieldValue(
           'itemGroupMaxCapacityDto.consumableMaxCapacity.isDeleted',
-          true,
-        )
-        setFieldValue(
-          'itemGroupMaxCapacityDto.vaccinationMaxCapacity.isDeleted',
           true,
         )
         setFieldValue(
           'itemGroupMaxCapacityDto.serviceMaxCapacity.isDeleted',
           true,
         )
-
-        /* Commented Package Input - Need to re-test if enabling it back in the future */
-        // setFieldValue(
-        //   'itemGroupMaxCapacityDto.packageMaxCapacity.isDeleted',
-        //   true,
-        // )
       }
     }
   }
@@ -124,34 +97,6 @@ const CoverageCap = ({ values, theme, classes, setFieldValue }) => {
           )}
         />
         <Field
-          name='itemGroupMaxCapacityDto.medicationMaxCapacity.maxCapValue'
-          render={args => (
-            <NumberInput
-              disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
-              label={formatMessage({
-                id: 'finance.scheme.setting.maximumCapMedications',
-              })}
-              currency
-              min={0}
-              {...args}
-            />
-          )}
-        />
-        <Field
-          name='itemGroupMaxCapacityDto.vaccinationMaxCapacity.maxCapValue'
-          render={args => (
-            <NumberInput
-              disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
-              label={formatMessage({
-                id: 'finance.scheme.setting.maximumCapVaccines',
-              })}
-              currency
-              min={0}
-              {...args}
-            />
-          )}
-        />
-        <Field
           name='itemGroupMaxCapacityDto.serviceMaxCapacity.maxCapValue'
           render={args => (
             <NumberInput
@@ -165,21 +110,6 @@ const CoverageCap = ({ values, theme, classes, setFieldValue }) => {
             />
           )}
         />
-        {/* Commented Package Input - Need to re-test if enabling it back in the future */}
-        {/* <Field
-          name='itemGroupMaxCapacityDto.packageMaxCapacity.maxCapValue'
-          render={(args) => (
-            <NumberInput
-              disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
-              label={formatMessage({
-                id: 'finance.scheme.setting.maximumCapPackages',
-              })}
-              currency
-              min={0}
-              {...args}
-            />
-          )}
-        /> */}
         <p style={{ marginTop: theme.spacing(1) }}>Leave blank if no cap</p>
       </GridItem>
     </GridContainer>

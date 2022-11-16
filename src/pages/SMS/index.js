@@ -106,7 +106,7 @@ const SMS = ({
           .add(1, 'months')
           .endOf('day')
           .formatUTC(false),
-        in_AppointmentStatusFk: `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.PFA_RESCHEDULED}|${APPOINTMENT_STATUS.CONFIRMED}`,
+        in_AppointmentStatusFk: `${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.PFA_RESCHEDULED}|${APPOINTMENT_STATUS.CONFIRMED}`,
         [doctorProperty]: doctor,
       }
     }

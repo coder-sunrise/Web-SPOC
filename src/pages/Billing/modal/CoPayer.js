@@ -400,8 +400,8 @@ class CoPayer extends Component {
               size='sm'
               rows={_.orderBy(
                 invoiceItems,
-                ['isVisitPurposeItem', 'itemType', 'itemName'],
-                ['desc', 'asc', 'asc'],
+                ['itemType', 'itemName'],
+                ['asc', 'asc'],
               ).map(item => ({
                 ...item,
                 disabled: !selectedRows.includes(item.id),

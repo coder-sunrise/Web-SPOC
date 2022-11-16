@@ -4,41 +4,16 @@ import { connect } from 'dva'
 import CodeSelect from './CodeSelect'
 import { getMappedVisitType } from '@/utils/utils'
 
-@connect(({ codetable, clinicSettings }) => ({ codetable, clinicSettings }))
+@connect(({ codetable }) => ({ codetable }))
 class VisitTypeSelect extends React.Component {
-  state = {}
   constructor(props) {
     super(props)
   }
-
-  componentDidMount() {
-    const { dispatch, clinicSettings } = this.props
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctVisitpurpose',
-      },
-    }).then(result => {
-      if (result) {
-        const visitTypeSetting = JSON.parse(
-          clinicSettings.settings.visitTypeSetting,
-        )
-        var newVisitType = getMappedVisitType(result, visitTypeSetting).filter(
-          vt => vt.isEnabled === 'true',
-        )
-        this.setState({
-          ctVisitpurpose: newVisitType,
-        })
-      }
-    })
-  }
-
   render() {
     const {
       field,
       form,
       codetable,
-      clinicSettings,
       label,
       mode,
       maxTagPlaceholder,
@@ -50,7 +25,7 @@ class VisitTypeSelect extends React.Component {
         label={label}
         maxTagCount={0}
         maxTagPlaceholder={maxTagPlaceholder}
-        options={this.state.ctVisitpurpose}
+        code='ctVisitpurpose'
         labelField='name'
         {...this.props}
       />

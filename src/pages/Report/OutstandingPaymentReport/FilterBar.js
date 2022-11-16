@@ -97,7 +97,9 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={2}>
             <FastField
               name='groupByDoctor'
-              render={args => <Checkbox {...args} label='Group By Doctor' />}
+              render={args => (
+                <Checkbox {...args} label='Group By Optometrist' />
+              )}
             />
           </GridItem>
           <GridItem md={1}>

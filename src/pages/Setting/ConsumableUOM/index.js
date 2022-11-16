@@ -59,9 +59,7 @@ class ConsumableUOM extends PureComponent {
           open={settingConsumableUOM.showModal}
           observe='ConsumableUOMDetail'
           title={
-            settingConsumableUOM.entity
-              ? 'Edit Consumable UOM'
-              : 'Add Consumable UOM'
+            settingConsumableUOM.entity ? 'Edit Product UOM' : 'Add Product UOM'
           }
           maxWidth='md'
           bodyNoPadding

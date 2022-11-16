@@ -127,8 +127,7 @@ export default createListViewModel({
         if (response.status === '200') {
           return {
             list: (response.data.data || []).map(item => {
-              if (item.visitPurposeFK === VISIT_TYPE.OTC || item.isNurseNote)
-                return item
+              if (item.isNurseNote) return item
               let newEntity = ParseEyeFormData(item.patientHistoryDetail)
               newEntity = {
                 ...newEntity,
@@ -164,19 +163,6 @@ export default createListViewModel({
         }
         return false
       },
-      *queryRetailHistory({ payload }, { call, put }) {
-        const response = yield call(service.queryRetailHistory, payload)
-
-        if (response.status === '200') {
-          yield put({
-            type: 'getRetailHistory',
-            payload: response,
-          })
-          return response
-        }
-        return false
-      },
-
       *queryInvoiceHistory({ payload }, { call, put }) {
         const response = yield call(service.queryInvoiceHistory, payload)
 
@@ -273,12 +259,7 @@ export default createListViewModel({
       queryDone(st, { payload }) {
         // const { data } = payload
         st.list = st.list.map(item => {
-          if (
-            item.visitPurposeFK === VISIT_TYPE.OTC ||
-            !item.coHistory ||
-            item.coHistory.length === 0
-          )
-            return item
+          if (!item.coHistory || item.coHistory.length === 0) return item
           let newEntity = ParseEyeFormData(item.patientHistoryDetail)
           newEntity = {
             ...newEntity,
@@ -319,13 +300,6 @@ export default createListViewModel({
 
         return {
           ...st,
-        }
-      },
-      getRetailHistory(st, { payload }) {
-        const { data } = payload
-        return {
-          ...st,
-          entity: data,
         }
       },
       getReferalHistory(st, { payload }) {

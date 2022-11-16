@@ -30,14 +30,6 @@ export const getCoverageAmountAndType = (scheme, invoiceItem) => {
     _coPaymentItem => _coPaymentItem.itemCode === invoiceItem.itemCode,
   )
 
-  // If is drug mixture item, check if can claim
-  if (invoiceItem.isDrugMixture && !invoiceItem.isClaimable) {
-    schemeCoverageType = 'Percentage'
-    coverage = convertAmountToPercentOrCurrency(schemeCoverageType, 0)
-    schemeCoverage = 0
-    return { coverage, schemeCoverage, schemeCoverageType }
-  }
-
   if (isSpecificDefined) {
     const coPaymentItem = scheme.coPaymentByItem.find(
       _coPaymentItem => _coPaymentItem.itemCode === invoiceItem.itemCode,
@@ -98,9 +90,6 @@ export const getApplicableClaimAmount = (
   )
 
   if (payableBalance <= 0 || !scheme) return returnClaimAmount
-
-  // If is drug mixture item, check if can claim
-  if (invoicePayerItem.isDrugMixture && !invoicePayerItem.isClaimable) return 0
 
   const isSpecificDefined = coPaymentByItem.find(
     _coPaymentItem => _coPaymentItem.itemCode === invoicePayerItem.itemCode,
@@ -410,16 +399,12 @@ export const validateClaimAmount = (schemeRow, tempInvoicePayers) => {
     coverageMaxCap,
     patientMinCoPaymentAmount,
     patientMinCoPaymentAmountType,
-    medicationCoverageMaxCap,
     consumableCoverageMaxCap,
     serviceCoverageMaxCap,
-    vaccinationCoverageMaxCap,
     orderSetCoverageMaxCap,
 
     isCoverageMaxCapCheckRequired,
-    isMedicationCoverageMaxCapCheckRequired,
     isConsumableCoverageMaxCapCheckRequired,
-    isVaccinationCoverageMaxCapCheckRequired,
     isServiceCoverageMaxCapCheckRequired,
     isOrderSetCoverageMaxCapCheckRequired,
 
@@ -477,7 +462,6 @@ export const validateClaimAmount = (schemeRow, tempInvoicePayers) => {
     // check for each item category
     // return isValid = false early
     const consumableTotalClaim = getItemTypeSubtotal(invoicePayerItem, 2)
-    const vaccinationTotalClaim = getItemTypeSubtotal(invoicePayerItem, 3)
     const serviceTotalClaim = getItemTypeSubtotal(invoicePayerItem, 4)
     const orderSetTotalClaim = getItemTypeSubtotal(invoicePayerItem, 5)
 
@@ -485,7 +469,7 @@ export const validateClaimAmount = (schemeRow, tempInvoicePayers) => {
       isConsumableCoverageMaxCapCheckRequired &&
       consumableTotalClaim > consumableCoverageMaxCap
     )
-      invalidMessage.push('Consumable claim amount has exceed the max cap')
+      invalidMessage.push('Product claim amount has exceed the max cap')
 
     if (
       isServiceCoverageMaxCapCheckRequired &&
@@ -499,11 +483,7 @@ export const validateClaimAmount = (schemeRow, tempInvoicePayers) => {
     )
       invalidMessage.push('Order Set total claim amount has exceed the max cap')
 
-    const total =
-      consumableTotalClaim +
-      vaccinationTotalClaim +
-      serviceTotalClaim +
-      orderSetTotalClaim
+    const total = consumableTotalClaim + serviceTotalClaim + orderSetTotalClaim
 
     if (total <= 0)
       invalidMessage.push('Total Claim Amount must be at least $0.01')

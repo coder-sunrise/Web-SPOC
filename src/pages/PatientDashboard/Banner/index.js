@@ -19,7 +19,6 @@ import PatientStickyNotesBtn from '@/components/_medisys/PatientInfoSideBanner/P
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import { MoreButton, LoadingWrapper } from '@/components/_medisys'
 import PatientLabelBtn from '@/components/_medisys/PatientInfoSideBanner/PatientLabelBtn'
-import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 import {
   GridContainer,
   GridItem,
@@ -43,7 +42,6 @@ import HistoryDiagnosis from './HistoryDiagnosis'
 import { SwitcherTwoTone } from '@ant-design/icons'
 import { SCHEME_TYPE } from '@/utils/constants'
 import CopayerDetails from '@/pages/Setting/Company/CopayerDetails'
-import ClaimHistory from '@/pages/PatientDatabase/Detail/ClaimHistory'
 import PatientResults from '@/pages/PatientDatabase/Detail/Results'
 
 const headerStyles = {
@@ -106,16 +104,12 @@ const styles = theme => ({
 )
 class Banner extends PureComponent {
   state = {
-    existsAllergy: false,
     refreshedSchemeData: {},
     refreshedSchemePayerData: {},
     currPatientCoPaymentSchemeFK: 0,
     currentSchemeType: 0,
     showNotesModal: false,
     showSchemeModal: false,
-    showNonClaimableHistoryModal: false,
-    showExaminationDetailsModal: false,
-    showPreOrderModal: false,
     isExpanded: false,
   }
 
@@ -123,14 +117,6 @@ class Banner extends PureComponent {
     super(props)
     this.fetchCodeTables()
   }
-
-  componentWillMount() {
-                         const { dispatch } = this.props
-                         // dispatch({
-                         //   type: 'codetable/fetchCodes',
-                         //   payload: { code: 'ctg6pd' },
-                         // })
-                       }
 
   componentWillUnmount() {
     const { dispatch, isDisposePatientEntity = true } = this.props
@@ -140,127 +126,6 @@ class Banner extends PureComponent {
         payload: { entity: null },
       })
     }
-  }
-
-  getAllergyData() {
-    const { patient } = this.props
-    const { entity } = patient
-    const { info } = entity
-    const { patientAllergy = [], patientAllergyMetaData = [] } = entity
-    const da = _.orderBy(patientAllergy, ['type'], ['asc']).filter(
-      t => t.patientAllergyStatusFK === 1,
-    )
-    const allergyData = da.reduce((data, current) => {
-      if (!data) return current.allergyName
-      return `${data}, ${current.allergyName}`
-    }, '')
-
-    this.setState({
-      existsAllergy: da.length ? true : false,
-    })
-
-    return (
-      entity &&
-      entity.isActive && (
-        <span style={{ marginTop: 5 }}>{allergyData || '-'}</span>
-      )
-    )
-  }
-
-  getAllergyLink(data) {
-    const { props } = this
-    const {
-      patient,
-      codetable: { ctg6pd = [] },
-      from,
-    } = props
-    const { entity } = patient
-    const info = entity
-    const { patientAllergy = [], patientAllergyMetaData = [] } = info
-    const da = _.orderBy(patientAllergy, ['type'], ['asc'])
-    let allergyData = '-'
-
-    if (da.length > 0) {
-      if (da.length >= 2) {
-        allergyData = `${da[0].allergyName}, ${da[1].allergyName}`
-      } else {
-        allergyData = `${da[0].allergyName}`
-      }
-    }
-
-    this.setState({
-      existsAllergy: da.length,
-    })
-    let g6PD
-    if (patientAllergyMetaData.length > 0) {
-      g6PD = ctg6pd.find(o => o.id === patientAllergyMetaData[0].g6PDFK)
-    }
-    return (
-      entity &&
-      entity.isActive && (
-        <div style={{ display: 'inline-block' }}>
-          {data === 'link' ? (
-            <Link
-              to={getAppendUrl({
-                md: 'pt',
-                cmt: 3,
-                pid: info.id,
-              })}
-              tabIndex='-1'
-            >
-              <IconButton style={{ padding: 0 }}>
-                <Edit color='action' />
-              </IconButton>
-            </Link>
-          ) : (
-            <div style={{ marginTop: 5 }}>
-              {allergyData.length > 25
-                ? `${allergyData.substring(0, 25).trim()}...`
-                : allergyData}
-
-              {da.length > 0 && (
-                <Popover
-                  icon={null}
-                  content={
-                    <div>
-                      {da.map((item, i) => {
-                        return (
-                          <GridContainer>
-                            <GridItem>
-                              {i + 1}. {item.allergyName}
-                            </GridItem>
-                          </GridContainer>
-                        )
-                      })}
-                    </div>
-                  }
-                  trigger='click'
-                  placement='bottomLeft'
-                >
-                  <div style={{ display: 'inline-block' }}>
-                    <MoreButton />
-                  </div>
-                </Popover>
-              )}
-
-              <div>
-                <span
-                  style={{
-                    color: 'darkblue',
-                    fontWeight: 500,
-                    position: 'relative',
-                    fontSize: '16.1px',
-                  }}
-                >
-                  G6PD:{' '}
-                </span>
-                {g6PD ? g6PD.name : '-'}
-              </div>
-            </div>
-          )}
-        </div>
-      )
-    )
   }
 
   fetchCodeTables = async () => {
@@ -295,8 +160,6 @@ class Banner extends PureComponent {
     history.push(getAppendUrl(parameter))
   }
   closeNotes = () => this.setState({ showNotesModal: false })
-  openPreOrders = () => this.setState({ showPreOrderModal: true })
-  closePreOrders = () => this.setState({ showPreOrderModal: false })
   openScheme = coPayerFK => {
     const { dispatch } = this.props
     dispatch({
@@ -356,6 +219,9 @@ class Banner extends PureComponent {
   }
 
   getSchemeList = schemeDataList => {
+    const chasOrMedisave = (schemeDataList || []).filter(
+      o => o.schemeTypeFK <= 6 || this.isMedisave(o.schemeTypeFK),
+    )
     const { patient, clinicSettings } = this.props
     const { entity } = patient
     const { patientScheme } = entity
@@ -366,9 +232,157 @@ class Banner extends PureComponent {
         patientScheme.find(
           ps => ps.coPaymentSchemeFK === s.coPaymentSchemeFK,
         ) || {}
-      return <span style={{ paddingRight: 5 }}></span>
+      return (
+        <span style={{ paddingRight: 5 }}>
+          {chasOrMedisave &&
+          chasOrMedisave.find(list => s.schemeTypeFK === list.schemeTypeFK) ? (
+            <Popover
+              icon={null}
+              content={
+                <div>
+                  <div>
+                    {s.coPaymentSchemeFK ||
+                    schemeDataList.filter(p =>
+                      this.isMedisave(p.schemeTypeFK),
+                    )[0] === s
+                      ? s.copaymentSchemeName
+                      : s.schemeTypeName}
+                    <span style={{ bottom: -2 }}>
+                      {s.schemeTypeFK <= 6 && (
+                        <IconButton onClick={this.refreshChasBalance}>
+                          <Refresh />
+                        </IconButton>
+                      )}
+                      {this.isMedisave(s.schemeTypeFK) &&
+                        schemeDataList.filter(p =>
+                          this.isMedisave(p.schemeTypeFK),
+                        )[0] === s && (
+                          <IconButton onClick={this.refreshMedisaveBalance}>
+                            <Refresh />
+                          </IconButton>
+                        )}
+                    </span>
+                  </div>
+                  {s.schemeType && (
+                    <div style={{ marginTop: 15 }}>{s.schemeType}</div>
+                  )}
+                  {this.isMedisave(s.schemeTypeFK) && (
+                    <div>
+                      Payer: {s.payerName} ({s.payerAccountNo})
+                    </div>
+                  )}
+                  {s.validFrom && (
+                    <div>
+                      Validity:{' '}
+                      {s.validFrom ? (
+                        <DatePicker
+                          text
+                          format={dateFormatLong}
+                          value={s.validFrom}
+                        />
+                      ) : (
+                        ''
+                      )}
+                      &nbsp;-&nbsp;
+                      {s.validTo ? (
+                        <DatePicker
+                          text
+                          format={dateFormatLong}
+                          value={s.validTo}
+                        />
+                      ) : (
+                        ''
+                      )}
+                    </div>
+                  )}
+                  {s.schemeTypeFK !== 15 ? (
+                    <div>
+                      Balance: <NumberInput text currency value={s.balance} />
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                  {s.schemeTypeFK <= 6 ? (
+                    <div>
+                      Patient Acute Visit Balance:{' '}
+                      <NumberInput
+                        text
+                        currency
+                        value={s.acuteVisitPatientBalance}
+                      />
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                  {s.schemeTypeFK <= 6 ? (
+                    <div>
+                      Patient Acute Clinic Balance:{' '}
+                      <NumberInput
+                        text
+                        currency
+                        value={s.acuteVisitClinicBalance}
+                      />
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                </div>
+              }
+              trigger='click'
+              placement='bottom'
+            >
+              <Link>
+                <span
+                  style={{
+                    color: scheme.isExpired ? 'red' : 'black',
+                    textDecoration: 'underline',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {s.copaymentSchemeName || s.schemeTypeName}
+                  {s.validTo
+                    ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`
+                    : ' (Exp: -)'}
+                  {i < arr.length - 1 ? ',' : ''}
+                </span>
+              </Link>
+            </Popover>
+          ) : (
+            <span
+              style={{
+                cursor: 'pointer',
+                color: scheme.isExpired
+                  ? 'red'
+                  : scheme.schemeTypeFK === SCHEME_TYPE.INSURANCE
+                  ? `#${schemeInsuranceDisplayColorCode}`
+                  : 'black',
+                textDecoration: 'underline',
+                wordBreak: 'break-word',
+              }}
+              onClick={e => {
+                const editDetailAccessRight = Authorized.check(
+                  'copayer.copayerdetails',
+                ) || {
+                  rights: 'hidden',
+                }
+                if (editDetailAccessRight.rights === 'hidden') return
+                if (scheme.copayerFK) {
+                  this.openScheme(scheme.copayerFK)
+                }
+              }}
+            >
+              {s.copaymentSchemeName || s.schemeTypeName}
+              {s.validTo
+                ? ` (Exp: ${moment(s.validTo).format('DD MMM YYYY')})`
+                : ' (Exp: -)'}
+              {i < arr.length - 1 ? ',' : ''}
+            </span>
+          )}
+        </span>
+      )
     })
   }
+
   getTagData = () => {
     const { patient } = this.props
     const { entity } = patient
@@ -387,6 +401,11 @@ class Banner extends PureComponent {
     return '-'
   }
 
+  isMedisave = schemeTypeFK => {
+    if (schemeTypeFK) return [12, 13, 14].indexOf(schemeTypeFK) >= 0
+    return false
+  }
+
   getSchemeDetails = schemeData => {
     const { refreshedSchemeData } = this.state
 
@@ -396,8 +415,8 @@ class Banner extends PureComponent {
     ) {
       return { ...refreshedSchemeData }
     }
-
     // Scheme Balance
+    schemeData.patientSchemeBalance = schemeData.patientSchemeBalance || []
     const balance =
       schemeData.patientSchemeBalance.length <= 0
         ? undefined
@@ -471,8 +490,6 @@ class Banner extends PureComponent {
       !_.isEmpty(this.state.refreshedSchemePayerData.payerBalanceList) &&
       this.state.refreshedSchemePayerData.isSuccessful === true
     ) {
-      // return { ...this.state.refreshedSchemePayerData }
-
       const refreshData = this.state.refreshedSchemePayerData.payerBalanceList.find(
         row => row.schemePayerFK === schemePayer.id,
       )
@@ -576,43 +593,23 @@ class Banner extends PureComponent {
     return 12
   }
 
-  openNonClaimableHistory = () => {
+  onViewExternalTrackingClick = () => {
     const { dispatch, patient } = this.props
     const { entity = {} } = patient
-    dispatch({
-      type: 'nonClaimableHistory/query',
-      payload: {
-        patientProfileFK: entity.id,
-      },
-    })
-
-    this.setState({ showNonClaimableHistoryModal: true })
+    this.setState({ showExternalTrackingModal: true })
   }
-  openExaminationResults = () => {
-    const { dispatch, patient } = this.props
-    const { entity = {} } = patient
-    this.setState({ showExaminationDetailsModal: true })
+  onViewPatientDocumentClick = patientProfileFK => {
+    history.push(
+      getAppendUrl({
+        md: 'pt',
+        cmt: 7,
+        pid: patientProfileFK,
+        v: Date.now(),
+      }),
+    )
   }
-  closeNonClaimableHistory = () => {
-    const { dispatch, patient } = this.props
-    const { entity } = patient
-    dispatch({
-      type: 'patient/query',
-      payload: {
-        id: entity.id,
-      },
-    })
-
-    dispatch({
-      type: 'nonClaimableHistory/updateState',
-      payload: {
-        list: [],
-      },
-    })
-    this.setState({ showNonClaimableHistoryModal: false })
-  }
-  closeExaminationDetails = () => {
-    this.setState({ showExaminationDetailsModal: false })
+  closeExternalTracking = () => {
+    this.setState({ showExternalTrackingModal: false })
   }
   expandOrCollespe = () => {
     this.setState({ isExpanded: !this.state.isExpanded })
@@ -625,14 +622,10 @@ class Banner extends PureComponent {
     const { props } = this
     const {
       extraCmt,
-      preOrderCmt,
       from = '',
       patient,
       codetable,
       classes,
-      activePreOrderItems,
-      onSelectPreOrder,
-      isEnableRecurrence,
       apptId,
       apptMode,
       style = {
@@ -643,7 +636,6 @@ class Banner extends PureComponent {
         backgroundColor: '#f0f8ff',
       },
       refreshingBalance,
-      disablePreOrder,
       dispatch,
       isReadOnly,
       isRetail,
@@ -663,10 +655,6 @@ class Banner extends PureComponent {
       'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
     ) || { rights: 'hidden' }
 
-    const nonClaimableHistoryAccessRight = Authorized.check(
-      'patientdatabase.patientprofiledetails.patienthistory.nonclaimablehistory',
-    ) || { rights: 'hidden' }
-
     const viewPatientProfileAccess = Authorized.check(
       'patientdatabase.patientprofiledetails',
     )
@@ -681,20 +669,30 @@ class Banner extends PureComponent {
     const { ctsalutation = [] } = codetable
     const info = entity
     const name = `${info.name}`
-    /* const allergiesStyle = () => {
-      return {
-        color: this.state.existsAllergy ? 'red' : 'darkblue',
-        fontWeight: 500,
-      }
-    } */
+
     const year = Math.floor(moment.duration(moment().diff(info.dob)).asYears())
 
     // get scheme details based on scheme type
     const schemeDataList = []
-    const g6PD = null
+    const notMedisaveSchemes =
+      entity.patientScheme && entity.patientScheme.length > 0
+        ? entity.patientScheme.filter(
+            o => !this.isMedisave(o.schemeTypeFK) && o.isSchemeActive,
+          )
+        : null
 
-    const pendingPreOrderItems =
-      entity.pendingPreOrderItem?.filter(item => !item.isDeleted) || []
+    if (notMedisaveSchemes !== null)
+      notMedisaveSchemes.forEach(row => {
+        schemeDataList.push(this.getSchemeDetails(row))
+      })
+    const medisaveSchemePayers =
+      entity.schemePayer && entity.schemePayer.length > 0
+        ? entity.schemePayer
+        : null
+    if (medisaveSchemePayers !== null)
+      medisaveSchemePayers.forEach(row => {
+        schemeDataList.push(this.getSchemePayerDetails(row))
+      })
 
     const persistentDiagnosis =
       isEnableJapaneseICD10Diagnosis === true &&
@@ -711,10 +709,6 @@ class Banner extends PureComponent {
             .map(d => d.diagnosisDescription)
             .join(', ')
         : '-'
-
-    const viewNonClaimableHistoryRight = Authorized.check(
-      'patientdatabase.patientprofiledetails.claimhistory.viewnonclaimablehistory',
-    ) || { rights: 'hidden' }
 
     const patientTitle = (
       <div>
@@ -756,8 +750,6 @@ class Banner extends PureComponent {
         {'( '}
         <span className={classes.part}>{info.patientReferenceNo}</span>
         {') '}
-        <span className={classes.part}>{info.patientAccountNo}</span>
-        {', '}
         <span className={classes.part}>
           {
             <CodeSelect
@@ -771,6 +763,8 @@ class Banner extends PureComponent {
         </span>
         {'/'}
         <span className={classes.part}>{year > 1 ? `${year}` : `${year}`}</span>
+        {', '}
+        <span className={classes.part}>{info.patientAccountNo}</span>
         {', '}
         <span className={classes.part}>
           <DatePicker
@@ -834,18 +828,27 @@ class Banner extends PureComponent {
         </Col>
       </Row>
     )
-    const patientG6PD = (
+    const spokenLanguage = (
       <Row wrap={false}>
         <Col flex='none'>
-          <span
-            className={classes.header}
-            style={{ color: g6PD && g6PD.name === 'Yes' ? 'red' : 'darkblue' }}
-          >
-            G6PD:{' '}
+          <span className={classes.header} style={{ color: 'darkblue' }}>
+            Spoken Language:{' '}
           </span>
         </Col>
         <Col flex='auto' className={contentClass}>
-          <span>{g6PD ? g6PD.name : '-'}</span>
+          <span>{info.spokenLanguage ? info.spokenLanguage : '-'}</span>
+        </Col>
+      </Row>
+    )
+    const referralSource = (
+      <Row wrap={false}>
+        <Col flex='none'>
+          <span className={classes.header} style={{ color: 'darkblue' }}>
+            Referral Source:{' '}
+          </span>
+        </Col>
+        <Col flex='auto' className={contentClass}>
+          <span>{info.referralSource ? info.referralSource : '-'}</span>
         </Col>
       </Row>
     )
@@ -901,10 +904,6 @@ class Banner extends PureComponent {
           </span>
         </Col>
         <Col flex='auto' className={contentClass}>
-          {/* <LoadingWrapper
-            loading={refreshingBalance}
-            text='Retrieving balance...'
-          > */}
           <Tooltip
             enterDelay={100}
             style={{ width: 300 }}
@@ -939,7 +938,7 @@ class Banner extends PureComponent {
       <Row wrap={false}>
         <Col flex='none'>
           <Tooltip title='Patient Request'>
-            <span className={classes.header}>Request: </span>
+            <span className={classes.header}>Patient Request: </span>
           </Tooltip>
         </Col>
         <Col flex='auto' className={contentClass}>
@@ -953,98 +952,6 @@ class Banner extends PureComponent {
         </Col>
       </Row>
     )
-    const patientHRP = (
-      <Row wrap={false}>
-        <Col flex='none'>
-          <span
-            className={classes.header}
-            style={{
-              color: info.patientMedicalHistory?.highRiskCondition
-                ? 'red'
-                : 'darkblue',
-            }}
-          >
-            HRP:{' '}
-          </span>
-        </Col>
-        <Col flex='auto' className={contentClass}>
-          <Tooltip
-            enterDelay={100}
-            title={info.patientMedicalHistory?.highRiskCondition}
-            interactive='true'
-          >
-            <span>{info.patientMedicalHistory?.highRiskCondition || '-'}</span>
-          </Tooltip>
-        </Col>
-      </Row>
-    )
-    const patientPersistDiagnosis = (
-      <Row wrap={false}>
-        <Col flex='none'>
-          <Tooltip title='Persistent Diagnosis'>
-            <span className={classes.header}>
-              P. Diagnosis
-              {isEnableJapaneseICD10Diagnosis === true &&
-              info?.patientHistoryDiagnosis?.length > 0 ? (
-                <span>{`(${info?.patientHistoryDiagnosis?.length})`}</span>
-              ) : (
-                <span></span>
-              )}
-              :{' '}
-            </span>
-          </Tooltip>
-        </Col>
-        <Col flex='auto' className={contentClass}>
-          <Tooltip
-            enterDelay={100}
-            title={persistentDiagnosis}
-            interactive='true'
-          >
-            <span>{persistentDiagnosis}</span>
-          </Tooltip>
-        </Col>
-      </Row>
-    )
-    const longTermMedication = (
-      <Row wrap={false}>
-        <Col flex='none'>
-          <Tooltip title='Long Term Medication'>
-            <span className={classes.header}>L.T. Med.: </span>
-          </Tooltip>
-        </Col>
-        <Col flex='auto' className={contentClass}>
-          <Tooltip
-            enterDelay={100}
-            title={info.patientMedicalHistory?.longTermMedication}
-            interactive='true'
-          >
-            <span>{info.patientMedicalHistory?.longTermMedication || '-'}</span>
-          </Tooltip>
-        </Col>
-      </Row>
-    )
-    const patientAllergy = (
-      <Row wrap={false}>
-        <Col flex='none'>
-          <span
-            className={classes.header}
-            style={{ color: this.state.existsAllergy ? 'red' : 'darkblue' }}
-          >
-            Allergy:
-          </span>
-          <span>{this.getAllergyLink('link')}</span>
-        </Col>
-        <Col flex='auto' className={contentClass}>
-          <Tooltip
-            enterDelay={100}
-            title={this.getAllergyData()}
-            interactive='true'
-          >
-            <span>{this.getAllergyData()}</span>
-          </Tooltip>
-        </Col>
-      </Row>
-    )
     const visitDateElm = (
       <Row wrap={false}>
         <Col flex='none'>
@@ -1053,25 +960,6 @@ class Banner extends PureComponent {
         <Col flex='auto' className={contentClass}>
           {moment(visitRegistration?.entity?.visit?.visitDate).format(
             dateFormatLong,
-          )}
-        </Col>
-      </Row>
-    )
-    const visitPurposeElm = (
-      <Row wrap={false}>
-        <Col flex='none'>
-          <span className={classes.header}>Visit Purpose: </span>
-        </Col>
-        <Col flex='auto' className={contentClass}>
-          {visitRegistration?.entity?.visit?.visitOrderTemplateDetails ? (
-            <VisitOrderTemplateIndicateString
-              oneline
-              visitOrderTemplateDetails={
-                visitRegistration?.entity?.visit?.visitOrderTemplateDetails
-              }
-            ></VisitOrderTemplateIndicateString>
-          ) : (
-            <span>-</span>
           )}
         </Col>
       </Row>
@@ -1147,7 +1035,7 @@ class Banner extends PureComponent {
                     {patientTag}
                   </GridItem>
                   <GridItem xs={6} md={4}>
-                    {patientG6PD}
+                    {spokenLanguage}
                   </GridItem>
                   <GridItem xs={6} md={4}>
                     {patientOS}
@@ -1156,20 +1044,14 @@ class Banner extends PureComponent {
                     {patientSchemeDetails}
                   </GridItem>
                   <GridItem xs={6} md={4}>
+                    {referralSource}
+                  </GridItem>
+                  <GridItem xs={6} md={4}>
                     {patientRequest}
                   </GridItem>
-                  <GridItem xs={6} md={4}>
-                    {patientHRP}
-                  </GridItem>
-                  <GridItem xs={6} md={4}>
-                    {patientPersistDiagnosis}
-                  </GridItem>
-                  <GridItem xs={6} md={4}>
-                    {longTermMedication}
-                  </GridItem>
-                  <GridItem xs={6} md={4}>
-                    {patientAllergy}
-                  </GridItem>
+                  <GridItem xs={6} md={4}></GridItem>
+                  <GridItem xs={6} md={4}></GridItem>
+                  <GridItem xs={6} md={4}></GridItem>
                 </GridContainer>
               </GridItem>
               <GridItem xs={2} md={2}>
@@ -1190,33 +1072,6 @@ class Banner extends PureComponent {
                     <GridItem xs={12} md={12}></GridItem>
                   )}
                   <GridItem xs={12} md={12}>
-                    {viewNonClaimableHistoryRight.rights === 'enable' && (
-                      <span className={classes.header}>
-                        <span
-                          style={{
-                            display: 'block',
-                            textDecoration: 'underline',
-                            cursor: 'pointer',
-                          }}
-                          onClick={e => {
-                            this.openNonClaimableHistory()
-                          }}
-                        >
-                          {`Non Claimable History (${info.nonClaimableHistoryCount ||
-                            0})`}
-                        </span>
-                      </span>
-                    )}
-                    <div>
-                      {notesHistoryAccessRight.rights !== 'hidden' && (
-                        <span
-                          className={classes.header}
-                          style={{ marginRight: 10 }}
-                        >
-                          {patientNotesLinkElm}
-                        </span>
-                      )}
-                    </div>
                     <span
                       className={classes.header}
                       style={{
@@ -1225,18 +1080,23 @@ class Banner extends PureComponent {
                         textDecoration: 'underline',
                         cursor: 'pointer',
                       }}
-                      to={getAppendUrl({
-                        md: 'pt',
-                        cmt: 1,
-                        pid: info.id,
-                      })}
-                      onClick={e => {
-                        this.openExaminationResults()
-                      }}
-                      // disabled={}
+                      onClick={e => this.onViewExternalTrackingClick()}
                       tabIndex='-1'
                     >
-                      Examination Results
+                      External Tracking
+                    </span>
+                    <span
+                      className={classes.header}
+                      style={{
+                        display: 'block',
+                        paddingRight: 10,
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                      }}
+                      onClick={e => this.onViewPatientDocumentClick(info.id)}
+                      tabIndex='-1'
+                    >
+                      Patient Documents
                     </span>
                   </GridItem>
                 </GridContainer>
@@ -1305,26 +1165,18 @@ class Banner extends PureComponent {
         >
           <CopayerDetails fromCommonModal />
         </CommonModal>
+
         <CommonModal
-          open={this.state.showNonClaimableHistoryModal}
-          title='Claim History'
-          onClose={this.closeNonClaimableHistory}
+          open={this.state.showExternalTrackingModal}
+          title='External Tracking'
+          onClose={this.closeExternalTracking}
           maxWidth='lg'
         >
-          <ClaimHistory
-            defaultTab='NonClaimableHistory'
+          <PatientResults
+            patient={patient}
             patientProfileFK={entity.id}
-            values={{ isActive: entity.isActive }}
+            defaultActiveKey='1'
           />
-        </CommonModal>
-        <CommonModal
-          open={this.state.showExaminationDetailsModal}
-          title='Examination Details'
-          onClose={this.closeExaminationDetails}
-          maxWidth='lg'
-          fullHeight
-        >
-          <PatientResults patient={patient} patientProfileFK={entity.id} />
         </CommonModal>
       </Paper>
     )

@@ -192,7 +192,6 @@ const InvoiceHistory = ({
       totalPayment,
       patientOutstanding,
       invoiceTotalAftGST,
-      visitOrderTemplateFK,
     } = row
     return (
       <GridContainer>
@@ -227,75 +226,18 @@ const InvoiceHistory = ({
               <NumberInput text currency value={patientOutstanding} />
             </p>
             <p className={classes.printButtonStyle}>
-              {visitOrderTemplateFK && (
-                <Popover
-                  icon={null}
-                  trigger='click'
-                  placement='left'
-                  visible={showPrintInvoiceMenu === row.id}
-                  onVisibleChange={visible => {
-                    if (!visible && showPrintInvoiceMenu)
-                      setShowPrintInvoiceMenu(undefined)
-                  }}
-                  content={
-                    <MenuList
-                      role='menu'
-                      onClick={e => {
-                        e.stopPropagation()
-                      }}
-                    >
-                      <MenuItem
-                        onClick={e => {
-                          e.stopPropagation()
-                          setShowPrintInvoiceMenu(undefined)
-                          toggleReport(row, INVOICE_REPORT_TYPES.SUMMARYINVOICE)
-                        }}
-                      >
-                        Summary Invoice
-                      </MenuItem>
-                      <MenuItem
-                        onClick={e => {
-                          e.stopPropagation()
-                          setShowPrintInvoiceMenu(undefined)
-                          toggleReport(
-                            row,
-                            INVOICE_REPORT_TYPES.INDIVIDUALINVOICE,
-                          )
-                        }}
-                      >
-                        Individual Invoice
-                      </MenuItem>
-                    </MenuList>
-                  }
-                >
-                  <Button
-                    size='sm'
-                    color='primary'
-                    icon
-                    onClick={event => {
-                      setShowPrintInvoiceMenu(row.id)
-                      event.stopPropagation()
-                    }}
-                  >
-                    <Printer />
-                    Print Invoice
-                  </Button>
-                </Popover>
-              )}
-              {!visitOrderTemplateFK && (
-                <Button
-                  size='sm'
-                  color='primary'
-                  icon
-                  onClick={event => {
-                    toggleReport(row, INVOICE_REPORT_TYPES.INDIVIDUALINVOICE)
-                    event.stopPropagation()
-                  }}
-                >
-                  <Printer />
-                  Print Invoice
-                </Button>
-              )}
+              <Button
+                size='sm'
+                color='primary'
+                icon
+                onClick={event => {
+                  toggleReport(row, INVOICE_REPORT_TYPES.INDIVIDUALINVOICE)
+                  event.stopPropagation()
+                }}
+              >
+                <Printer />
+                Print Invoice
+              </Button>
               {isEnableVisitationInvoiceReport && (
                 <Button
                   size='sm'

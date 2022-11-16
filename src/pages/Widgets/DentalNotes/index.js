@@ -372,12 +372,10 @@ class DentalNotes extends Component {
 
   onEditorChange = type => v => {
     const { entity } = this.props.consultation
-    entity.corDoctorNote = [
-      {
-        ...entity.corDoctorNote[0],
-        [type]: v,
-      },
-    ]
+    entity.corDoctorNote = {
+      ...entity.corDoctorNote,
+      [type]: v,
+    }
     this.props.dispatch({
       type: 'consultation/updateState',
       payload: {
@@ -388,7 +386,7 @@ class DentalNotes extends Component {
 
   render() {
     const {
-      prefix = 'corDoctorNote[0].',
+      prefix = 'corDoctorNote.',
       clinicalnotes,
       classes,
       scriblenotes,

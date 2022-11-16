@@ -126,7 +126,7 @@ const schemaDemographic = {
     .NRIC()
     .required(),
   genderFK: Yup.number().required(),
-  nationalityFK: Yup.number().required(),
+  nationalityFK: Yup.number(),
   referredBy: Yup.string(),
   referralSourceFK: Yup.number().when('referredBy', {
     is: 'Company',
@@ -138,7 +138,9 @@ const schemaDemographic = {
   }),
   contact: Yup.object().shape({
     contactEmailAddress: Yup.object().shape({
-      emailAddress: Yup.string().email(),
+      emailAddress: Yup.string()
+        .email()
+        .required(),
     }),
     mobileContactNumber: null,
   }),
@@ -161,38 +163,6 @@ const schemaEmergencyContact = {
         }),
       ),
   }),
-}
-
-const schemaAllergies = {
-  patientAllergyMetaData: Yup.array()
-    .compact(v => v.isDeleted)
-    .of(
-      Yup.object().shape({
-        noAllergies: Yup.boolean(),
-        // isG6PDConfirmed: Yup.boolean(),
-        g6PDFK: Yup.number(),
-      }),
-    ),
-  patientAllergy: Yup.array()
-    .compact(v => v.isDeleted)
-    .of(
-      Yup.object().shape({
-        type: Yup.string().required(),
-        allergyFK: Yup.number().when('type', {
-          is: 'Allergy',
-          then: Yup.number().required(),
-        }),
-        ingredientFK: Yup.number().when('type', {
-          is: 'Ingredient',
-          then: Yup.number().required(),
-        }),
-        allergyName: Yup.string().required(),
-        allergyReactionFK: Yup.number().required(),
-        patientAllergyStatusFK: Yup.number().required(),
-        // adverseReaction: Yup.string(),
-        // onsetDate: Yup.date(),
-      }),
-    ),
 }
 
 const schemaSchemes = {
@@ -245,12 +215,14 @@ const schema = props => {
   if (!clinicSettings.isNationalityMandatoryInRegistration) {
     schemaDemographic.nationalityFK = Yup.number()
   } else {
-    schemaDemographic.nationalityFK = Yup.number().required()
+    schemaDemographic.nationalityFK = Yup.number()
   }
   if (!clinicSettings.isContactNoMandatoryInRegistration) {
     schemaDemographic.contact = Yup.object().shape({
       contactEmailAddress: Yup.object().shape({
-        emailAddress: Yup.string().email(),
+        emailAddress: Yup.string()
+          .email()
+          .required('Email is required'),
       }),
       contactAddress: Yup.array().of(
         Yup.object().shape({
@@ -270,7 +242,9 @@ const schema = props => {
   } else {
     schemaDemographic.contact = Yup.object().shape({
       contactEmailAddress: Yup.object().shape({
-        emailAddress: Yup.string().email(),
+        emailAddress: Yup.string()
+          .email()
+          .required('Email is required'),
       }),
       contactAddress: Yup.array().of(
         Yup.object().shape({
@@ -291,13 +265,11 @@ const schema = props => {
   const patientDatabaseSchema = Yup.object().shape({
     ...schemaDemographic,
     ...schemaEmergencyContact,
-    ...schemaAllergies,
     ...schemaSchemes,
   })
 
   patientDatabaseSchema.demographic = schemaDemographic
   patientDatabaseSchema.schemes = schemaSchemes
-  patientDatabaseSchema.allergies = schemaAllergies
   patientDatabaseSchema.emergencyContact = schemaEmergencyContact
   return patientDatabaseSchema
 }

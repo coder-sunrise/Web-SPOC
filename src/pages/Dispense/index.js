@@ -138,14 +138,20 @@ class Dispense extends PureComponent {
     const { visit = {} } = entity
 
     return (
-      <div className={classes.root}>
+      <div
+        className={classes.root}
+        style={{
+          backgroundColor: 'white',
+          marginBottom: 0,
+          paddingBottom: 8,
+        }}
+      >
         <LoadingWrapper loading={loading.models.dispense}>
           <Banner
             from='Dispense'
             editingOrder={
               editingOrder || visit.visitPurposeFK === VISIT_TYPE.OTC
             }
-            onSelectPreOrder={this.onSelectPreOrder}
             extraCmt={this.getExtraComponent}
             isRetail={visit.visitPurposeFK === VISIT_TYPE.OTC}
           />

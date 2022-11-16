@@ -52,7 +52,9 @@ const checkSinglePermission = (
 
     match = r.find(o => ['readonly', 'disable'].indexOf(o.rights) >= 0)
     if (match) {
-      match.rights = HiddenWhenDisable.some(a => a === match.name) ? 'hidden' : 'disable'
+      match.rights = HiddenWhenDisable.some(a => a === match.name)
+        ? 'hidden'
+        : 'disable'
 
       if (type === 'decorator') return match
 

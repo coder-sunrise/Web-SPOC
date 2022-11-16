@@ -31,13 +31,12 @@ import { getAppendUrl } from '@/utils/utils'
 import { widgets } from '@/utils/widgets'
 import Authorized from '@/utils/Authorized'
 import { sendNotification } from '@/utils/realtime'
-import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
-import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 import {
-  visitBasicExaminationsSchema,
-  eyeExaminationsSchema,
-} from '@/pages/Reception/Queue/NewVisit/validationScheme'
-import { showEyeExaminations } from '../Widgets/PatientHistory/config'
+  NOTIFICATION_TYPE,
+  NOTIFICATION_STATUS,
+  VISIT_TYPE,
+} from '@/utils/constants'
+import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
 
 const discardConsultation = async ({
   dispatch,
@@ -83,10 +82,11 @@ const discardConsultation = async ({
   }
 }
 const styles = () => ({})
-@connect(({ consultation, user, clinicSettings }) => ({
+@connect(({ consultation, user, clinicSettings, global }) => ({
   consultation,
   user,
   clinicSettings: clinicSettings.settings || clinicSettings.default,
+  mainDivHeight: global.mainDivHeight,
 }))
 @withFormikExtend({
   authority: ['queue.dispense.editorder'],
@@ -109,12 +109,6 @@ const styles = () => ({})
         then: Yup.string().required(),
       }),
     }),
-    corPatientNoteVitalSign: Yup.array()
-      .compact(v => v.isDeleted)
-      .of(visitBasicExaminationsSchema),
-    corEyeExaminations: Yup.array()
-      .compact(v => v.isDeleted)
-      .of(eyeExaminationsSchema),
   }),
   dirtyCheckMessage: 'Discard edit order?',
   onDirtyDiscard: discardConsultation,
@@ -124,12 +118,10 @@ const styles = () => ({})
 class EditOrder extends Component {
   constructor(props) {
     super(props)
-    this.eyeExaminationsRef = React.createRef()
   }
 
   state = {
     acknowledged: true,
-    expandedEyeExaminations: false,
   }
 
   componentDidMount() {
@@ -311,12 +303,20 @@ class EditOrder extends Component {
   }
 
   render() {
-    const { classes, theme, values } = this.props
+    const {
+      classes,
+      theme,
+      values,
+      mainDivHeight,
+      visitRegistration: {
+        entity: {
+          visit: { visitPurposeFK },
+        },
+      },
+    } = this.props
     const orderWidget = widgets.find(o => o.id === '5')
     const cdWidget = widgets.find(o => o.id === '3')
     const formsWidget = widgets.find(o => o.id === '12')
-    const basicExaminationsWidget = widgets.find(o => o.id === '7')
-    const eyeExaminationsWidget = widgets.find(o => o.id === '23')
     const Order = orderWidget.component
     const ConsultationDocument = cdWidget.component
     const consultationDocumentAccessRight = Authorized.check(
@@ -324,183 +324,145 @@ class EditOrder extends Component {
     )
     const Forms = formsWidget.component
     const formAccessRight = Authorized.check(formsWidget.accessRight)
-    const BasicExaminations = basicExaminationsWidget.component
-    const basicExaminationsAccessRight = Authorized.check(
-      basicExaminationsWidget.accessRight,
-    )
-    const EyeExaminations = eyeExaminationsWidget.component
-    const eyeExaminationsAccessRight = Authorized.check(
-      eyeExaminationsWidget.accessRight,
-    )
-    if (
-      eyeExaminationsAccessRight.rights !== 'hidden' &&
-      !this.state.expandedEyeExaminations &&
-      showEyeExaminations(values.corEyeExaminations)
-    ) {
-      let div = $(this.eyeExaminationsRef.current).find(
-        'div[aria-expanded]:eq(0)',
-      )
-      if (div.attr('aria-expanded') === 'false') div.click()
-    }
 
     const visitRemarks = this.props.visitRegistration?.entity?.visit
       ?.visitRemarks
+    const isRetail = visitPurposeFK === VISIT_TYPE.OTC
     return (
-      <div className={classes.content} style={{ backgroundColor: 'white' }}>
-        <GridContainer>
-          <GridItem xs={12} md={6}>
-            <GridItem xs={12}>
-              <h5>Orders</h5>
-              <Order
-                visitRegistration={this.props.visitRegistration}
-                className={classes.orderPanel}
-                status=''
-                from='EditOrder'
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='visitRemarks'
-                render={args => {
-                  return (
-                    <TextField
-                      multiline
-                      rowsMax='5'
-                      disabled
-                      label='Visit Remarks'
-                      value={visitRemarks}
-                      {...args}
-                    />
-                  )
-                }}
-              />
+      <div>
+        <div
+          className={classes.content}
+          style={{
+            height: mainDivHeight - 170,
+            overflow: 'auto',
+          }}
+        >
+          <GridContainer>
+            <GridItem xs={12} md={6}>
+              <GridItem xs={12}>
+                <h5>Orders</h5>
+                <Order
+                  visitRegistration={this.props.visitRegistration}
+                  className={classes.orderPanel}
+                  status=''
+                  from='EditOrder'
+                />
+              </GridItem>
+              <GridItem xs={12}>
+                <FastField
+                  name='visitRemarks'
+                  render={args => {
+                    return (
+                      <TextField
+                        multiline
+                        rowsMax='5'
+                        disabled
+                        label='Visit Remarks'
+                        value={visitRemarks}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+              {!isRetail && (
+                <GridItem xs={12} md={6}>
+                  <FastField
+                    name='dispenseAcknowledgement.editDispenseReasonFK'
+                    render={args => {
+                      return (
+                        <CodeSelect
+                          label='Reason'
+                          code='cteditdispensereasons'
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+              )}
+              {!isRetail && (
+                <GridItem xs={12}>
+                  <FastField
+                    name='dispenseAcknowledgement.remarks'
+                    render={args => {
+                      return (
+                        <TextField
+                          multiline
+                          rowsMax='5'
+                          label='Remarks'
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+              )}
+              {!isRetail && (
+                <GridItem xs={12}>
+                  <FastField
+                    name='acknowledged'
+                    render={args => {
+                      return (
+                        <Checkbox
+                          onChange={e => {
+                            this.setState({
+                              acknowledged: e.target.value,
+                            })
+                          }}
+                          label='I hereby confirm the above orders are instructed by the attending physician'
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+              )}
             </GridItem>
             <GridItem xs={12} md={6}>
-              <FastField
-                name='dispenseAcknowledgement.editDispenseReasonFK'
-                render={args => {
-                  return (
-                    <CodeSelect
-                      label='Reason'
-                      code='cteditdispensereasons'
-                      {...args}
-                    />
-                  )
-                }}
-              />
+              {!isRetail &&
+                formAccessRight &&
+                formAccessRight.rights !== 'hidden' && (
+                  <div>
+                    <h5>
+                      <span style={{ display: 'inline-block' }}>Forms</span>
+                      <span className={classes.cdAddButton}>
+                        {cdWidget.toolbarAddon}
+                      </span>
+                    </h5>
+                    <Forms />
+                  </div>
+                )}
+              {consultationDocumentAccessRight &&
+                consultationDocumentAccessRight.rights !== 'hidden' && (
+                  <div>
+                    <h5>
+                      <span style={{ display: 'inline-block' }}>
+                        Consultation Document
+                      </span>
+                      <span className={classes.cdAddButton}>
+                        {cdWidget.toolbarAddon}
+                      </span>
+                    </h5>
+                    <ConsultationDocument forDispense />
+                  </div>
+                )}
             </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='dispenseAcknowledgement.remarks'
-                render={args => {
-                  return (
-                    <TextField
-                      multiline
-                      rowsMax='5'
-                      label='Remarks'
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='acknowledged'
-                render={args => {
-                  return (
-                    <Checkbox
-                      onChange={e => {
-                        this.setState({
-                          acknowledged: e.target.value,
-                        })
-                      }}
-                      label='I hereby confirm the above orders are instructed by the attending physician'
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem
-              xs={12}
-              style={{ textAlign: 'center', paddingTop: theme.spacing(2) }}
-            >
-              <Button color='danger' onClick={this.cancelOrder}>
-                Cancel
-              </Button>
-              <ProgressButton
-                color='primary'
-                disabled={!this.state.acknowledged}
-                onClick={this.signOrder}
-              >
-                Save
-              </ProgressButton>
-            </GridItem>
-          </GridItem>
-          <GridItem xs={12} md={6}>
-            {formAccessRight && formAccessRight.rights !== 'hidden' && (
-              <div>
-                <h5>
-                  <span style={{ display: 'inline-block' }}>Forms</span>
-                  <span className={classes.cdAddButton}>
-                    {cdWidget.toolbarAddon}
-                  </span>
-                </h5>
-                <Forms />
-              </div>
-            )}
-            {consultationDocumentAccessRight &&
-              consultationDocumentAccessRight.rights !== 'hidden' && (
-                <div>
-                  <h5>
-                    <span style={{ display: 'inline-block' }}>
-                      Consultation Document
-                    </span>
-                    <span className={classes.cdAddButton}>
-                      {cdWidget.toolbarAddon}
-                    </span>
-                  </h5>
-                  <ConsultationDocument forDispense />
-                </div>
-              )}
-            {basicExaminationsAccessRight &&
-              basicExaminationsAccessRight.rights !== 'hidden' && (
-                <div>
-                  <h5>
-                    <span style={{ display: 'inline-block' }}>
-                      Basic Examinations
-                    </span>
-                  </h5>
-                  <BasicExaminations />
-                </div>
-              )}
-            {eyeExaminationsAccessRight &&
-              eyeExaminationsAccessRight.rights !== 'hidden' && (
-                <div ref={this.eyeExaminationsRef}>
-                  <Accordion
-                    mode='multiple'
-                    onChange={(event, p, expanded) => {
-                      if (expanded && !this.state.expandedEyeExaminations) {
-                        this.setState({ expandedEyeExaminations: true })
-                      }
-                    }}
-                    collapses={[
-                      {
-                        title: 'Eye Examinations',
-                        content: (
-                          <div style={{ padding: '5px' }}>
-                            <EyeExaminations />
-                          </div>
-                        ),
-                      },
-                    ]}
-                  />
-                </div>
-              )}
-          </GridItem>
-        </GridContainer>
-        <ViewPatientHistory top='170px' />
+          </GridContainer>
+          <ViewPatientHistory top='170px' />
+        </div>
+        <div style={{ textAlign: 'right', marginTop: 8 }}>
+          <Button color='danger' onClick={this.cancelOrder}>
+            Cancel
+          </Button>
+          <ProgressButton
+            color='primary'
+            disabled={!this.state.acknowledged}
+            onClick={this.signOrder}
+          >
+            Save
+          </ProgressButton>
+        </div>
       </div>
     )
   }

@@ -30,8 +30,6 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                     options={[
                       { name: 'All', value: 'ALL' },
                       { name: 'Dispense', value: 'DISPENSE' },
-                      { name: 'Purchasing and Receiving', value: 'PODO' },
-                      { name: 'Receiving Goods', value: 'RG' },
                       { name: 'Inventory Adjustment', value: 'INVENTORYADJ' },
                       { name: 'Credit Note', value: 'CREDITNOTE' },
                     ]}
@@ -56,7 +54,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                   <Select
                     {...args}
                     label='Inventory Type'
-                    options={[{ name: 'Consumable', value: 'CONSUMABLE' }]}
+                    options={[{ name: 'Product', value: 'CONSUMABLE' }]}
                     allowClear={false}
                     onChange={e => {
                       if (e) {

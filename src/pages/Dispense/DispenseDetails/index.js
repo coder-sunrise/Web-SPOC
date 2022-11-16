@@ -49,7 +49,6 @@ import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { hasValue } from '@/pages/Widgets/PatientHistory/config'
 // sub components
 import TableData from './TableData'
-import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 
 // variables
 import {
@@ -135,7 +134,6 @@ const DispenseDetails = ({
     dispenseItems = [],
     service,
     otherOrder,
-    packageItem,
     invoice,
     visitPurposeFK,
     visitRemarks,
@@ -187,31 +185,6 @@ const DispenseDetails = ({
     }
   }
 
-  const discardAddOrderDetails = () => {
-    const { id } = invoice
-    dispatch({
-      type: 'dispense/removeAddOrderDetails',
-      payload: {
-        id,
-      },
-    }).then(r => {
-      if (r) {
-        const { entity } = visitRegistration
-        const visitTypeName = JSON.parse(settings.visitTypeSetting).find(
-          t => t.id === entity.visit.visitPurposeFK,
-        ).displayValue
-      }
-      sendNotification('EditedConsultation', {
-        type: NOTIFICATION_TYPE.CONSULTAION,
-        status: NOTIFICATION_STATUS.OK,
-        message: 'Completed Consultation',
-        visitID: values.id,
-      })
-
-      discardCallback(r)
-    })
-  }
-
   const discardBillOrder = () => {
     const { id } = invoice
     dispatch({
@@ -226,10 +199,7 @@ const DispenseDetails = ({
       payload: {
         openConfirm: true,
         openConfirmContent: `Discard dispense?`,
-        onConfirmSave:
-          visitPurposeFK === VISIT_TYPE.OTC
-            ? discardAddOrderDetails
-            : discardBillOrder,
+        onConfirmSave: discardBillOrder,
       },
     })
   }
@@ -284,9 +254,11 @@ const DispenseDetails = ({
   }
 
   const isRetailVisit = visitPurposeFK === VISIT_TYPE.OTC
-  const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BF
-  const disableRefreshOrder = isBillFirstVisit && !clinicalObjectRecordFK
-  const disableDiscard = totalPayment > 0 || !!clinicalObjectRecordFK
+  const disableDiscard =
+    totalPayment > 0 ||
+    visitStatus === VISIT_STATUS.IN_CONS ||
+    visitStatus === VISIT_STATUS.UPGRADED ||
+    visitStatus === VISIT_STATUS.VERIFIED
   const [showRemovePayment, setShowRemovePayment] = useState(false)
 
   const [voidReason, setVoidReason] = useState('')
@@ -304,45 +276,6 @@ const DispenseDetails = ({
           })),
       )
     })
-  }
-
-  const [expandedGroups, setExpandedGroups] = useState([])
-
-  const handleExpandedGroupsChange = e => {
-    setExpandedGroups(e)
-  }
-
-  useEffect(() => {
-    if (packageItem) {
-      const groups = packageItem.reduce(
-        (distinct, data) =>
-          distinct.includes(data.packageGlobalId)
-            ? [...distinct]
-            : [...distinct, data.packageGlobalId],
-        [],
-      )
-
-      setExpandedGroups(groups)
-    }
-  }, [packageItem])
-
-  const packageGroupCellContent = ({ row }) => {
-    let label = 'Package'
-    let totalPrice = 0
-    if (!packageItem) return ''
-    const data = packageItem.filter(item => item.packageGlobalId === row.value)
-    if (data.length > 0) {
-      totalPrice = _.sumBy(data, 'totalAfterItemAdjustment') || 0
-      label = `${data[0].packageCode} - ${data[0].packageName} (Total: `
-    }
-    return (
-      <span style={{ verticalAlign: 'middle', paddingRight: 8 }}>
-        <strong>
-          {label}
-          <NumberInput text currency value={totalPrice} />)
-        </strong>
-      </span>
-    )
   }
 
   const [selectedServiceRows, setSelectedServiceRows] = useState([])
@@ -446,14 +379,9 @@ const DispenseDetails = ({
     if (changed) {
       const key = Object.keys(changed)[0]
       const editRow = rows.find(r => r.uid === key)
-      let matchItems = []
-      if (editRow.isDrugMixture) {
-        matchItems = rows.filter(r => r.drugMixtureFK === editRow.drugMixtureFK)
-      } else {
-        matchItems = rows.filter(
-          r => r.type === editRow.type && r.id === editRow.id,
-        )
-      }
+      let matchItems = rows.filter(
+        r => r.type === editRow.type && r.id === editRow.id,
+      )
       const balanceQty =
         editRow.quantity - _.sumBy(matchItems, r => r.dispenseQuantity || 0)
       matchItems.forEach(item => (item.stockBalance = balanceQty))
@@ -537,26 +465,12 @@ const DispenseDetails = ({
       editRow[valueField] = value
     }
     if (valueField === 'dispenseQuantity' || valueField === 'stockFK') {
-      let matchItems = []
-      if (editRow.isDrugMixture) {
-        matchItems = newItems.filter(
-          r => r.drugMixtureFK === editRow.drugMixtureFK,
-        )
-      } else {
-        matchItems = newItems.filter(
-          r => r.type === editRow.type && r.id === editRow.id,
-        )
-      }
+      let matchItems = newItems.filter(
+        r => r.type === editRow.type && r.id === editRow.id,
+      )
       const balanceQty =
         editRow.quantity - _.sumBy(matchItems, r => r.dispenseQuantity || 0)
       matchItems.forEach(item => (item.stockBalance = balanceQty))
-    }
-    if (valueField === 'isCheckActualize') {
-      if (editRow.isDrugMixture) {
-        const drugMixtureIDs = newItems.filter(r => r.id === editRow.id)
-        drugMixtureIDs.forEach(x => (x[valueField] = value))
-      }
-      updateSelectAll(newItems)
     }
     setFieldValue('dispenseItems', newItems)
   }
@@ -576,9 +490,7 @@ const DispenseDetails = ({
       newItem = newItem.concat({
         uid: item.dispenseGroupId,
         isGroup: true,
-        groupName: item.isDrugMixture
-          ? item.drugMixtureName
-          : item.dispenseGroupId,
+        groupName: item.dispenseGroupId,
         groupNumber: 1,
         groupRowSpan: 1,
         countNumber: 1,
@@ -692,41 +604,26 @@ const DispenseDetails = ({
         </GridItem>
         {!viewOnly && (
           <GridItem className={classes.rightActionButtons} md={5}>
-            {(isRetailVisit || isBillFirstVisit) && (
+            <ProgressButton
+              color='danger'
+              size='sm'
+              icon={<Delete />}
+              onClick={discardDispense}
+              disabled={disableDiscard}
+            >
+              Discard
+            </ProgressButton>
+            <Authorized authority='queue.dispense.savedispense'>
               <ProgressButton
-                color='danger'
+                color='success'
                 size='sm'
-                icon={<Delete />}
-                onClick={discardDispense}
-                disabled={disableDiscard}
+                onClick={onSaveClick}
+                disabled={isIncludeExpiredItem}
               >
-                Discard
+                Save Dispense
               </ProgressButton>
-            )}
-            {!isBillFirstVisit && (
-              <Authorized authority='queue.dispense.savedispense'>
-                <ProgressButton
-                  color='success'
-                  size='sm'
-                  onClick={onSaveClick}
-                  disabled={isIncludeExpiredItem}
-                >
-                  Save Dispense
-                </ProgressButton>
-              </Authorized>
-            )}
-            {isRetailVisit && (
-              <ProgressButton
-                color='primary'
-                size='sm'
-                icon={<Edit />}
-                onClick={onEditOrderClick}
-                disabled={!dispense.queryCodeTablesDone}
-              >
-                Add Order
-              </ProgressButton>
-            )}
-            {!isRetailVisit && visitStatus !== VISIT_STATUS.PAUSED && (
+            </Authorized>
+            {visitStatus !== VISIT_STATUS.PAUSED && (
               <Authorized authority='queue.dispense.editorder'>
                 <ProgressButton
                   color='primary'
@@ -734,7 +631,7 @@ const DispenseDetails = ({
                   icon={<Edit />}
                   onClick={onEditOrderClick}
                 >
-                  Edit Order
+                  {isRetailVisit ? 'Add Order' : 'Edit Order'}
                 </ProgressButton>
               </Authorized>
             )}
@@ -824,12 +721,6 @@ const DispenseDetails = ({
               id: 'reception.queue.visitRegistration.visitRemarks',
             })}
           />
-          <VisitOrderTemplateIndicateString
-            visitOrderTemplateDetails={
-              dispense?.entity?.visitOrderTemplateDetails ||
-              values?.visitOrderTemplateDetails
-            }
-          ></VisitOrderTemplateIndicateString>
         </GridItem>
         {!viewOnly && (
           <GridItem xs={5} md={5}>

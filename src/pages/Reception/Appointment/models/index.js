@@ -32,7 +32,6 @@ const splitApptResource = data => {
     const { appointment_Resources, ...restValues } = data[i]
     const currentPatientAppts = appointment_Resources.map((appt, idx) => {
       const {
-        roomFk,
         startTime,
         endTime,
         appointmentFK,
@@ -43,7 +42,6 @@ const splitApptResource = data => {
         ...restValues,
         uid: getUniqueId(),
         id: appt.id,
-        roomFk,
         appointmentFK,
         apptTime: startTime,
         resource: resourceName,
@@ -79,6 +77,7 @@ export default createListViewModel({
     service,
     state: {
       filterTemplates: [],
+      filters: {},
     },
     effects: {
       *saveFilterTemplate({ payload }, { call, put, select }) {

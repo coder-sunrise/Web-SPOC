@@ -21,7 +21,7 @@ class ItemList extends React.Component {
     currentTab: 1,
   }
 
-  addItemToRows = (obj) => {
+  addItemToRows = obj => {
     const { setFieldValue, values, dispatch } = this.props
     const newRows = values.rows
     newRows.push(obj)
@@ -36,13 +36,13 @@ class ItemList extends React.Component {
     })
   }
 
-  onClickAdd = (type) => {
+  onClickAdd = type => {
     const { currentTab } = this.state
     const { values } = this.props
     if (values.tempSelectedItemFK === undefined) return
     const isExisted = values.rows
-      .filter((row) => !row.isDeleted && row.type === currentTab)
-      .map((row) => row.itemFK)
+      .filter(row => !row.isDeleted && row.type === currentTab)
+      .map(row => row.itemFK)
       .includes(values.tempSelectedItemFK)
 
     if (isExisted) {
@@ -50,7 +50,7 @@ class ItemList extends React.Component {
       return
     }
 
-    const itemFieldName = InventoryTypes.filter((x) => x.ctName === type)[0]
+    const itemFieldName = InventoryTypes.filter(x => x.ctName === type)[0]
 
     let newItemRow = {
       uid: getUniqueId(),
@@ -83,13 +83,13 @@ class ItemList extends React.Component {
     }
   }
 
-  addContent = (type) => {
+  addContent = type => {
     return (
       <GridContainer>
         <GridItem xs={8}>
           <FastField
             name='tempSelectedItemFK'
-            render={(args) => {
+            render={args => {
               return (
                 <CodeSelect
                   labelField='displayValue'
@@ -98,7 +98,7 @@ class ItemList extends React.Component {
                   }
                   onChange={(e, option) => this.onItemSelect(e, option, type)}
                   code={type}
-                  renderDropdown={(option) => {
+                  renderDropdown={option => {
                     let suffix = ''
                     if (type === 'ctservice') {
                       suffix = option.serviceCenter
@@ -131,11 +131,10 @@ class ItemList extends React.Component {
     )
   }
 
-  onDeleteClick = (row) => {
+  onDeleteClick = row => {
     const { values, setFieldValue, dispatch } = this.props
-    const newRows = values.rows.map(
-      (item) =>
-        item.itemFK === row.itemFK ? { ...item, isDeleted: true } : { ...item },
+    const newRows = values.rows.map(item =>
+      item.itemFK === row.itemFK ? { ...item, isDeleted: true } : { ...item },
     )
     setFieldValue('rows', newRows)
     dispatch({
@@ -143,7 +142,7 @@ class ItemList extends React.Component {
     })
   }
 
-  onTabChange = (tabId) => {
+  onTabChange = tabId => {
     const { setFieldValue } = this.props
     setFieldValue('tempSelectedItemFK', undefined)
     this.setState({
@@ -151,7 +150,7 @@ class ItemList extends React.Component {
     })
   }
 
-  render () {
+  render() {
     const { theme, CPSwitch, CPNumber, values } = this.props
 
     return (
@@ -162,25 +161,14 @@ class ItemList extends React.Component {
           options={[
             {
               id: 2,
-              name: 'Consumable',
+              name: 'Product',
               content: this.addContent('inventoryconsumable'),
-            },
-            {
-              id: 3,
-              name: 'Vaccination',
-              content: this.addContent('inventoryvaccination'),
             },
             {
               id: 4,
               name: 'Service',
               content: this.addContent('ctservice'),
             },
-            /* Commented Package Input - Need to re-test if enabling it back in the future */
-            // {
-            //   id: 5,
-            //   name: 'Package',
-            //   content: this.addContent('inventorypackage'),
-            // },
           ]}
         />
         <CommonTableGrid

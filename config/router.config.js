@@ -572,18 +572,6 @@ const _routes = [
             authority: ['report.finance.paymentcollectionsummary'],
           },
           {
-            path: '/report/wiprevenue',
-            name: 'wiprevenue',
-            component: './Report/WIPRevenue',
-            authority: ['report.finance.wiprevenuereport'],
-          },
-          {
-            path: '/report/saleslistingbyperformer',
-            name: 'saleslistingbyperformer',
-            component: './Report/SalesListingByPerformer',
-            authority: ['report.finance.saleslistingbyperformerreport'],
-          },
-          {
             path: '/report/xeroinvoicesreport',
             name: 'xeroinvoicesreport',
             component: './Report/XeroInvoicesReport',
@@ -841,6 +829,12 @@ const _routes = [
             authority: ['settings.clinicsetting.casetype'],
           },
           {
+            path: '/setting/salestype',
+            name: 'salestype',
+            component: './Setting/SalesType',
+            authority: ['settings.clinicsetting.salestype'],
+          },
+          {
             path: '/setting/casedescription',
             name: 'casedescription',
             component: './Setting/CaseDescription',
@@ -858,18 +852,12 @@ const _routes = [
             component: './Setting/ReferralPerson',
             authority: ['settings.contact.referralperson'],
           },
-          {
-            path: '/setting/visitordertemplate',
-            name: 'visitordertemplate',
-            component: './Setting/VisitOrderTemplate',
-            authority: ['settings.templates.visitordertemplate'],
-          },
-          {
-            path: '/setting/invoiceadjustment',
-            name: 'invoiceadjustment',
-            component: './Setting/InvoiceAdjustment',
-            authority: ['settings.clinicsetting.invoiceadjustment'],
-          },
+          // {
+          //   path: '/setting/invoiceadjustment',
+          //   name: 'invoiceadjustment',
+          //   component: './Setting/InvoiceAdjustment',
+          //   authority: ['settings.clinicsetting.invoiceadjustment'],
+          // },
           {
             path: '/setting/checklist',
             name: 'checklist',
@@ -887,6 +875,24 @@ const _routes = [
             name: 'resource',
             component: './Setting/Resource',
             authority: ['settings.clinicsetting.resource'],
+          },
+          {
+            path: '/setting/gradingchart',
+            name: 'gradingchart',
+            component: './Setting/GradingChart',
+            authority: ['settings.clinicsetting.gradingchart'],
+          },
+          {
+            path: '/setting/instrument',
+            name: 'instrument',
+            component: './Setting/Instrument',
+            authority: ['settings.clinicsetting.instrument'],
+          },
+          {
+            path: '/setting/typeoftest',
+            name: 'typeoftest',
+            component: './Setting/TypeOfTest',
+            authority: ['settings.clinicsetting.typeoftest'],
           },
         ],
       },

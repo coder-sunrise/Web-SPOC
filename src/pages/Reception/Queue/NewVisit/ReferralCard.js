@@ -449,19 +449,6 @@ class ReferralCard extends PureComponent {
               </GridItem>
             </GridContainer>
           )}
-          <GridItem xs md={12}>
-            {mode !== 'patientprofile' && (
-              <AttachmentWithThumbnail
-                label='Attachment'
-                isReadOnly={disabled}
-                attachmentType='VisitReferral'
-                handleUpdateAttachments={handleUpdateAttachments}
-                attachments={attachments}
-                disabled={disabled}
-                fieldName='visitAttachment'
-              />
-            )}
-          </GridItem>
         </GridContainer>
 
         <CommonModal

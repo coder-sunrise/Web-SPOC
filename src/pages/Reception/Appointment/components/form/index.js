@@ -107,54 +107,9 @@ const gridValidationSchema = Yup.object().shape({
   mapPropsToValues,
 })
 class Form extends React.PureComponent {
-  state = {
-    submitCount: this.props.commitCount,
-    showPatientProfile: false,
-    showSearchPatientModal: false,
-    showDeleteConfirmationModal: false,
-    showRescheduleForm: false,
-    datagrid:
-      this.props.values && this.props.values.currentAppointment
-        ? this.props.values.currentAppointment.appointments_Resources
-        : [],
-    showSeriesUpdateConfirmation: false,
-    tempNewAppointmentStatusFK: -1,
-    isDataGridValid: this.props.values.id !== undefined,
-    editingRows: [],
-    hasActiveSession: false,
-    showSelectPreOrder: false,
-  }
-
-  componentDidMount = async () => {
-    const { values, dispatch, setFieldValue } = this.props
-    const response = await dispatch({
-      type: 'visitRegistration/getVisitOrderTemplateListForDropdown',
-      payload: {
-        pagesize: 9999,
-      },
-    })
-    if (response) {
-      const { data } = response
-      const templateOptions = data
-        .filter(template => template.isActive)
-        .map(template => {
-          return {
-            ...template,
-            value: template.id,
-            name: template.displayValue,
-          }
-        })
-
-      dispatch({
-        type: 'visitRegistration/updateState',
-        payload: {
-          visitOrderTemplateOptions: templateOptions,
-        },
-      })
-      this.setBannerHeight()
-    }
-
-    this.checkHasActiveSession()
+  constructor(props) {
+    super(props)
+    const { values, dispatch, setFieldValue } = props
     Promise.all([
       dispatch({
         type: 'codetable/fetchCodes',
@@ -173,6 +128,29 @@ class Form extends React.PureComponent {
         payload: { code: 'ctcalendarresource' },
       }),
     ])
+    this.state = {
+      submitCount: this.props.commitCount,
+      showPatientProfile: false,
+      showSearchPatientModal: false,
+      showDeleteConfirmationModal: false,
+      showRescheduleForm: false,
+      datagrid:
+        this.props.values && this.props.values.currentAppointment
+          ? this.props.values.currentAppointment.appointments_Resources
+          : [],
+      showSeriesUpdateConfirmation: false,
+      tempNewAppointmentStatusFK: -1,
+      isDataGridValid: this.props.values.id !== undefined,
+      editingRows: [],
+      hasActiveSession: false,
+      conflicts: [],
+    }
+  }
+
+  componentDidMount = async () => {
+    const { values, dispatch, setFieldValue } = this.props
+    this.setBannerHeight()
+    this.checkHasActiveSession()
 
     if (values && values.patientProfileFK) {
       this.refreshPatient(values.patientProfileFK)
@@ -185,6 +163,8 @@ class Form extends React.PureComponent {
       if (values.isUpdated) {
         setFieldValue('isUpdated', false)
       }
+
+      this.onValidateClick()
     }, 500)
   }
 
@@ -272,6 +252,9 @@ class Form extends React.PureComponent {
           number: values.patientContactNo,
           countryCodeFK: values.countryCodeFK,
         },
+        contactEmailAddress: {
+          emailAddress: values.email,
+        },
       },
     }
 
@@ -335,6 +318,7 @@ class Form extends React.PureComponent {
       patientAccountNo,
       name,
       mobileNo,
+      email,
       countryCodeFK,
     } = patientProfile
     const { values, setValues } = this.props
@@ -344,11 +328,12 @@ class Form extends React.PureComponent {
       patientProfileFK: id,
       patientName: name,
       patientContactNo: mobileNo,
+      email: email,
       countryCodeFK,
     })
     this.refreshPatient(id)
     if (!autoPopulate) this.toggleSearchPatientModal()
-
+    this.onValidateClick()
     return true
   }
 
@@ -438,7 +423,7 @@ class Form extends React.PureComponent {
     return endResult
   }
 
-  onCommitChanges = ({ rows, deleted, ...restProps }) => {
+  onCommitChanges = ({ rows, deleted, changed, ...restProps }) => {
     const { setFieldValue } = this.props
     setFieldValue('_fakeField', 'fakeValue')
     if (deleted) {
@@ -498,9 +483,24 @@ class Form extends React.PureComponent {
           this.updateEnableRecurrence()
         },
       )
+
+      if (changed) {
+        const keys = Object.keys(changed)
+        if (keys.length) {
+          const updateData = changed[Object.keys(changed)[0]]
+          if (
+            Object.keys(updateData).find(
+              key =>
+                ['calendarResourceFK', 'startTime', 'endTime'].indexOf(key) >=
+                0,
+            )
+          ) {
+            this.onValidateClick()
+          }
+        }
+      }
       return updatedRows
     }
-
     return rows
   }
 
@@ -596,33 +596,17 @@ class Form extends React.PureComponent {
       })
       if (validate && response) {
         const conflicts = [...response]
-
-        this.setState(
-          preState => ({
-            submitCount: preState.submitCount + 1,
-            datagrid: preState.datagrid.reduce(
-              (data, d) => [
-                ...data,
-                {
-                  ...d,
-                  conflicts:
-                    conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
-                      ? conflicts[d.sortOrder].conflicts
-                      : undefined,
-                },
-              ],
-              [],
+        if (response.length > 0) {
+          this.setState({
+            conflicts: _.orderBy(
+              response[0].conflicts || [],
+              ['isPrevent'],
+              ['desc'],
             ),
-          }),
-          () => {
-            this.props.dispatch({
-              type: 'global/updateState',
-              payload: {
-                commitCount: this.state.submitCount + 1,
-              },
-            })
-          },
-        )
+          })
+        } else {
+          this.setState({ conflicts: [] })
+        }
         return conflicts
       }
       if (!validate && response) {
@@ -678,7 +662,7 @@ class Form extends React.PureComponent {
 
   saveAppointment = () => {
     const { values, mode, viewingAppointment } = this.props
-    const appointmentStatusFK = APPOINTMENT_STATUS.DRAFT
+    const appointmentStatusFK = APPOINTMENT_STATUS.CONFIRMED
 
     const hasModifiedAsSingle = viewingAppointment.appointments.reduce(
       (editedAsSingle, appointment) =>
@@ -748,14 +732,12 @@ class Form extends React.PureComponent {
           clinicianName,
           clinicianTitle,
           sortOrder,
-          isPrimaryClinician,
           id,
           isDeleted,
           concurrencyToken,
           apptDurationHour,
           apptDurationMinute,
           preCalendarResourceFK,
-          roomFk,
           appointmentTypeFK,
         } = resource
         return {
@@ -766,14 +748,12 @@ class Form extends React.PureComponent {
           startTime,
           endTime,
           sortOrder,
-          isPrimaryClinician,
           id,
           isDeleted,
           concurrencyToken,
           apptDurationHour,
           apptDurationMinute,
           preCalendarResourceFK,
-          roomFk,
           appointmentTypeFK,
         }
       })
@@ -790,14 +770,12 @@ class Form extends React.PureComponent {
               startTime,
               endTime,
               sortOrder,
-              isPrimaryClinician,
               id,
               isDeleted,
               concurrencyToken,
               apptDurationHour,
               apptDurationMinute,
               preCalendarResourceFK,
-              roomFk,
               appointmentTypeFK,
             } = resource
             return {
@@ -808,14 +786,12 @@ class Form extends React.PureComponent {
               startTime,
               endTime,
               sortOrder,
-              isPrimaryClinician,
               id,
               isDeleted,
               concurrencyToken,
               apptDurationHour,
               apptDurationMinute,
               preCalendarResourceFK,
-              roomFk,
               appointmentTypeFK,
             }
           },
@@ -859,8 +835,7 @@ class Form extends React.PureComponent {
           if (
             values.id !== undefined &&
             mode === 'series' &&
-            hasModifiedAsSingle &&
-            viewingAppointment.isEnableRecurrence
+            hasModifiedAsSingle
           ) {
             this.openSeriesUpdateConfirmation(this.openRescheduleForm)
             return true
@@ -969,85 +944,25 @@ class Form extends React.PureComponent {
   getVisregUrl = () => {
     const { datagrid } = this.state
     const { values, history } = this.props
-    const primaryDoctorResource = datagrid.find(item => item.isPrimaryClinician)
+    // const primaryDoctorResource = datagrid.find(item => item.isPrimaryClinician)
     const firstResource = datagrid.find(i => i.sortOrder === 0)
     const parameters = {
       md: 'visreg',
       pid: values.patientProfileFK,
       apptid: values.currentAppointment.id,
-      pdid: primaryDoctorResource?.calendarResource?.clinicianProfileDto?.id, // primary clinician id
-    }
-
-    if (firstResource?.roomFk) {
-      // pdroomid: primaryDoctorResource.roomFk || null, // primary clinician resource room fk
-      parameters.pdroomid = firstResource.roomFk
-    }
-    if (values.currentAppointment.visitOrderTemplateFK) {
-      parameters.visitOrderTemplateFK =
-        values.currentAppointment.visitOrderTemplateFK
     }
 
     return getAppendUrl(parameters)
   }
 
-  containsPrimaryClinician = () => {
-    const { datagrid } = this.state
-    if (datagrid.find(item => item.isPrimaryClinician)) {
-      return true
-    }
-    return false
-  }
+  // containsPrimaryClinician = () => {
+  //   const { datagrid } = this.state
+  //   if (datagrid.find(item => item.isPrimaryClinician)) {
+  //     return true
+  //   }
+  //   return false
+  // }
 
-  onVisitPurposeSelected = template => {
-    const { datagrid } = this.state
-    _.remove(datagrid, n => {
-      return n.id < 0 && n.templateFK
-    })
-    if (!template) {
-      return
-    }
-    const primaryResrouce = datagrid.find(x => x.isPrimaryClinician)
-    let sortOrder = _.maxBy(datagrid, 'sortOrder')?.sortOrder || 0
-    const { ctresource = [], ctcalendarresource = [] } = this.props.codetable
-    template.visitOrderTemplate_Resources.forEach(temp => {
-      sortOrder++
-      const resource = ctresource.find(
-        x => x.id === temp.resourceFK && x.isActive,
-      )
-      if (!resource) return
-      const calendarResource = ctcalendarresource.find(
-        source => source.id === resource.calendarResourceFK && source.isActive,
-      )
-      if (!calendarResource) return
-      console.log(datagrid)
-      if (
-        datagrid.find(
-          res =>
-            res.calendarResourceFK === calendarResource.id && !res.isDeleted,
-        )
-      ) {
-        // Skip the active resources
-        return
-      }
-      const newResource = {
-        templateFK: template.id,
-        appointmentTypeFK: primaryResrouce?.appointmentTypeFK,
-        apptDurationHour: primaryResrouce?.apptDurationHour,
-        apptDurationMinute: primaryResrouce?.apptDurationMinute,
-        calendarResourceFK: calendarResource.id,
-        calendarResource: calendarResource
-          ? { ...calendarResource }
-          : undefined,
-        isPrimaryClinician: false,
-        sortOrder: sortOrder,
-        id: getUniqueNumericId(),
-        startTime: primaryResrouce?.startTime,
-        endTime: primaryResrouce?.endTime,
-      }
-      datagrid.push(newResource)
-    })
-    this.validateDataGrid()
-  }
   onViewPatientProfile = () => {
     const { values, history } = this.props
     history.push(
@@ -1072,8 +987,8 @@ class Form extends React.PureComponent {
     if (
       !isDataGridValid ||
       !values.patientName ||
-      values.patientContactNo === undefined ||
-      values.patientContactNo === null
+      !values.patientContactNo ||
+      !values.email
     )
       return true
 
@@ -1129,80 +1044,9 @@ class Form extends React.PureComponent {
     )
   }
 
-  openSelectPreOrder = () => {
-    this.setState({ showSelectPreOrder: true })
-  }
-
-  updatePreOrderSequence = (appointmentPreOrderItem = []) => {
-    let sequence = 0
-    appointmentPreOrderItem.forEach(po => {
-      if (!po.isDeleted) {
-        po.sequence = sequence
-        sequence = sequence + 1
-      }
-    })
-  }
-
-  closeSelectPreOrder = () => {
-    this.setState({ showSelectPreOrder: false })
-  }
-
   checkedRecurrence = () => {
     const { dispatch, values, setFieldValue } = this.props
     const { currentAppointment = {} } = values
-    if ((currentAppointment.appointmentPreOrderItem || []).length) {
-      dispatch({
-        type: 'global/updateAppState',
-        payload: {
-          openConfirm: true,
-          openConfirmText: 'OK',
-          openConfirmContent: `Check Recurrence will remove all Pre-Order.`,
-          onConfirmSave: () => {
-            setFieldValue('currentAppointment.appointmentPreOrderItem', [])
-          },
-          onConfirmClose: () => {
-            setFieldValue('isEnableRecurrence', false)
-          },
-        },
-      })
-    }
-  }
-
-  showPreOrder = () => {
-    const { values, mode } = this.props
-    const { isEnableRecurrence, patientProfileFK, currentAppointment } = values
-    const { appointmentPreOrderItem = {} } = currentAppointment
-    if (!appointmentPreOrderItem.length) return false
-    if (values.id) {
-      return mode !== 'series'
-    }
-    return patientProfileFK && !isEnableRecurrence
-  }
-
-  deletePreOrderItem = actualizedPreOrderItemFK => {
-    const { values, setFieldValue } = this.props
-    const { currentAppointment = {} } = values
-    let { appointmentPreOrderItem = [] } = currentAppointment
-
-    var item = appointmentPreOrderItem.find(
-      poi => poi.actualizedPreOrderItemFK === actualizedPreOrderItemFK,
-    )
-    if (item) {
-      if (item.id) {
-        item.isDeleted = true
-      } else {
-        appointmentPreOrderItem = [
-          ...appointmentPreOrderItem.filter(
-            poi => poi.actualizedPreOrderItemFK !== actualizedPreOrderItemFK,
-          ),
-        ]
-      }
-    }
-    this.updatePreOrderSequence(appointmentPreOrderItem)
-    setFieldValue('currentAppointment.appointmentPreOrderItem', [
-      ...appointmentPreOrderItem,
-    ])
-    setFieldValue('currentAppointment.dirty', true)
   }
 
   setBannerHeight = () => {
@@ -1250,7 +1094,6 @@ class Form extends React.PureComponent {
       height,
       onHistoryRowSelected,
       patientProfile,
-      visitRegistration: { visitOrderTemplateOptions = [] },
       dispatch,
       setFieldValue,
       handleCopyAppointmentClick,
@@ -1266,7 +1109,6 @@ class Form extends React.PureComponent {
       showRescheduleForm,
       datagrid,
       editingRows,
-      showSelectPreOrder,
     } = this.state
 
     const patientIsActive =
@@ -1275,25 +1117,10 @@ class Form extends React.PureComponent {
         : true
 
     const { currentAppointment = {}, isEnableRecurrence } = values
-    const { appointmentPreOrderItem = [] } = currentAppointment
     const disablePatientInfo = this.shouldDisablePatientInfo()
     const disableFooterButton = this.shouldDisableButtonAction()
     const disableCheckAvailabilityFooterButton = this.shouldDisableCheckAvailabilityButtonAction()
     const disableDataGrid = this.shouldDisableDatagrid()
-    const disablePreOrderConditions = [
-      {
-        condition: disableDataGrid,
-        message: `Pre-Order is not allowed for current appointment status.`,
-      },
-      {
-        condition: values.id && mode == 'series',
-        message: `Pre-Order is not allowed for entire series appointment.`,
-      },
-      {
-        condition: !values.id && isEnableRecurrence,
-        message: `Pre-Order is not allowed for recurring appointment.`,
-      },
-    ]
 
     const _datagrid =
       conflicts.length > 0
@@ -1310,8 +1137,6 @@ class Form extends React.PureComponent {
       loading.effects['patientSearch/query'] || loading.models.calendar
     const _disableAppointmentDate =
       this.shouldDisableAppointmentDate() || !patientIsActive
-
-    const { pendingPreOrderItem = [] } = patientProfile || {}
 
     return (
       <LoadingWrapper loading={show} text='Loading...'>
@@ -1349,22 +1174,23 @@ class Form extends React.PureComponent {
                     onProceed: () => registerToVisit(),
                   })}
                   patientContactNo={values.patientContactNo}
+                  email={values.email}
                   patientName={values.patientName}
                   patientProfileFK={values.patientProfileFK}
                   patientIsActive={patientIsActive}
                   appointmentStatusFK={currentAppointment.appointmentStatusFk}
                   values={values}
                   hasActiveSession={this.state.hasActiveSession}
-                  containsPrimaryClinician={this.containsPrimaryClinician()}
                 />
                 <AppointmentDateInput
                   disabled={_disableAppointmentDate}
-                  visitOrderTemplateOptions={visitOrderTemplateOptions}
                   patientProfileFK={values.patientProfileFK}
                   values={values}
-                  onVisitPurposeSelected={this.onVisitPurposeSelected}
                   patientProfile={patientProfile}
-                  getClinicoperationhour={this.getClinicoperationhour}
+                  getClinicoperationhour={() => {
+                    this.getClinicoperationhour()
+                    this.onValidateClick()
+                  }}
                 />
                 <GridItem xs md={12} className={classes.verticalSpacing}>
                   <AppointmentDataGrid
@@ -1445,6 +1271,7 @@ class Form extends React.PureComponent {
                     handleSaveDraftClick={this.onSaveDraftClick}
                     handleConfirmClick={this.onConfirmClick}
                     handleValidateClick={this.onValidateClick}
+                    conflicts={this.state.conflicts}
                   />
                 </GridItem>
               </GridItem>

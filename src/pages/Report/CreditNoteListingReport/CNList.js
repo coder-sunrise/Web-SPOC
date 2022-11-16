@@ -22,7 +22,7 @@ class CNList extends PureComponent {
       { name: 'account', title: 'Account' },
       { name: 'name', title: 'Name' },
       { name: 'remark', title: 'Remarks' },
-      { name: 'doctorName', title: 'Doctor Name' },
+      { name: 'doctorName', title: 'Optometrist Name' },
       { name: 'invoiceNo', title: 'Invoice No.' },
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'total', title: 'Cn Amt.' },

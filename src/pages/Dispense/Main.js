@@ -14,7 +14,6 @@ import Yup from '@/utils/yup'
 import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
-import AddOrder from './DispenseDetails/AddOrder'
 import DispenseDetails from './DispenseDetails/WebSocketWrapper'
 import { DispenseItemsColumnExtensions } from './variables'
 import _ from 'lodash'
@@ -89,22 +88,16 @@ const constructPayload = values => {
   const updateTempDispenseItem = (items, inventoryFiledName) => {
     return items?.map(m => {
       let tempDispenseItem = []
-      if (!m.isPreOrder || (m.isPreOrder && m.isChargeToday)) {
-        const matchItem = values.dispenseItems.filter(
-          d =>
-            d.type === m.type &&
-            d.id === m.id &&
-            d.dispenseQuantity > 0 &&
-            !d.isDispensedByPharmacy,
-        )
-        if (matchItem.length) {
-          matchItem.forEach(item => {
-            tempDispenseItem.push({
-              ...getTransaction(item),
-              inventoryFK: item[inventoryFiledName],
-            })
+      const matchItem = values.dispenseItems.filter(
+        d => d.type === m.type && d.id === m.id && d.dispenseQuantity > 0,
+      )
+      if (matchItem.length) {
+        matchItem.forEach(item => {
+          tempDispenseItem.push({
+            ...getTransaction(item),
+            inventoryFK: item[inventoryFiledName],
           })
-        }
+        })
       }
       return {
         ...m,
@@ -127,9 +120,7 @@ const constructPayload = values => {
 
 const validDispense = (dispenseItems = []) => {
   let isValid = true
-  const dispensedItems = dispenseItems.filter(
-    d => !d.isPreOrder && d.stockFK && !d.isDispensedByPharmacy,
-  )
+  const dispensedItems = dispenseItems.filter(d => d.stockFK)
   for (let index = 0; index < dispensedItems.length; index++) {
     if (
       dispensedItems[index].dispenseQuantity > dispensedItems[index].quantity
@@ -152,21 +143,11 @@ const validDispense = (dispenseItems = []) => {
       break
     }
 
-    let matchItems = []
-    if (dispensedItems[index].isDrugMixture) {
-      matchItems = dispenseItems.filter(
-        d =>
-          d.type === dispensedItems[index].type &&
-          dispensedItems[index].isDrugMixture &&
-          d.drugMixtureFK === dispensedItems[index].drugMixtureFK,
-      )
-    } else {
-      matchItems = dispenseItems.filter(
-        d =>
-          d.type === dispensedItems[index].type &&
-          d.id === dispensedItems[index].id,
-      )
-    }
+    let matchItems = dispenseItems.filter(
+      d =>
+        d.type === dispensedItems[index].type &&
+        d.id === dispensedItems[index].id,
+    )
 
     if (
       dispensedItems[index].quantity !== _.sumBy(matchItems, 'dispenseQuantity')
@@ -245,10 +226,8 @@ const validDispense = (dispenseItems = []) => {
 }))
 class Main extends Component {
   state = {
-    showOrderModal: false,
     hasShowOrderModal: false,
     isShowOrderUpdated: false,
-    currentDrugToPrint: {},
     dispenseItems: [],
   }
 
@@ -312,14 +291,8 @@ class Main extends Component {
     const { dispatch, dispense, values, history } = this.props
     const { location } = history
     const { query } = location
-    const { visitPurposeFK } = values
-    const addOrderList = [VISIT_TYPE.OTC]
-    const shouldShowAddOrderModal = addOrderList.includes(visitPurposeFK)
 
-    if (shouldShowAddOrderModal) {
-      this.handleOrderModal()
-    }
-    if (visitPurposeFK !== VISIT_TYPE.OTC && values.id) {
+    if (values.id) {
       dispatch({
         type: `consultation/editOrder`,
         payload: {
@@ -332,7 +305,7 @@ class Main extends Component {
           dispatch({
             type: `dispense/updateState`,
             payload: {
-              editingOrder: !shouldShowAddOrderModal,
+              editingOrder: true,
             },
           })
           reloadDispense(this.props)
@@ -343,117 +316,14 @@ class Main extends Component {
 
   editOrder = e => {
     const { values } = this.props
-    const { visitPurposeFK } = values
 
-    if (visitPurposeFK === VISIT_TYPE.OTC) {
-      this._editOrder()
-    } else {
-      navigateDirtyCheck({
-        onProceed: this._editOrder,
-      })(e)
-    }
-  }
-
-  openFirstTabAddOrder = () => {
-    const { dispatch, values } = this.props
-    if (this.state.showOrderModal) {
-      dispatch({
-        type: 'orders/updateState',
-        payload: {
-          type: orderTypes[0].value,
-          visitPurposeFK: values.visitPurposeFK,
-        },
-      })
-    } else {
-      dispatch({
-        type: 'orders/updateState',
-        payload: {
-          visitPurposeFK: values.visitPurposeFK,
-        },
-      })
-    }
-  }
-
-  handleOrderModal = () => {
-    this.props.dispatch({
-      type: 'orders/reset',
-    })
-
-    this.setState(
-      prevState => {
-        return {
-          showOrderModal: !prevState.showOrderModal,
-          isFirstAddOrder: false,
-        }
-      },
-      () => {
-        this.openFirstTabAddOrder()
-      },
-    )
+    navigateDirtyCheck({
+      onProceed: this._editOrder,
+    })(e)
   }
 
   handleReloadClick = () => {
     reloadDispense(this.props, 'refresh')
-  }
-
-  showConfirmationBox = () => {
-    const { dispatch, history } = this.props
-    dispatch({
-      type: 'global/updateAppState',
-      payload: {
-        openConfirm: true,
-        openConfirmContent: formatMessage({
-          id: 'app.general.leave-without-save',
-        }),
-        onConfirmSave: () => {
-          history.push({
-            pathname: history.location.pathname,
-            query: {
-              ...history.location.query,
-              isInitialLoading: false,
-            },
-          })
-          this.handleOrderModal()
-        },
-      },
-    })
-  }
-
-  handleCloseAddOrder = () => {
-    const {
-      dispatch,
-      consultation,
-      values,
-      orders: { rows },
-      formik,
-    } = this.props
-    const { visitPurposeFK } = values
-    const newOrderRows = rows.filter(row => !row.id && !row.isDeleted)
-
-    if (
-      (formik.OrderPage && !formik.OrderPage.dirty) ||
-      newOrderRows.length > 0
-    )
-      this.showConfirmationBox()
-    else if (visitPurposeFK === VISIT_TYPE.BF) {
-      dispatch({
-        type: 'consultation/discard',
-        payload: {
-          id: consultation.entity.id,
-        },
-      }).then(response => {
-        dispatch({
-          type: 'dispense/query',
-          payload: {
-            id: values.id,
-            version: Date.now(),
-          },
-        })
-        if (response) this.handleOrderModal()
-      })
-    } else {
-      this.handleOrderModal()
-    }
   }
 
   showRefreshOrder = () => {
@@ -487,38 +357,6 @@ class Main extends Component {
     return false
   }
 
-  checkOTCAddOrder = () => {
-    const {
-      dispatch,
-      values,
-      dispense,
-      clinicSettings,
-      visitRegistration,
-    } = this.props
-    if (this.state.hasShowOrderModal || !dispense.queryCodeTablesDone) {
-      return
-    }
-    const { entity = {} } = visitRegistration
-    const { visit = {} } = entity
-    const { service = [], consumable = [] } = values
-    const isEmptyDispense = service.length === 0 && consumable.length === 0
-    const noClinicalObjectRecord = !values.clinicalObjectRecordFK
-    if (visit.visitPurposeFK === VISIT_TYPE.OTC && isEmptyDispense) {
-      this.setState(
-        prevState => {
-          return {
-            showOrderModal: !prevState.showOrderModal,
-            hasShowOrderModal: true,
-            isFirstAddOrder: true,
-          }
-        },
-        () => {
-          this.openFirstTabAddOrder()
-        },
-      )
-    }
-  }
-
   checkBillFirst = () => {
     const {
       dispatch,
@@ -547,7 +385,6 @@ class Main extends Component {
     if (
       accessRights &&
       accessRights.rights !== 'hidden' &&
-      visit.visitPurposeFK === VISIT_TYPE.BF &&
       isEmptyDispense &&
       noClinicalObjectRecord &&
       !query.backToDispense
@@ -575,7 +412,6 @@ class Main extends Component {
     }
   }
   render() {
-    this.checkOTCAddOrder()
     this.checkBillFirst()
     const {
       classes,
@@ -583,7 +419,6 @@ class Main extends Component {
       values,
       dispense,
       codetable,
-      isActualizeInRetail,
       testProps,
     } = this.props
 
@@ -596,29 +431,8 @@ class Main extends Component {
           onFinalizeClick={this.makePayment}
           onReloadClick={this.handleReloadClick}
           onLabLabelClick={this.handleLabLabelClick}
-          currentDrugToPrint={this.state.currentDrugToPrint}
           isIncludeExpiredItem={this.checkExpiredItems()}
         />
-        <CommonModal
-          title='Orders'
-          open={this.state.showOrderModal && dispense.queryCodeTablesDone}
-          onClose={this.handleCloseAddOrder}
-          onConfirm={this.handleOrderModal}
-          maxWidth='md'
-          observe='OrderPage'
-        >
-          <AddOrder
-            visitType={
-              this.props.visitRegistration?.entity?.visit?.visitPurposeFK
-            }
-            visitRegistration={this.props.visitRegistration}
-            isFirstLoad={this.state.isFirstAddOrder}
-            onReloadClick={() => {
-              reloadDispense(this.props)
-            }}
-            {...this.props}
-          />
-        </CommonModal>
         <ViewPatientHistory top='213px' />
 
         <CommonModal

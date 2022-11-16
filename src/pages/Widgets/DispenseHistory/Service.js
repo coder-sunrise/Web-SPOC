@@ -37,13 +37,7 @@ export default ({ classes, current, fieldName = '', isFullScreen = true }) => {
       render: (text, row) => {
         return (
           <div style={{ position: 'relative' }}>
-            <div
-              className={classes.wrapCellTextStyle}
-              style={{
-                paddingRight:
-                  row.isPreOrder || row.isActualizedPreOrder ? 24 : 0,
-              }}
-            >
+            <div className={classes.wrapCellTextStyle}>
               <Tooltip
                 title={
                   <div>
@@ -53,28 +47,8 @@ export default ({ classes, current, fieldName = '', isFullScreen = true }) => {
                   </div>
                 }
               >
-                <div>{row.description}</div>
+                <div className='threeline_textblock'>{row.description}</div>
               </Tooltip>
-              <div style={{ position: 'absolute', top: '-1px', right: '-4px' }}>
-                {(row.isPreOrder || row.isActualizedPreOrder) && (
-                  <Tooltip
-                    title={
-                      row.isPreOrder ? 'New Pre-Order' : 'Actualized Pre-Order'
-                    }
-                  >
-                    <div
-                      className={classes.rightIcon}
-                      style={{
-                        borderRadius: 4,
-                        backgroundColor: row.isPreOrder ? '#4255bd' : 'green',
-                        display: 'inline-block',
-                      }}
-                    >
-                      Pre
-                    </div>
-                  </Tooltip>
-                )}
-              </div>
             </div>
           </div>
         )
@@ -124,11 +98,7 @@ export default ({ classes, current, fieldName = '', isFullScreen = true }) => {
       align: 'right',
       width: isFullScreen ? 90 : 80,
       render: (text, row) =>
-        showCurrency(
-          (row.isPreOrder && !row.isChargeToday) || row.hasPaid
-            ? 0
-            : row.totalAfterItemAdjustment,
-        ),
+        showCurrency(row.hasPaid ? 0 : row.totalAfterItemAdjustment),
     },
     {
       dataIndex: 'remarks',

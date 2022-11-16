@@ -83,7 +83,7 @@ class PartialDispenseList extends PureComponent {
       },
       { name: 'uom', title: 'UOM' },
       { name: 'instruction', title: 'Instruction' },
-      { name: 'visitDoctor', title: 'Visit Doctor' },
+      { name: 'visitDoctor', title: 'Visit Optometrist' },
     ]
     PartialDispenseExtensions = [
       {

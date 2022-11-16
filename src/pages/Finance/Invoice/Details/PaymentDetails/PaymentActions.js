@@ -24,7 +24,6 @@ const PaymentActions = ({
   companyFK,
   readOnly,
   isEnableWriteOffinInvoice,
-  visitOrderTemplateFK,
   isFromPastSession = false,
 }) => {
   const [showPrintInvoiceMenu, setShowPrintInvoiceMenu] = useState(false)
@@ -112,7 +111,7 @@ const PaymentActions = ({
         placement='right'
         visible={showPrintInvoiceMenu}
         onVisibleChange={() => {
-          if (!companyFK && !visitOrderTemplateFK) {
+          if (!companyFK) {
             handlePrinterClick(
               'TaxInvoice',
               undefined,
@@ -126,21 +125,6 @@ const PaymentActions = ({
         }}
         content={
           <MenuList role='menu' onClick={() => setShowPrintInvoiceMenu(false)}>
-            {visitOrderTemplateFK && (
-              <MenuItem
-                onClick={() =>
-                  handlePrinterClick(
-                    'TaxInvoice',
-                    undefined,
-                    companyFK,
-                    invoicePayerFK,
-                    INVOICE_REPORT_TYPES.SUMMARYINVOICE,
-                  )
-                }
-              >
-                Summary Invoice
-              </MenuItem>
-            )}
             {companyFK && (
               <MenuItem
                 onClick={() =>

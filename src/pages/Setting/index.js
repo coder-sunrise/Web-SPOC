@@ -93,9 +93,6 @@ class SystemSetting extends PureComponent {
         accessRight.rights === 'disable'
       )
         return [..._result]
-
-      if (m.text === 'Package' && !settings.isEnablePackage) return [..._result]
-
       return [..._result, { ...m, rights: accessRight.rights }]
     }
 
@@ -104,7 +101,7 @@ class SystemSetting extends PureComponent {
         .reduce(filterByAccessRight, [])
         .filter(m => {
           return (
-            m.text.toLocaleLowerCase().indexOf(searchText) >= 0 || !searchText
+            m.text?.toLocaleLowerCase().indexOf(searchText) >= 0 || !searchText
           )
         })
 
@@ -133,13 +130,22 @@ class SystemSetting extends PureComponent {
                       [classes.baseBtn]: true,
                     })}
                     variant='outlined'
-                    // disabled={disabled}
                     onClick={() => {
                       this.props.history.push(item.url)
                     }}
                   >
                     <ListAlt />
-                    <span>{item.text}</span>
+                    <span>
+                      <span>{item.text}</span>
+                      {item?.textExtension && (
+                        <>
+                          <br />
+                          <span style={{ fontSize: '0.95rem' }}>
+                            {item?.textExtension}
+                          </span>
+                        </>
+                      )}
+                    </span>
                   </Button>
                 </GridItem>
               )
@@ -157,7 +163,7 @@ class SystemSetting extends PureComponent {
     })
     return menusKeys
   }
-  
+
   setActivePanelKey = activeKeys => {
     const { dispatch, systemSetting } = this.props
     const { filterValues } = systemSetting

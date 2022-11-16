@@ -141,7 +141,7 @@ const PatientInfoInput = ({
                   </Button>
                 </Authorized>
               )}
-              {hasActiveSession && containsPrimaryClinician && (
+              {hasActiveSession && (
                 <Authorized authority='queue.registervisit'>
                   <Button
                     size='sm'
@@ -211,7 +211,16 @@ const PatientInfoInput = ({
               )}
             />
           </GridItem>
-          <GridItem xs md={3} />
+          <GridItem xs md={3}>
+            <FastField
+              name='email'
+              render={args => {
+                return (
+                  <TextField {...args} defaultValue={undefined} label='Email' />
+                )
+              }}
+            />
+          </GridItem>
         </React.Fragment>
       )}
     </React.Fragment>

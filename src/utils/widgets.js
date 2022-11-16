@@ -32,9 +32,6 @@ const widgets = [
         padding: '5px',
       },
     },
-    testProps: {
-      test: '123',
-    },
     toolbarAddon: (
       <AuthorizedContext>
         {r => {
@@ -43,23 +40,6 @@ const widgets = [
         }}
       </AuthorizedContext>
     ),
-  },
-  {
-    id: '13',
-    name: 'Medical History',
-    accessRight: 'queue.consultation.widgets.medicalhistory',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/MedicalHistory'),
-      loading: Loading,
-    }),
-    model: 'patientMedicalHistory',
-    layoutConfig: {
-      h: 2,
-      w: 12,
-      style: {
-        padding: 5,
-      },
-    },
   },
   {
     id: '2',
@@ -102,7 +82,7 @@ const widgets = [
   },
   {
     id: '4',
-    name: 'Patient History',
+    name: 'Visit History',
     accessRight: 'queue.consultation.widgets.patienthistory',
     component: Loadable({
       loader: () =>
@@ -145,128 +125,91 @@ const widgets = [
       },
     },
   },
-  {
-    id: '7',
-    name: 'Basic Examinations',
-    shortName: 'Basic Exam.',
-    accessRight: 'queue.consultation.widgets.vitalsign',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/VitalSign'),
-      loading: Loading,
-    }),
-    model: 'patientVitalSign',
-    associatedProps: ['corPatientNoteVitalSign'],
-    layoutConfig: {
-      minW: 12,
-      minH: 10,
-      style: {
-        padding: '5px',
-      },
-    },
-  },
-  {
-    id: '23',
-    name: 'Eye Examinations',
-    shortName: 'Eye Exam.',
-    accessRight: 'queue.consultation.widgets.eyeexaminations',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/EyeExaminations'),
-      loading: Loading,
-    }),
-    associatedProps: ['corEyeExaminations'],
-    layoutConfig: {
-      minW: 12,
-      minH: 10,
-      style: {
-        padding: '0 5px',
-      },
-    },
-  },
-  {
-    id: '21',
-    name: 'Dental Chart',
-    accessRight: 'queue.consultation.widgets.dentalchart',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/DentalChart'),
-      loading: Loading,
-    }),
-    onUnmount: () => {
-      window.g_app._store.dispatch({
-        type: 'dentalChartComponent/reset',
-      })
-    },
-  },
-  {
-    id: '8',
-    name: 'Attachment',
-    accessRight: 'queue.consultation.widgets.attachment',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/Attachment'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...p} mainType='ClinicalNotes' />
-      },
-      loading: Loading,
-    }),
-    model: 'attachment',
-    associatedProps: ['corAttachment'],
-    layoutConfig: {
-      minW: 12,
-      minH: 10,
-      style: {
-        padding: '5px',
-      },
-    },
-  },
-  {
-    id: '9',
-    name: 'Visual Acuity Test',
-    shortName: 'Visual Acuity',
-    accessRight: 'queue.consultation.widgets.eyevisualacuity',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/EyeVisualAcuity'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return (
-          <Fragment>
-            <Authorized authority='queue.consultation.widgets.eyevisualacuity'>
-              <Cmpnet
-                {...p}
-                prefix='corEyeVisualAcuityTest.eyeVisualAcuityTestForms'
-                attachmentsFieldName='corAttachment'
-                fromConsultation
-                handleUpdateAttachments={({
-                  updated,
-                  form,
-                  dispatch,
-                  consultation,
-                }) => {
-                  form.setFieldValue('corAttachment', updated)
-                  const { entity } = consultation
-                  entity.corAttachment = updated
-                  dispatch({
-                    type: 'consultation/updateState',
-                    payload: {
-                      entity,
-                    },
-                  })
-                }}
-              />
-            </Authorized>
-          </Fragment>
-        )
-      },
-      loading: Loading,
-    }),
-    associatedProps: ['corEyeVisualAcuityTest'],
-    layoutConfig: {
-      minW: 12,
-      minH: 10,
-      style: {
-        padding: 5,
-      },
-    },
-  },
+  // {
+  //   id: '21',
+  //   name: 'Dental Chart',
+  //   accessRight: 'queue.consultation.widgets.dentalchart',
+  //   component: Loadable({
+  //     loader: () => import('@/pages/Widgets/DentalChart'),
+  //     loading: Loading,
+  //   }),
+  //   onUnmount: () => {
+  //     window.g_app._store.dispatch({
+  //       type: 'dentalChartComponent/reset',
+  //     })
+  //   },
+  // },
+  // {
+  //   id: '8',
+  //   name: 'Attachment',
+  //   accessRight: 'queue.consultation.widgets.attachment',
+  //   component: Loadable({
+  //     loader: () => import('@/pages/Widgets/Attachment'),
+  //     render: (loaded, p) => {
+  //       let Cmpnet = loaded.default
+  //       return <Cmpnet {...p} mainType='ClinicalNotes' />
+  //     },
+  //     loading: Loading,
+  //   }),
+  //   model: 'attachment',
+  //   associatedProps: ['corAttachment'],
+  //   layoutConfig: {
+  //     minW: 12,
+  //     minH: 10,
+  //     style: {
+  //       padding: '5px',
+  //     },
+  //   },
+  // },
+  // {
+  //   id: '9',
+  //   name: 'Visual Acuity Test',
+  //   shortName: 'Visual Acuity',
+  //   accessRight: 'queue.consultation.widgets.eyevisualacuity',
+  //   component: Loadable({
+  //     loader: () => import('@/pages/Widgets/EyeVisualAcuity'),
+  //     render: (loaded, p) => {
+  //       let Cmpnet = loaded.default
+  //       return (
+  //         <Fragment>
+  //           <Authorized authority='queue.consultation.widgets.eyevisualacuity'>
+  //             <Cmpnet
+  //               {...p}
+  //               prefix='corEyeVisualAcuityTest.eyeVisualAcuityTestForms'
+  //               attachmentsFieldName='corAttachment'
+  //               fromConsultation
+  //               handleUpdateAttachments={({
+  //                 updated,
+  //                 form,
+  //                 dispatch,
+  //                 consultation,
+  //               }) => {
+  //                 form.setFieldValue('corAttachment', updated)
+  //                 const { entity } = consultation
+  //                 entity.corAttachment = updated
+  //                 dispatch({
+  //                   type: 'consultation/updateState',
+  //                   payload: {
+  //                     entity,
+  //                   },
+  //                 })
+  //               }}
+  //             />
+  //           </Authorized>
+  //         </Fragment>
+  //       )
+  //     },
+  //     loading: Loading,
+  //   }),
+  //   associatedProps: ['corEyeVisualAcuityTest'],
+  //   layoutConfig: {
+  //     minW: 12,
+  //     minH: 10,
+  //     style: {
+  //       padding: 5,
+  //     },
+  //   },
+  // },
   {
     id: '10',
     name: 'Refraction Form',
@@ -283,23 +226,23 @@ const widgets = [
     // model: 'refractionForm',
     layoutConfig: {},
   },
-  {
-    id: '11',
-    name: 'Examination Form',
-    shortName: 'Exam. Form',
-    accessRight: 'queue.consultation.widgets.eyeexaminationform',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/ExaminationForm'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...p} prefix='corEyeExaminationForm.formData' />
-      },
-      loading: Loading,
-    }),
-    associatedProps: ['corEyeExaminationForm'],
-    // model: 'refractionForm',
-    layoutConfig: {},
-  },
+  // {
+  //   id: '11',
+  //   name: 'Examination Form',
+  //   shortName: 'Exam. Form',
+  //   accessRight: 'queue.consultation.widgets.eyeexaminationform',
+  //   component: Loadable({
+  //     loader: () => import('@/pages/Widgets/ExaminationForm'),
+  //     render: (loaded, p) => {
+  //       let Cmpnet = loaded.default
+  //       return <Cmpnet {...p} prefix='corEyeExaminationForm.formData' />
+  //     },
+  //     loading: Loading,
+  //   }),
+  //   associatedProps: ['corEyeExaminationForm'],
+  //   // model: 'refractionForm',
+  //   layoutConfig: {},
+  // },
   {
     id: '12',
     name: 'Forms',

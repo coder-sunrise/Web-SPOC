@@ -5,16 +5,16 @@ import $ from 'jquery'
 // react-grid-layout
 import { Responsive, WidthProvider } from 'react-grid-layout'
 // antd
-import { Anchor, Menu, Dropdown } from 'antd'
+import { Anchor, Menu, Dropdown, Drawer } from 'antd'
 // material ui
-import { Paper, Divider, Slide, Tooltip, Drawer } from '@material-ui/core'
+import { Paper, Divider, Slide, Tooltip } from '@material-ui/core'
 import Clear from '@material-ui/icons/Clear'
 import Settings from '@material-ui/icons/Settings'
 import Fullscreen from '@material-ui/icons/Fullscreen'
 import FullscreenExit from '@material-ui/icons/FullscreenExit'
 import CompareArrows from '@material-ui/icons/CompareArrows'
 import Accessibility from '@material-ui/icons/Accessibility'
-import { connect } from 'dva' 
+import { connect } from 'dva'
 import { headerHeight } from 'mui-pro-jss'
 // common components
 import {
@@ -55,8 +55,9 @@ const ResponsiveGridLayout = WidthProvider(Responsive)
 let lastActivedWidget = null
 
 const { Link } = Anchor
-@connect(({ diagnosis }) => ({
+@connect(({ diagnosis, scriblenotes }) => ({
   diagnosis,
+  scriblenotes,
 }))
 @control()
 class Layout extends PureComponent {
@@ -806,6 +807,7 @@ class Layout extends PureComponent {
                           <LoadableComponent
                             {...widgetProps}
                             {...w.restProps}
+                            {...this.props}
                             isFullScreen={state.fullScreenWidget === id}
                             isEnableEditOrder={this.isEnableEditOrder()}
                           />
@@ -820,48 +822,11 @@ class Layout extends PureComponent {
         )}
         {!state.fullScreenWidget && (
           <React.Fragment>
-            {/* <div className={classes.fabContainer}>
-              <Slide
-                direction='up'
-                in={this.state.mode === 'edit'}
-                mountOnEnter
-              >
-                <div style={{ display: 'inline-block' }}>
-                  <Fab
-                    color='secondary'
-                    className={classes.fab}
-                    style={{ marginRight: 8 }}
-                    variant='extended'
-                    size='small'
-                    onClick={this.toggleDrawer}
-                  >
-                    <Settings />&nbsp;Widget Settings
-                  </Fab>
-                </div>
-              </Slide>
-              {clinicTypeFK === CLINIC_TYPE.DENTAL && (
-                <Slide
-                  direction='up'
-                  in={this.state.mode === 'edit'}
-                  mountOnEnter
-                >
-                  <div style={{ display: 'inline-block' }}>
-                    <Fab
-                      color='secondary'
-                      className={classes.fab}
-                      style={{ marginRight: 8 }}
-                      variant='extended'
-                      size='small'
-                      onClick={this.togglePatientHistoryDrawer}
-                    >
-                      <Accessibility />&nbsp;Patient History
-                    </Fab>
-                  </div>
-                </Slide>
-              )}
-            </div> */}
             <Drawer
-              anchor='right'
+              width='auto'
+              closable={false}
+              placement='right'
+              bodyStyle={{ padding: 0 }}
               open={this.state.openPatientHistoryDrawer}
               onClose={this.togglePatientHistoryDrawer}
             >
@@ -869,13 +834,6 @@ class Layout extends PureComponent {
                 {...widgetProps}
                 onClose={this.togglePatientHistoryDrawer}
               />
-              {/* <div style={{ width: '67vw', padding: theme.spacing(2) }}>
-                <h4>Patient History</h4>
-                <Button />
-                <SizeContainer size='sm'>
-                  <PatientHistory {...widgetProps} mode='integrated' />
-                </SizeContainer>
-              </div> */}
             </Drawer>
             <Drawer
               anchor='right'

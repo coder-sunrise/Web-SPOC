@@ -23,7 +23,6 @@ import { locationQueryParameters } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import PatientInfoCard from './PatientInfoCard'
 import VisitInfoCard from './VisitInfoCard'
-// import VitalSignCard from './VitalSignCard'
 import ReferralCard from './ReferralCard'
 import EyeVisualAcuityCard from './EyeVisualAcuityCard'
 import RefractionFormCard from './RefractionFormCard'
@@ -39,7 +38,7 @@ import FormFieldName from './formField'
 // misc utils
 import { formikMapPropsToValues, formikHandleSubmit } from './miscUtils'
 import { VISIT_STATUS } from '../variables'
-import { preOrderItemCategory } from '@/utils/codes'
+import { orderItemCategory } from '@/utils/codes'
 import _ from 'lodash'
 
 const styles = theme => ({
@@ -114,7 +113,6 @@ const getHeight = propsHeight => {
 class NewVisit extends PureComponent {
   state = {
     hasActiveSession: false,
-    currentVisitOrderTemplate: undefined,
   }
 
   constructor(props) {
@@ -124,31 +122,6 @@ class NewVisit extends PureComponent {
 
   componentDidMount = async () => {
     const { dispatch, patientInfo, values, visitRegistration } = this.props
-    // const response = await dispatch({
-    //   type: 'visitRegistration/getVisitOrderTemplateListForDropdown',
-    //   payload: {
-    //     pagesize: 9999,
-    //   },
-    // })
-    // if (response) {
-    //   const { data } = response
-    //   const templateOptions = data
-    //     .filter(template => template.isActive)
-    //     .map(template => {
-    //       return {
-    //         ...template,
-    //         value: template.id,
-    //         name: template.displayValue,
-    //       }
-    //     })
-
-    //   dispatch({
-    //     type: 'visitRegistration/updateState',
-    //     payload: {
-    //       visitOrderTemplateOptions: templateOptions,
-    //     },
-    //   })
-    // }
     this.setBannerHeight()
 
     const bizSession = await dispatch({
@@ -162,23 +135,6 @@ class NewVisit extends PureComponent {
       hasActiveSession: data.length > 0,
     })
     await this.getCodeTables()
-    setTimeout(() => {
-      if (
-        visitRegistration.visitOrderTemplateFK &&
-        visitRegistration.fromAppt
-      ) {
-        dispatch({
-          type: 'settingVisitOrderTemplate/queryOne',
-          payload: {
-            id: visitRegistration.visitOrderTemplateFK,
-          },
-        }).then(template => {
-          if (template) {
-            this.setState({ currentVisitOrderTemplate: template })
-          }
-        })
-      }
-    }, 200)
   }
 
   getCodeTables = async () => {
@@ -252,25 +208,6 @@ class NewVisit extends PureComponent {
       }, [])
     setFieldValue('visitAttachment', updated)
   }
-  getVisitOrderTemplateDetails = id => {
-    if (!id) {
-      this.setState({ currentVisitOrderTemplate: undefined })
-      return
-    }
-    if (this.state.currentVisitOrderTemplate?.id === id) return
-    this.props
-      .dispatch({
-        type: 'settingVisitOrderTemplate/queryOne',
-        payload: {
-          id: id,
-        },
-      })
-      .then(template => {
-        if (template) {
-          this.setState({ currentVisitOrderTemplate: template })
-        }
-      })
-  }
 
   validatePatient = () => {
     const {
@@ -283,30 +220,6 @@ class NewVisit extends PureComponent {
     } = this.props
 
     const { doctorProfileFK, visitDoctor = [] } = values
-
-    if (
-      visitDoctor.find(
-        x => !x.isDeleted && x.doctorProfileFK === doctorProfileFK,
-      )
-    ) {
-      notification.error({
-        message: 'Primary doctor and reporting doctor cannot be the same.',
-      })
-      return
-    }
-
-    if (
-      visitDoctor.filter(x => !x.isDeleted).length !==
-      _.uniqBy(
-        visitDoctor.filter(x => !x.isDeleted),
-        'doctorProfileFK',
-      ).length
-    ) {
-      notification.error({
-        message: 'Can not select duplicate doctor.',
-      })
-      return
-    }
 
     if (Object.keys(errors).length > 0) return handleSubmit()
 
@@ -417,12 +330,7 @@ class NewVisit extends PureComponent {
       theme,
       queueLog: { list = [] } = { list: [] },
       loading,
-      visitRegistration: {
-        errorState,
-        visitOrderTemplateOptions,
-        expandRefractionForm,
-        visitMode,
-      },
+      visitRegistration: { errorState, expandRefractionForm, visitMode },
       values,
       global,
       isSubmitting,
@@ -434,12 +342,6 @@ class NewVisit extends PureComponent {
       codetable,
     } = this.props
 
-    const vitalAccessRight = Authorized.check(
-      'queue.registervisit.vitalsign',
-    ) || { rights: 'hidden' }
-    const vitalSignEditAccessRight =
-      vitalAccessRight.rights === 'readwrite' ||
-      vitalAccessRight.rights === 'enable'
     if (expandRefractionForm) {
       let div = $(this.myRef.current).find('div[aria-expanded]:eq(1)')
       if (div.attr('aria-expanded') === 'false') div.click()
@@ -540,39 +442,14 @@ class NewVisit extends PureComponent {
                           )}
                           isReadOnly={isReadOnly}
                           handleUpdateAttachments={this.updateAttachments}
-                          getVisitOrderTemplateDetails={
-                            this.getVisitOrderTemplateDetails
-                          }
-                          currentVisitTemplate={
-                            this.state.currentVisitOrderTemplate
-                          }
                           attachments={values.visitAttachment}
                           visitType={values.visitPurposeFK}
                           dispatch={dispatch}
-                          visitOrderTemplateOptions={visitOrderTemplateOptions}
                           {...this.props}
                         />
                       </GridItem>
                     </Authorized.Context.Provider>
                     <React.Fragment>
-                      {/* <GridItem xs={12} className={classes.row}>
-                        <Authorized.Context.Provider
-                          value={{
-                            rights: isBasicExaminationDisabled
-                              ? 'disable'
-                              : 'enable',
-                          }}
-                        >
-                          <VitalSignCard
-                            {...this.props}
-                            disabled={
-                              !vitalSignEditAccessRight ||
-                              visitMode === 'view' ||
-                              values.isDoctorConsulted
-                            }
-                          />
-                        </Authorized.Context.Provider>
-                      </GridItem> */}
                       <GridItem xs={12} className={classes.row}>
                         <CommonCard title='Referral'>
                           <ReferralCard

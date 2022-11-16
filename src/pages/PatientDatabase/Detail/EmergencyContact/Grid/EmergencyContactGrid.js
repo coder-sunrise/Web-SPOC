@@ -23,10 +23,10 @@ class EmergencyContactGrid extends PureComponent {
 
   tableParas = {
     columns: [
-      { name: 'accountNoTypeFK', title: 'Account Type' },
-      { name: 'accountNo', title: 'Account No' },
       { name: 'salutationFK', title: 'Salutation' },
       { name: 'name', title: 'Name' },
+      { name: 'accountNoTypeFK', title: 'Account Type' },
+      { name: 'accountNo', title: 'Account No' },
       { name: 'relationshipFK', title: 'Relationship' },
       { name: 'address', title: 'Address' },
       { name: 'primaryContactNo', title: 'Primary Contact' },
@@ -163,13 +163,13 @@ class EmergencyContactGrid extends PureComponent {
       )
     ) {
       notification.warn({
-        message: 'This contact person already existed',
+        message: 'This family member already existed',
       })
       return
     }
     if (o.id === values.id) {
       notification.warn({
-        message: 'Can not add this patient himself as contact person',
+        message: 'Can not add this patient himself as family member',
       })
       return
     }

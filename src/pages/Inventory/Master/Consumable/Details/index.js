@@ -165,6 +165,7 @@ export default compose(
           .trim()
           .required(),
       }),
+      code: Yup.string().required(),
       displayValue: Yup.string().required(),
       revenueCategoryFK: Yup.string().required(),
       effectiveDates: Yup.array()
@@ -216,7 +217,7 @@ export default compose(
       if (consumableStock.length === 0) {
         defaultConsumableStock = [
           {
-            inventoryVaccinationFK: id,
+            inventoryConsumableFK: id,
             batchNo: 'Not Applicable',
             stock: 0,
             isDefault: true,

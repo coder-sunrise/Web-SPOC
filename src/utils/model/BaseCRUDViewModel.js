@@ -13,20 +13,7 @@ import {
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
 import { getTranslationValue } from '@/utils/utils'
 // Pages with a second print language
-const secondaryPrintoutLanguageArr = [
-  'settingMedicationContraIndication',
-  'settingMedicationUOM',
-  'settingMedicationDosage',
-  'settingMedicationFrequency',
-  'settingMedicationConsumptionMethod',
-  'settingMedicationInteraction',
-  'settingMedicationSideEffect',
-  'settingAdministrationRoute',
-  'settingSummaryComment',
-  'settingIndividualComment',
-  'settingMedicationPrecautions',
-  'settingMedicineTrivia',
-]
+const secondaryPrintoutLanguageArr = []
 
 let lastLocation = null
 export default class BaseCRUDViewModel {

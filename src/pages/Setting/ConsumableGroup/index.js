@@ -60,8 +60,8 @@ class ConsumableGroup extends PureComponent {
           observe='ConsumableGroupDetail'
           title={
             settingConsumableGroup.entity
-              ? 'Edit Consumable Category'
-              : 'Add Consumable Category'
+              ? 'Edit Product Category'
+              : 'Add Product Category'
           }
           maxWidth='md'
           bodyNoPadding

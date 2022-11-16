@@ -6,7 +6,7 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { ReportDataGrid } from '@/components/_medisys'
 
 class VisitList extends PureComponent {
-  render () {
+  render() {
     let listData = []
     const { reportDatas } = this.props
     if (!reportDatas) return null
@@ -19,12 +19,14 @@ class VisitList extends PureComponent {
     const VisitListingColumns = [
       { name: 'visitDate', title: 'Date' },
       { name: 'patientReferenceNo', title: 'Ref. No.' },
-      { name: 'patientNRIC', title: 'NRIC No.' },
+      { name: 'patientNRIC', title: 'Acc. No.' },
       { name: 'patientName', title: 'Patient Name' },
-      { name: 'visitPurpose', title: 'Visit Purpose' },
+      { name: 'salesType', title: 'Sales Type' },
+      { name: 'queueStatus', title: 'Q.Status' },
+      { name: 'studentOptometrist', title: 'S.Optometrist' },
+      { name: 'doctorName', title: 'Optometrist' },
       { name: 'invoiceNo', title: 'Invoice No.' },
-      { name: 'doctorName', title: 'Doctor' },
-      { name: 'diagnosis', title: 'Diagnosis' },
+      { name: 'copayer', title: 'Co-Payer' },
       { name: 'visitRemarks', title: 'Remarks' },
     ]
 
@@ -37,30 +39,14 @@ class VisitList extends PureComponent {
       { columnName: 'patientReferenceNo', sortingEnabled: false, width: 100 },
       { columnName: 'patientNRIC', sortingEnabled: false, width: 100 },
       { columnName: 'patientName', sortingEnabled: false },
-      { columnName: 'visitPurpose', sortingEnabled: false },
+      { columnName: 'copayer', sortingEnabled: false },
       { columnName: 'invoiceNo', sortingEnabled: false, width: 100 },
       { columnName: 'doctorName', sortingEnabled: false },
-      {
-        columnName: 'diagnosis',
-        sortingEnabled: false,
-        render: (row) => {
-          return (
-            <div
-              style={{
-                wordWrap: 'break-word',
-                whiteSpace: 'pre-wrap',
-              }}
-            >
-              {row.diagnosis}
-            </div>
-          )
-        },
-      },
       { columnName: 'visitRemarks', sortingEnabled: false, width: 180 },
     ]
-    const SummaryRow = (p) => {
+    const SummaryRow = p => {
       const { children } = p
-      let countCol = children.find((c) => {
+      let countCol = children.find(c => {
         return (
           c.props.tableColumn.column &&
           c.props.tableColumn.column.name === 'visitDate'
@@ -87,9 +73,7 @@ class VisitList extends PureComponent {
       summary: true,
       summaryConfig: {
         state: {
-          totalItems: [
-            { columnName: 'visitDate', type: 'visitCount' },
-          ],
+          totalItems: [{ columnName: 'visitDate', type: 'visitCount' }],
         },
         integrated: {
           calculator: (type, rows, getValue) => {
@@ -115,24 +99,24 @@ class VisitList extends PureComponent {
         },
       },
     }
-
+    let afterGroupingVisitListingColumns = VisitListingColumns
     if (
       reportDatas.VisitListingInfo &&
       reportDatas.VisitListingInfo.length > 0 &&
       (reportDatas.VisitListingInfo[0].isGroupByDoctor ||
-        reportDatas.VisitListingInfo[0].isGroupByVisitPurpose)
+        reportDatas.VisitListingInfo[0].isGroupByVisitPurpose ||
+        reportDatas.VisitListingInfo[0].isGroupByCopayer ||
+        reportDatas.VisitListingInfo[0].isGroupByOptometrist ||
+        reportDatas.VisitListingInfo[0].isGroupByStudentOptometrist ||
+        reportDatas.VisitListingInfo[0].isGroupByQueueStatus)
     ) {
       FuncProps = {
         pager: false,
         summary: true,
         summaryConfig: {
           state: {
-            totalItems: [
-              { columnName: 'visitDate', type: 'visitCount' },
-            ],
-            groupItems: [
-              { columnName: 'visitDate', type: 'groupCount' },
-            ],
+            totalItems: [{ columnName: 'visitDate', type: 'visitCount' }],
+            groupItems: [{ columnName: 'visitDate', type: 'groupCount' }],
           },
           integrated: {
             calculator: (type, rows, getValue) => {
@@ -164,9 +148,17 @@ class VisitList extends PureComponent {
           state: {
             grouping: [
               {
-                columnName: reportDatas.VisitListingInfo[0].isGroupByDoctor
-                  ? 'doctorName'
-                  : 'visitPurpose',
+                columnName: [
+                  { prop: 'isGroupByDoctor', columnName: 'doctorName' },
+                  { prop: 'isGroupByVisitPurpose', columnName: 'visitPurpose' },
+                  { prop: 'isGroupByCopayer', columnName: 'copayer' },
+                  { prop: 'isGroupByOptometrist', columnName: 'doctorName' },
+                  {
+                    prop: 'isGroupByStudentOptometrist',
+                    columnName: 'studentOptometrist',
+                  },
+                  { prop: 'isGroupByQueueStatus', columnName: 'queueStatus' },
+                ].find(g => reportDatas.VisitListingInfo[0][g.prop]).columnName,
               },
             ],
           },
@@ -175,10 +167,10 @@ class VisitList extends PureComponent {
     }
     return (
       <ReportDataGrid
-        data={(listData || []).map((o) => {
+        data={(listData || []).map(o => {
           return { ...o, visitDate: moment(o.visitDate).format('DD MMM YYYY') }
         })}
-        columns={VisitListingColumns}
+        columns={afterGroupingVisitListingColumns}
         columnExtensions={VisitListingColumnsExtensions}
         FuncProps={FuncProps}
       />

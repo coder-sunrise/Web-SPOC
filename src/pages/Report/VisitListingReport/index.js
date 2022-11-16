@@ -21,8 +21,9 @@ const styles = () => ({
   },
 })
 
-@connect(({ visitRegistration }) => ({
+@connect(({ visitRegistration, codetable }) => ({
   visitRegistration,
+  ctcopayer: codetable.ctcopayer || [],
 }))
 class VisitListing extends ReportBase {
   constructor(props) {
@@ -39,48 +40,30 @@ class VisitListing extends ReportBase {
       ...params,
       groupByVisitPurpose: params.groupBy === 'VisitPurpose',
       groupByDoctor: params.groupBy === 'Doctor',
+      groupByCopayer: params.groupBy === 'Copayer',
+      groupByQueueStatus: params.groupBy === 'QueueStatus',
+      groupByOptometrist: params.groupBy === 'Optometrist',
+      groupByStudentOptometrist: params.groupBy === 'StudentOptometrist',
     }
   }
 
   componentDidMount = async () => {
     const { dispatch } = this.props
-    const response = await dispatch({
-      type: 'visitRegistration/getVisitOrderTemplateListForDropdown',
+    await dispatch({
+      type: 'codetable/fetchCodes',
       payload: {
-        pagesize: 9999,
+        code: 'ctcopayer',
       },
     })
-    if (response) {
-      const { data } = response
-      const templateOptions = data
-        .filter(template => template.isActive)
-        .map(template => {
-          return {
-            ...template,
-            value: template.id,
-            name: template.displayValue,
-          }
-        })
-
-      dispatch({
-        type: 'visitRegistration/updateState',
-        payload: {
-          visitOrderTemplateOptions: templateOptions,
-        },
-      })
-    }
   }
 
   renderFilterBar = (handleSubmit, isSubmitting) => {
-    const {
-      visitRegistration: { visitOrderTemplateOptions = [] },
-      classes,
-    } = this.props
+    const { ctcopayer, classes } = this.props
     return (
       <FilterBar
         handleSubmit={handleSubmit}
         isSubmitting={isSubmitting}
-        visitOrderTemplateOptions={visitOrderTemplateOptions}
+        ctcopayer={ctcopayer}
         classes={classes}
       />
     )

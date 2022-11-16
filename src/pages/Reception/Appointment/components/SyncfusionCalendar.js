@@ -197,7 +197,9 @@ class SyncfusionCalendar extends React.PureComponent {
               popupOpen={event => {
                 if (event.type === 'Editor') {
                   event.cancel = true
-                  eventDoubleClick(event.data)
+                  if (!event.data.isRoomBlock) {
+                    eventDoubleClick(event.data)
+                  }
                 }
               }}
               cellDoubleClick={cellDoubleClick}
@@ -267,6 +269,11 @@ class SyncfusionCalendar extends React.PureComponent {
                   let eventObj = this.scheduleObj.getEventDetails(
                     this.selectedTarget,
                   )
+
+                  if (eventObj.isRoomBlock) {
+                    return
+                  }
+
                   this.setState({ selectedData: { ...eventObj } })
                   const viewApptAccessRight = Authorized.check(
                     'appointment.appointmentdetails',

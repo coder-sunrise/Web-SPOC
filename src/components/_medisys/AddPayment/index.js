@@ -537,7 +537,6 @@ class AddPayment extends Component {
     const sortedInvoicePayerItem = _.orderBy(
       invoicePayerItem,
       [
-        'isVisitPurposeItem',
         x => (x.itemType || '').toLowerCase(),
         x => (x.itemName || '').toLowerCase(),
       ],
@@ -600,16 +599,6 @@ class AddPayment extends Component {
                               <Tooltip title={row.itemType}>
                                 <span>{itemType?.displayValue}</span>
                               </Tooltip>
-                              {row.isVisitPurposeItem && (
-                                <Tooltip
-                                  title='Visit Purpose Item'
-                                  placement='right'
-                                >
-                                  <Tag style={{ marginRight: 0 }} color='blue'>
-                                    V.P.
-                                  </Tag>
-                                </Tooltip>
-                              )}
                             </div>
                           )
                         },

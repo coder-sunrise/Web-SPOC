@@ -23,6 +23,7 @@ import {
   timeFormat24Hour,
   Popconfirm,
   Button,
+  CodeSelect,
 } from '@/components'
 import Delete from '@material-ui/icons/Delete'
 import { ShoppingCartTwoTone } from '@material-ui/icons'
@@ -53,6 +54,7 @@ const resourceCapacitySchema = Yup.object().shape({
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
+    roomFK: Yup.number().required(),
     effectiveDates: Yup.array()
       .of(Yup.date())
       .min(2)
@@ -248,47 +250,47 @@ class Detail extends PureComponent {
       <React.Fragment>
         <GridContainer
           style={{
-            height: 700,
             alignItems: 'start',
             overflowY: 'scroll',
+            marginBottom: '40px',
           }}
         >
-          <div style={{ margin: theme.spacing(1) }}>
-            <GridContainer>
-              <GridItem md={6}>
-                <FastField
-                  name='code'
-                  render={args => (
-                    <TextField
-                      label='Code'
-                      autoFocus
+          <GridItem md={7}>
+            <GridItem md={12}>
+              <FastField
+                name='code'
+                render={args => (
+                  <TextField
+                    label='Code'
+                    autoFocus
+                    {...args}
+                    disabled={!!values.id}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={12}>
+              <FastField
+                name='displayValue'
+                render={args => <TextField label='Display Value' {...args} />}
+              />
+            </GridItem>
+            <GridItem md={12}>
+              <FastField
+                name='effectiveDates'
+                render={args => {
+                  return (
+                    <DateRangePicker
+                      label='Effective Start Date'
+                      label2='End Date'
                       {...args}
-                      disabled={!!values.id}
                     />
-                  )}
-                />
-              </GridItem>
-              <GridItem md={6}>
-                <FastField
-                  name='displayValue'
-                  render={args => <TextField label='Display Value' {...args} />}
-                />
-              </GridItem>
-              <GridItem md={6}>
-                <FastField
-                  name='effectiveDates'
-                  render={args => {
-                    return (
-                      <DateRangePicker
-                        label='Effective Start Date'
-                        label2='End Date'
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem md={6}>
+                  )
+                }}
+              />
+            </GridItem>
+            <GridContainer>
+              <GridItem md={5}>
                 <FastField
                   name='sortOrder'
                   render={args => {
@@ -304,276 +306,45 @@ class Detail extends PureComponent {
                   }}
                 />
               </GridItem>
-              <GridItem md={12}>
+              <GridItem md={2} />
+              <GridItem md={5}>
                 <FastField
-                  name='description'
+                  name='roomFK'
                   render={args => {
-                    return (
-                      <TextField
-                        label='Description'
-                        multiline
-                        rowsMax={4}
-                        {...args}
-                      />
-                    )
+                    return <CodeSelect label='Room' code='ctRoom' {...args} />
                   }}
                 />
               </GridItem>
             </GridContainer>
-            <GridContainer>
-              <GridItem md={8}>
-                <div style={{ position: 'relative' }}>
-                  <h5 style={{ fontWeight: 400, margin: '8px 6px -4px 6px' }}>
-                    <b>Resource Management</b>
-                  </h5>
-                  <EditableTableGrid
-                    forceRender
-                    style={{
-                      marginTop: theme.spacing(1),
-                    }}
-                    rows={(
-                      values.calendarResource?.ctCalendarResourceCapacity || []
-                    ).map(item => ({ ...item, operationhour }))}
-                    EditingProps={{
-                      showCommandColumn: false,
-                      showAddCommand: true,
-                      onCommitChanges: this.commitChanges,
-                    }}
-                    schema={resourceCapacitySchema}
-                    columns={[
-                      { name: 'capacityTime', title: 'Time From & Time To' },
-                      {
-                        name: 'maxCapacity',
-                        title: 'Default Maximum Capacity',
-                      },
-                      { name: 'action', title: ' ' },
-                    ]}
-                    columnExtensions={[
-                      {
-                        columnName: 'capacityTime',
-                        isReactComponent: true,
-                        render: e => {
-                          const { row, columnConfig, cellProps } = e
-                          const { control, error, validSchema } = columnConfig
-                          const { operationhour = {} } = row
-                          const startError = (row._errors || []).find(
-                            se => se.path === 'startTime',
-                          )
-                          const endError = (row._errors || []).find(
-                            se => se.path === 'endTime',
-                          )
-                          const moreThanError = (row._errors || []).find(
-                            se => se.path === 'capacityTime',
-                          )
-                          return (
-                            <GridContainer>
-                              <GridItem xs md={6} style={{ paddingRight: 10 }}>
-                                <div
-                                  style={{
-                                    position: 'relative',
-                                    paddingRight: 16,
-                                  }}
-                                >
-                                  <SyncfusionTimePicker
-                                    step={apptTimeIntervel}
-                                    value={row.startTime}
-                                    style={{ margin: 0 }}
-                                    min={operationhour.startTime}
-                                    max={operationhour.endTime}
-                                    onChange={e => {
-                                      if (!this.isTimeChange(row.startTime, e))
-                                        return
-                                      const { commitChanges } = control
-                                      row.startTime = e
-                                      if (
-                                        row.startTime &&
-                                        row.endTime &&
-                                        row.startTime > row.endTime
-                                      ) {
-                                        row.endTime = row.startTime
-                                      }
-                                      commitChanges({
-                                        changed: {
-                                          [row.id]: {
-                                            startTime: row.startTime,
-                                            endTime: row.endTime,
-                                          },
-                                        },
-                                      })
-                                    }}
-                                  />
-                                  <div
-                                    style={{
-                                      position: 'absolute',
-                                      right: '-6px',
-                                      top: 8,
-                                    }}
-                                  >
-                                    {startError && (
-                                      <Tooltip
-                                        title={
-                                          (startError || startRangeError)
-                                            .message
-                                        }
-                                      >
-                                        <Warning color='error' />
-                                      </Tooltip>
-                                    )}
-                                  </div>
-                                </div>
-                              </GridItem>
-                              <GridItem xs md={6} style={{ paddingLeft: 20 }}>
-                                <div
-                                  style={{
-                                    position: 'relative',
-                                    paddingRight: 10,
-                                  }}
-                                >
-                                  <div
-                                    style={{
-                                      position: 'absolute',
-                                      left: '-25px',
-                                      top: 6,
-                                    }}
-                                  >
-                                    To
-                                  </div>
-                                  <SyncfusionTimePicker
-                                    step={apptTimeIntervel}
-                                    style={{ margin: 0 }}
-                                    value={row.endTime}
-                                    min={operationhour.startTime}
-                                    max={operationhour.endTime}
-                                    onChange={e => {
-                                      if (!this.isTimeChange(row.endTime, e))
-                                        return
-                                      const { commitChanges } = control
-                                      row.endTime = e
-                                      commitChanges({
-                                        changed: {
-                                          [row.id]: {
-                                            endTime: row.endTime,
-                                          },
-                                        },
-                                      })
-                                    }}
-                                  />
-                                  <div
-                                    style={{
-                                      position: 'absolute',
-                                      right: '-12px',
-                                      top: 8,
-                                    }}
-                                  >
-                                    {(endError || moreThanError) && (
-                                      <Tooltip
-                                        title={
-                                          (
-                                            endError ||
-                                            endRangeError ||
-                                            moreThanError
-                                          ).message
-                                        }
-                                      >
-                                        <Warning color='error' />
-                                      </Tooltip>
-                                    )}
-                                  </div>
-                                </div>
-                              </GridItem>
-                            </GridContainer>
-                          )
-                        },
-                        sortingEnabled: false,
-                      },
-                      {
-                        columnName: 'maxCapacity',
-                        type: 'number',
-                        max: 9999,
-                        precision: 0,
-                        min: 0,
-                        sortingEnabled: false,
-                        width: 200,
-                      },
-                      {
-                        columnName: 'action',
-                        width: 60,
-                        isReactComponent: true,
-                        sortingEnabled: false,
-                        isDisabled: row => true,
-                        render: e => {
-                          const { row, columnConfig } = e
-                          const { control } = columnConfig
-                          const { commitChanges } = control
-                          return (
-                            <Popconfirm
-                              title='Confirm to delete?'
-                              onConfirm={() => {
-                                commitChanges({
-                                  changed: {
-                                    [row.id]: {
-                                      isDeleted: true,
-                                    },
-                                  },
-                                })
-                              }}
-                            >
-                              <Button size='sm' justIcon color='danger'>
-                                <Delete />
-                              </Button>
-                            </Popconfirm>
-                          )
-                        },
-                      },
-                    ]}
-                    FuncProps={{
-                      pager: false,
-                    }}
-                  />
-                  <div style={{ position: 'absolute', bottom: 10, right: 14 }}>
-                    {this.isEnableDailyManagement() && (
-                      <Link
-                        component='button'
-                        style={{ textDecoration: 'underline' }}
-                        onClick={e => {
-                          navigateDirtyCheck({
-                            onProceed: async () => {
-                              await dispatch({
-                                type: 'calendarResource/updateState',
-                                payload: {
-                                  editId: values.calendarResource.id,
-                                  selectMonth: moment(),
-                                },
-                              })
-                              this.setState({ showDailyManagementModal: true })
-                            },
-                          })(e)
-                        }}
-                      >
-                        Daily Resource Management
-                      </Link>
-                    )}
-                  </div>
-                  {this.checkConflictTime() && (
-                    <div style={{ color: 'red', marginLeft: 16 }}>
-                      Time range conflicting with other times.
-                    </div>
-                  )}
-                </div>
-              </GridItem>
-              <GridItem md={4}>
-                <div>
-                  <h5 style={{ fontWeight: 400, margin: '8px 6px 4px 6px' }}>
-                    <b>Resource Color</b>
-                  </h5>
-                  <ChromePicker
-                    onChangeComplete={this.onColorChange}
-                    color={values?.balanceTagColorHex ?? '#31C736'}
-                  />
-                </div>
-              </GridItem>
+            <GridItem md={12}>
+              <FastField
+                name='description'
+                render={args => {
+                  return (
+                    <TextField
+                      label='Description'
+                      multiline
+                      rowsMax={4}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          </GridItem>
+          <GridItem md={5}>
+            <GridContainer md={12} justify='center'>
+              <div style={{ marginBottom: '20px' }}>
+                <h5 style={{ fontWeight: 400, margin: '8px 6px 4px 6px' }}>
+                  <b>Resource Color</b>
+                </h5>
+                <ChromePicker
+                  onChangeComplete={this.onColorChange}
+                  color={values?.balanceTagColorHex ?? '#31C736'}
+                />
+              </div>
             </GridContainer>
-          </div>
+          </GridItem>
         </GridContainer>
         {footer &&
           footer({
@@ -583,7 +354,7 @@ class Detail extends PureComponent {
               disabled: false,
             },
           })}
-        <CommonModal
+        {/* <CommonModal
           open={this.state.showDailyManagementModal}
           observe='DailyResourceManagement'
           title={'Daily Resource Management'}
@@ -593,7 +364,7 @@ class Detail extends PureComponent {
           onConfirm={this.toggleModal}
         >
           <DailyResourceManagement {...this.props} />
-        </CommonModal>
+        </CommonModal> */}
       </React.Fragment>
     )
   }

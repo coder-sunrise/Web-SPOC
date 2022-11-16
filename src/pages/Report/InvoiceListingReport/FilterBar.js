@@ -39,7 +39,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                     },
                     {
                       value: 'Doctor',
-                      label: 'Doctor',
+                      label: 'Optometrist',
                     },
                     {
                       value: 'None',

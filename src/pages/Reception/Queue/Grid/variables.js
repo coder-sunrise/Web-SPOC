@@ -17,7 +17,6 @@ import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE } from '@/utils/constants'
 import DoctorConsultationStatus from './DoctorConsultationStatus'
-import VisitOrderTemplateIndicateString from '@/pages/Widgets/Orders/VisitOrderTemplateIndicateString'
 
 const compareString = (a, b) => a.localeCompare(b)
 const compareDoctor = (a, b) => {
@@ -69,7 +68,7 @@ export const AppointmentTableConfig = {
     { name: 'patientName', title: 'Patient Name' },
     { name: 'patientAccountNo', title: 'Acc. No.' },
     { name: 'gender/age', title: 'Gender / Age' },
-    { name: 'doctorName', title: 'Doctor' },
+    { name: 'doctorName', title: 'Optometrist' },
     { name: 'appointmentTime', title: 'Appt. Time' },
     { name: 'roomNo', title: 'Room No.' },
     { name: 'remarks', title: 'Remarks' },
@@ -168,16 +167,18 @@ export const QueueTableConfig = {
       title: 'Cons. Ready',
       fullTitle: 'Ready for Consultation',
     },
+    { name: 'salesType', title: 'Sales Type' },
     { name: 'patientReferenceNo', title: 'Ref. No.' },
     { name: 'patientName', title: 'Patient Name' },
-    { name: 'orderCreateTime', title: 'Order Created Time' },
     { name: 'patientAccountNo', title: 'Acc. No.' },
     { name: 'gender/age', title: 'Gender / Age' },
-    { name: 'doctor', title: 'Doctor' },
-    { name: 'appointmentTime', title: 'Appt. Time' },
+    { name: 'doctor', title: 'Optometrist' },
     { name: 'roomNo', title: 'Room No.' },
+    { name: 'apptType', title: 'Appt. Type' },
+    { name: 'appointmentTime', title: 'Appt. Time' },
     { name: 'remarks', title: 'Remarks' },
     { name: 'timeIn', title: 'Time In' },
+    { name: 'orderCreateTime', title: 'Order Created Time' },
     { name: 'timeOut', title: 'Time Out' },
     { name: 'invoiceNo', title: 'Invoice No' },
     { name: 'invoiceStatus', title: 'Invoice Status' },
@@ -188,7 +189,6 @@ export const QueueTableConfig = {
     { name: 'invoiceOutstanding', title: 'Patient O/S' },
     { name: 'patientScheme', title: 'Scheme' },
     { name: 'patientMobile', title: 'Phone' },
-    { name: 'visitOrderTemplate', title: 'Visit Purpose' },
     { name: 'action', title: 'Action' },
   ],
   leftColumns: ['visitStatus', 'queueNo', 'patientName'],
@@ -249,16 +249,19 @@ export const QueueColumnExtensions = props => {
     },
     {
       columnName: 'invoiceStatus',
-      width: 120,
+      width: 180,
       render: row => {
+        const invoiceStatus = `${row.invoiceStatus}${
+          row.isFinalized ? '' : ' (Unfinalized)'
+        }`
         if (row.isItemOverPaid) {
           return (
             <Tooltip title='There are any overpaid item(s).'>
-              <span style={{ color: 'red' }}>{row.invoiceStatus}</span>
+              <span style={{ color: 'red' }}>{invoiceStatus}</span>
             </Tooltip>
           )
         }
-        return <span>{row.invoiceStatus}</span>
+        return <span>{invoiceStatus}</span>
       },
     },
     {
@@ -405,18 +408,12 @@ export const QueueColumnExtensions = props => {
       width: 280,
     },
     {
-      columnName: 'visitOrderTemplate',
-      width: 180,
-      render: row => {
-        return row.visitOrderTemplate ? (
-          <VisitOrderTemplateIndicateString
-            oneline
-            visitOrderTemplateDetails={row.visitOrderTemplate}
-          ></VisitOrderTemplateIndicateString>
-        ) : (
-          <span>-</span>
-        )
-      },
+      columnName: 'salesType',
+      width: 120,
+    },
+    {
+      columnName: 'apptType',
+      width: 120,
     },
   ]
 }

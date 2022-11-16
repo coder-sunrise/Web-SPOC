@@ -10,10 +10,13 @@ import moment from 'moment'
 import { getUniqueId, getTranslationValue } from '@/utils/utils'
 import { ORDER_TYPES } from '@/utils/constants'
 import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
+import { formConfigs } from '@/pages/Widgets/ClinicalNotes/config'
+import { getIn, setIn } from 'formik'
 
 const orderTypes = [
   {
-    name: 'Consumable',
+    type: 'Consumable',
+    name: 'Product',
     value: ORDER_TYPES.CONSUMABLE,
     prop: 'corConsumable',
     accessRight: 'queue.consultation.order.consumable',
@@ -21,6 +24,7 @@ const orderTypes = [
     component: props => <Consumable {...props} />,
   },
   {
+    type: 'Service',
     name: 'Service',
     value: ORDER_TYPES.SERVICE,
     prop: 'corService',
@@ -167,14 +171,9 @@ const convertToConsultation = (
 ) => {
   const { rows = [] } = consultationDocument
   consultationDocumentTypes.forEach(p => {
-    values[p.prop] = rows.filter(o => o.type === p.value && !o.vaccinationUFK)
+    values[p.prop] = rows.filter(o => o.type === p.value)
   })
-  const {
-    rows: orderRows = [],
-    finalAdjustments = [],
-    isGSTInclusive,
-    corPackage = [],
-  } = orders
+  const { rows: orderRows = [], finalAdjustments = [], isGSTInclusive } = orders
 
   values.corOrderAdjustment = finalAdjustments
   orderTypes.forEach((p, i) => {
@@ -183,8 +182,9 @@ const convertToConsultation = (
         orderRows.filter(o => o.type === p.value),
       )
     }
-  }) 
+  })
 
+  values = convertClinicalNotesForms(values)
   values = convertEyeForms(values)
 
   const formRows = forms.rows
@@ -197,11 +197,57 @@ const convertToConsultation = (
           })
       : []
   })
- 
+
   return {
     ...values,
     isGSTInclusive,
   }
+}
+
+const convertClinicalNotesForms = values => {
+  let anyChange = false
+  formConfigs.forEach(form => {
+    var list = getIn(values, form.prop) || []
+    var entity = getIn(values, form.prefixProp)
+    var oldList = list.map(x => ({ ...x }))
+    //check list any old item
+    if (list && list.length > 0) {
+      //unticked form
+      if (!entity) {
+        list[0].isDeleted = true
+      } else {
+        //add new after unticked
+        if (!entity.id) {
+          list[0].isDeleted = true
+          list.push({ ...entity })
+        }
+        //update old item
+        else {
+          list[0] = {
+            ...list[0],
+            ...entity,
+          }
+        }
+      }
+    }
+    //fist add
+    else if (entity) {
+      list.push(entity)
+      values = setIn(values, form.prop, list)
+    }
+    if (!anyChange && !_.isEqual(list, oldList)) {
+      anyChange = true
+    }
+
+    values = setIn(values, form.prefixProp, undefined)
+    list.forEach(item => {
+      item.rightScribbleNote = undefined
+      item.leftScribbleNote = undefined
+      item.ocularMotilityScribbleNote = undefined
+    })
+  })
+  if (anyChange) values.corDoctorNote.lastChangeDate = moment()
+  return values
 }
 
 const cleanConsultation = values => {
@@ -222,10 +268,6 @@ const generateConsumable = item => {
     consumableName: item.consumableName,
     inventoryConsumableFK: item.inventoryConsumableFK,
     isDeleted: item.isDeleted,
-    isDispensedByPharmacy: item.isDispensedByPharmacy,
-    isNurseActualizeRequired: item.isNurseActualizeRequired,
-    isPreOrder: item.isPreOrder,
-    performingUserFK: item.performingUserFK,
     quantity: item.quantity,
     remark: item.remark,
     unitOfMeasurement: item.unitOfMeasurement,
@@ -259,7 +301,7 @@ const getOrdersData = val => {
     primaryPrintoutLanguage = 'EN',
     secondaryPrintoutLanguage = '',
   } = clinicSettings
-  const { corVitalSign = [], rows } = orders
+  const { rows } = orders
 
   return data
 }
@@ -271,4 +313,5 @@ export {
   convertConsultationDocument,
   cleanFields,
   getOrdersData,
+  convertClinicalNotesForms,
 }

@@ -50,41 +50,17 @@ class HistoryDetails extends PureComponent {
 
   componentWillMount() {
     const { selectHistory } = this.props
-    const isRetailVisit = selectHistory.visitPurposeFK === VISIT_TYPE.OTC
-    if (isRetailVisit) {
-      this.handleRetailVisitHistory(selectHistory)
-    } else
-      this.props
-        .dispatch({
-          type: 'patientHistory/queryOne',
-          payload: selectHistory.coHistory[0].id,
-        })
-        .then(r => {
-          if (r) {
-            this.props.dispatch({
-              type: 'patientHistory/updateState',
-              payload: {
-                selectedSubRow: selectHistory.coHistory[0],
-              },
-            })
-          }
-        })
-  }
-
-  handleRetailVisitHistory = v => {
     this.props
       .dispatch({
-        type: 'patientHistory/queryRetailHistory',
-        payload: {
-          id: v.invoiceFK,
-        },
+        type: 'patientHistory/queryOne',
+        payload: selectHistory.coHistory[0].id,
       })
       .then(r => {
         if (r) {
           this.props.dispatch({
             type: 'patientHistory/updateState',
             payload: {
-              selectedSubRow: v,
+              selectedSubRow: selectHistory.coHistory[0],
             },
           })
         }
@@ -95,12 +71,9 @@ class HistoryDetails extends PureComponent {
     const { patientHistory, clinicSettings, selectHistory } = this.props
     const { settings = [] } = clinicSettings
     const { selectedSubRow } = patientHistory
-    const isRetailVisit = selectHistory.visitPurposeFK === VISIT_TYPE.OTC
     let newArray = []
 
-    if (isRetailVisit) {
-      newArray.push(selectHistory)
-    } else if (
+    if (
       settings.showConsultationVersioning === false ||
       settings.showConsultationVersioning === undefined
     ) {
@@ -124,11 +97,9 @@ class HistoryDetails extends PureComponent {
           const updateByUser = o.userName
             ? `${o.userTitle || ''} ${o.userName || ''}`
             : undefined
-          const lastUpdateDate = moment(
-            selectHistory.visitPurposeFK === VISIT_TYPE.OTC
-              ? o.visitDate
-              : o.signOffDate,
-          ).format('DD MMM YYYY HH:mm')
+          const lastUpdateDate = moment(o.signOffDate).format(
+            'DD MMM YYYY HH:mm',
+          )
           const {
             visitDate,
             timeIn,
@@ -155,24 +126,21 @@ class HistoryDetails extends PureComponent {
                   if (selectedSubRow && selectedSubRow.id === o.id) {
                     return
                   }
-                  if (isRetailVisit) {
-                    this.handleRetailVisitHistory(selectHistory)
-                  } else
-                    this.props
-                      .dispatch({
-                        type: 'patientHistory/queryOne',
-                        payload: o.id,
-                      })
-                      .then(r => {
-                        if (r) {
-                          this.props.dispatch({
-                            type: 'patientHistory/updateState',
-                            payload: {
-                              selectedSubRow: o,
-                            },
-                          })
-                        }
-                      })
+                  this.props
+                    .dispatch({
+                      type: 'patientHistory/queryOne',
+                      payload: o.id,
+                    })
+                    .then(r => {
+                      if (r) {
+                        this.props.dispatch({
+                          type: 'patientHistory/updateState',
+                          payload: {
+                            selectedSubRow: o,
+                          },
+                        })
+                      }
+                    })
                 }}
               >
                 <ListItemText
@@ -192,7 +160,7 @@ class HistoryDetails extends PureComponent {
                         })${docotrName ? ` - ${docotrName}` : ''}`}
                       </div>
                       <div>
-                        {settings.showConsultationVersioning && !isRetailVisit
+                        {settings.showConsultationVersioning
                           ? `${selectHistory.visitPurposeName} (V${
                               o.versionNumber
                             }), Last Update By: ${updateByUser || ''}${
@@ -258,7 +226,11 @@ class HistoryDetails extends PureComponent {
             .filter(_widget => {
               if (visitPurposeFK === VISIT_TYPE.OTC) {
                 return (
-                  _widget.id === WidgetConfig.WIDGETS_ID.INVOICE &&
+                  (_widget.id === WidgetConfig.WIDGETS_ID.ORDERS ||
+                    _widget.id === WidgetConfig.WIDGETS_ID.INVOICE ||
+                    _widget.id === WidgetConfig.WIDGETS_ID.VISITREMARKS ||
+                    _widget.id === WidgetConfig.WIDGETS_ID.REFERRAL ||
+                    _widget.id === WidgetConfig.WIDGETS_ID.ATTACHMENT) &&
                   WidgetConfig.showWidget(current, _widget.id)
                 )
               }

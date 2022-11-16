@@ -3,7 +3,6 @@ import { bool } from 'prop-types'
 import _ from 'lodash'
 import { cleanFields } from '@/pages/Consultation/utils'
 import { VISIT_TYPE, VISITDOCTOR_CONSULTATIONSTATUS } from '@/utils/constants'
-import { visitOrderTemplateItemTypes } from '@/utils/codes'
 import { notification } from '@/components'
 import { VISIT_STATUS } from '../variables'
 import { roundTo } from '@/utils/utils'
@@ -106,22 +105,6 @@ const convertEyeForms = values => {
   return values
 }
 
-const getVisitOrderTemplateTotal = (vType, template) => {
-  let activeItemTotal = 0
-  visitOrderTemplateItemTypes.forEach(type => {
-    if (vType === VISIT_TYPE.OTC && type.id === 3) return
-    const currentTypeItems = template.visitOrderTemplateItemDtos.filter(
-      itemType => itemType.inventoryItemTypeFK === type.id,
-    )
-    currentTypeItems.map(item => {
-      if (item[type.dtoName].isActive === true) {
-        activeItemTotal += item.totalAftAdj || 0
-      }
-    })
-  })
-  return activeItemTotal
-}
-
 export const getMCReportLanguage = (patient, clinicSettings) => {
   const {
     primaryPrintoutLanguage = 'EN',
@@ -156,11 +139,8 @@ export const formikMapPropsToValues = ({
     let visitPurposeFK = clinicSettings.defaultVisitType
     let roomAssignmentFK
     let consReady
-    let currentVisitOrderTemplateFK
+    let resourceRoomFK
     if (clinicInfo) {
-      // doctorProfile = doctorProfiles.find(
-      //   (item) => item.doctorMCRNo === clinicInfo.primaryMCRNO,
-      // )
       doctorProfileFK = clinicInfo.primaryRegisteredDoctorFK
     }
 
@@ -185,7 +165,6 @@ export const formikMapPropsToValues = ({
     const {
       visit = {
         visitDoctor: [],
-        visitBasicExaminations: [{}],
         isDoctorInCharge: true,
       },
     } = visitInfo
@@ -198,14 +177,7 @@ export const formikMapPropsToValues = ({
       {},
     )
     const { location } = history
-    if (location.query.pdid) {
-      doctorProfile = doctorProfiles.find(
-        item => item.clinicianProfile.id === parseInt(location.query.pdid, 10),
-      )
-      doctorProfileFK = doctorProfile ? doctorProfile.id : doctorProfileFK
-    }
-
-    const { visitOrderTemplateFK, visitEyeRefractionForm } = visitEntries
+    const { visitEyeRefractionForm } = visitEntries
 
     if (!visitEntries.id) {
       if (doctorProfile) {
@@ -223,17 +195,19 @@ export const formikMapPropsToValues = ({
         }
       }
       if (appointment && appointment.appointments.length) {
-        currentVisitOrderTemplateFK =
-          appointment.appointments[0].visitOrderTemplateFK
+        resourceRoomFK =
+          appointment.appointments[0].appointments_Resources[0].calendarResource
+            ?.resourceDto?.roomFK
+        if (
+          appointment.appointments[0].appointments_Resources[0].calendarResource
+            .resourceType === 'Doctor'
+        ) {
+          doctorProfileFK =
+            appointment.appointments[0].appointments_Resources[0]
+              .calendarResource.clinicianProfileDto.doctorProfileFK
+        }
       }
-    } else {
-      currentVisitOrderTemplateFK = visitOrderTemplateFK
     }
-    // const isVisitOrderTemplateActive = (
-    //   visitRegistration.visitOrderTemplateOptions || []
-    // )
-    //   .map(option => option.id)
-    //   .includes(currentVisitOrderTemplateFK)
 
     let newFormData
     if (visitEyeRefractionForm && visitEyeRefractionForm.formData) {
@@ -264,19 +238,13 @@ export const formikMapPropsToValues = ({
 
     return {
       queueNo: qNo,
-      visitPurposeFK: 2,
+      visitPurposeFK: VISIT_TYPE.BF,
       consReady,
-      roomFK: roomAssignmentFK || roomFK,
+      roomFK: resourceRoomFK || roomAssignmentFK || roomFK,
       visitStatus: VISIT_STATUS.WAITING,
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
       doctorProfileFK,
       ...visitEntries,
-      // visitOrderTemplateFK: isVisitOrderTemplateActive
-      //   ? currentVisitOrderTemplateFK
-      //   : undefined,
-      // visitOrderTemplateTotal: !visitEntries.id
-      //   ? undefined
-      //   : visitEntries.visitOrderTemplateTotal,
       visitEyeRefractionForm: {
         ...visitEyeRefractionForm,
         formData: newFormData,
@@ -298,10 +266,6 @@ export const formikMapPropsToValues = ({
         ...visitEntries.visitDoctor.filter(d => !d.isPrimaryDoctor),
       ],
       visitPrimaryDoctor: visitEntries.visitDoctor.find(d => d.isPrimaryDoctor),
-      // visitBasicExaminations: visitEntries.visitBasicExaminations.map(be => ({
-      //   ...be,
-      //   visitPurposeFK: visitEntries.visitPurposeFK || visitPurposeFK,
-      // })),
     }
   } catch (error) {
     console.log({ error })
@@ -313,13 +277,7 @@ export const formikHandleSubmit = (
   values,
   { props, resetForm, setSubmitting },
 ) => {
-  const {
-    queueNo,
-    visitAttachment,
-    referralBy = [],
-    visitOrderTemplate,
-    ...restValues
-  } = values
+  const { queueNo, visitAttachment, referralBy = [], ...restValues } = values
   const {
     history,
     dispatch,

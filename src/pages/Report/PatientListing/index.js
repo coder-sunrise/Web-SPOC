@@ -12,7 +12,7 @@ const reportId = 2
 const fileName = 'Patient Listing Report'
 
 class PatientListing extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       ...this.state,
@@ -25,25 +25,28 @@ class PatientListing extends ReportBase {
     return <FilterBar {...this.props} handleSubmit={handleSubmit} />
   }
 
-  renderContent = (reportDatas) => {
+  renderContent = reportDatas => {
     return <PatientList reportDatas={reportDatas} />
   }
 }
 
 const PatientListingWithFormik = withFormik({
-  validationSchema: Yup.object().shape(
-    {
-      // patientCriteria: Yup.string().required(),
-    },
-  ),
+  validationSchema: Yup.object().shape({
+    // patientCriteria: Yup.string().required(),
+  }),
   mapPropsToValues: () => ({
     patientCriteria: '',
-    dateFrom: moment(new Date()).startOf('month').toDate(),
-    dateTo: moment(new Date()).endOf('month').toDate(),
+    dateFrom: moment(new Date())
+      .startOf('month')
+      .toDate(),
+    dateTo: moment(new Date())
+      .endOf('month')
+      .toDate(),
     ageFrom: 0,
     ageTo: 0,
     isAllDate: false,
     patientStatus: 'all',
+    visitTypeIDs: [-99],
   }),
 })(PatientListing)
 

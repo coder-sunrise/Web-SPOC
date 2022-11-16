@@ -5,11 +5,7 @@ import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { Divider } from '@material-ui/core'
 import Cross from '@material-ui/icons/HighlightOff'
-import VisitOrderTemplateIndicateString from './VisitOrderTemplateIndicateString'
-import {
-  isMatchInstructionRule,
-  ReplaceCertificateTeplate,
-} from '@/pages/Widgets/Orders/utils'
+import { isMatchInstructionRule } from '@/pages/Widgets/Orders/utils'
 import {
   calculateAdjustAmount,
   getUniqueId,
@@ -34,7 +30,6 @@ import {
 import { Button } from 'antd'
 import { orderTypes } from '@/pages/Consultation/utils'
 import Authorized from '@/utils/Authorized'
-import VisitOrderTemplateRevert from './VisitOrderTemplateRevert'
 import moment from 'moment'
 export default ({
   orders,
@@ -56,15 +51,6 @@ export default ({
     isGSTInclusive,
   )
 
-  const [
-    removedVisitOrderTemplateItem,
-    setRemovedVisitOrderTemplateItem,
-  ] = useState([])
-
-  const [showRevertVisitPurposeItem, setShowRevertVisitPurposeItem] = useState(
-    false,
-  )
-
   const [expandedGroups, setExpandedGroups] = useState([])
 
   const getOrderAccessRight = (accessRight, isEnableEditOrder) => {
@@ -81,109 +67,6 @@ export default ({
     setExpandedGroups(e)
   }
 
-  const GetService = async (currentVisitOrderTemplate, sequence) => {
-    const ctservice = await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctservice',
-      },
-    })
-    var service = ctservice.find(
-      t =>
-        t.serviceCenter_ServiceId ===
-        currentVisitOrderTemplate.visitOrderTemplateServiceItemDto
-          .serviceCenterServiceFK,
-    )
-    let type = ORDER_TYPES.SERVICE
-    const newService = {
-      adjAmount: currentVisitOrderTemplate.adjAmt,
-      adjType: currentVisitOrderTemplate.adjType,
-      adjValue: currentVisitOrderTemplate.adjValue,
-      isActive: true,
-      isDeleted: false,
-      isDisplayValueChangable: service.isDisplayValueChangable,
-      isMinus: !!(
-        currentVisitOrderTemplate.adjValue &&
-        currentVisitOrderTemplate.adjValue < 0
-      ),
-      isExactAmount: !!(
-        currentVisitOrderTemplate.adjType &&
-        currentVisitOrderTemplate.adjType === 'ExactAmount'
-      ),
-      isOrderedByDoctor:
-        user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
-      performingUserFK: user.data.clinicianProfile.userProfile.id,
-      quantity: currentVisitOrderTemplate.quantity,
-      sequence: sequence,
-      serviceCenterFK: service.serviceCenterId,
-      serviceCenterServiceFK: service.serviceCenter_ServiceId,
-      serviceCode: service.code,
-      serviceFK: service.serviceId,
-      serviceName: service.displayValue,
-      subject: service.displayValue,
-      total: currentVisitOrderTemplate.total,
-      totalAfterItemAdjustment: currentVisitOrderTemplate.totalAftAdj,
-      type: type,
-      priority: 'Normal',
-      unitPrice: currentVisitOrderTemplate.unitPrice,
-      visitPurposeFK: currentVisitOrderTemplate.visitOrderTemplateFK,
-      visitOrderTemplateItemFK: currentVisitOrderTemplate.id,
-    }
-    return newService
-  }
-  const GetConsumable = async (currentVisitOrderTemplate, sequence) => {
-    const inventoryconsumable = await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventoryconsumable',
-      },
-    })
-
-    var consumable = inventoryconsumable.find(
-      t =>
-        t.id ===
-        currentVisitOrderTemplate.visitOrderTemplateConsumableItemDto
-          .inventoryConsumableFK,
-    )
-    let defaultBatch = consumable?.consumableStock.find(
-      o => o.isDefault === true,
-    )
-    const newConsumable = {
-      adjAmount: currentVisitOrderTemplate.adjAmt,
-      adjType: currentVisitOrderTemplate.adjType,
-      adjValue: currentVisitOrderTemplate.adjValue,
-      batchNo: defaultBatch?.batchNo,
-      consumableCode: consumable.code,
-      consumableName: consumable.displayValue,
-      inventoryConsumableFK: consumable.id,
-      isActive: true,
-      isDeleted: false,
-      isDispensedByPharmacy: consumable.isDispensedByPharmacy,
-      isMinus: !!(
-        currentVisitOrderTemplate.adjValue &&
-        currentVisitOrderTemplate.adjValue < 0
-      ),
-      isExactAmount: !!(
-        currentVisitOrderTemplate.adjType &&
-        currentVisitOrderTemplate.adjType === 'ExactAmount'
-      ),
-      isNurseActualizeRequired: consumable.isNurseActualizable,
-      isOrderedByDoctor: true,
-      performingUserFK:
-        user.data.clinicianProfile.userProfile.role.clinicRoleFK === 1,
-      quantity: currentVisitOrderTemplate.quantity,
-      sequence: sequence,
-      subject: consumable.displayValue,
-      totalAfterItemAdjustment: currentVisitOrderTemplate.totalAftAdj,
-      totalPrice: currentVisitOrderTemplate.total,
-      type: ORDER_TYPES.CONSUMABLE,
-      unitOfMeasurement: consumable.uom?.name,
-      unitPrice: currentVisitOrderTemplate.unitPrice,
-      visitOrderTemplateItemFK: currentVisitOrderTemplate.id,
-    }
-
-    return newConsumable
-  }
   useEffect(() => {
     setCheckedStatusIncldGST(orders.isGSTInclusive)
   }, [orders])
@@ -266,22 +149,6 @@ export default ({
         payload: {
           entity: row,
           type: row.type,
-        },
-      })
-    }
-    if (row.type === '7') {
-      const treatment =
-        (codetable.cttreatment || []).find(
-          o => o.isActive && o.id === row.treatmentFK,
-        ) || {}
-      const action = (codetable.ctchartmethod || []).find(
-        o => o.id === treatment.chartMethodFK,
-      )
-      dispatch({
-        type: 'dentalChartComponent/updateState',
-        payload: {
-          mode: 'treatment',
-          action,
         },
       })
     }
@@ -511,117 +378,6 @@ export default ({
     }
     return row.subject
   }
-
-  const getVisitOrderTemplateDetails = rows => {
-    const { entity } = visitRegistration || {}
-    if (!entity) return ''
-    const { visit } = entity
-    const { visitOrderTemplate = {} } = visit
-    const { visitOrderTemplateItemDtos = [] } = visitOrderTemplate
-    const remainedTemplateItemIds = rows
-      .filter(t => !t.isDeleted && t.visitOrderTemplateItemFK)
-      .map(t => t.visitOrderTemplateItemFK)
-    let visitPurpose = visitOrderTemplate.displayValue
-    let removedItems = visitOrderTemplateItemDtos
-      .filter(t => remainedTemplateItemIds.indexOf(t.id) < 0)
-      .map(t => t.inventoryItemName)
-    let addedItems = rows
-      .filter(t => !t.isDeleted && !t.visitOrderTemplateItemFK)
-      .map(t => {
-        return t.subject
-      })
-    return JSON.stringify({
-      visitPurpose: visitPurpose,
-      removedItems: removedItems,
-      addedItems: addedItems,
-    })
-  }
-
-  const revertVisitPurpose = () => {
-    if (!isEnableEditOrder) return
-    const { entity } = visitRegistration
-    const { visit } = entity
-    const { visitOrderTemplate } = visit
-    const { visitOrderTemplateItemDtos } = visitOrderTemplate
-
-    let removedTemplateItems = visitOrderTemplateItemDtos
-      .filter(
-        t =>
-          t.inventoryItemTypeFK === 3 ||
-          t.inventoryItemTypeFK === 4 ||
-          ((t.inventoryItemTypeFK === 2 || t.inventoryItemTypeFK === 1) &&
-            t.orderable),
-      )
-      .filter(t => {
-        if (
-          rows.filter(
-            x => x.isDeleted === false && x.visitOrderTemplateItemFK === t.id,
-          ).length > 0
-        ) {
-          return undefined
-        } else return t
-      })
-    if (visit.visitPurposeFK === VISIT_TYPE.OTC) {
-      removedTemplateItems = removedTemplateItems.filter(t => {
-        if (t.inventoryItemTypeFK !== 3 && t.inventoryItemTypeFK !== 4) {
-          return true
-        }
-        if (t.inventoryItemTypeFK === 4) {
-          return true
-        }
-        return false
-      })
-    }
-    _.sortBy(removedTemplateItems, 'inventoryItemTypeFK')
-    setRemovedVisitOrderTemplateItem(removedTemplateItems)
-    setShowRevertVisitPurposeItem(true)
-  }
-  const confirmRevert = async data => {
-    let newItems = []
-    let currentSequence =
-      (_.max(rows.filter(t => !t.isDeleted).map(t => t.sequence)) || 0) + 1
-
-    const allDocs = (consultationDocument.rows || []).filter(s => !s.isDeleted)
-    let vaccCertSequence = 1
-    if (allDocs && allDocs.length > 0) {
-      const { sequence: documentSequence } = _.maxBy(allDocs, 'sequence')
-      vaccCertSequence = documentSequence + 1
-    }
-
-    for (let index = 0; index < data.length; index++) {
-      let templateItem = data[index]
-      if (templateItem.visitOrderTemplateConsumableItemDto) {
-        try {
-          const newConsumable = await GetConsumable(
-            templateItem,
-            currentSequence,
-          )
-          newItems.push(newConsumable)
-        } catch (error) {
-          console.log(error)
-          notification.error({
-            message: `Revert consumable ${templateItem?.inventoryItemName} failed.`,
-          })
-        }
-      } else if (templateItem.visitOrderTemplateServiceItemDto) {
-        try {
-          const newService = await GetService(templateItem, currentSequence)
-          newItems.push(newService)
-        } catch (error) {
-          console.log(error)
-          notification.error({
-            message: `Revert service ${templateItem?.inventoryItemName} failed.`,
-          })
-        }
-      }
-      currentSequence = currentSequence + 1
-    }
-    dispatch({
-      type: 'orders/upsertRows',
-      payload: newItems,
-    })
-    setShowRevertVisitPurposeItem(false)
-  }
   return (
     <Fragment>
       <CommonTableGrid
@@ -633,10 +389,7 @@ export default ({
           .map(r => {
             return {
               ...r,
-              currentTotal:
-                (!r.isPreOrder && !r.hasPaid) || r.isChargeToday
-                  ? r.totalAfterItemAdjustment
-                  : 0,
+              currentTotal: r.totalAfterItemAdjustment,
               isEditingEntity: isEditingEntity,
               isEnableEditOrder: isEnableEditOrder,
             }
@@ -705,9 +458,6 @@ export default ({
                 const { visit } = entity || {}
                 const { children, ...restProps } = p
                 let newChildren = []
-                let visitOrderTemplateDetails = visit?.visitOrderTemplateFK
-                  ? getVisitOrderTemplateDetails(rows)
-                  : {}
                 newChildren = [
                   <Table.Cell
                     colSpan={3}
@@ -716,32 +466,7 @@ export default ({
                       position: 'relative',
                       color: 'rgba(0, 0, 0, 1)',
                     }}
-                  >
-                    {visit && visit.visitOrderTemplateFK && (
-                      <div>
-                        <div>
-                          <VisitOrderTemplateIndicateString
-                            visitOrderTemplateDetails={
-                              visitOrderTemplateDetails
-                            }
-                          ></VisitOrderTemplateIndicateString>
-                        </div>
-                        <div>
-                          {isEnableEditOrder && (
-                            <Link
-                              style={{ textDecoration: 'underline' }}
-                              onClick={e => {
-                                e.preventDefault()
-                                revertVisitPurpose()
-                              }}
-                            >
-                              Click to Revert Visit Purpose Item
-                            </Link>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </Table.Cell>,
+                  ></Table.Cell>,
                   React.cloneElement(children[6], {
                     colSpan: 2,
                     ...restProps,
@@ -855,7 +580,7 @@ export default ({
               let displayText
 
               const itemType = orderItemTypes.find(
-                t => t.type.toUpperCase() === (otype.name || '').toUpperCase(),
+                t => t.type.toUpperCase() === (otype.type || '').toUpperCase(),
               )
               texts = [
                 otype.name,
@@ -912,10 +637,7 @@ export default ({
                   <Tooltip
                     title={
                       <div>
-                        {`Code: ${row.serviceCode ||
-                          row.drugCode ||
-                          row.consumableCode ||
-                          row.vaccinationCode}`}
+                        {`Code: ${row.serviceCode || row.consumableCode}`}
                         <br />
                         {`Name: ${getDisplayName(row)}`}
                       </div>
@@ -927,6 +649,7 @@ export default ({
                           position: 'relative',
                           left: 0,
                         }}
+                        className='threeline_textblock'
                       >
                         {getDisplayName(row)}
                       </div>
@@ -1033,10 +756,7 @@ export default ({
                     style={{ marginRight: 5 }}
                     disabled={
                       row.isEditingEntity ||
-                      (!row.isActive &&
-                        row.type !== '5' &&
-                        !row.isDrugMixture) ||
-                      row.isPreOrderActualize ||
+                      (!row.isActive && row.type !== '5') ||
                       !editEnable ||
                       getOrderAccessRight(
                         editAccessRight,
@@ -1051,7 +771,6 @@ export default ({
                       type='danger'
                       disabled={
                         row.isEditingEntity ||
-                        row.isPreOrderActualize ||
                         !deleteEnable ||
                         getOrderAccessRight(
                           editAccessRight,
@@ -1115,25 +834,6 @@ export default ({
           },
         ]}
       />
-      {/* <CommonModal
-        open={showRevertVisitPurposeItem}
-        title='Revert Visit Purpose Item(s)'
-        cancelText='Cancel'
-        maxWidth='sm'
-        onClose={() => {
-          setShowRevertVisitPurposeItem(false)
-        }}
-        onConfirm={() => {
-          setShowRevertVisitPurposeItem(false)
-        }}
-      >
-        <VisitOrderTemplateRevert
-          data={removedVisitOrderTemplateItem}
-          dispatch={dispatch}
-          open={showRevertVisitPurposeItem}
-          confirmRevert={confirmRevert}
-        ></VisitOrderTemplateRevert>
-      </CommonModal> */}
     </Fragment>
   )
 }

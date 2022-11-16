@@ -64,6 +64,7 @@ const Detail = ({
                         label={formatMessage({
                           id: 'inventory.master.consumable.name',
                         })}
+                        maxLength={2000}
                         {...args}
                       />
                     )
@@ -79,6 +80,7 @@ const Detail = ({
                         label={formatMessage({
                           id: 'inventory.master.consumable.description',
                         })}
+                        maxLength={2000}
                         {...args}
                       />
                     )
@@ -96,10 +98,41 @@ const Detail = ({
                         })}
                         multiline
                         rowsMax='5'
+                        maxLength={2000}
                         {...args}
                       />
                     )
                   }}
+                />
+              </GridItem>
+              <GridItem>
+                <FastField
+                  name='availableOpts'
+                  render={args => (
+                    <CheckboxGroup
+                      vertical
+                      simple
+                      valueField='id'
+                      textField='name'
+                      options={[
+                        {
+                          id: 'orderable',
+                          name: 'Orderable',
+                          tooltip:
+                            'Item is orderable and dispensable to patient',
+                          disabled:
+                            hasActiveSession &&
+                            consumableDetail.entity?.id &&
+                            consumableDetail.entity?.isActive &&
+                            consumableDetail.entity?.orderable,
+                          layoutConfig: {
+                            style: {},
+                          },
+                        },
+                      ]}
+                      {...args}
+                    />
+                  )}
                 />
               </GridItem>
             </GridContainer>

@@ -569,7 +569,7 @@ class Main extends React.Component {
                     <div
                       style={{
                         marginTop: 5,
-                        marginLeft: item.level > 1 ? 10 * (item.level - 1) : 0,
+                        marginLeft: item.grade > 1 ? 10 * (item.grade - 1) : 0,
                         color: this.isParentSelect(
                           item.clientAccessRightFK,
                           item.module,
@@ -649,7 +649,6 @@ class Main extends React.Component {
     } = values
 
     const isEdit = !!id
-    let filterArray = [CLINICAL_ROLE.DOCTOR, CLINICAL_ROLE.OTHERS]
     return (
       <React.Fragment>
         <GridContainer
@@ -745,9 +744,9 @@ class Main extends React.Component {
                     code='ltclinicalrole'
                     labelField='displayValue'
                     disabled={isEdit}
-                    localFilter={item => {
-                      return filterArray.includes(item.id)
-                    }}
+                    // localFilter={item => {
+                    //   return filterArray.includes(item.id)
+                    // }}
                     onChange={this.handleSearch}
                   />
                 )}

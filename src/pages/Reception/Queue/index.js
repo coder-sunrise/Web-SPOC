@@ -179,10 +179,7 @@ class Queue extends React.Component {
     visitID = undefined,
     patientID = undefined,
     appointmentID = undefined,
-    pdid = undefined,
-    pdroomid = undefined,
     visitMode = undefined,
-    visitOrderTemplateFK = undefined,
   }) => {
     const parameter = {
       md: 'visreg',
@@ -190,11 +187,7 @@ class Queue extends React.Component {
     if (patientID) parameter.pid = patientID
     if (visitID) parameter.vis = visitID
     if (appointmentID) parameter.apptid = appointmentID
-    if (pdid) parameter.pdid = pdid
-    if (pdroomid) parameter.pdroomid = pdroomid
     if (visitMode) parameter.visitMode = visitMode
-    if (visitOrderTemplateFK)
-      parameter.visitOrderTemplateFK = visitOrderTemplateFK
 
     // console.log(parameter)
     this.togglePatientSearch(false)
@@ -204,16 +197,10 @@ class Queue extends React.Component {
   handleActualizeAppointment = ({
     patientID = undefined,
     appointmentID = undefined,
-    primaryClinicianFK = undefined,
-    primaryClinicianRoomFK = undefined,
-    visitOrderTemplateFK = undefined,
   }) => {
     this.showVisitRegistration({
       patientID,
       appointmentID,
-      pdid: primaryClinicianFK,
-      pdroomid: primaryClinicianRoomFK,
-      visitOrderTemplateFK: visitOrderTemplateFK,
       visitMode: 'edit',
     })
   }
@@ -267,6 +254,9 @@ class Queue extends React.Component {
             mobileContactNumber: {
               ...DefaultPatientProfile.contact.mobileContactNumber,
               number: row.patientContactNo,
+            },
+            contactEmailAddress: {
+              emailAddress: row.patientEmail,
             },
           },
         },
@@ -543,9 +533,6 @@ class Queue extends React.Component {
         break
       case '1': {
         // dispense
-        const isInitialLoading =
-          row.visitPurposeFK === VISIT_TYPE.OTC &&
-          row.visitStatus === VISIT_STATUS.WAITING
         const version = Date.now()
         dispatch({
           type: `dispense/start`,
@@ -564,7 +551,7 @@ class Queue extends React.Component {
               },
             })
             history.push(
-              `/reception/queue/dispense?isInitialLoading=${isInitialLoading}&qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
+              `/reception/queue/dispense?qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
             )
           }
         })
@@ -704,9 +691,6 @@ class Queue extends React.Component {
         this.handleActualizeAppointment({
           patientID: row.patientProfileFk,
           appointmentID: row.id,
-          primaryClinicianFK: doctorProfile ? doctorProfile.id : undefined,
-          primaryClinicianRoomFK: row.roomFk,
-          visitOrderTemplateFK: row.visitOrderTemplateFK,
         })
         break
       }
@@ -905,8 +889,7 @@ class Queue extends React.Component {
       refreshInfo,
     } = this.state
     const { sessionInfo, error, queueFilterBar = {} } = queueLog
-    const { visitType = [] } = queueFilterBar
-    const { doctor = [] } = queueFilterBar
+    const { doctor = [], visitType = [], room = [] } = queueFilterBar
     const { sessionNo, isClinicSessionClosed } = sessionInfo
     const { oriQCallList } = queueCalling
     const openQueueDisplayAccessRight = Authorized.check('openqueuedisplay')
@@ -931,42 +914,7 @@ class Queue extends React.Component {
                     style={{
                       display: 'inline-block',
                       position: 'absolute',
-                      right: 700,
-                      width: 200,
-                    }}
-                  >
-                    <p style={{ fontWeight: 400, fontSize: '0.8rem' }}>
-                      Now Serving:
-                    </p>
-                    <Tooltip
-                      title={
-                        queueCallList?.[0]
-                          ? `${queueCallList?.[0]?.qNo}.0 (${queueCallList?.[0]?.patientName})`
-                          : '-'
-                      }
-                    >
-                      <p
-                        style={{
-                          color: '#1890f8',
-                          textOverflow: 'ellipsis',
-                          overflow: 'hidden',
-                          whiteSpace: 'nowrap',
-                          marginTop: -5,
-                          fontSize: '0.9rem',
-                          width: 200,
-                        }}
-                      >
-                        {queueCallList?.[0]
-                          ? `${queueCallList?.[0]?.qNo}.0 (${queueCallList?.[0]?.patientName})`
-                          : '-'}
-                      </p>
-                    </Tooltip>
-                  </div>
-                  <div
-                    style={{
-                      display: 'inline-block',
-                      position: 'absolute',
-                      right: 620,
+                      right: 450,
                     }}
                   >
                     <p style={{ fontWeight: 400, fontSize: '0.8rem' }}>
@@ -1060,6 +1008,7 @@ class Queue extends React.Component {
                 searchQuery={search}
                 visitType={visitType}
                 doctor={doctor}
+                room={room}
               />
               <RightClickContextMenu
                 onMenuItemClick={this.onMenuItemClick}

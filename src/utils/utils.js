@@ -930,7 +930,7 @@ const htmlDecodeByRegExp = (str = '') => {
   s = s.replace(/&quot;/g, '"')
   return s
 }
- 
+
 const sortAdjustment = (a, b) => {
   const { sequence: aSequence } = a
   const { sequence: bSequence } = b
@@ -994,7 +994,7 @@ const calculateAmount = (
 ) => {
   let gst = 0
   allOrderRows
-    .filter(o => !o.isDeleted && o.isPreOrder && !o.hasPaid)
+    .filter(o => !o.isDeleted && !o.hasPaid)
     .forEach(r => {
       r[adjustedField] = r[totalField]
       r[gstField] = r[adjustedField]
@@ -1002,21 +1002,11 @@ const calculateAmount = (
     })
   // pre-order
   const activeOrderRows = allOrderRows.filter(
-    o =>
-      !o.isDeleted &&
-      (!o.isPreOrder || o.isChargeToday) &&
-      !o.hasPaid &&
-      o[totalField] > 0,
+    o => !o.isDeleted && !o.hasPaid && o[totalField] > 0,
   )
   // zero amount
   allOrderRows
-    .filter(
-      o =>
-        !o.isDeleted &&
-        (!o.isPreOrder || o.isChargeToday) &&
-        !o.hasPaid &&
-        o[totalField] === 0,
-    )
+    .filter(o => !o.isDeleted && !o.hasPaid && o[totalField] === 0)
     .forEach(r => {
       r[adjustedField] = r[totalField]
       r[gstField] = r[adjustedField]
@@ -1327,6 +1317,54 @@ export const convertToBase64 = file =>
     reader.onerror = error => reject(error)
   })
 
+export const getDefaultLayerContent = async (
+  imageName,
+  size = { width: 0, height: 0 },
+  positon = { left: 0, top: 0 },
+) => {
+  const imageResult = await fetch(imageName).then(response => response.blob())
+  const result = await convertToBase64(imageResult)
+  return JSON.stringify({
+    type: 'image',
+    version: '3.5.1',
+    originX: 'left',
+    originY: 'top',
+    left: positon.left,
+    top: positon.top,
+    width: size.width,
+    height: size.height,
+    fill: 'rgb(0,0,0)',
+    stroke: null,
+    strokeWidth: 0,
+    strokeDashArray: null,
+    strokeLineCap: 'butt',
+    strokeDashOffset: 0,
+    strokeLineJoin: 'miter',
+    strokeMiterLimit: 4,
+    scaleX: 1,
+    scaleY: 1,
+    angle: 0,
+    flipX: false,
+    flipY: false,
+    opacity: 1,
+    shadow: null,
+    visible: true,
+    clipTo: null,
+    backgroundColor: '',
+    fillRule: 'nonzero',
+    paintFirst: 'fill',
+    globalCompositeOperation: 'source-over',
+    transformMatrix: null,
+    skewX: 0,
+    skewY: 0,
+    crossOrigin: '',
+    cropX: 0,
+    cropY: 0,
+    src: `data:image/png;base64,${result}`,
+    filters: [],
+  })
+}
+
 const enableTableForceRender = (duration = 1000) => {
   window._forceTableUpdate = true
   setTimeout(() => {
@@ -1555,7 +1593,7 @@ const menuViewableByAuthoritys = (authoritys = []) => {
   return false
 }
 const getFixedWidthBreakLineChars = (
-  comment,
+  content,
   style = {
     height: 0,
     display: 'inline-block',
@@ -1565,15 +1603,15 @@ const getFixedWidthBreakLineChars = (
   maxLineWidth = 700,
   minLineLength = 40,
 ) => {
-  if (!comment || !comment.trim().length) return ''
+  if (!content || !content.trim().length) return ''
   $('#div_text_width').css(style)
-  let newComment = ''
-  const comments = comment.split('\n')
-  comments.forEach(item => {
+  let newContent = ''
+  const contents = content.split('\n')
+  contents.forEach(item => {
     $('#div_text_width').html(item)
-    //if less than one line, return comment
+    //if less than one line, return content
     if ($('#div_text_width').width() <= maxLineWidth) {
-      newComment = item
+      newContent = item
     } else {
       let startIndex = 0
       let subLength = minLineLength
@@ -1582,19 +1620,19 @@ const getFixedWidthBreakLineChars = (
         if ($('#div_text_width').width() <= maxLineWidth) {
           subLength += 1
         } else {
-          if (newComment === '') {
-            newComment = item.substr(startIndex, subLength - 1)
+          if (newContent === '') {
+            newContent = item.substr(startIndex, subLength - 1)
           } else {
-            newComment += '\n' + item.substr(startIndex, subLength - 1)
+            newContent += '\n' + item.substr(startIndex, subLength - 1)
           }
           startIndex += subLength - 1
           subLength = minLineLength
           $('#div_text_width').html(
             item.substr(startIndex, item.length - startIndex),
           )
-          //if remain line less than one line, return comment
+          //if remain line less than one line, return content
           if ($('#div_text_width').width() <= maxLineWidth) {
-            newComment +=
+            newContent +=
               '\n' + item.substr(startIndex, item.length - startIndex)
             break
           }
@@ -1603,7 +1641,7 @@ const getFixedWidthBreakLineChars = (
     }
   })
   $('#div_text_width').html('')
-  return newComment
+  return newContent
 }
 export {
   sleep,

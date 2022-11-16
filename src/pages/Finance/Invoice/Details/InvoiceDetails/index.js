@@ -31,20 +31,10 @@ class InvoiceDetails extends Component {
   state = {
     showReport: false,
     showVisitInvoiceReport: false,
-    isExistPackage: false,
-    expandedGroups: [],
-    showPrintInvoiceMenu: false,
     invoiceReportType: '',
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { values } = nextProps
-    if (values.invoiceItem) {
-      this.setState({
-        isExistPackage: false,
-      })
-    }
-  }
+  componentWillReceiveProps(nextProps) {}
 
   toggleReport = invoiceReportType => {
     this.setState(preState => ({
@@ -62,41 +52,6 @@ class InvoiceDetails extends Component {
   render() {
     const { classes, values, isEnableVisitationInvoiceReport } = this.props
 
-    const handleExpandedGroupsChange = e => {
-      this.setState({
-        expandedGroups: e,
-      })
-    }
-
-    const packageGroupCellContent = ({ row }) => {
-      if (row.value === undefined || row.value === '') {
-        return (
-          <span style={{ verticalAlign: 'middle', paddingRight: 8 }}>
-            <strong>Non-Package Items</strong>
-          </span>
-        )
-      }
-
-      let label = 'Package'
-      let totalPrice = 0
-      if (!values.invoiceItem) return ''
-      const data = values.invoiceItem.filter(
-        item => item.packageGlobalId === row.value,
-      )
-      if (data.length > 0) {
-        totalPrice = _.sumBy(data, 'totalAfterItemAdjustment') || 0
-        label = `${data[0].packageCode} - ${data[0].packageName} (Total: `
-      }
-      return (
-        <span style={{ verticalAlign: 'middle', paddingRight: 8 }}>
-          <strong>
-            {label}
-            <NumberInput text currency value={totalPrice} />)
-          </strong>
-        </span>
-      )
-    }
-
     let newColumns = [
       { name: 'itemType', title: 'Type' },
       { name: 'itemName', title: 'Name' },
@@ -104,13 +59,6 @@ class InvoiceDetails extends Component {
       { name: 'adjAmt', title: 'Adjustment' },
       { name: 'totalAfterItemAdjustment', title: 'Total ($)' },
     ]
-
-    if (this.state.isExistPackage) {
-      newColumns.push({
-        name: 'packageGlobalId',
-        title: 'Package',
-      })
-    }
 
     return (
       <div className={classes.cardContainer}>
@@ -121,50 +69,17 @@ class InvoiceDetails extends Component {
             marginBottom: 10,
           }}
         >
-          <Popover
-            icon={null}
-            trigger='click'
-            placement='right'
-            visible={this.state.showPrintInvoiceMenu}
-            onVisibleChange={() => {
-              if (!values.visitOrderTemplateFK) {
-                this.toggleReport(INVOICE_REPORT_TYPES.INDIVIDUALINVOICE)
-              } else {
-                this.setState(preState => {
-                  return {
-                    showPrintInvoiceMenu: !preState.showPrintInvoiceMenu,
-                  }
-                })
-              }
+          <Button
+            size='sm'
+            color='primary'
+            icon
+            onClick={() => {
+              this.toggleReport(INVOICE_REPORT_TYPES.INDIVIDUALINVOICE)
             }}
-            content={
-              <MenuList
-                role='menu'
-                onClick={() => this.setState({ showPrintInvoiceMenu: false })}
-              >
-                <MenuItem
-                  onClick={() =>
-                    this.toggleReport(INVOICE_REPORT_TYPES.SUMMARYINVOICE)
-                  }
-                >
-                  Summary Invoice
-                </MenuItem>
-
-                <MenuItem
-                  onClick={() =>
-                    this.toggleReport(INVOICE_REPORT_TYPES.INDIVIDUALINVOICE)
-                  }
-                >
-                  Individual Invoice
-                </MenuItem>
-              </MenuList>
-            }
           >
-            <Button size='sm' color='primary' icon>
-              <Printer />
-              Print Invoice
-            </Button>
-          </Popover>
+            <Printer />
+            Print Invoice
+          </Button>
           {isEnableVisitationInvoiceReport && (
             <Button
               size='sm'
@@ -184,22 +99,10 @@ class InvoiceDetails extends Component {
           columns={newColumns}
           columnExtensions={DataGridColExtensions}
           defaultSorting={[
-            { columnName: 'packageGlobalId', direction: 'asc' },
             { columnName: 'invoiceItemTypeFK', direction: 'asc' },
           ]}
           FuncProps={{
             pager: false,
-            grouping: this.state.isExistPackage,
-            groupingConfig: {
-              state: {
-                grouping: [{ columnName: 'packageGlobalId' }],
-                expandedGroups: [...this.state.expandedGroups],
-                onExpandedGroupsChange: handleExpandedGroupsChange,
-              },
-              row: {
-                contentComponent: packageGroupCellContent,
-              },
-            },
           }}
         />
         <Summary values={values} />

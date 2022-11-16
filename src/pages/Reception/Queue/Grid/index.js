@@ -64,6 +64,7 @@ class Grid extends React.Component {
     if (this.props.mainDivHeight !== nextProps.mainDivHeight) return true
     if (this.props.searchQuery !== nextProps.searchQuery) return true
     if (this.props.visitType !== nextProps.visitType) return true
+    if (this.props.room !== nextProps.room) return true
     if (this.props.doctor !== nextProps.doctor) return true
 
     if (
@@ -79,20 +80,6 @@ class Grid extends React.Component {
     return false
   }
 
-  onRowDoubleClick = row => {
-    const { visitStatus, visitPurposeFK = VISIT_TYPE.BF } = row
-    const isWaiting = visitStatus === VISIT_STATUS.WAITING
-    const {
-      clinicianProfile: { doctorProfile },
-    } = this.props.user.data
-    const retailVisits = [VISIT_TYPE.OTC, VISIT_TYPE.BF]
-    if (!doctorProfile || retailVisits.includes(visitPurposeFK)) return false
-
-    if (isWaiting) this.props.onMenuItemClick(row, '5') // start consultation context menu id = 5
-
-    return true
-  }
-
   computeQueueListingData = () => {
     const {
       calendarEvents = [],
@@ -103,11 +90,20 @@ class Grid extends React.Component {
       queueList = [],
       visitType = [],
       doctor = [],
+      room = [],
     } = this.props
     const user = JSON.parse(
       sessionStorage.getItem('user') || localStorage.getItem('user'),
     )
+    const roomLocalIdentityID = localStorage.getItem('roomLocalIdentityID')
     const { clinicianProfile } = user.data
+    const clinicRoleFK = clinicianProfile.userProfile.role?.clinicRoleFK
+    const selectRoom =
+      clinicRoleFK === 3
+        ? roomLocalIdentityID
+          ? [parseInt(roomLocalIdentityID, 10)]
+          : [-100]
+        : room
     if (filter === StatusIndicator.APPOINTMENT) {
       let result = calendarEvents
       if (selfOnly) {
@@ -116,12 +112,16 @@ class Grid extends React.Component {
             ? item.clinicianProfileFk === clinicianProfile.id
             : true,
         )
-      }
-      if (doctor.length > 0) {
+      } else if (doctor.length > 0 && doctor.indexOf(-99) < 0) {
         result = result.filter(
           item => doctor.indexOf(item.doctorProfileFK) > -1,
         )
       }
+
+      if (selectRoom.length > 0 && selectRoom.indexOf(-99) < 0) {
+        result = result.filter(item => selectRoom.indexOf(item.roomFk) >= 0)
+      }
+
       if (searchQuery) {
         result = result.filter(
           item =>
@@ -162,8 +162,7 @@ class Grid extends React.Component {
           : true
       })
     }
-
-    return filterData(filter, data, searchQuery, visitType, doctor)
+    return filterData(filter, data, searchQuery, visitType, doctor, selectRoom)
   }
 
   getActionButton = row => (
@@ -203,12 +202,7 @@ class Grid extends React.Component {
 
     switch (visitStatus) {
       case VISIT_STATUS.WAITING:
-        if (
-          visitPurposeFK === VISIT_TYPE.OTC ||
-          visitPurposeFK === VISIT_TYPE.BF
-        )
-          id = '1'
-        else id = '5'
+        id = '1'
         break
       case VISIT_STATUS.IN_CONS:
         id = '6'
@@ -225,13 +219,18 @@ class Grid extends React.Component {
         break
       case VISIT_STATUS.DISPENSE:
       case VISIT_STATUS.ORDER_UPDATED:
-        id = '1'
-        break
       case VISIT_STATUS.BILLING:
       case VISIT_STATUS.COMPLETED:
+      //case VISIT_STATUS.IN_CONS:
+      case VISIT_STATUS.UPGRADED:
+      case VISIT_STATUS.VERIFIED:
       case VISIT_STATUS.PAYMENT_REQUESTED:
       case VISIT_STATUS.PAYMENT_FAILED:
-        id = '1.1'
+        if (!row.isFinalized) {
+          id = '1'
+        } else {
+          id = '1.1'
+        }
         break
       case VISIT_STATUS.EQ_PENDING:
         id = '12'
@@ -297,6 +296,12 @@ class Grid extends React.Component {
               TableProps={TableProps}
               rows={queueListingData}
               forceRender
+              defaultHiddenColumns={[
+                'queueNo',
+                'patientAccountNo',
+                'timeOut',
+                'invoiceNo',
+              ]}
               columnExtensions={[
                 ...queueColumns,
                 {
@@ -342,7 +347,6 @@ class Grid extends React.Component {
                 },
               ]}
               FuncProps={FuncConfig}
-              onRowDoubleClick={this.onRowDoubleClick}
               onContextMenu={this.props.onContextMenu}
               {...queueConfig}
             />
@@ -353,6 +357,7 @@ class Grid extends React.Component {
               TableProps={TableProps}
               rows={queueListingData}
               forceRender
+              defaultHiddenColumns={['patientAccountNo']}
               columnExtensions={[
                 ...ApptColumnExtensions,
                 {
@@ -390,7 +395,6 @@ class Grid extends React.Component {
                 },
               ]}
               FuncProps={FuncConfig}
-              onRowDoubleClick={this.onRowDoubleClick}
               {...AppointmentTableConfig}
             />
           )}

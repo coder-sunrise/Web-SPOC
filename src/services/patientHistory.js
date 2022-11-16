@@ -13,10 +13,6 @@ const fns = {
   query: params => {
     return service.query(url, params)
   },
-
-  queryRetailHistory: params => {
-    return service.query(`${url}/Retail`, params)
-  },
   queryDispenseHistory: params => {
     return service.query(`${url}/Dispense`, params)
   },
@@ -33,9 +29,6 @@ const fns = {
   //   return service.upsert(url, params)
   // },
 
-  queryMedicationHistory: params => {
-    return service.query(`${url}/MedicationHistory`, params)
-  },
   queryVisitHistory: params => {
     return service.query(`${url}/VisitHistory`, params)
   },

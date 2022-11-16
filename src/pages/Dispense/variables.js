@@ -318,7 +318,7 @@ export const DispenseItemsColumns1 = (viewOnly = false, onValueChange) => {
                 </div>
               }
             >
-              <span>{row.name}</span>
+              <span className='threeline_textblock'>{row.name}</span>
             </Tooltip>
             <div style={{ position: 'absolute', top: 0, right: '-10px' }}>
               {lowStockIndicator(
@@ -855,7 +855,7 @@ export const DispenseItemsColumnExtensions = (viewOnly = false) => {
       sortingEnabled: false,
       type: 'number',
       isDisabled: row => {
-        return viewOnly || !row.allowToDispense || row.isDispensedByPharmacy
+        return viewOnly || !row.allowToDispense
       },
       render: row => {
         if (viewOnly || !row.allowToDispense) {
@@ -869,7 +869,7 @@ export const DispenseItemsColumnExtensions = (viewOnly = false) => {
           )
         }
         let maxQuantity
-        if (row.isDefault || row.isDispensedByPharmacy) {
+        if (row.isDefault) {
           maxQuantity = row.quantity
         } else {
           maxQuantity = row.quantity > row.stock ? row.stock : row.quantity
@@ -882,7 +882,6 @@ export const DispenseItemsColumnExtensions = (viewOnly = false) => {
               format='0.0'
               //max={maxQuantity}
               min={0}
-              disabled={row.isDispensedByPharmacy}
               precision={1}
               value={row.dispenseQuantity}
             />
@@ -1219,7 +1218,7 @@ export const ServiceColumns1 = (
                   whiteSpace: 'pre-wrap',
                 }}
               >
-                {row.description}
+                <span className='threeline_textblock'>{row.description}</span>
                 <div style={{ position: 'relative', top: 2 }}>
                   {lowStockIndicator(row, 'itemFK')}
                 </div>
@@ -1361,6 +1360,9 @@ export const OtherOrdersColumns1 = onPrint => [
     key: 'description',
     title: 'Name',
     width: 700,
+    render: (_, row) => (
+      <span className='threeline_textblock'>{row.description}</span>
+    ),
   },
   { dataIndex: 'remarks', key: 'remarks', title: 'Remarks', width: 700 },
   {
