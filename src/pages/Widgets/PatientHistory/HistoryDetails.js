@@ -7,6 +7,7 @@ import {
   TextField,
   DatePicker,
   CardContainer,
+  dateFormatLong,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE } from '@/utils/constants'
@@ -25,7 +26,10 @@ class HistoryDetails extends PureComponent {
       props,
       props.scribbleNoteUpdateState,
     ).filter(o => {
-      return props.getCategoriesOptions().find(c => c.value === o.id)
+      return (
+        o.id === WidgetConfig.WIDGETS_ID.ClINICALNOTES ||
+        props.getCategoriesOptions().find(c => c.value === o.id)
+      )
     })
   }
 
@@ -87,10 +91,10 @@ class HistoryDetails extends PureComponent {
             timeOut,
             userTitle,
             userName,
+            doctors = [],
           } = selectHistory
-          const docotrName = userName
-            ? `${userTitle || ''} ${userName || ''}`
-            : undefined
+          const student = doctors.find(doctor => !doctor.isPrimaryDoctor)
+          const optometrist = doctors.find(doctor => doctor.isPrimaryDoctor)
           return (
             <React.Fragment>
               <ListItem
@@ -132,13 +136,11 @@ class HistoryDetails extends PureComponent {
                       }}
                     >
                       <div style={{ fontWeight: 500 }}>
-                        {`${moment(visitDate).format(
-                          'DD MMM YYYY',
-                        )} (Time In: ${moment(timeIn).format(
-                          'HH:mm',
-                        )} Time Out: ${
-                          timeOut ? moment(timeOut).format('HH:mm') : '-'
-                        })${docotrName ? ` - ${docotrName}` : ''}`}
+                        {`${moment(visitDate).format(dateFormatLong)} (${
+                          student ? `Student: ${student.name}, ` : ''
+                        }${
+                          optometrist ? `Optometrist: ${optometrist.name}` : ''
+                        })`}
                       </div>
                       <div>
                         {settings.showConsultationVersioning
@@ -165,7 +167,13 @@ class HistoryDetails extends PureComponent {
   }
 
   detailPanel = () => {
-    const { classes, override = {}, patientHistory, selectHistory } = this.props
+    const {
+      classes,
+      override = {},
+      patientHistory,
+      selectHistory,
+      getCategoriesOptions,
+    } = this.props
     let visitDetails = {
       visitDate: selectHistory.visitDate,
       patientName: selectHistory.patientName,
@@ -186,6 +194,7 @@ class HistoryDetails extends PureComponent {
       visitPurposeFK: visitPurposeFK,
       patientGender: selectHistory.patientGender,
     }
+    const selectCategories = getCategoriesOptions().map(sc => sc.value) || []
     return (
       <CardContainer
         hideHeader
@@ -203,15 +212,31 @@ class HistoryDetails extends PureComponent {
                 return (
                   (_widget.id === WidgetConfig.WIDGETS_ID.ORDERS ||
                     _widget.id === WidgetConfig.WIDGETS_ID.INVOICE ||
-                    _widget.id === WidgetConfig.WIDGETS_ID.VISITREMARKS ||
-                    _widget.id === WidgetConfig.WIDGETS_ID.REFERRAL) &&
+                    _widget.id === WidgetConfig.WIDGETS_ID.VISITREMARKS) &&
                   WidgetConfig.showWidget(current, _widget.id)
                 )
               }
-              return WidgetConfig.showWidget(current, _widget.id)
+              return WidgetConfig.showWidget(
+                current,
+                _widget.id,
+                selectCategories.length === 0
+                  ? WidgetConfig.formWidgets()
+                  : WidgetConfig.formWidgets().filter(
+                      fw => selectCategories.indexOf(fw.id) >= 0,
+                    ),
+              )
             })
             .map(o => {
               const Widget = o.component
+              let selectForms = []
+              if (o.id === WidgetConfig.WIDGETS_ID.ClINICALNOTES) {
+                selectForms =
+                  selectCategories.length === 0
+                    ? WidgetConfig.formWidgets().map(fw => fw.id)
+                    : WidgetConfig.formWidgets()
+                        .filter(fw => selectCategories.indexOf(fw.id) >= 0)
+                        .map(fw => fw.id)
+              }
               return (
                 <div>
                   <span
@@ -228,6 +253,7 @@ class HistoryDetails extends PureComponent {
                     visitDetails={visitDetails}
                     {...this.props}
                     setFieldValue={this.props.setFieldValue}
+                    selectForms={selectForms}
                   />
                 </div>
               )

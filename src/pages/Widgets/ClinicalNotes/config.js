@@ -144,7 +144,7 @@ export const formConfigs = [
   },
   {
     id: CLINICALNOTE_FORM.FOLLOWUP,
-    name: 'Follow-Up',
+    name: 'Follow-up',
     component: Loadable({
       loader: () => import('./Forms/FollowUp'),
       loading: Loading,

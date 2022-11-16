@@ -26,10 +26,15 @@ import {
   dateFormatLong,
   dateFormatLongWithTimeNoSec,
   timeFormat24Hour,
+  Switch,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 // utils
-import { findGetParameter, commonDataReaderTransform } from '@/utils/utils'
+import {
+  findGetParameter,
+  commonDataReaderTransform,
+  getDefaultLayerContent,
+} from '@/utils/utils'
 import { VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
 import { scribbleTypes } from '@/utils/codes'
 import { DoctorProfileSelect } from '@/components/_medisys'
@@ -55,6 +60,7 @@ const defaultValue = {
   visitTypeIDs: [-99],
   selectCategories: [],
   isAllDate: true,
+  notesBy: 'Optometrist',
 }
 
 const styles = theme => ({
@@ -152,7 +158,10 @@ class PatientHistory extends Component {
       props,
       this.scribbleNoteUpdateState,
     ).filter(o => {
-      return this.getCategoriesOptions().find(c => c.value === o.id)
+      return (
+        o.id === WidgetConfig.WIDGETS_ID.ClINICALNOTES ||
+        this.getCategoriesOptions().find(c => c.value === o.id)
+      )
     })
 
     this.state = {
@@ -160,7 +169,6 @@ class PatientHistory extends Component {
       showHistoryDetails: false,
       selectHistory: undefined,
       activeKey: [],
-      selectItems: [],
       visitDate: [
         moment(new Date())
           .startOf('day')
@@ -178,8 +186,7 @@ class PatientHistory extends Component {
       totalVisits: 0,
       currentHeight: window.innerHeight,
       isLoadingData: undefined,
-      currentOrders: [],
-      showActualizationHistory: false,
+      notesBy: 'Optometrist',
     }
   }
 
@@ -231,7 +238,7 @@ class PatientHistory extends Component {
         this.setState({ selectCategories }, () => {
           setFieldValue('selectCategories', selectCategories)
         })
-        // this.queryVisitHistory(5)
+        this.queryVisitHistory()
       })
     })
   }
@@ -243,16 +250,13 @@ class PatientHistory extends Component {
   }
 
   getCategoriesOptions = () => {
-    let categories = WidgetConfig.GPCategory
     return WidgetConfig.categoryTypes
       .filter(o => {
         const accessRight = Authorized.check(o.authority)
         if (!accessRight || accessRight.rights === 'hidden') return false
         return true
       })
-      .map(o => {
-        return { ...o }
-      })
+      .map(o => ({ ...o }))
   }
 
   queryVisitHistory = pageSize => {
@@ -263,6 +267,7 @@ class PatientHistory extends Component {
       visitDate,
       visitTypeIDs = [],
       selectCategories = [],
+      notesBy,
     } = this.state
     const {
       dispatch,
@@ -270,7 +275,10 @@ class PatientHistory extends Component {
       patientHistory,
       setFieldValue,
       values,
+      user,
     } = this.props
+    const isStudent =
+      user.data.clinicianProfile?.userProfile?.role?.clinicRoleFK === 3
     const { settings = {} } = clinicSettings
     const { viewVisitPageSize = 10 } = settings
 
@@ -305,6 +313,7 @@ class PatientHistory extends Component {
               .formatUTC(false)
           : undefined,
         isAllDate,
+        notesBy: isStudent ? 'Student' : notesBy,
         visitTypeIDs: visitTypeIDs.join(','),
         pageIndex: pageIndex + 1,
         pageSize: pageSize || viewVisitPageSize,
@@ -342,6 +351,31 @@ class PatientHistory extends Component {
     })
   }
 
+  showEditButton = (visitStatus, doctorProfileFK, isClinicSessionClosed) => {
+    const { notesBy, user } = this.props
+    const clinicRoleFK =
+      user.data.clinicianProfile?.userProfile?.role?.clinicRoleFK
+    if (clinicRoleFK === 1 && notesBy === 'Optometrist') {
+      if (
+        (visitStatus === VISIT_STATUS.UNGRADED ||
+          visitStatus === VISIT_STATUS.VERIFIED) &&
+        doctorProfileFK === user.data.clinicianProfile.doctorProfile.id
+      )
+        return true
+    }
+    if (clinicRoleFK === 3) {
+      if (
+        visitStatus === VISIT_STATUS.IN_CONS ||
+        ((visitStatus === VISIT_STATUS.UNGRADED ||
+          visitStatus === VISIT_STATUS.VERIFIED) &&
+          isClinicSessionClosed)
+      )
+        return true
+    }
+
+    return false
+  }
+
   getTitle = row => {
     const {
       theme,
@@ -368,25 +402,19 @@ class PatientHistory extends Component {
       isNurseNote,
       visitStatus,
       isExistsVerifiedReport,
+      doctorProfileFK,
+      isClinicSessionClosed,
+      doctors = [],
+      signOffByUser,
     } = row
     const { settings = [] } = clinicSettings
     const { patientID, ableToEditConsultation } = patientHistory
-    const isRetailVisit = visitPurposeFK === VISIT_TYPE.OTC
     const patientIsActive = patient.isActive
     const docotrName = userName
       ? `${userTitle || ''} ${userName || ''}`
       : undefined
-    let LastUpdateBy
-    if (coHistory.length > 0) {
-      LastUpdateBy = coHistory[0].userName
-        ? `${coHistory[0].userTitle || ''} ${coHistory[0].userName || ''}`
-        : undefined
-    } else {
-      LastUpdateBy = userName
-        ? `${userTitle || ''} ${userName || ''}`
-        : undefined
-    }
-    const isSelect = !!this.state.selectItems.find(o => o === row.currentId)
+    const student = doctors.find(doctor => !doctor.isPrimaryDoctor)
+    const optometrist = doctors.find(doctor => doctor.isPrimaryDoctor)
     return (
       <div
         style={{
@@ -437,17 +465,13 @@ class PatientHistory extends Component {
           {!isNurseNote && (
             <div style={{ fontSize: '0.9em' }}>
               <div style={{ fontWeight: 500, marginTop: 6 }}>
-                {`${moment(visitDate).format(
-                  dateFormatLong,
-                )} (Time In: ${moment(timeIn).format(
-                  timeFormat24Hour,
-                )} Time Out: ${
-                  timeOut ? moment(timeOut).format(timeFormat24Hour) : '-'
-                })${docotrName ? ` - ${docotrName}` : ''}`}
+                {`${moment(visitDate).format(dateFormatLong)} (${
+                  student ? `Student: ${student.name}, ` : ''
+                }${optometrist ? `Optometrist: ${optometrist.name}` : ''})`}
               </div>
               <div style={{ marginTop: 18 }}>
                 <span>
-                  {`Last Update By: ${LastUpdateBy || ''} on ${moment(
+                  {`Last Update By: ${signOffByUser || ''} on ${moment(
                     signOffDate,
                   ).format(dateFormatLongWithTimeNoSec)}`}
                 </span>
@@ -462,8 +486,11 @@ class PatientHistory extends Component {
               }}
             >
               {patientIsActive &&
-                !isRetailVisit &&
-                visitStatus != VISIT_STATUS.PAUSED &&
+                this.showEditButton(
+                  visitStatus,
+                  doctorProfileFK,
+                  isClinicSessionClosed,
+                ) &&
                 fromModule !== 'Consultation' &&
                 fromModule !== 'History' &&
                 ableToEditConsultation && (
@@ -557,20 +584,6 @@ class PatientHistory extends Component {
             top: 0,
           }}
         >
-          {/* {isForInvoiceReplacement && (
-            <Tooltip title='For Invoice Replacement'>
-              <div
-                style={{
-                  display: 'inline-block',
-                  marginRight: 10,
-                  position: 'relative',
-                  top: 6,
-                }}
-              >
-                <InvoiceReplacement />
-              </div>
-            </Tooltip>
-          )} */}
           <div style={{ display: 'inline-block', width: 40, marginRight: 10 }}>
             {visitPurposeFK && <VisitTypeTag type={visitPurposeFK} />}
           </div>
@@ -584,23 +597,26 @@ class PatientHistory extends Component {
               marginRight: 6,
             }}
           >
-            {!isNurseNote && settings.showConsultationVersioning && (
-              <Tooltip title='View History'>
-                <span
-                  className='material-icons'
-                  style={{ color: 'gray' }}
-                  onClick={event => {
-                    event.stopPropagation()
-                    this.setState({
-                      showHistoryDetails: true,
-                      selectHistory: { ...row },
-                    })
-                  }}
-                >
-                  history
-                </span>
-              </Tooltip>
-            )}
+            {!isNurseNote &&
+              settings.showConsultationVersioning &&
+              (visitStatus === VISIT_STATUS.UNGRADED ||
+                visitStatus === VISIT_STATUS.VERIFIED) && (
+                <Tooltip title='View History'>
+                  <span
+                    className='material-icons'
+                    style={{ color: 'gray' }}
+                    onClick={event => {
+                      event.stopPropagation()
+                      this.setState({
+                        showHistoryDetails: true,
+                        selectHistory: { ...row },
+                      })
+                    }}
+                  >
+                    history
+                  </span>
+                </Tooltip>
+              )}
           </div>
         </div>
       </div>
@@ -608,6 +624,9 @@ class PatientHistory extends Component {
   }
 
   checkSelectWidget = widgetId => {
+    if (widgetId === WidgetConfig.WIDGETS_ID.ClINICALNOTES) {
+      return true
+    }
     const { selectCategories = [] } = this.state
     if (selectCategories.length > 0) {
       return selectCategories.find(c => c === widgetId) || false
@@ -615,19 +634,9 @@ class PatientHistory extends Component {
     return true
   }
 
-  viewActualizationHistory = orders => {
-    this.setState({
-      currentOrders: orders,
-      showActualizationHistory: true,
-    })
-  }
-
-  closeActualizationHistory = () => {
-    this.setState({ currentOrders: [], showActualizationHistory: false })
-  }
-
   getDetailPanel = history => {
     const { isFullScreen = true, classes, clinicSettings } = this.props
+    const { selectCategories = [] } = this.state
     const { visitPurposeFK, isNurseNote, nurseNotes } = history
     if (isNurseNote) {
       let e = document.createElement('div')
@@ -658,17 +667,8 @@ class PatientHistory extends Component {
     }
     let current = {
       ...history.patientHistoryDetail,
-      visitAttachments: history.visitAttachments,
       visitRemarks: history.visitRemarks,
-      referralSourceFK: history.referralSourceFK,
-      referralPersonFK: history.referralPersonFK,
-      referralPatientProfileFK: history.referralPatientProfileFK,
-      referralSource: history.referralSource,
-      referralPerson: history.referralPerson,
-      referralPatientName: history.referralPatientName,
-      referralRemarks: history.referralRemarks,
       visitPurposeFK: history.visitPurposeFK,
-      patientGender: history.patientGender,
     }
     let visitDetails = {
       visitDate: history.visitDate,
@@ -697,6 +697,15 @@ class PatientHistory extends Component {
           <div>
             {currentTagWidgets.map(o => {
               const Widget = o.component
+              let selectForms = []
+              if (o.id === WidgetConfig.WIDGETS_ID.ClINICALNOTES) {
+                selectForms =
+                  selectCategories.length === 0
+                    ? WidgetConfig.formWidgets().map(fw => fw.id)
+                    : WidgetConfig.formWidgets()
+                        .filter(fw => selectCategories.indexOf(fw.id) >= 0)
+                        .map(fw => fw.id)
+              }
               return (
                 <div>
                   <span
@@ -707,22 +716,6 @@ class PatientHistory extends Component {
                     }}
                   >
                     <span>{o.name}</span>
-                    {o.name === 'Orders' &&
-                      current.isExistsActualizationHistory && (
-                        <span>
-                          <Link
-                            style={{
-                              marginLeft: 10,
-                              textDecoration: 'underline',
-                            }}
-                            onClick={() => {
-                              this.viewActualizationHistory(current.orders)
-                            }}
-                          >
-                            Actualization History
-                          </Link>
-                        </span>
-                      )}
                   </span>
                   {Widget ? (
                     <Widget
@@ -731,6 +724,7 @@ class PatientHistory extends Component {
                       {...this.props}
                       setFieldValue={this.props.setFieldValue}
                       isFullScreen={isFullScreen}
+                      selectForms={selectForms}
                     />
                   ) : (
                     ''
@@ -753,14 +747,49 @@ class PatientHistory extends Component {
       payload: {
         showViewScribbleModal: !scriblenotes.showViewScribbleModal,
         isReadonly: false,
+        cavanSize: undefined,
       },
     })
   }
 
-  scribbleNoteUpdateState = selectedDataValue => {
-    this.setState({
-      selectedData: selectedDataValue,
-    })
+  scribbleNoteUpdateState = async (
+    selectedDataValue,
+    defaultImage,
+    cavanSize,
+    imageSize,
+    position,
+    defaultSubject,
+  ) => {
+    let scribbleNote = selectedDataValue
+    if (!scribbleNote) {
+      const layerContent = await getDefaultLayerContent(
+        defaultImage,
+        imageSize,
+        position,
+      )
+      scribbleNote = {
+        subject: defaultSubject,
+        scribbleNoteLayers: [
+          { layerType: 'image', layerNumber: -100, layerContent },
+        ],
+      }
+    }
+    this.setState(
+      {
+        selectedData: scribbleNote,
+      },
+      () => {
+        this.props.dispatch({
+          type: 'scriblenotes/updateState',
+          payload: {
+            showViewScribbleModal: true,
+            isReadonly: true,
+            entity: { ...scribbleNote },
+            cavanSize,
+          },
+        })
+      },
+    )
   }
 
   setExpandAll = (isExpandAll = false) => {
@@ -773,6 +802,7 @@ class PatientHistory extends Component {
   }
 
   checkShowData = (widgetId, current, visitPurposeFK, isNurseNote) => {
+    const { selectCategories = [] } = this.state
     if (isNurseNote) return false
     if (visitPurposeFK === VISIT_TYPE.OTC) {
       return (
@@ -785,14 +815,23 @@ class PatientHistory extends Component {
     }
     return (
       this.checkSelectWidget(widgetId) &&
-      WidgetConfig.showWidget(current, widgetId)
+      WidgetConfig.showWidget(
+        current,
+        widgetId,
+        selectCategories.length === 0
+          ? WidgetConfig.formWidgets()
+          : WidgetConfig.formWidgets().filter(
+              fw => selectCategories.indexOf(fw.id) >= 0,
+            ),
+      )
     )
   }
 
   getFilterBar = () => {
-    const { values, fromModule } = this.props
+    const { values, fromModule, user } = this.props
+    const isStudent =
+      user.data.clinicianProfile?.userProfile?.role?.clinicRoleFK === 3
     const { isAllDate } = values
-    const { selectItems } = this.state
     return (
       <div>
         <div style={{ display: 'flex' }}>
@@ -849,7 +888,7 @@ class PatientHistory extends Component {
                   <Checkbox
                     {...args}
                     label='All Date'
-                    style={{ width: fromModule === 'PatientHistory' ? 75 : 70 }}
+                    style={{ width: fromModule === 'PatientHistory' ? 75 : 80 }}
                   />
                 )}
               />
@@ -869,6 +908,9 @@ class PatientHistory extends Component {
                     marginLeft: 10,
                   }}
                   options={this.getCategoriesOptions()}
+                  groupField='title'
+                  listHeight={576}
+                  virtual={false}
                   {...args}
                 />
               )}
@@ -911,6 +953,7 @@ class PatientHistory extends Component {
                 color='primary'
                 size='sm'
                 icon={<Search />}
+                justIcon
                 onClick={this.handelSearch}
               >
                 Search
@@ -919,14 +962,28 @@ class PatientHistory extends Component {
           </div>
         </div>
         <div style={{ display: 'flex' }}>
-          <div
-            style={{
-              position: 'relative',
-              bottom: -4,
-            }}
-          >
-            <div></div>
-          </div>
+          {!isStudent && (
+            <div style={{ position: 'relative', top: 10, marginRight: 4 }}>
+              Notes By:
+            </div>
+          )}
+          {!isStudent && (
+            <Field
+              name='notesBy'
+              render={args => (
+                <Switch
+                  style={{ width: 200, position: 'relative', top: 0 }}
+                  checkedChildren='Optom.'
+                  checkedValue='Optometrist'
+                  unCheckedChildren='Student'
+                  unCheckedValue='Student'
+                  label=''
+                  onChange={this.onNotesByChange}
+                  {...args}
+                />
+              )}
+            />
+          )}
           <div style={{ marginLeft: 'auto' }}>
             <div
               style={{
@@ -944,7 +1001,7 @@ class PatientHistory extends Component {
                 <span
                   className='material-icons'
                   style={{
-                    marginTop: 15,
+                    marginTop: 10,
                     fontSize: '1.2rem',
                   }}
                 >
@@ -985,7 +1042,9 @@ class PatientHistory extends Component {
   }
 
   getConsultationFilterBar = () => {
-    const { values, isFullScreen = true } = this.props
+    const { values, isFullScreen = true, user } = this.props
+    const isStudent =
+      user.data.clinicianProfile?.userProfile?.role?.clinicRoleFK === 3
     const { isAllDate } = values
     return (
       <div>
@@ -995,7 +1054,7 @@ class PatientHistory extends Component {
               name='visitTypeIDs'
               render={args => (
                 <VisitTypeSelect
-                  label={formatMessage({ id: 'lab.search.visittype' })}
+                  label='Visit Types'
                   mode='multiple'
                   maxTagPlaceholder='Visit Types'
                   style={{
@@ -1011,7 +1070,7 @@ class PatientHistory extends Component {
             <div
               style={{
                 display: 'inline-Block',
-                marginLeft: 5,
+                marginLeft: 4,
               }}
             >
               <Field
@@ -1032,7 +1091,7 @@ class PatientHistory extends Component {
             <div
               style={{
                 display: 'inline-Block',
-                marginLeft: 5,
+                marginLeft: 4,
               }}
             >
               <Field
@@ -1052,10 +1111,15 @@ class PatientHistory extends Component {
                   style={{
                     width: !isFullScreen ? 150 : 240,
                     display: 'inline-Block',
-                    marginLeft: 5,
+                    marginLeft: 4,
                     marginBottom: -12,
                   }}
                   options={this.getCategoriesOptions()}
+                  groupField='title'
+                  listHeight={576}
+                  virtual={false}
+                  dropdownMatchSelectWidth={false}
+                  dropdownStyle={{ width: 220 }}
                   {...args}
                 />
               )}
@@ -1067,7 +1131,7 @@ class PatientHistory extends Component {
                   style={{
                     width: !isFullScreen ? 150 : 240,
                     display: 'inline-Block',
-                    marginLeft: 5,
+                    marginLeft: 4,
                     marginBottom: -12,
                   }}
                   label='Doctors'
@@ -1089,7 +1153,7 @@ class PatientHistory extends Component {
             <div
               style={{
                 display: 'inline-Block',
-                marginLeft: 5,
+                marginLeft: 4,
                 position: 'relative',
                 top: '-5px',
                 lineHeight: '46px',
@@ -1099,121 +1163,86 @@ class PatientHistory extends Component {
                 color='primary'
                 size='sm'
                 icon={<Search />}
+                justIcon
                 onClick={this.handelSearch}
               >
                 Search
               </ProgressButton>
             </div>
           </div>
-          {isFullScreen && (
-            <div
-              style={{
-                marginLeft: 'auto',
-                position: 'relative',
-                bottom: -10,
-              }}
-            >
-              <div>
-                <span
-                  style={{
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => {
-                    this.setExpandAll(true)
-                  }}
-                >
-                  <span
-                    className='material-icons'
-                    style={{
-                      marginTop: 15,
-                      fontSize: '1.2rem',
-                    }}
-                  >
-                    unfold_more
-                  </span>
-                  <span style={{ position: 'relative', top: -5 }}>
-                    Expand All
-                  </span>
-                </span>
-                <span
-                  style={{
-                    cursor: 'pointer',
-                    marginLeft: 20,
-                    marginRight: 10,
-                  }}
-                  onClick={() => {
-                    this.setExpandAll(false)
-                  }}
-                >
-                  <span
-                    className='material-icons'
-                    style={{
-                      marginTop: 10,
-                      fontSize: '1.2rem',
-                    }}
-                  >
-                    unfold_less
-                  </span>
-                  <span style={{ position: 'relative', top: -5 }}>
-                    Collapse All
-                  </span>
-                </span>
-              </div>
+        </div>
+        <div style={{ display: 'flex' }}>
+          {!isStudent && (
+            <div style={{ position: 'relative', top: 7, marginRight: 4 }}>
+              Notes By:
             </div>
           )}
-        </div>
-        {!isFullScreen && (
-          <div style={{ display: 'flex' }}>
-            <div style={{ marginLeft: 'auto' }}>
-              <div>
+          {!isStudent && (
+            <Field
+              name='notesBy'
+              render={args => (
+                <Switch
+                  style={{ width: 200, position: 'relative', top: 2 }}
+                  checkedChildren='Optom.'
+                  checkedValue='Optometrist'
+                  unCheckedChildren='Student'
+                  unCheckedValue='Student'
+                  onChange={this.onNotesByChange}
+                  label=''
+                  {...args}
+                />
+              )}
+            />
+          )}
+          <div style={{ marginLeft: 'auto' }}>
+            <div>
+              <span
+                style={{
+                  cursor: 'pointer',
+                }}
+                onClick={() => {
+                  this.setExpandAll(true)
+                }}
+              >
                 <span
+                  className='material-icons'
                   style={{
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => {
-                    this.setExpandAll(true)
+                    marginTop: 10,
+                    fontSize: '1.2rem',
                   }}
                 >
-                  <span
-                    className='material-icons'
-                    style={{
-                      marginTop: 15,
-                      fontSize: '1.2rem',
-                    }}
-                  >
-                    unfold_more
-                  </span>
-                  <span style={{ position: 'relative', top: -5 }}>
-                    Expand All
-                  </span>
+                  unfold_more
                 </span>
+                <span style={{ position: 'relative', top: -5 }}>
+                  Expand All
+                </span>
+              </span>
+              <span
+                style={{
+                  cursor: 'pointer',
+                  marginLeft: 20,
+                  marginRight: 10,
+                }}
+                onClick={() => {
+                  this.setExpandAll(false)
+                }}
+              >
                 <span
+                  className='material-icons'
                   style={{
-                    cursor: 'pointer',
-                    marginLeft: 20,
-                    marginRight: 10,
-                  }}
-                  onClick={() => {
-                    this.setExpandAll(false)
+                    marginTop: 10,
+                    fontSize: '1.2rem',
                   }}
                 >
-                  <span
-                    className='material-icons'
-                    style={{
-                      marginTop: 10,
-                      fontSize: '1.2rem',
-                    }}
-                  >
-                    unfold_less
-                  </span>
-                  <span style={{ position: 'relative', top: -5 }}>
-                    Collapse All
-                  </span>
+                  unfold_less
                 </span>
-              </div>
+                <span style={{ position: 'relative', top: -5 }}>
+                  Collapse All
+                </span>
+              </span>
             </div>
           </div>
-        )}
+        </div>
       </div>
     )
   }
@@ -1240,6 +1269,7 @@ class PatientHistory extends Component {
       selectDoctors,
       selectCategories,
       visitTypeIDs,
+      notesBy,
     } = values
     this.setState(
       {
@@ -1248,11 +1278,11 @@ class PatientHistory extends Component {
         pageIndex: 0,
         loadVisits: [],
         activeKey: [],
-        selectItems: [],
         totalVisits: 0,
         selectDoctors,
         visitTypeIDs,
         selectCategories,
+        notesBy,
         isLoadingData: true,
       },
       () => {
@@ -1302,6 +1332,20 @@ class PatientHistory extends Component {
         }
         this.queryVisitHistory()
       },
+    )
+  }
+
+  onNotesByChange = v => {
+    this.setState(
+      {
+        pageIndex: 0,
+        loadVisits: [],
+        activeKey: [],
+        totalVisits: 0,
+        notesBy: v,
+        isLoadingData: true,
+      },
+      this.queryVisitHistory,
     )
   }
 

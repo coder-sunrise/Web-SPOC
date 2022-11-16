@@ -100,25 +100,7 @@ export default createListViewModel({
         const response = yield call(service.queryVisitHistory, payload)
         if (response.status === '200') {
           return {
-            list: (response.data.data || []).map(item => {
-              if (item.isNurseNote) return item
-              let newEntity = item.patientHistoryDetail
-              newEntity = {
-                ...newEntity,
-                forms: newEntity.forms.map(o => {
-                  return {
-                    ...o,
-                    typeName: formTypes.find(
-                      type => parseInt(type.value, 10) === o.type,
-                    ).name,
-                  }
-                }),
-              }
-              return {
-                ...item,
-                patientHistoryDetail: newEntity,
-              }
-            }),
+            list: response.data.data || [],
             totalVisits: response.data.totalRecords,
           }
         }
@@ -230,47 +212,6 @@ export default createListViewModel({
       },
     },
     reducers: {
-      queryDone(st, { payload }) {
-        st.list = st.list.map(item => {
-          if (!item.coHistory || item.coHistory.length === 0) return item
-          let newEntity = item.patientHistoryDetail
-          newEntity = {
-            ...item.patientHistoryDetail,
-            forms: newEntity.forms.map(o => {
-              return {
-                ...o,
-                typeName: formTypes.find(
-                  type => parseInt(type.value, 10) === o.type,
-                ).name,
-              }
-            }),
-          }
-          return {
-            ...item,
-            patientHistoryDetail: newEntity,
-          }
-        })
-        return {
-          ...st,
-        }
-      },
-      queryOneDone(st, { payload }) {
-        st.entity = {
-          ...st.entity,
-          forms: st.entity.forms.map(o => {
-            return {
-              ...o,
-              typeName: formTypes.find(
-                type => parseInt(type.value, 10) === o.type,
-              ).name,
-            }
-          }),
-        }
-
-        return {
-          ...st,
-        }
-      },
       getReferalHistory(st, { payload }) {
         const { data } = payload
         return {
