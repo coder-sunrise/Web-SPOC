@@ -73,6 +73,9 @@ export const formConfigs = [
     }),
     prop: 'corDoctorNote.corPatientHistory',
     prefixProp: 'corDoctorNote.corPatientHistoryEntity',
+    defaultValue: {
+      lastChangeDate: moment(),
+    },
   },
   {
     id: CLINICALNOTE_FORM.VISIONREFRACTION,
@@ -109,7 +112,7 @@ export const formConfigs = [
     thumbnailSize: { width: 300, height: 150 },
     thumbnailDisplaySize: { width: 260, height: 130 },
     defaultValue: {
-      lastUpdateDate: moment(),
+      lastChangeDate: moment(),
       rightScribbleNote: {
         thumbnail: CLINICALNOTE_FORMTHUMBNAIL.POSTERIOREYEEXAMINATION,
         subject: 'Right Eye',
@@ -136,7 +139,7 @@ export const formConfigs = [
     thumbnailSize: { width: 300, height: 150 },
     thumbnailDisplaySize: { width: 260, height: 130 },
     defaultValue: {
-      lastUpdateDate: moment(),
+      lastChangeDate: moment(),
       rightScribbleNote: {
         thumbnail: CLINICALNOTE_FORMTHUMBNAIL.POSTERIOREYEEXAMINATION,
         subject: 'Right Eye',
@@ -210,6 +213,9 @@ export const formConfigs = [
     }),
     prop: 'corDoctorNote.corInvestigativeTests',
     prefixProp: 'corDoctorNote.corInvestigativeTestsEntity',
+    defaultValue: {
+      lastChangeDate: moment(),
+    },
   },
   {
     id: CLINICALNOTE_FORM.FOLLOWUP,
