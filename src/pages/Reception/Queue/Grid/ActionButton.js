@@ -13,7 +13,7 @@ import {
   filterMap,
   VISIT_STATUS,
 } from '../variables'
-import { VISIT_TYPE } from '@/utils/constants'
+import { CLINICAL_ROLE, VISIT_TYPE } from '@/utils/constants'
 
 const ActionButton = ({ row, onClick }) => {
   const { visitStatus } = row
@@ -58,12 +58,19 @@ const ActionButton = ({ row, onClick }) => {
   const isStatusCompleted = [
     VISIT_STATUS.COMPLETED,
     VISIT_STATUS.IN_CONS,
-    VISIT_STATUS.UNGRADED,
+    VISIT_STATUS.UPGRADED,
     VISIT_STATUS.VERIFIED,
   ].includes(row.visitStatus)
 
   const user = useSelector(st => st.user)
   const clinicRoleFK = user.data.clinicianProfile.userProfile.role?.clinicRoleFK
+  let disableEditConsultation = falsel
+  if (
+    clinicRoleFK === CLINICAL_ROLE.STUDENT &&
+    [VISIT_STATUS.UPGRADED, VISIT_STATUS.VERIFIED].includes(row.visitStatus)
+  ) {
+    disableEditConsultation
+  }
   const hideResumeButton =
     clinicRoleFK === 1
       ? ![VISIT_STATUS.IN_CONS, VISIT_STATUS.PAUSED].includes(row.visitStatus)
@@ -140,7 +147,7 @@ const ActionButton = ({ row, onClick }) => {
           case 7: // edit consultation
             return {
               ...opt,
-              disabled: !isStatusCompleted,
+              disabled: true,
               hidden: hideEditConsultation,
             }
           case 10: // forms

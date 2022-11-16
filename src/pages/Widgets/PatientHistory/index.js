@@ -30,7 +30,7 @@ import {
 import Authorized from '@/utils/Authorized'
 // utils
 import { findGetParameter, commonDataReaderTransform } from '@/utils/utils'
-import { VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
+import { VISIT_TYPE, CLINIC_TYPE, CLINICAL_ROLE } from '@/utils/constants'
 import { scribbleTypes } from '@/utils/codes'
 import { DoctorProfileSelect } from '@/components/_medisys'
 import withWebSocket from '@/components/Decorator/withWebSocket'
@@ -441,6 +441,8 @@ class PatientHistory extends Component {
       visitStatus,
       isExistsVerifiedReport,
     } = row
+    const clinicRoleFK =
+      user.data.clinicianProfile.userProfile.role?.clinicRoleFK
     const { settings = [] } = clinicSettings
     const { patientID, ableToEditConsultation } = patientHistory
     const isRetailVisit = visitPurposeFK === VISIT_TYPE.OTC
@@ -576,6 +578,11 @@ class PatientHistory extends Component {
                         }}
                         size='sm'
                         justIcon
+                        disabled={
+                          clinicRoleFK === CLINICAL_ROLE.STUDENT &&
+                          (visitStatus === VISIT_STATUS.UPGRADED ||
+                            visitStatus === VISIT_STATUS.VERIFIED)
+                        }
                         onClick={event => {
                           event.stopPropagation()
                           const closeOtherPopup = () => {

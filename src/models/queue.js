@@ -346,12 +346,6 @@ export default createListViewModel({
       },
       *refresh({ payload }, { put }) {
         yield put({
-          type: 'updateState',
-          payload: {
-            list: [],
-          },
-        })
-        yield put({
           type: 'getSessionInfo',
           payload,
         })
