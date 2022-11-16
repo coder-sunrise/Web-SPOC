@@ -131,13 +131,6 @@ const FilterBar = ({
               name='showDetails'
               render={args => (
                 <Checkbox
-                  style={{
-                    marginLeft:
-                      diagnosisDataSource === DIAGNOSIS_TYPE.SNOMEDDIAGNOSIS ||
-                      !isEnableJapaneseICD10Diagnosis
-                        ? 0
-                        : 110,
-                  }}
                   {...args}
                   label='Show Details'
                 />

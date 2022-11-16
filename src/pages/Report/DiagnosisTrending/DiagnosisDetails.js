@@ -35,7 +35,7 @@ class DiagnosisDetails extends PureComponent {
     const DiagnosisDetailsColumns = [
       { name: 'groupName', title: 'Diagnosis' },
       { name: 'visitDate', title: 'Visit Date' },
-      { name: 'doctorName', title: 'Visit Doctor' },
+      { name: 'doctorName', title: 'Optometrist' },
       { name: 'patientName', title: 'Patient Name' },
       { name: 'genderAge', title: 'Gender/Age' },
     ]
