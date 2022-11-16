@@ -885,7 +885,10 @@ class Billing extends Component {
     if (
       visitStatus &&
       visitStatus !== VISIT_STATUS.BILLING &&
-      visitStatus !== VISIT_STATUS.COMPLETED
+      visitStatus !== VISIT_STATUS.COMPLETED &&
+      visitStatus !== VISIT_STATUS.IN_CONS &&
+      visitStatus !== VISIT_STATUS.UPGRADED &&
+      visitStatus !== VISIT_STATUS.VERIFIED
     ) {
       showRefreshOrder = true
     }

@@ -249,16 +249,19 @@ export const QueueColumnExtensions = props => {
     },
     {
       columnName: 'invoiceStatus',
-      width: 120,
+      width: 180,
       render: row => {
+        const invoiceStatus = `${row.invoiceStatus}${
+          row.isFinalized ? '' : ' (Unfinalized)'
+        }`
         if (row.isItemOverPaid) {
           return (
             <Tooltip title='There are any overpaid item(s).'>
-              <span style={{ color: 'red' }}>{row.invoiceStatus}</span>
+              <span style={{ color: 'red' }}>{invoiceStatus}</span>
             </Tooltip>
           )
         }
-        return <span>{row.invoiceStatus}</span>
+        return <span>{invoiceStatus}</span>
       },
     },
     {

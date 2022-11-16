@@ -8,6 +8,9 @@ import Timer from 'react-compound-timer'
 import { sendNotification } from '@/utils/realtime'
 import { withStyles } from '@material-ui/core'
 import TimerIcon from '@material-ui/icons/Timer'
+import Save from '@material-ui/icons/Save'
+import Check from '@material-ui/icons/Check'
+import Undo from '@material-ui/icons/Undo'
 import {
   CommonModal,
   GridContainer,
@@ -46,6 +49,7 @@ import {
   REPORT_ID,
   CLINICALNOTE_FORM,
   CLINICALNOTE_FORMTHUMBNAIL,
+  CLINICAL_ROLE,
 } from '@/utils/constants'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { CallingQueueButton } from '@/components/_medisys'
@@ -225,6 +229,7 @@ const saveConsultation = ({
   successMessage,
   shouldPromptConfirm = true,
   successCallback = undefined,
+  openConfirmTitle,
 }) => {
   const {
     dispatch,
@@ -269,6 +274,11 @@ const saveConsultation = ({
     newValues.corDoctorNote.signedDate = moment()
     if (!newValues.corDoctorNote.lastChangeDate)
       newValues.corDoctorNote.lastChangeDate = moment()
+
+    //handle corPaediatric Form
+    if (newValues.corDoctorNote.corPaediatric.length > 0) {
+      newValues.corDoctorNote.corPaediatric.at(-1).recordStatusFK = 1
+    }
 
     newValues.corScribbleNotes.forEach(
       note => (note.signedByUserFK = user.data.id),
@@ -318,6 +328,7 @@ const saveConsultation = ({
         openConfirm: true,
         openConfirmContent: confirmMessage,
         openConfirmText: 'Confirm',
+        openConfirmTitle: openConfirmTitle,
         onConfirmSave,
       },
     })
@@ -355,6 +366,7 @@ const pauseConsultation = async ({
     user,
     visitRegistration,
   } = rest
+  const clinicRoleFK = user.data.clinicianProfile.userProfile.role?.clinicRoleFK
   const { entity: vistEntity = {} } = visitRegistration
   const { visit = {} } = vistEntity
   let settings = JSON.parse(localStorage.getItem('clinicSettings'))
@@ -415,7 +427,7 @@ const pauseConsultation = async ({
       if (r) {
         sessionStorage.removeItem(`${values.id}_consultationTimer`)
         notification.success({
-          message: 'Consultation paused.',
+          message: 'Saved',
         })
         dispatch({ type: 'consultation/closeModal' })
       }
@@ -539,8 +551,14 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
   notDirtyDuration: 0, // this page should alwasy show warning message when leave
   onDirtyDiscard: discardConsultation,
   handleSubmit: async (values, { props }) => {
-    const { dispatch, handlePrint, orders = {}, clinicSettings } = props
+    const { dispatch, handlePrint, orders = {}, clinicSettings, user } = props
     const { summary } = orders
+    const clinicRoleFK =
+      user.data.clinicianProfile.userProfile.role?.clinicRoleFK
+    const message =
+      clinicRoleFK == CLINICAL_ROLE.DOCTOR
+        ? 'Are you sure to submit Patient Record?'
+        : 'Patient Record will be submitted for review, amendment can only be done the other days. \nConfirm to submit?'
     if (!(await autoPrintSelection('sign', { values, ...props }))) {
       saveConsultation({
         props: {
@@ -553,14 +571,12 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
                 return (
                   <div>
                     <h3>Total invoice amount is negative.</h3>
-                    <h3 style={{ marginTop: 0 }}>
-                      Confirm sign off current consultation?
-                    </h3>
+                    <h3 style={{ marginTop: 0 }}>{message}</h3>
                   </div>
                 )
               }
-            : 'Confirm sign off current consultation?',
-        successMessage: 'Consultation signed',
+            : message,
+        successMessage: 'Consultation Submitted.',
         action: 'sign',
         successCallback: () => {
           props.dispatch({ type: 'consultation/closeModal' })
@@ -717,8 +733,8 @@ class Main extends React.Component {
     } else if (!(await autoPrintSelection('pause', this.props))) {
       saveConsultation({
         props: this.props,
-        confirmMessage: 'Pause consultation?',
-        successMessage: 'Consultation paused.',
+        confirmMessage: 'Save Patient Record as Draft?',
+        successMessage: 'Patient Record Saved Successfully.',
         action: 'pause',
         successCallback: () => {
           this.props.dispatch({ type: 'consultation/closeModal' })
@@ -905,6 +921,21 @@ class Main extends React.Component {
 
   // discardConsultation =
 
+  showSaveDraft = (visit, clinicRoleFK) => {
+    // student
+    if (clinicRoleFK == 3) {
+      if ([VISIT_STATUS.IN_CONS].includes(visit.visitStatus)) {
+        return true
+      }
+    }
+    // Optometrist
+    else if (clinicRoleFK == 1) {
+      if ([VISIT_STATUS.UPGRADED].includes(visit.visitStatus)) {
+        return true
+      }
+    }
+    return false
+  }
   getExtraComponent = () => {
     const {
       theme,
@@ -914,13 +945,17 @@ class Main extends React.Component {
       visitRegistration,
       clinicSettings,
       patient,
+      user,
     } = this.props
+    console.log(user)
     const { entity: vistEntity = {} } = visitRegistration
     // if (!vistEntity) return null
     const { visit = {}, queueNo } = vistEntity
     const { summary } = orders
     const patientName = patient?.entity?.name
     // const { adjustments, total, gst, totalWithGst } = summary
+    const clinicRoleFK =
+      user.data.clinicianProfile.userProfile.role?.clinicRoleFK
 
     return (
       <SizeContainer size='sm'>
@@ -1071,22 +1106,20 @@ class Main extends React.Component {
                     showSecondConfirmButton: false,
                     openConfirmContent: discardMessage,
                   })}
-                  icon={null}
+                  icon={<Undo />}
                 >
                   Discard
                 </ProgressButton>
               )}
               <Authorized authority='patientdashboard.startresumeconsultation'>
                 <React.Fragment>
-                  {[VISIT_STATUS.IN_CONS, VISIT_STATUS.WAITING].includes(
-                    visit.visitStatus,
-                  ) && (
+                  {this.showSaveDraft(visit, clinicRoleFK) && (
                     <ProgressButton
                       onClick={this.pauseConsultation}
                       color='info'
-                      icon={null}
+                      icon={<Save />}
                     >
-                      Pause
+                      Save
                     </ProgressButton>
                   )}
                   {visit.visitStatus === VISIT_STATUS.PAUSED && (
@@ -1104,9 +1137,9 @@ class Main extends React.Component {
               <ProgressButton
                 color='primary'
                 onClick={this.handleSignOffClick}
-                icon={null}
+                icon={<Check />}
               >
-                Sign Off
+                Submit
               </ProgressButton>
             </GridItem>
           </GridContainer>

@@ -1,5 +1,4 @@
 import Yup from '@/utils/yup'
-import { hasValue } from '../Widgets/PatientHistory/config'
 const schema = Yup.object().shape({
   corDiagnosis: Yup.array().of(
     Yup.object().shape({

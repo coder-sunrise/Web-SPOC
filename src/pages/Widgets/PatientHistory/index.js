@@ -407,6 +407,8 @@ class PatientHistory extends Component {
       doctors = [],
       signOffByUser,
     } = row
+    const clinicRoleFK =
+      user.data.clinicianProfile.userProfile.role?.clinicRoleFK
     const { settings = [] } = clinicSettings
     const { patientID, ableToEditConsultation } = patientHistory
     const patientIsActive = patient.isActive
@@ -505,6 +507,11 @@ class PatientHistory extends Component {
                         }}
                         size='sm'
                         justIcon
+                        disabled={
+                          clinicRoleFK === CLINICAL_ROLE.STUDENT &&
+                          (visitStatus === VISIT_STATUS.UPGRADED ||
+                            visitStatus === VISIT_STATUS.VERIFIED)
+                        }
                         onClick={event => {
                           event.stopPropagation()
                           const closeOtherPopup = () => {

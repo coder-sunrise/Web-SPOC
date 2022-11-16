@@ -6,6 +6,7 @@ import {
 import Loading from '@/components/PageLoading/index'
 import PosteriorEyeExamination from '@/assets/img/ClinicalNoteForm/PosteriorEyeExamination.jpg'
 import moment from 'moment'
+import Paediatric from '@/assets/img/ClinicalNoteForm/OcularMotility.jpg'
 
 export const formConfigs = [
   {
@@ -131,6 +132,19 @@ export const formConfigs = [
     }),
     prop: 'corDoctorNote.corPaediatric',
     prefixProp: 'corDoctorNote.corPaediatricEntity',
+    defaultImage: Paediatric,
+    cavanSize: { width: 600, height: 300 },
+    imageSize: { width: 250, height: 200 },
+    position: { left: 175, top: 50 },
+    thumbnailSize: { width: 300, height: 150 },
+    thumbnailDisplaySize: { width: 260, height: 130 },
+    defaultValue: {
+      lastChangeDate: moment(),
+      ocularMotilityScribbleNote: {
+        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.PAEDIATRIC,
+        subject: 'Ocular Motility',
+      },
+    },
   },
   {
     id: CLINICALNOTE_FORM.INVESTIGATIVETESTS,
