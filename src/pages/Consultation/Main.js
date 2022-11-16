@@ -951,7 +951,7 @@ class Main extends React.Component {
       patient,
       user,
     } = this.props
-    console.log(user)
+
     const { entity: vistEntity = {} } = visitRegistration
     // if (!vistEntity) return null
     const { visit = {}, queueNo } = vistEntity
