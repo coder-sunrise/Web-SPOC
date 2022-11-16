@@ -48,7 +48,7 @@ class InventoryDetails extends PureComponent {
     const InventoryDetailsColumns = [
       { name: 'groupName', title: 'Inventory' },
       { name: 'visitDate', title: 'Visit Date' },
-      { name: 'doctorName', title: 'Visit Doctor' },
+      { name: 'doctorName', title: 'Optometrist' },
       { name: 'patientName', title: 'Patient Name' },
       { name: 'genderAge', title: 'Gender/Age' },
       { name: 'quantity', title: 'Dispense Quantity' },
