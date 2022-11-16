@@ -37,8 +37,6 @@ import {
   VISIT_TYPE,
 } from '@/utils/constants'
 import ViewPatientHistory from '@/pages/Consultation/ViewPatientHistory'
-import { eyeExaminationsSchema } from '@/pages/Reception/Queue/NewVisit/validationScheme'
-import { showEyeExaminations } from '../Widgets/PatientHistory/config'
 
 const discardConsultation = async ({
   dispatch,
@@ -111,9 +109,6 @@ const styles = () => ({})
         then: Yup.string().required(),
       }),
     }),
-    corEyeExaminations: Yup.array()
-      .compact(v => v.isDeleted)
-      .of(eyeExaminationsSchema),
   }),
   dirtyCheckMessage: 'Discard edit order?',
   onDirtyDiscard: discardConsultation,
@@ -123,12 +118,10 @@ const styles = () => ({})
 class EditOrder extends Component {
   constructor(props) {
     super(props)
-    this.eyeExaminationsRef = React.createRef()
   }
 
   state = {
     acknowledged: true,
-    expandedEyeExaminations: false,
   }
 
   componentDidMount() {
@@ -324,7 +317,6 @@ class EditOrder extends Component {
     const orderWidget = widgets.find(o => o.id === '5')
     const cdWidget = widgets.find(o => o.id === '3')
     const formsWidget = widgets.find(o => o.id === '12')
-    const eyeExaminationsWidget = widgets.find(o => o.id === '23')
     const Order = orderWidget.component
     const ConsultationDocument = cdWidget.component
     const consultationDocumentAccessRight = Authorized.check(
@@ -332,20 +324,6 @@ class EditOrder extends Component {
     )
     const Forms = formsWidget.component
     const formAccessRight = Authorized.check(formsWidget.accessRight)
-    const EyeExaminations = eyeExaminationsWidget.component
-    const eyeExaminationsAccessRight = Authorized.check(
-      eyeExaminationsWidget.accessRight,
-    )
-    if (
-      eyeExaminationsAccessRight.rights !== 'hidden' &&
-      !this.state.expandedEyeExaminations &&
-      showEyeExaminations(values.corEyeExaminations)
-    ) {
-      let div = $(this.eyeExaminationsRef.current).find(
-        'div[aria-expanded]:eq(0)',
-      )
-      if (div.attr('aria-expanded') === 'false') div.click()
-    }
 
     const visitRemarks = this.props.visitRegistration?.entity?.visit
       ?.visitRemarks
@@ -467,30 +445,6 @@ class EditOrder extends Component {
                       </span>
                     </h5>
                     <ConsultationDocument forDispense />
-                  </div>
-                )}
-              {!isRetail &&
-                eyeExaminationsAccessRight &&
-                eyeExaminationsAccessRight.rights !== 'hidden' && (
-                  <div ref={this.eyeExaminationsRef}>
-                    <Accordion
-                      mode='multiple'
-                      onChange={(event, p, expanded) => {
-                        if (expanded && !this.state.expandedEyeExaminations) {
-                          this.setState({ expandedEyeExaminations: true })
-                        }
-                      }}
-                      collapses={[
-                        {
-                          title: 'Eye Examinations',
-                          content: (
-                            <div style={{ padding: '5px' }}>
-                              <EyeExaminations />
-                            </div>
-                          ),
-                        },
-                      ]}
-                    />
                   </div>
                 )}
             </GridItem>

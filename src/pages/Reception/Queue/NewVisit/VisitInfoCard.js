@@ -127,8 +127,6 @@ const VisitInfoCard = ({
 
   const handleDoctorChange = (v, op) => {
     if (op.clinicianProfile) {
-      const { roomAssignment = {} } = op.clinicianProfile
-      setFieldValue(FormField['visit.roomFK'], roomAssignment.roomFK)
       if (!op.clinicianProfile.specialtyFK) {
         setFieldValue(FormField['visit.isDoctorInCharge'], true)
       }
