@@ -27,7 +27,6 @@ export const WIDGETS_ID = {
   CONSULTATION_DOCUMENT: '20',
   NURSENOTES: '21',
   DOCTORNOTE: '22',
-  EYEEXAMINATIONS: '23',
 }
 
 export const GPCategory = [
@@ -38,7 +37,6 @@ export const GPCategory = [
   WIDGETS_ID.DIAGNOSIS,
   WIDGETS_ID.VISITREMARKS,
   WIDGETS_ID.REFERRAL,
-  WIDGETS_ID.EYEEXAMINATIONS,
   WIDGETS_ID.ORDERS,
   WIDGETS_ID.INVOICE,
   WIDGETS_ID.CONSULTATION_DOCUMENT,
@@ -58,7 +56,6 @@ export const EyeCategory = [
   WIDGETS_ID.EXAMINATIONFORM,
   WIDGETS_ID.VISITREMARKS,
   WIDGETS_ID.REFERRAL,
-  WIDGETS_ID.EYEEXAMINATIONS,
   WIDGETS_ID.ORDERS,
   WIDGETS_ID.INVOICE,
   WIDGETS_ID.CONSULTATION_DOCUMENT,
@@ -145,12 +142,6 @@ export const categoryTypes = [
     value: WIDGETS_ID.REFERRAL,
     name: 'Referral',
     authority: '',
-  },
-  {
-    value: WIDGETS_ID.EYEEXAMINATIONS,
-    name: 'Eye Examinations',
-    shortname: 'Eye Exam.',
-    authority: 'queue.consultation.widgets.eyeexaminations',
   },
   {
     value: WIDGETS_ID.ORDERS,
@@ -330,19 +321,6 @@ export const widgets = (
       render: (loaded, p) => {
         let Cmpnet = loaded.default
         return <Cmpnet {...props} {...p} fieldName='visitReferral' />
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: WIDGETS_ID.EYEEXAMINATIONS,
-    name: 'Eye Examinations',
-    authority: 'queue.consultation.widgets.eyeexaminations',
-    component: Loadable({
-      loader: () => import('./EyeExaminations'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
       },
       loading: Loading,
     }),
@@ -599,12 +577,6 @@ export const showWidget = (current, widgetId, selectNoteTypes = []) => {
       current.orders.filter(o => o.type === 'Treatment').length === 0)
   )
     return false
-  // check show eye examinations
-  if (
-    widgetId === WIDGETS_ID.EYEEXAMINATIONS &&
-    !showEyeExaminations(current.corEyeExaminations)
-  )
-    return false
 
   // check show visit referral
   if (widgetId === WIDGETS_ID.REFERRAL) {
@@ -640,31 +612,4 @@ export const showNote = (
     return false
   }
   return true
-}
-
-export const showEyeExaminations = (corEyeExaminations = []) => {
-  if (
-    corEyeExaminations.find(
-      row =>
-        hasValue(row.visionCorrectionMethod) ||
-        hasValue(row.leftBareEye5) ||
-        hasValue(row.leftCorrectedVision5) ||
-        hasValue(row.leftBareEye50) ||
-        hasValue(row.leftCorrectedVision50) ||
-        hasValue(row.rightBareEye5) ||
-        hasValue(row.rightCorrectedVision5) ||
-        hasValue(row.rightBareEye50) ||
-        hasValue(row.rightCorrectedVision50) ||
-        hasValue(row.leftFirstResult) ||
-        hasValue(row.leftSecondResult) ||
-        hasValue(row.leftThirdResult) ||
-        hasValue(row.rightFirstResult) ||
-        hasValue(row.rightSecondResult) ||
-        hasValue(row.rightThirdResult) ||
-        hasValue(row.colorVisionTestResult) ||
-        (hasValue(row.remarks) && row.remarks.trim().length),
-    )
-  )
-    return true
-  return false
 }

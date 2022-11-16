@@ -1240,7 +1240,6 @@ class PatientHistory extends Component {
     let orders = []
     let consultationDocument = []
     let doctorNote = []
-    let corEyeExaminations = []
 
     var printVisit = loadVisits.filter(visit =>
       selectItems.find(item => item === visit.currentId),
@@ -1333,12 +1332,6 @@ class PatientHistory extends Component {
         visitPurposeFK,
         isNurseNote,
       )
-      const isShowJGHEyeExaminations = this.checkShowData(
-        WidgetConfig.WIDGETS_ID.EYEEXAMINATIONS,
-        current,
-        visitPurposeFK,
-        isNurseNote,
-      )
       if (
         isNurseNote ||
         isShowDoctorNote ||
@@ -1350,8 +1343,7 @@ class PatientHistory extends Component {
         isShowRefractionForm ||
         isShowEyeExaminations ||
         isShowOrders ||
-        isShowConsultationDocument ||
-        isShowJGHEyeExaminations
+        isShowConsultationDocument
       ) {
         let referral = { isShowReferral: false }
         if (isShowReferral) {
@@ -1461,79 +1453,6 @@ class PatientHistory extends Component {
           )
         }
 
-        // JGH Eye Examinations
-        if (isShowJGHEyeExaminations) {
-          corEyeExaminations = corEyeExaminations.concat(
-            current.corEyeExaminations.map(o => {
-              return {
-                visitFK: current.currentId,
-                visionCorrectionMethod: o.visionCorrectionMethod || '',
-                rightBareEye5: WidgetConfig.hasValue(o.rightBareEye5)
-                  ? `${numeral(o.rightBareEye5).format('0.0')}`
-                  : '-',
-                rightCorrectedVision5: WidgetConfig.hasValue(
-                  o.rightCorrectedVision5,
-                )
-                  ? `${numeral(o.rightCorrectedVision5).format('0.0')}`
-                  : '-',
-                rightBareEye50: WidgetConfig.hasValue(o.rightBareEye50)
-                  ? `${numeral(o.rightBareEye50).format('0.0')}`
-                  : '-',
-                rightCorrectedVision50: WidgetConfig.hasValue(
-                  o.rightCorrectedVision50,
-                )
-                  ? `${numeral(o.rightCorrectedVision50).format('0.0')}`
-                  : '-',
-                leftBareEye5: WidgetConfig.hasValue(o.leftBareEye5)
-                  ? `${numeral(o.leftBareEye5).format('0.0')}`
-                  : '-',
-                leftCorrectedVision5: WidgetConfig.hasValue(
-                  o.leftCorrectedVision5,
-                )
-                  ? `${numeral(o.leftCorrectedVision5).format('0.0')}`
-                  : '-',
-                leftBareEye50: WidgetConfig.hasValue(o.leftBareEye50)
-                  ? `${numeral(o.leftBareEye50).format('0.0')}`
-                  : '-',
-                leftCorrectedVision50: WidgetConfig.hasValue(
-                  o.leftCorrectedVision50,
-                )
-                  ? `${numeral(o.leftCorrectedVision50).format('0.0')}`
-                  : '-',
-                rightFirstResult: WidgetConfig.hasValue(o.rightFirstResult)
-                  ? `${o.rightFirstResult}`
-                  : '-',
-                rightSecondResult: WidgetConfig.hasValue(o.rightSecondResult)
-                  ? `${o.rightSecondResult}`
-                  : '-',
-                rightThirdResult: WidgetConfig.hasValue(o.rightThirdResult)
-                  ? `${o.rightThirdResult}`
-                  : '-',
-                rightAverageResult: WidgetConfig.hasValue(o.rightAverageResult)
-                  ? `${numeral(o.rightAverageResult).format('0')}`
-                  : '-',
-                leftFirstResult: WidgetConfig.hasValue(o.leftFirstResult)
-                  ? `${o.leftFirstResult}`
-                  : '-',
-                leftSecondResult: WidgetConfig.hasValue(o.leftSecondResult)
-                  ? `${o.leftSecondResult}`
-                  : '-',
-                leftThirdResult: WidgetConfig.hasValue(o.leftThirdResult)
-                  ? `${o.leftThirdResult}`
-                  : '-',
-                leftAverageResult: WidgetConfig.hasValue(o.leftAverageResult)
-                  ? `${numeral(o.leftAverageResult).format('0')}`
-                  : '-',
-                colorVisionTestResult: o.colorVisionTestResult || '',
-                remarks:
-                  WidgetConfig.hasValue(o.remarks) && o.remarks.trim().length
-                    ? o.remarks
-                    : '-',
-              }
-            }),
-          )
-        }
-
         // orders
         if (isShowOrders) {
           orders = orders.concat(
@@ -1587,7 +1506,6 @@ class PatientHistory extends Component {
       Orders: orders,
       ConsultationDocument: consultationDocument,
       DoctorNote: doctorNote,
-      COREyeExaminations: corEyeExaminations,
       ReportContext: reportContext,
     }
     const payload1 = [
