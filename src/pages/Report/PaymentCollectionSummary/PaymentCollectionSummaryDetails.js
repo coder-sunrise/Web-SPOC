@@ -28,7 +28,7 @@ class PaymentCollectionSummaryDetails extends PureComponent {
 
     if (groupByDoctor) {
       PaymentCollectionSummaryDetailsCols = [
-        { name: 'doctorName', title: 'Doctor Name' },
+        { name: 'doctorName', title: 'Optometrist Name' },
         ...PaymentCollectionSummaryDetailsCols,
       ]
 
