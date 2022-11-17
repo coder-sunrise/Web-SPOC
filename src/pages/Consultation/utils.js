@@ -205,7 +205,6 @@ const convertToConsultation = (
 }
 
 const convertClinicalNotesForms = values => {
-  let anyChange = false
   formConfigs.forEach(form => {
     var list = getIn(values, form.prop) || []
     var entity = getIn(values, form.prefixProp)
@@ -219,6 +218,7 @@ const convertClinicalNotesForms = values => {
         //add new after unticked
         if (!entity.id) {
           list[0].isDeleted = true
+          entity.lastChangeDate = moment()
           list.push({ ...entity })
         }
         //update old item
@@ -232,11 +232,9 @@ const convertClinicalNotesForms = values => {
     }
     //fist add
     else if (entity) {
+      entity.lastChangeDate = moment()
       list.push(entity)
       values = setIn(values, form.prop, list)
-    }
-    if (!anyChange && !_.isEqual(list, oldList)) {
-      anyChange = true
     }
 
     values = setIn(values, form.prefixProp, undefined)
@@ -246,7 +244,7 @@ const convertClinicalNotesForms = values => {
       item.ocularMotilityScribbleNote = undefined
     })
   })
-  if (anyChange) values.corDoctorNote.lastChangeDate = moment()
+
   return values
 }
 
