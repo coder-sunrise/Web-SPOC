@@ -1,15 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
-import {
-  GridContainer,
-  GridItem,
-  TextField,
-  DatePicker,
-  CardContainer,
-  dateFormatLong,
-} from '@/components'
-import Authorized from '@/utils/Authorized'
+import { CardContainer, dateFormatLong } from '@/components'
 import { VISIT_TYPE } from '@/utils/constants'
 import { List, ListItem, ListItemText } from '@material-ui/core'
 import classnames from 'classnames'
@@ -85,14 +77,7 @@ class HistoryDetails extends PureComponent {
           const lastUpdateDate = moment(o.signOffDate).format(
             'DD MMM YYYY HH:mm',
           )
-          const {
-            visitDate,
-            timeIn,
-            timeOut,
-            userTitle,
-            userName,
-            doctors = [],
-          } = selectHistory
+          const { visitDate, doctors = [] } = selectHistory
           const student = doctors.find(doctor => !doctor.isPrimaryDoctor)
           const optometrist = doctors.find(doctor => doctor.isPrimaryDoctor)
           return (
@@ -211,7 +196,8 @@ class HistoryDetails extends PureComponent {
               if (visitPurposeFK === VISIT_TYPE.OTC) {
                 return (
                   (_widget.id === WidgetConfig.WIDGETS_ID.ORDERS ||
-                    _widget.id === WidgetConfig.WIDGETS_ID.INVOICE ||
+                    _widget.id ===
+                      WidgetConfig.WIDGETS_ID.CONSULTATION_DOCUMENT ||
                     _widget.id === WidgetConfig.WIDGETS_ID.VISITREMARKS) &&
                   WidgetConfig.showWidget(current, _widget.id)
                 )

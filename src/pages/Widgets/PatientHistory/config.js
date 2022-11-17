@@ -22,7 +22,7 @@ export const WIDGETS_ID = {
   FOLLOWUP: '11',
   CONSULTATION_DOCUMENT: '12',
   DIAGNOSIS: '13',
-  INVOICE: '14',
+  //INVOICE: '14',
   NURSENOTES: '15',
   ORDERS: '16',
   VISITREMARKS: '17',
@@ -42,7 +42,7 @@ export const GPCategory = [
   WIDGETS_ID.FOLLOWUP,
   WIDGETS_ID.CONSULTATION_DOCUMENT,
   WIDGETS_ID.DIAGNOSIS,
-  WIDGETS_ID.INVOICE,
+  //WIDGETS_ID.INVOICE,
   WIDGETS_ID.NURSENOTES,
   WIDGETS_ID.ORDERS,
   WIDGETS_ID.VISITREMARKS,
@@ -115,16 +115,21 @@ export const categoryTypes = [
     name: 'Diagnosis',
     authority: 'queue.consultation.widgets.diagnosis',
   },
-  {
-    value: WIDGETS_ID.INVOICE,
-    name: 'Invoice',
-    authority: 'finance/invoicepayment',
-  },
+  //{
+  //  value: WIDGETS_ID.INVOICE,
+  //  name: 'Invoice',
+  //  authority: 'finance/invoicepayment',
+  //},
   {
     value: WIDGETS_ID.NURSENOTES,
     name: 'Notes',
     authority:
       'patientdatabase.patientprofiledetails.patienthistory.nursenotes',
+  },
+  {
+    value: WIDGETS_ID.ORDERS,
+    name: 'Orders',
+    authority: 'queue.consultation.widgets.order',
   },
   {
     value: WIDGETS_ID.VISITREMARKS,
@@ -179,32 +184,19 @@ export const widgets = (props, scribbleNoteUpdateState = () => {}) => [
       loading: Loading,
     }),
   },
-  {
-    id: WIDGETS_ID.ORDERS,
-    name: 'Orders',
-    authority: 'queue.consultation.widgets.order',
-    component: Loadable({
-      loader: () => import('./Orders'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: WIDGETS_ID.INVOICE,
-    name: 'Invoice',
-    authority: 'queue.consultation.widgets.order',
-    component: Loadable({
-      loader: () => import('./Invoice'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
+  //{
+  //  id: WIDGETS_ID.INVOICE,
+  //  name: 'Invoice',
+  //  authority: 'finance/invoicepayment',
+  //  component: Loadable({
+  //  loader: () => import('./Invoice'),
+  //  render: (loaded, p) => {
+  //  let Cmpnet = loaded.default
+  //  return <Cmpnet {...props} {...p} />
+  //},
+  //  loading: Loading,
+  //}),
+  //},
   {
     id: WIDGETS_ID.ORDERS,
     name: 'Orders',

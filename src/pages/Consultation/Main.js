@@ -276,7 +276,7 @@ const saveConsultation = ({
       newValues.corDoctorNote.lastChangeDate = moment()
 
     //handle corPaediatric Form
-    if (newValues.corDoctorNote.corPaediatric.length > 0) {
+    if (newValues.corDoctorNote.corPaediatric?.length > 0) {
       newValues.corDoctorNote.corPaediatric.at(-1).recordStatusFK = 1
     }
 

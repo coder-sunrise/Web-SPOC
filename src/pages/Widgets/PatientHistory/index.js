@@ -3,12 +3,9 @@ import { Collapse } from 'antd'
 import _ from 'lodash'
 import moment from 'moment'
 import { Edit, Print } from '@material-ui/icons'
-import SvgIcon from '@material-ui/core/SvgIcon'
 import { connect } from 'dva'
 import { history, formatMessage } from 'umi'
-import { InvoiceReplacement } from '@/components/Icon/customIcons'
 import { Field } from 'formik'
-import numeral from 'numeral'
 import Search from '@material-ui/icons/Search'
 import { VisitTypeTag } from '@/components/_medisys'
 import { withStyles, Link } from '@material-ui/core'
@@ -25,22 +22,14 @@ import {
   VisitTypeSelect,
   dateFormatLong,
   dateFormatLongWithTimeNoSec,
-  timeFormat24Hour,
   Switch,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 // utils
-import {
-  findGetParameter,
-  commonDataReaderTransform,
-  getDefaultLayerContent,
-} from '@/utils/utils'
-import { VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
-import { scribbleTypes } from '@/utils/codes'
+import { findGetParameter, getDefaultLayerContent } from '@/utils/utils'
+import { VISIT_TYPE, CLINICAL_ROLE } from '@/utils/constants'
 import { DoctorProfileSelect } from '@/components/_medisys'
 import withWebSocket from '@/components/Decorator/withWebSocket'
-import { getReportContext } from '@/services/report'
-import { getFileContentByFileID } from '@/services/file'
 import * as WidgetConfig from './config'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import HistoryDetails from './HistoryDetails'
@@ -278,7 +267,8 @@ class PatientHistory extends Component {
       user,
     } = this.props
     const isStudent =
-      user.data.clinicianProfile?.userProfile?.role?.clinicRoleFK === 3
+      user.data.clinicianProfile?.userProfile?.role?.clinicRoleFK ===
+      CLINICAL_ROLE.STUDENT
     const { settings = {} } = clinicSettings
     const { viewVisitPageSize = 10 } = settings
 
@@ -351,24 +341,45 @@ class PatientHistory extends Component {
     })
   }
 
-  showEditButton = (visitStatus, doctorProfileFK, isClinicSessionClosed) => {
-    const { notesBy, user } = this.props
+  showEditButton = (
+    visitStatus,
+    doctorProfileFK,
+    isClinicSessionClosed,
+    visitDate,
+  ) => {
+    const { user, clinicSettings } = this.props
+    const { notesBy } = this.state
+    const { settings = [] } = clinicSettings
+    const {
+      isBackdatedClinicalNotesEntry = false,
+      backdatedClinicalNotesEntryStudent = 14,
+      backdatedClinicalNotesEntryOptometrist = 90,
+    } = settings
     const clinicRoleFK =
       user.data.clinicianProfile?.userProfile?.role?.clinicRoleFK
-    if (clinicRoleFK === 1 && notesBy === 'Optometrist') {
+    if (clinicRoleFK === CLINICAL_ROLE.DOCTOR && notesBy === 'Optometrist') {
       if (
-        (visitStatus === VISIT_STATUS.UNGRADED ||
+        (visitStatus === VISIT_STATUS.UPGRADED ||
           visitStatus === VISIT_STATUS.VERIFIED) &&
-        doctorProfileFK === user.data.clinicianProfile.doctorProfile.id
-      )
+        doctorProfileFK === user.data.clinicianProfile.doctorProfile.id &&
+        (!isBackdatedClinicalNotesEntry ||
+          moment(visitDate)
+            .startOf('day')
+            .add(backdatedClinicalNotesEntryOptometrist, 'day') > moment())
+      ) {
         return true
+      }
     }
-    if (clinicRoleFK === 3) {
+    if (clinicRoleFK === CLINICAL_ROLE.STUDENT) {
       if (
         visitStatus === VISIT_STATUS.IN_CONS ||
-        ((visitStatus === VISIT_STATUS.UNGRADED ||
+        ((visitStatus === VISIT_STATUS.UPGRADED ||
           visitStatus === VISIT_STATUS.VERIFIED) &&
-          isClinicSessionClosed)
+          isClinicSessionClosed &&
+          (!isBackdatedClinicalNotesEntry ||
+            moment(visitDate)
+              .startOf('day')
+              .add(backdatedClinicalNotesEntryStudent, 'day') > moment()))
       )
         return true
     }
@@ -394,21 +405,13 @@ class PatientHistory extends Component {
       visitDate,
       signOffDate,
       visitPurposeFK,
-      timeIn,
-      timeOut,
-      isForInvoiceReplacement,
-      visitPurposeName,
-      coHistory = [],
       isNurseNote,
       visitStatus,
-      isExistsVerifiedReport,
       doctorProfileFK,
       isClinicSessionClosed,
       doctors = [],
       signOffByUser,
     } = row
-    const clinicRoleFK =
-      user.data.clinicianProfile.userProfile.role?.clinicRoleFK
     const { settings = [] } = clinicSettings
     const { patientID, ableToEditConsultation } = patientHistory
     const patientIsActive = patient.isActive
@@ -492,6 +495,7 @@ class PatientHistory extends Component {
                   visitStatus,
                   doctorProfileFK,
                   isClinicSessionClosed,
+                  visitDate,
                 ) &&
                 fromModule !== 'Consultation' &&
                 fromModule !== 'History' &&
@@ -507,11 +511,6 @@ class PatientHistory extends Component {
                         }}
                         size='sm'
                         justIcon
-                        disabled={
-                          clinicRoleFK === CLINICAL_ROLE.STUDENT &&
-                          (visitStatus === VISIT_STATUS.UPGRADED ||
-                            visitStatus === VISIT_STATUS.VERIFIED)
-                        }
                         onClick={event => {
                           event.stopPropagation()
                           const closeOtherPopup = () => {
@@ -606,7 +605,7 @@ class PatientHistory extends Component {
           >
             {!isNurseNote &&
               settings.showConsultationVersioning &&
-              (visitStatus === VISIT_STATUS.UNGRADED ||
+              (visitStatus === VISIT_STATUS.UPGRADED ||
                 visitStatus === VISIT_STATUS.VERIFIED) && (
                 <Tooltip title='View History'>
                   <span
@@ -837,7 +836,8 @@ class PatientHistory extends Component {
   getFilterBar = () => {
     const { values, fromModule, user } = this.props
     const isStudent =
-      user.data.clinicianProfile?.userProfile?.role?.clinicRoleFK === 3
+      user.data.clinicianProfile?.userProfile?.role?.clinicRoleFK ===
+      CLINICAL_ROLE.STUDENT
     const { isAllDate } = values
     return (
       <div>
@@ -1051,7 +1051,8 @@ class PatientHistory extends Component {
   getConsultationFilterBar = () => {
     const { values, isFullScreen = true, user } = this.props
     const isStudent =
-      user.data.clinicianProfile?.userProfile?.role?.clinicRoleFK === 3
+      user.data.clinicianProfile?.userProfile?.role?.clinicRoleFK ===
+      CLINICAL_ROLE.STUDENT
     const { isAllDate } = values
     return (
       <div>
