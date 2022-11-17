@@ -74,7 +74,7 @@ class HistoryDetails extends PureComponent {
           const updateByUser = o.userName
             ? `${o.userTitle || ''} ${o.userName || ''}`
             : undefined
-          const lastUpdateDate = moment(o.signOffDate).format(
+          const lastChangeDate = moment(o.signOffDate).format(
             'DD MMM YYYY HH:mm',
           )
           const { visitDate, doctors = [] } = selectHistory
@@ -132,12 +132,12 @@ class HistoryDetails extends PureComponent {
                           ? `${selectHistory.visitPurposeName} (V${
                               o.versionNumber
                             }), Last Update By: ${updateByUser || ''}${
-                              lastUpdateDate ? ` on ${lastUpdateDate}` : ''
+                              lastChangeDate ? ` on ${lastChangeDate}` : ''
                             }`
                           : `${
                               selectHistory.visitPurposeName
                             }, Last Update By: ${updateByUser || ''}${
-                              lastUpdateDate ? ` on ${lastUpdateDate}` : ''
+                              lastChangeDate ? ` on ${lastChangeDate}` : ''
                             }`}
                       </div>
                     </div>

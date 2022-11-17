@@ -62,7 +62,7 @@ const PaymentCollections = ({
 
   let invoiceNoTitle = 'Invoice No.'
   let invoiceDateTitle = 'Invoice Date'
-  let doctorTitle = 'Doctor'
+  let doctorTitle = 'Optometrist'
   if (isCompanyPaymentCollectionsForPast) {
     invoiceNoTitle = (
       <div><span style={{ display: 'block' }}>Statement No.</span>
