@@ -54,7 +54,7 @@ const ClinicalNotes = props => {
                 </span>
                 <span
                   style={{ fontStyle: 'italic', fontSize: '0.7rem' }}
-                >{`Last Update on ${moment(formList[0].lastUpdateDate).format(
+                >{`Last Update on ${moment(formList[0].lastChangeDate).format(
                   dateFormatLongWithTimeNoSec,
                 )}`}</span>
               </div>
