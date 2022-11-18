@@ -50,7 +50,7 @@ const ActionButton = ({ row, onClick }) => {
   }
 
   const isStatusWaiting = row.visitStatus === VISIT_STATUS.WAITING
-  const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
+  const isStatusInProgress = filterMap[StatusIndicator.DISPENSE].includes(
     row.visitStatus,
   )
   // const isStatusDispense = row.visitStatus === VISIT_STATUS.DISPENSE
@@ -58,7 +58,7 @@ const ActionButton = ({ row, onClick }) => {
   const isStatusCompleted = [
     VISIT_STATUS.COMPLETED,
     VISIT_STATUS.IN_CONS,
-    VISIT_STATUS.UPGRADED,
+    VISIT_STATUS.UNGRADED,
     VISIT_STATUS.VERIFIED,
   ].includes(row.visitStatus)
 
@@ -67,7 +67,7 @@ const ActionButton = ({ row, onClick }) => {
   let disableEditConsultation = falsel
   if (
     clinicRoleFK === CLINICAL_ROLE.STUDENT &&
-    [VISIT_STATUS.UPGRADED, VISIT_STATUS.VERIFIED].includes(row.visitStatus)
+    [VISIT_STATUS.UNGRADED, VISIT_STATUS.VERIFIED].includes(row.visitStatus)
   ) {
     disableEditConsultation
   }
@@ -132,18 +132,18 @@ const ActionButton = ({ row, onClick }) => {
             return { ...opt, disabled: !row.isFinalized }
           case 2: // delete visit
             return { ...opt, disabled: !isStatusWaiting }
-          case 5: // start consultation
-            return {
-              ...opt,
-              disabled: isStatusInProgress,
-              hidden: true,
-            }
-          case 6: // resume consultation
-            return {
-              ...opt,
-              disabled: !isStatusInProgress,
-              hidden: hideResumeButton || isRetailVisit || isBillFirstVisit,
-            }
+          // case 5: // start consultation
+          //   return {
+          //     ...opt,
+          //     disabled: isStatusInProgress,
+          //     hidden: true,
+          //   }
+          // case 6: // resume consultation
+          //   return {
+          //     ...opt,
+          //     disabled: !isStatusInProgress,
+          //     hidden: hideResumeButton || isRetailVisit || isBillFirstVisit,
+          //   }
           case 7: // edit consultation
             return {
               ...opt,

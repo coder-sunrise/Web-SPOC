@@ -91,7 +91,7 @@ const buttonStyle = {
   fullWidth: {
     width: '100%',
   },
-  outlined: { 
+  outlined: {
     border: '1px solid #d9d9d9',
     backgroundColor: 'transparent',
     '&:hover': {
@@ -105,7 +105,9 @@ const buttonStyle = {
     color: '#ffffff',
     backgroundColor: grayColor,
     '&:hover:not($simple):not($link):not($transparent)': {
-      backgroundColor: color(grayColor).darken(0.2).hex(),
+      backgroundColor: color(grayColor)
+        .darken(0.2)
+        .hex(),
     },
     '& > span': {
       '& > svg': {
@@ -124,27 +126,33 @@ const buttonStyle = {
   containedlogin: {
     backgroundColor: '#0093f1',
     '&:hover:not($simple):not($link):not($transparent)': {
-      backgroundColor: color('#0093f1').darken(0.2).hex(),
+      backgroundColor: color('#0093f1')
+        .darken(0.2)
+        .hex(),
     },
   },
   primary: {
     boxShadow: 'none',
-      // '0px 1px 5px 0px rgba(28, 26, 124,0.2), 0px 2px 2px 0px rgba(28, 26, 124,0.14), 0px 3px 1px -2px rgba(28, 26, 124,0.12)',
+    // '0px 1px 5px 0px rgba(28, 26, 124,0.2), 0px 2px 2px 0px rgba(28, 26, 124,0.14), 0px 3px 1px -2px rgba(28, 26, 124,0.12)',
     '&:hover': {
-      boxShadow:'none',
-        // '0 14px 26px -12px rgba(28, 26, 124, 0.42), 0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(28, 26, 124, 0.2)',
+      boxShadow: 'none',
+      // '0 14px 26px -12px rgba(28, 26, 124, 0.42), 0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(28, 26, 124, 0.2)',
     },
   },
   containedprimary: {
     backgroundColor: primaryColor,
     '&:hover:not($simple):not($link):not($transparent)': {
-      backgroundColor: color(primaryColor).darken(0.2).hex(),
+      backgroundColor: color(primaryColor)
+        .darken(0.2)
+        .hex(),
     },
   },
   outlinedprimary: {
     color: primaryColor,
     '&:hover': {
-      backgroundColor: color(primaryColor).lighten(0.8).hex(),
+      backgroundColor: color(primaryColor)
+        .lighten(0.8)
+        .hex(),
       borderColor: primaryColor,
       color: primaryColor,
     },
@@ -160,13 +168,17 @@ const buttonStyle = {
   containedinfo: {
     backgroundColor: infoColor,
     '&:hover:not($simple):not($link):not($transparent)': {
-      backgroundColor: color(infoColor).darken(0.2).hex(),
+      backgroundColor: color(infoColor)
+        .darken(0.2)
+        .hex(),
     },
   },
   outlinedinfo: {
     color: infoColor,
     '&:hover': {
-      backgroundColor: color(infoColor).lighten(0.8).hex(),
+      backgroundColor: color(infoColor)
+        .lighten(0.8)
+        .hex(),
       borderColor: infoColor,
       color: infoColor,
     },
@@ -182,13 +194,17 @@ const buttonStyle = {
   containedsuccess: {
     backgroundColor: successColor,
     '&:hover:not($simple):not($link):not($transparent)': {
-      backgroundColor: color(successColor).darken(0.2).hex(),
+      backgroundColor: color(successColor)
+        .darken(0.2)
+        .hex(),
     },
   },
   outlinedsuccess: {
     color: successColor,
     '&:hover': {
-      backgroundColor: color(successColor).lighten(0.8).hex(),
+      backgroundColor: color(successColor)
+        .lighten(0.8)
+        .hex(),
       borderColor: successColor,
       color: successColor,
     },
@@ -204,13 +220,17 @@ const buttonStyle = {
   containedwarning: {
     backgroundColor: warningColor,
     '&:hover:not($simple):not($link):not($transparent)': {
-      backgroundColor: color(warningColor).darken(0.2).hex(),
+      backgroundColor: color(warningColor)
+        .darken(0.2)
+        .hex(),
     },
   },
   outlinedwarning: {
     color: warningColor,
     '&:hover': {
-      backgroundColor: color(warningColor).lighten(0.8).hex(),
+      backgroundColor: color(warningColor)
+        .lighten(0.8)
+        .hex(),
       borderColor: warningColor,
       color: warningColor,
     },
@@ -226,13 +246,17 @@ const buttonStyle = {
   containeddanger: {
     backgroundColor: dangerColor,
     '&:hover:not($simple):not($link):not($transparent)': {
-      backgroundColor: color(dangerColor).darken(0.2).hex(),
+      backgroundColor: color(dangerColor)
+        .darken(0.2)
+        .hex(),
     },
   },
   outlineddanger: {
     color: dangerColor,
     '&:hover': {
-      backgroundColor: color(dangerColor).lighten(0.8).hex(),
+      backgroundColor: color(dangerColor)
+        .lighten(0.8)
+        .hex(),
       borderColor: dangerColor,
       color: dangerColor,
     },
@@ -248,13 +272,17 @@ const buttonStyle = {
   containedrose: {
     backgroundColor: roseColor,
     '&:hover:not($simple):not($link):not($transparent)': {
-      backgroundColor: color(roseColor).darken(0.2).hex(),
+      backgroundColor: color(roseColor)
+        .darken(0.2)
+        .hex(),
     },
   },
   outlinedrose: {
     color: roseColor,
     '&:hover': {
-      backgroundColor: color(roseColor).lighten(0.8).hex(),
+      backgroundColor: color(roseColor)
+        .lighten(0.8)
+        .hex(),
     },
   },
   white: {
@@ -263,7 +291,9 @@ const buttonStyle = {
       color: grayColor,
     },
     '&:hover:not($simple):not($link):not($transparent)': {
-      backgroundColor: color('#ffffff').darken(0.05).hex(),
+      backgroundColor: color('#ffffff')
+        .darken(0.05)
+        .hex(),
     },
   },
   twitter: {
@@ -303,15 +333,29 @@ const buttonStyle = {
     },
   },
   linkedin: {
-    backgroundColor: '#0976b4',
-    color: '#fff',
     boxShadow:
       '0px 1px 5px 0px rgba(9, 118, 180, 0.14), 0px 2px 2px 0px rgba(9, 118, 180, 0.2), 0px 3px 1px -2px rgba(9, 118, 180, 0.12)',
     '&:hover': {
-      backgroundColor: '#0976b4',
-      color: '#fff',
       boxShadow:
         '0 14px 26px -12px rgba(9, 118, 180, 0.42), 0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(9, 118, 180, 0.2)',
+    },
+  },
+  containedlinkedin: {
+    backgroundColor: '#0976b4',
+    '&:hover:not($simple):not($link):not($transparent)': {
+      backgroundColor: color('#0976b4')
+        .darken(0.2)
+        .hex(),
+    },
+  },
+  outlinedlinkedin: {
+    color: '#0976b4',
+    '&:hover': {
+      backgroundColor: color('#0976b4')
+        .lighten(0.8)
+        .hex(),
+      borderColor: '#0976b4',
+      color: '#0976b4',
     },
   },
   pinterest: {
@@ -387,15 +431,29 @@ const buttonStyle = {
     },
   },
   reddit: {
-    backgroundColor: '#ff4500',
-    color: ' #fff',
     boxShadow:
       '0px 1px 5px 0px rgba(255, 69, 0, 0.14), 0px 2px 2px 0px rgba(255, 69, 0, 0.2), 0px 3px 1px -2px rgba(255, 69, 0, 0.12)',
     '&:hover': {
-      backgroundColor: '#ff4500',
-      color: ' #fff',
       boxShadow:
         '0 14px 26px -12px rgba(255, 69, 0, 0.42), 0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(255, 69, 0, 0.2)',
+    },
+  },
+  containedreddit: {
+    backgroundColor: '#ff4500',
+    '&:hover:not($simple):not($link):not($transparent)': {
+      backgroundColor: color('#ff4500')
+        .darken(0.2)
+        .hex(),
+    },
+  },
+  outlinedreddit: {
+    color: '#ff4500',
+    '&:hover': {
+      backgroundColor: color('#ff4500')
+        .lighten(0.8)
+        .hex(),
+      borderColor: '#ff4500',
+      color: '#ff4500',
     },
   },
   simple: {
@@ -491,7 +549,7 @@ const buttonStyle = {
     },
     '&$reddit': {
       '&,&:focus,&:hover,&:visited': {
-        color: '#ff4500',
+        color: '#F7880D',
       },
     },
   },

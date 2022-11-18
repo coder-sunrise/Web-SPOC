@@ -18,7 +18,7 @@ export default {
 
   'reception.queue.status.all': 'All',
   'reception.queue.status.waiting': 'Waiting',
-  'reception.queue.status.inProgress': 'In Progress',
+  'reception.queue.status.inProgress': 'Dispense',
   'reception.queue.status.completed': 'Completed',
 
   'reception.queue.registerVisit': 'Visit',

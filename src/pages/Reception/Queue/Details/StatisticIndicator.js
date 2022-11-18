@@ -34,11 +34,20 @@ const StatisticStyles = () => ({
   statusAll: {
     color: '#000',
   },
-  statusInProgress: {
+  statusDispense: {
     color: warningColor,
   },
   statusCompleted: {
     color: grayColor,
+  },
+  statusInCons: {
+    color: 'red',
+  },
+  statusPast: {
+    color: '#0070C0',
+  },
+  statusUngraded: {
+    color: '#F7880D',
   },
   statusWaiting: {
     color: primaryColor,
@@ -77,7 +86,7 @@ const StatisticIndicator = ({
   const statistic = {
     all: getStatisticCount(StatusIndicator.ALL, list),
     waiting: getStatisticCount(StatusIndicator.WAITING, list),
-    inProgress: getStatisticCount(StatusIndicator.IN_PROGRESS, list),
+    dispense: getStatisticCount(StatusIndicator.DISPENSE, list),
     completed: getStatisticCount(StatusIndicator.COMPLETED, list),
     appointment: numOfcalendarData,
   }
@@ -121,8 +130,8 @@ const StatisticIndicator = ({
         </Button>
       </Paper>
       <Paper elevation={6} className={classnames(classes.container)}>
-        <h4 className={classnames([classes.number, classes.statusInProgress])}>
-          {statistic.inProgress}
+        <h4 className={classnames([classes.number, classes.statusDispense])}>
+          {statistic.dispense}
         </h4>
         <Divider variant='fullWidth' />
 
@@ -130,11 +139,11 @@ const StatisticIndicator = ({
           color='danger'
           size='sm'
           block
-          id={StatusIndicator.IN_PROGRESS}
+          id={StatusIndicator.DISPENSE}
           onClick={onButtonClick}
         >
-          {currentFilter === StatusIndicator.IN_PROGRESS && <Check />}
-          {StatusIndicator.IN_PROGRESS}
+          {currentFilter === StatusIndicator.DISPENSE && <Check />}
+          {StatusIndicator.DISPENSE}
         </Button>
       </Paper>
       <Paper elevation={6} className={classnames(classes.container)}>

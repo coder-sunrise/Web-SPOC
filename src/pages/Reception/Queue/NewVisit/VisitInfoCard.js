@@ -154,6 +154,9 @@ const VisitInfoCard = ({
       values.visitStatus !== VISIT_STATUS.UPCOMING_APPT) ||
     visitMode === 'view'
 
+
+  const roomDisabled =
+    values.visitStatus === VISIT_STATUS.IN_CONS || visitMode === 'view'
   const hasCOR = values.clinicalObjectRecordFK
   const activeCORCreatedBy = values.activeCORCreatedBy
   return (
@@ -255,7 +258,7 @@ const VisitInfoCard = ({
             name={FormField['visit.roomFK']}
             render={args => (
               <CodeSelect
-                disabled={notWaiting || isReadOnly}
+                disabled={roomDisabled || isReadOnly}
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.room',
                 })}

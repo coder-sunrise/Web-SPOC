@@ -216,13 +216,16 @@ class NewVisit extends PureComponent {
       values,
     } = this.props
 
-    const { doctorProfileFK, visitDoctor = [] } = values
+    const { doctorProfileFK, visitDoctor = [], visitPurposeFK } = values
 
     if (Object.keys(errors).length > 0) return handleSubmit()
 
     const alreadyRegisteredVisit = list.reduce(
       (registered, queue) =>
-        !registered ? queue.patientProfileFK === patientInfo.id : registered,
+        !registered
+          ? queue.patientProfileFK === patientInfo.id &&
+            queue.visitPurposeFK == visitPurposeFK
+          : registered,
       false,
     )
 
@@ -233,7 +236,7 @@ class NewVisit extends PureComponent {
           openConfirm: true,
           openConfirmTitle: 'Confirm Register New Visit',
           openConfirmContent:
-            'This patient already registered in current session, are you sure to continue?',
+            'This patient already registered for the same visit type in current session, are you sure to continue?',
           onConfirmSave: handleSubmit,
         },
       })
@@ -292,13 +295,15 @@ class NewVisit extends PureComponent {
     } = this.props
     const height = getHeight(this.props.height)
 
-    const existingQNo = list.reduce(
-      (queueNumbers, queue) =>
-        queue.visitFK === values.id
-          ? [...queueNumbers]
-          : [...queueNumbers, queue.queueNo],
-      [],
-    )
+    const existingQNo = list
+      .filter(queue => !queue.isClinicSessionClosed)
+      .reduce(
+        (queueNumbers, queue) =>
+          queue.visitFK === values.id
+            ? [...queueNumbers]
+            : [...queueNumbers, queue.queueNo],
+        [],
+      )
     const isReadOnly =
       !patientInfo || !patientInfo.isActive || visitMode === 'view'
     const isEdit = !!values.id

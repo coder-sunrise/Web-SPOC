@@ -926,7 +926,7 @@ class Main extends React.Component {
     }
     // Optometrist
     else if (clinicRoleFK == 1) {
-      if ([VISIT_STATUS.UPGRADED].includes(visit.visitStatus)) {
+      if ([VISIT_STATUS.UNGRADED].includes(visit.visitStatus)) {
         return true
       }
     }

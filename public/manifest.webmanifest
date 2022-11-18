@@ -1,7 +1,7 @@
 {
-  "short_name": "Medicloud S",
-  "name": "Medicloud",
-  "description": "Medicloud description",
+  "short_name": "DMRS",
+  "name": "DMRS",
+  "description": "DMRS description",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
