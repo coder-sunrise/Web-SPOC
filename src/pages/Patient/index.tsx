@@ -58,7 +58,7 @@ const menus = [
   },
   {
     id: 4,
-    label: 'Patient History',
+    label: 'Visit History',
     Icon: ArrowForwardIosOutlinedIcon,
     cmt: 6,
     style: iconStyle,

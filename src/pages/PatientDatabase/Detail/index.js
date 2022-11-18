@@ -203,7 +203,7 @@ class PatientDetail extends PureComponent {
       },
       {
         id: '6',
-        name: 'Patient History',
+        name: 'Visit History',
         access: [
           'patientdatabase.newpatient',
           'patientdatabase.patientprofiledetails',

@@ -11,8 +11,8 @@ import PatientHistory from '@/pages/Widgets/PatientHistory'
 const PatientHistoryDrawer = ({ classes, theme, onClose, ...restProps }) => {
   return (
     <div style={{ width: '67vw', padding: theme.spacing(2) }}>
-      <h4 style={{ display: 'inline-block' }}>Patient History</h4>
-      <Tooltip title='Close Patient History'>
+      <h4 style={{ display: 'inline-block' }}>Visit History</h4>
+      <Tooltip title='Close Visit History'>
         <Button
           justIcon
           className={classes.modalCloseButton}
