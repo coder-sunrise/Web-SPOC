@@ -278,7 +278,7 @@ const saveConsultation = ({
       newValues.corDoctorNote.lastChangeDate = moment()
 
     //handle corPaediatric Form
-    if (newValues.corDoctorNote.corPaediatric.length > 0) {
+    if (newValues.corDoctorNote.corPaediatric?.length > 0) {
       newValues.corDoctorNote.corPaediatric.at(-1).recordStatusFK = 1
     }
 
@@ -934,7 +934,7 @@ class Main extends React.Component {
     }
     // Optometrist
     else if (clinicRoleFK == 1) {
-      if ([VISIT_STATUS.UPGRADED].includes(visit.visitStatus)) {
+      if ([VISIT_STATUS.UNGRADED].includes(visit.visitStatus)) {
         return true
       }
     }

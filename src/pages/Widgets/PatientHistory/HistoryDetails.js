@@ -151,13 +151,9 @@ class HistoryDetails extends PureComponent {
                       }}
                     >
                       <div style={{ fontWeight: 500 }}>
-                        {`${moment(visitDate).format(
-                          'DD MMM YYYY',
-                        )} (Time In: ${moment(timeIn).format(
-                          'HH:mm',
-                        )} Time Out: ${
-                          timeOut ? moment(timeOut).format('HH:mm') : '-'
-                        })${docotrName ? ` - ${docotrName}` : ''}`}
+                        {`${moment(visitDate).format('DD MMM YYYY')} ${
+                          docotrName ? ` - ${docotrName}` : ''
+                        }`}
                       </div>
                       <div>
                         {settings.showConsultationVersioning
