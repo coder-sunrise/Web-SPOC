@@ -14,9 +14,25 @@ export const filterData = (
   visitType = [],
   doctor = [],
   room = [],
+  currentDoctorId,
 ) => {
+  if (filter === 'Past') {
+    console.log(
+      data.filter(eachRow => {
+        return (
+          eachRow.isClinicSessionClosed && eachRow.doctor.id === currentDoctorId
+        )
+      }),
+    )
+    return data.filter(eachRow => {
+      return (
+        eachRow.isClinicSessionClosed && eachRow.doctor.id === currentDoctorId
+      )
+    })
+  }
   let newData = data.filter(eachRow => {
     return (
+      !eachRow.isClinicSessionClosed &&
       filterMap[filter].includes(eachRow.visitStatus) &&
       (searchQuery === '' ||
         (eachRow.patientName || '')
@@ -44,7 +60,7 @@ export const filterData = (
         room.indexOf(eachRow.roomFK) >= 0)
     )
   })
-  return newData
+  return newData || []
 }
 
 export const filterDoctorBlock = data => {
@@ -53,8 +69,16 @@ export const filterDoctorBlock = data => {
   )
 }
 
-export const getCount = (type, data) => {
-  const filteredData = filterData(type, data)
+export const getCount = (type, data, doctorId, roomIds, doctorIds) => {
+  const filteredData = filterData(
+    type,
+    data,
+    '',
+    [],
+    doctorIds,
+    roomIds,
+    doctorId,
+  )
   return filteredData.length
 }
 

@@ -80,7 +80,7 @@ const withWebSocket = () => Component => {
       }
       if (!sendSuccess && !autoupdate) {
         notification.error({
-          message: `Medicloud printing tool is not running, please start it.`,
+          message: `DMRS printing tool is not running, please start it.`,
         })
       }
       this.setState({ pendingJob: [] })

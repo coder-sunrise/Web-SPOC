@@ -1009,6 +1009,7 @@ class Queue extends React.Component {
                 visitType={visitType}
                 doctor={doctor}
                 room={room}
+                sessionID={sessionInfo?.id}
               />
               <RightClickContextMenu
                 onMenuItemClick={this.onMenuItemClick}

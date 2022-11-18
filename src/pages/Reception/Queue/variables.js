@@ -12,27 +12,30 @@ import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf'
 
 export const StatusIndicator = {
   ALL: 'All',
-  APPOINTMENT: 'Appointment',
+  APPOINTMENT: 'Appt.',
   WAITING: 'Waiting',
-  IN_PROGRESS: 'In Progress',
+  DISPENSE: 'Dispense',
   BILLING: 'Billing',
+  IN_CONS: 'In Cons',
+  UNGRADED: 'Ungraded',
   COMPLETED: 'Completed',
+  PAST: 'Past',
 }
 
 export const modelKey = 'queueLog/'
 
 export const VISIT_STATUS = {
-         WAITING: 'Waiting',
-         IN_CONS: 'In Cons',
-         PAUSED: 'Paused',
-         DISPENSE: 'Dispense',
-         BILLING: 'Billing',
-         ORDER_UPDATED: 'Order Updated',
-         COMPLETED: 'Completed',
-         UPCOMING_APPT: 'Upcoming Appt.',
-         UPGRADED: 'Upgraded',
-         VERIFIED: 'Verified',
-       }
+  WAITING: 'Waiting',
+  IN_CONS: 'In Cons',
+  PAUSED: 'Paused',
+  DISPENSE: 'Dispense',
+  BILLING: 'Billing',
+  ORDER_UPDATED: 'Order Updated',
+  COMPLETED: 'Completed',
+  UPCOMING_APPT: 'Upcoming Appt.',
+  UNGRADED: 'Ungraded',
+  VERIFIED: 'Verified',
+}
 
 export const filterMap = {
   [StatusIndicator.ALL]: [
@@ -41,13 +44,11 @@ export const filterMap = {
   [StatusIndicator.APPOINTMENT]: [VISIT_STATUS.UPCOMING_APPT],
   [StatusIndicator.WAITING]: [VISIT_STATUS.WAITING],
   [StatusIndicator.BILLING]: [VISIT_STATUS.BILLING],
-  [StatusIndicator.IN_PROGRESS]: [
-    VISIT_STATUS.DISPENSE,
-    VISIT_STATUS.IN_CONS,
-    VISIT_STATUS.PAUSED,
-    VISIT_STATUS.ORDER_UPDATED,
-  ],
-  [StatusIndicator.COMPLETED]: [VISIT_STATUS.COMPLETED],
+  [StatusIndicator.DISPENSE]: [VISIT_STATUS.DISPENSE],
+  [StatusIndicator.UNGRADED]: [VISIT_STATUS.UNGRADED],
+  [StatusIndicator.IN_CONS]: [VISIT_STATUS.IN_CONS],
+  [StatusIndicator.COMPLETED]: [VISIT_STATUS.COMPLETED, VISIT_STATUS.VERIFIED],
+  [StatusIndicator.PAST]: [VISIT_STATUS.VERIFIED],
 }
 
 export const AppointmentContextMenu = [
@@ -126,21 +127,21 @@ export const ContextMenuOptions = [
     authority: 'patientdashboard',
   },
   { isDivider: true },
-  {
-    id: 5,
-    label: 'Start Consultation',
-    Icon: Play,
-    disabled: false,
-    authority: 'patientdashboard.startresumeconsultation',
-  },
-  {
-    id: 6,
-    label: 'Resume Consultation',
-    Icon: PlayCircle,
-    disabled: true,
-    hidden: true,
-    authority: 'patientdashboard.startresumeconsultation',
-  },
+  // {
+  //   id: 5,
+  //   label: 'Start Consultation',
+  //   Icon: Play,
+  //   disabled: false,
+  //   authority: 'patientdashboard.startresumeconsultation',
+  // },
+  // {
+  //   id: 6,
+  //   label: 'Resume Consultation',
+  //   Icon: PlayCircle,
+  //   disabled: true,
+  //   hidden: true,
+  //   authority: 'patientdashboard.startresumeconsultation',
+  // },
   {
     id: 7,
     label: 'Edit Consultation',

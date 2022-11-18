@@ -599,7 +599,7 @@ class Form extends React.PureComponent {
         if (response.length > 0) {
           this.setState({
             conflicts: _.orderBy(
-              response[0].conflicts || [],
+              response[0]?.conflicts || [],
               ['isPrevent'],
               ['desc'],
             ),

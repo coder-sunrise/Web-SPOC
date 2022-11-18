@@ -74,7 +74,7 @@ const ContextMenu = ({
 }) => {
   const isStatusWaiting = row.visitStatus === VISIT_STATUS.WAITING
   const isVisitEditable = true
-  const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
+  const isStatusInProgress = filterMap[StatusIndicator.DISPENSE].includes(
     row.visitStatus,
   )
   // const isStatusDispense = row.visitStatus === VISIT_STATUS.DISPENSE
@@ -84,7 +84,7 @@ const ContextMenu = ({
   const isStatusCompleted = [
     VISIT_STATUS.COMPLETED,
     VISIT_STATUS.IN_CONS,
-    VISIT_STATUS.UPGRADED,
+    VISIT_STATUS.UNGRADED,
     VISIT_STATUS.VERIFIED,
   ].includes(row.visitStatus)
 
@@ -162,7 +162,7 @@ const ContextMenu = ({
     let disableEditConsultation = false
     if (
       clinicRoleFK === CLINICAL_ROLE.STUDENT &&
-      [VISIT_STATUS.UPGRADED, VISIT_STATUS.VERIFIED].includes(row.visitStatus)
+      [VISIT_STATUS.UNGRADED, VISIT_STATUS.VERIFIED].includes(row.visitStatus)
     ) {
       disableEditConsultation = true
     }
