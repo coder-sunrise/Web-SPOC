@@ -220,5 +220,12 @@ export const formConfigs = [
     }),
     prop: 'corDoctorNote.corFollowUp',
     prefixProp: 'corDoctorNote.corFollowUpEntity',
+    defaultValue: {
+      lastChangeDate: moment(),
+      aided_RE_VA: '6',
+      aided_LE_VA: '6',
+      unaided_RE_VA: '6',
+      unaided_LE_VA: '6',
+    },
   },
 ]
