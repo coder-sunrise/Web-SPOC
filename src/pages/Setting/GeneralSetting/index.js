@@ -4,6 +4,7 @@ import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
 import { getBizSession } from '@/services/queue'
+import Yup from '@/utils/yup'
 
 import {
   currenciesList,
@@ -26,6 +27,7 @@ import {
   Checkbox,
   CheckboxGroup,
   WarningSnackbar,
+  NumberInput,
   CodeSelect,
   TextField,
 } from '@/components'
@@ -34,6 +36,7 @@ import {
   hourOptions,
   minuteOptions,
 } from '@/pages/Reception/Appointment/components/form/ApptDuration'
+import { bool } from 'prop-types'
 
 const styles = theme => ({
   ...basicStyle(theme),
@@ -68,7 +71,9 @@ const styles = theme => ({
         showTotalInvoiceAmtInConsultation,
         autoPrintReportsOnCompletePayment,
         autoPrintReportsOnSignOff,
+        isBackdatedClinicalNotesEntry,
       } = clinicSettings.entity
+
       return {
         ...clinicSettings.entity,
         defaultVisitType: {
@@ -113,6 +118,12 @@ const styles = theme => ({
           ...autoPrintReportsOnSignOff,
           settingValue: autoPrintReportsOnSignOff.settingValue.split(','),
         },
+        isBackdatedClinicalNotesEntry: {
+          ...isBackdatedClinicalNotesEntry,
+          settingValue:
+            isBackdatedClinicalNotesEntry &&
+            isBackdatedClinicalNotesEntry.settingValue === 'true',
+        },
       }
     }
     return clinicSettings.entity
@@ -152,13 +163,30 @@ class GeneralSetting extends PureComponent {
     hasActiveSession: false,
     autoPrintOnSignOff: false,
     autoPrintOnCompletePayment: false,
+    isBackdatedClinicalNotesEntry: false,
   }
 
   componentDidMount = () => {
     this.checkHasActiveSession()
-    this.props.dispatch({
-      type: 'clinicSettings/query',
-    })
+    this.props
+      .dispatch({
+        type: 'clinicSettings/query',
+      })
+      .then(r => {
+        this.setState({
+          autoPrintOnSignOff:
+            r?.find(setting => setting.settingKey === 'AutoPrintOnSignOff')
+              .settingValue === 'true',
+          isBackdatedClinicalNotesEntry:
+            r?.find(
+              setting => setting.settingKey === 'IsBackdatedClinicalNotesEntry',
+            ).settingValue === 'true',
+          autoPrintOnCompletePayment:
+            r?.find(
+              setting => setting.settingKey === 'AutoPrintOnCompletePayment',
+            ).settingValue === 'true',
+        })
+      })
   }
 
   checkHasActiveSession = async () => {
@@ -183,7 +211,14 @@ class GeneralSetting extends PureComponent {
     }
     this.setState(() => {
       return {
-        autoPrintOnSignOff: !checked,
+        autoPrintOnSignOff: checked,
+      }
+    })
+  }
+  isBackdatedClinicalNotesEntryChanged = (checked, e) => {
+    this.setState(() => {
+      return {
+        isBackdatedClinicalNotesEntry: checked,
       }
     })
   }
@@ -196,7 +231,7 @@ class GeneralSetting extends PureComponent {
     }
     this.setState(() => {
       return {
-        autoPrintOnCompletePayment: !checked,
+        autoPrintOnCompletePayment: checked,
       }
     })
   }
@@ -266,6 +301,7 @@ class GeneralSetting extends PureComponent {
       hasActiveSession,
       autoPrintOnSignOff,
       autoPrintOnCompletePayment,
+      isBackdatedClinicalNotesEntry,
     } = this.state
     const durationMinutes = values?.apptTimeSlotDuration?.settingValue || 15
     const { apptDurationHour, apptDurationMinute } = this.calcApptDuration(
@@ -447,7 +483,7 @@ class GeneralSetting extends PureComponent {
                     <CheckboxGroup
                       valueField='code'
                       textField='description'
-                      disabled={!!hasActiveSession || autoPrintOnSignOff}
+                      disabled={!!hasActiveSession || !autoPrintOnSignOff}
                       options={ReportsOnSignOff}
                       noUnderline
                       {...args}
@@ -483,7 +519,7 @@ class GeneralSetting extends PureComponent {
                   return (
                     <CheckboxGroup
                       disabled={
-                        !!hasActiveSession || autoPrintOnCompletePayment
+                        !!hasActiveSession || !autoPrintOnCompletePayment
                       }
                       valueField='code'
                       textField='description'
@@ -589,6 +625,62 @@ class GeneralSetting extends PureComponent {
                 </GridItem>
               </GridContainer>
             </GridContainer>
+          </GridContainer>
+          <GridContainer style={{ marginTop: 20 }}>
+            <GridItem md={3}>
+              <h5> Backdated Clinical Notes Entry</h5>
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='isBackdatedClinicalNotesEntry.settingValue'
+                render={args => (
+                  <Switch
+                    {...args}
+                    style={{ marginTop: 0 }}
+                    disabled={!!hasActiveSession}
+                    onChange={this.isBackdatedClinicalNotesEntryChanged}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={2}>
+              <Field
+                name='backdatedClinicalNotesEntryStudent.settingValue'
+                render={args => (
+                  <NumberInput
+                    label='Maximum Backdated Days(s) for Student'
+                    {...args}
+                    step={1}
+                    min={0}
+                    precision={0}
+                    max={9999}
+                    disabled={
+                      !!hasActiveSession || !isBackdatedClinicalNotesEntry
+                    }
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={2}>
+              <Field
+                name='backdatedClinicalNotesEntryOptometrist.settingValue'
+                render={args => (
+                  <NumberInput
+                    step={1}
+                    precision={0}
+                    min={0}
+                    max={9999}
+                    label='Maximum Backdated Days(s) for Optometrist'
+                    {...args}
+                    disabled={
+                      !!hasActiveSession || !isBackdatedClinicalNotesEntry
+                    }
+                  />
+                )}
+              />
+            </GridItem>
           </GridContainer>
           <div
             className={classes.actionBtn}

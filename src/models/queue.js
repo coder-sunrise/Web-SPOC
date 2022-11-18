@@ -150,7 +150,14 @@ export default createListViewModel({
           yield put({
             type: 'query',
             payload: {
-              'VisitFKNavigation.BizSessionFK': response.id,
+              group: [
+                {
+                  'VisitFKNavigation.BizSessionFK': response.id,
+                  'VisitFKNavigation.VisitStatusFKNavigation.Status':
+                    'Ungraded',
+                  combineCondition: 'or',
+                },
+              ],
             },
           })
         }
@@ -195,7 +202,14 @@ export default createListViewModel({
           yield put({
             type: 'query',
             payload: {
-              'VisitFKNavigation.BizSessionFK': response.id,
+              group: [
+                {
+                  'VisitFKNavigation.BizSessionFK': response.id,
+                  'VisitFKNavigation.VisitStatusFKNavigation.Status':
+                    'Ungraded',
+                  combineCondition: 'or',
+                },
+              ],
             },
           })
         }
@@ -248,7 +262,14 @@ export default createListViewModel({
               type: 'query',
               payload: {
                 pagesize: 999,
-                'VisitFKNavigation.BizSessionFK': sessionData[0].id,
+                group: [
+                  {
+                    'VisitFKNavigation.BizSessionFK': sessionData[0].id,
+                    'VisitFKNavigation.VisitStatusFKNavigation.Status':
+                      'Ungraded',
+                    combineCondition: 'or',
+                  },
+                ],
               },
             }),
             put({

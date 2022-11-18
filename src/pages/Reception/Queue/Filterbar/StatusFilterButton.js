@@ -9,6 +9,7 @@ import {
   warningColor,
   successColor,
   grayColor,
+  dangerColor,
 } from 'mui-pro-jss'
 import { Button } from '@/components'
 // styling
@@ -16,13 +17,14 @@ import { Button } from '@/components'
 import { flattenAppointmentDateToCalendarEvents } from '@/pages/Reception/Appointment'
 import { StatusIndicator } from '../variables'
 import { getCount, todayOnly } from '../utils'
+import { CLINICAL_ROLE } from '@/utils/constants'
 
 const styles = () => ({
   container: {
     textAlign: 'center',
     marginLeft: '4px',
     marginRight: '4px',
-    width: 95,
+    width: 90,
     minWidth: 'auto',
     '& button': {
       borderRadius: '0px !important',
@@ -43,7 +45,7 @@ const styles = () => ({
   statusAll: {
     color: '#000',
   },
-  statusInProgress: {
+  statusDispense: {
     color: warningColor,
   },
   statusCompleted: {
@@ -51,6 +53,15 @@ const styles = () => ({
   },
   statusBilling: {
     color: successColor,
+  },
+  statusInCons: {
+    color: 'red',
+  },
+  statusPast: {
+    color: '#0070C0',
+  },
+  statusUngraded: {
+    color: '#F7880D',
   },
   statusWaiting: {
     color: primaryColor,
@@ -61,9 +72,12 @@ const styles = () => ({
 const initialStatusCount = {
   all: 0,
   waiting: 0,
-  inProgress: 0,
+  dispense: 0,
   billing: 0,
+  inCons: 0,
+  ungraded: 0,
   completed: 0,
+  past: 0,
   appointment: 0,
 }
 
@@ -72,6 +86,10 @@ const StatusFilterButton = ({
   classes,
   appointments = [],
   queueLog: { currentFilter, list },
+  clinicRoleFK,
+  doctorId,
+  roomIds,
+  doctorIds,
 }) => {
   const [statusCount, setStatusCount] = useState({ ...initialStatusCount })
 
@@ -86,11 +104,44 @@ const StatusFilterButton = ({
 
   useEffect(() => {
     const count = {
-      all: getCount(StatusIndicator.ALL, list),
-      waiting: getCount(StatusIndicator.WAITING, list),
-      inProgress: getCount(StatusIndicator.IN_PROGRESS, list),
-      billing: getCount(StatusIndicator.BILLING, list),
-      completed: getCount(StatusIndicator.COMPLETED, list),
+      all: getCount(StatusIndicator.ALL, list, null, roomIds, doctorIds),
+      waiting: getCount(
+        StatusIndicator.WAITING,
+        list,
+        null,
+        roomIds,
+        doctorIds,
+      ),
+      dispense: getCount(
+        StatusIndicator.DISPENSE,
+        list,
+        null,
+        roomIds,
+        doctorIds,
+      ),
+      billing: getCount(
+        StatusIndicator.BILLING,
+        list,
+        null,
+        roomIds,
+        doctorIds,
+      ),
+      completed: getCount(
+        StatusIndicator.COMPLETED,
+        list,
+        null,
+        roomIds,
+        doctorIds,
+      ),
+      inCons: getCount(StatusIndicator.IN_CONS, list, null, roomIds, doctorIds),
+      ungraded: getCount(
+        StatusIndicator.UNGRADED,
+        list,
+        null,
+        roomIds,
+        doctorIds,
+      ),
+      past: getCount(StatusIndicator.PAST, list, doctorId),
       appointment: appointments.length,
     }
     setStatusCount(count)
@@ -113,7 +164,7 @@ const StatusFilterButton = ({
           color='primary'
           size='sm'
           block
-          style={{ height: 28, minWidth: 95 }}
+          style={{ height: 28, minWidth: 90 }}
           id={StatusIndicator.ALL}
           onClick={onButtonClick}
           variant={
@@ -139,7 +190,7 @@ const StatusFilterButton = ({
           className={classes.button}
           color='primary'
           size='sm'
-          style={{ height: 28, minWidth: 95 }}
+          style={{ height: 28, minWidth: 90 }}
           block
           id={StatusIndicator.WAITING}
           onClick={onButtonClick}
@@ -154,11 +205,11 @@ const StatusFilterButton = ({
       <Paper
         elevation={6}
         className={classnames(classes.container)}
-        id={StatusIndicator.IN_PROGRESS}
+        id={StatusIndicator.DISPENSE}
         onClick={onButtonClick}
       >
-        <h4 className={classnames([classes.number, classes.statusInProgress])}>
-          {statusCount.inProgress}
+        <h4 className={classnames([classes.number, classes.statusDispense])}>
+          {statusCount.dispense}
         </h4>
         <Divider variant='fullWidth' />
 
@@ -166,17 +217,17 @@ const StatusFilterButton = ({
           color='warning'
           size='sm'
           block
-          style={{ height: 28, minWidth: 95 }}
-          id={StatusIndicator.IN_PROGRESS}
+          style={{ height: 28, minWidth: 90 }}
+          id={StatusIndicator.DISPENSE}
           onClick={onButtonClick}
           variant={
-            currentFilter === StatusIndicator.IN_PROGRESS
+            currentFilter === StatusIndicator.DISPENSE
               ? 'contained'
               : 'outlined'
           }
         >
           {/* currentFilter === StatusIndicator.IN_PROGRESS && <Check /> */}
-          {StatusIndicator.IN_PROGRESS}
+          {StatusIndicator.DISPENSE}
         </Button>
       </Paper>
       <Paper
@@ -194,7 +245,7 @@ const StatusFilterButton = ({
           color='success'
           size='sm'
           block
-          style={{ height: 28, minWidth: 95 }}
+          style={{ height: 28, minWidth: 90 }}
           id={StatusIndicator.BILLING}
           onClick={onButtonClick}
           variant={
@@ -202,6 +253,58 @@ const StatusFilterButton = ({
           }
         >
           {StatusIndicator.BILLING}
+        </Button>
+      </Paper>
+      <Paper
+        elevation={6}
+        className={classnames(classes.container)}
+        id={StatusIndicator.IN_CONS}
+        onClick={onButtonClick}
+      >
+        <h4 className={classnames([classes.number, classes.statusInCons])}>
+          {statusCount.inCons}
+        </h4>
+        <Divider variant='fullWidth' />
+
+        <Button
+          size='sm'
+          color='danger'
+          block
+          style={{ height: 28, minWidth: 90 }}
+          id={StatusIndicator.IN_CONS}
+          onClick={onButtonClick}
+          variant={
+            currentFilter === StatusIndicator.IN_CONS ? 'contained' : 'outlined'
+          }
+        >
+          {StatusIndicator.IN_CONS}
+        </Button>
+      </Paper>
+      <Paper
+        elevation={6}
+        className={classnames(classes.container)}
+        id={StatusIndicator.UNGRADED}
+        onClick={onButtonClick}
+      >
+        <h4 className={classnames([classes.number, classes.statusUngraded])}>
+          {statusCount.ungraded}
+        </h4>
+        <Divider variant='fullWidth' />
+
+        <Button
+          size='sm'
+          block
+          color='reddit'
+          style={{ height: 28, minWidth: 90 }}
+          onClick={onButtonClick}
+          id={StatusIndicator.UNGRADED}
+          variant={
+            currentFilter === StatusIndicator.UNGRADED
+              ? 'contained'
+              : 'outlined'
+          }
+        >
+          {StatusIndicator.UNGRADED}
         </Button>
       </Paper>
       <Paper
@@ -218,7 +321,7 @@ const StatusFilterButton = ({
         <Button
           size='sm'
           block
-          style={{ height: 28, minWidth: 95 }}
+          style={{ height: 28, minWidth: 90 }}
           onClick={onButtonClick}
           id={StatusIndicator.COMPLETED}
           variant={
@@ -230,6 +333,33 @@ const StatusFilterButton = ({
           {StatusIndicator.COMPLETED}
         </Button>
       </Paper>
+      {clinicRoleFK === CLINICAL_ROLE.DOCTOR && (
+        <Paper
+          elevation={6}
+          className={classnames(classes.container)}
+          id={StatusIndicator.PAST}
+          onClick={onButtonClick}
+        >
+          <h4 className={classnames([classes.number, classes.statusPast])}>
+            {statusCount.past}
+          </h4>
+          <Divider variant='fullWidth' />
+
+          <Button
+            size='sm'
+            block
+            color='linkedin'
+            style={{ height: 28, minWidth: 90 }}
+            onClick={onButtonClick}
+            id={StatusIndicator.PAST}
+            variant={
+              currentFilter === StatusIndicator.PAST ? 'contained' : 'outlined'
+            }
+          >
+            {StatusIndicator.PAST}
+          </Button>
+        </Paper>
+      )}
       <Paper
         elevation={6}
         className={classnames({
@@ -248,7 +378,7 @@ const StatusFilterButton = ({
           color='primary'
           size='sm'
           block
-          style={{ height: 28, minWidth: 95 }}
+          style={{ height: 28, minWidth: 90 }}
           id={StatusIndicator.APPOINTMENT}
           onClick={onButtonClick}
           variant={
