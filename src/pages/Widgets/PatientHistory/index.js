@@ -360,12 +360,13 @@ class PatientHistory extends Component {
     if (clinicRoleFK === CLINICAL_ROLE.DOCTOR && notesBy === 'Optometrist') {
       if (
         (visitStatus === VISIT_STATUS.UPGRADED ||
-          visitStatus === VISIT_STATUS.VERIFIED) &&
-        doctorProfileFK === user.data.clinicianProfile.doctorProfile.id &&
-        (!isBackdatedClinicalNotesEntry ||
-          moment(visitDate)
-            .startOf('day')
-            .add(backdatedClinicalNotesEntryOptometrist, 'day') > moment())
+          (visitStatus === VISIT_STATUS.VERIFIED &&
+            (!isBackdatedClinicalNotesEntry ||
+              moment(visitDate)
+                .startOf('day')
+                .add(backdatedClinicalNotesEntryOptometrist, 'day') >
+                moment()))) &&
+        doctorProfileFK === user.data.clinicianProfile.doctorProfile.id
       ) {
         return true
       }
@@ -399,6 +400,7 @@ class PatientHistory extends Component {
       fromModule,
       global,
     } = this.props
+    const { notesBy } = this.state
     const {
       userTitle,
       userName,
@@ -420,6 +422,9 @@ class PatientHistory extends Component {
       : undefined
     const student = doctors.find(doctor => !doctor.isPrimaryDoctor)
     const optometrist = doctors.find(doctor => doctor.isPrimaryDoctor)
+    const isStudent =
+      user.data.clinicianProfile?.userProfile?.role?.clinicRoleFK ===
+      CLINICAL_ROLE.STUDENT
     return (
       <div
         style={{
@@ -605,7 +610,8 @@ class PatientHistory extends Component {
           >
             {!isNurseNote &&
               settings.showConsultationVersioning &&
-              (visitStatus === VISIT_STATUS.UPGRADED ||
+              ((visitStatus === VISIT_STATUS.UPGRADED &&
+                (isStudent || notesBy === 'Student')) ||
                 visitStatus === VISIT_STATUS.VERIFIED) && (
                 <Tooltip title='View History'>
                   <span
