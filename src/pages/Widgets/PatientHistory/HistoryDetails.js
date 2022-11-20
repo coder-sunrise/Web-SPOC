@@ -97,7 +97,7 @@ class HistoryDetails extends PureComponent {
           const updateByUser = o.userName
             ? `${o.userTitle || ''} ${o.userName || ''}`
             : undefined
-          const lastUpdateDate = moment(o.signOffDate).format(
+          const lastChangeDate = moment(o.signOffDate).format(
             'DD MMM YYYY HH:mm',
           )
           const {
@@ -151,25 +151,21 @@ class HistoryDetails extends PureComponent {
                       }}
                     >
                       <div style={{ fontWeight: 500 }}>
-                        {`${moment(visitDate).format(
-                          'DD MMM YYYY',
-                        )} (Time In: ${moment(timeIn).format(
-                          'HH:mm',
-                        )} Time Out: ${
-                          timeOut ? moment(timeOut).format('HH:mm') : '-'
-                        })${docotrName ? ` - ${docotrName}` : ''}`}
+                        {`${moment(visitDate).format('DD MMM YYYY')} ${
+                          docotrName ? ` - ${docotrName}` : ''
+                        }`}
                       </div>
                       <div>
                         {settings.showConsultationVersioning
                           ? `${selectHistory.visitPurposeName} (V${
                               o.versionNumber
                             }), Last Update By: ${updateByUser || ''}${
-                              lastUpdateDate ? ` on ${lastUpdateDate}` : ''
+                              lastChangeDate ? ` on ${lastChangeDate}` : ''
                             }`
                           : `${
                               selectHistory.visitPurposeName
                             }, Last Update By: ${updateByUser || ''}${
-                              lastUpdateDate ? ` on ${lastUpdateDate}` : ''
+                              lastChangeDate ? ` on ${lastChangeDate}` : ''
                             }`}
                       </div>
                     </div>

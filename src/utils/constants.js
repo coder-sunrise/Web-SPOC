@@ -701,54 +701,6 @@ export const SERVICE_CENTER_CATEGORY = {
   EXTERNALLABSERVICECENTRE: 6,
 }
 
-export const RADIOLOGY_WORKITEM_STATUS_TITLE = {
-  1: 'New',
-  2: 'In Progress',
-  3: 'Modality Completed',
-  4: 'Completed',
-  5: 'Cancelled',
-}
-
-export const RADIOLOGY_WORKITEM_STATUS = {
-  NEW: 1,
-  INPROGRESS: 2,
-  MODALITYCOMPLETED: 3,
-  COMPLETED: 4,
-  CANCELLED: 5,
-}
-
-export const RADIOLOGY_WORKLIST_STATUS_COLOR = {
-  1: '#009933',
-  2: '#960',
-  3: '#099',
-  4: '#366',
-  5: '#797979',
-}
-
-export const RADIOLOGY_WORKITEM_BUTTON = [
-  {
-    name: 'Start Examination',
-    currentStatusFK: 1,
-    nextStatusFK: 2,
-    enableCancel: true,
-    authority: 'radiologyworklist.startexamination',
-  },
-  {
-    name: 'Complete Modality',
-    currentStatusFK: 2,
-    nextStatusFK: 3,
-    enableCancel: true,
-    authority: 'radiologyworklist.completemodality',
-  },
-  {
-    name: 'Complete Reporting',
-    currentStatusFK: 3,
-    nextStatusFK: 4,
-    enableCancel: false,
-    authority: 'radiologyworklist.completereporting',
-  },
-]
-
 export const mapApptStatus = statusFK => {
   let status = ''
   switch (statusFK) {
@@ -929,12 +881,6 @@ export const DISPENSE_FROM = {
   QUEUE: 1,
 }
 
-export const EXAMINATION_STATUS = {
-  NEW: 'New',
-  INPROGRESS: 'In Progress',
-  COMPLETED: 'Completed',
-}
-
 export const APPOINTMENT_STAGE_COLOR = [
   {
     code: 'Draft',
@@ -963,22 +909,22 @@ export const APPOINTMENT_STAGE_COLOR = [
 ]
 
 export const VISIT_STATUS = [
-         {
-           id: 1,
-           code: 'COMPLETED',
-           displayValue: 'Completed',
-         },
-         {
-           id: 2,
-           code: 'UPGRADED',
-           displayValue: 'Upgraded',
-         },
-         {
-           id: 3,
-           code: 'VERIFIED',
-           displayValue: 'Verified',
-         },
-       ]
+  {
+    id: 1,
+    code: 'COMPLETED',
+    displayValue: 'Completed',
+  },
+  {
+    id: 2,
+    code: 'UNGRADED',
+    displayValue: 'Ungraded',
+  },
+  {
+    id: 3,
+    code: 'VERIFIED',
+    displayValue: 'Verified',
+  },
+]
 
 export const CLINICALNOTE_FORM = {
   PATIENTHISTORY: 1,

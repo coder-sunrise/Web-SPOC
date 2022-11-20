@@ -274,11 +274,9 @@ const saveConsultation = ({
 
     newValues.corDoctorNote.signedByUserFK = user.data.id
     newValues.corDoctorNote.signedDate = moment()
-    if (!newValues.corDoctorNote.lastChangeDate)
-      newValues.corDoctorNote.lastChangeDate = moment()
 
     //handle corPaediatric Form
-    if (newValues.corDoctorNote.corPaediatric.length > 0) {
+    if (newValues.corDoctorNote.corPaediatric?.length > 0) {
       newValues.corDoctorNote.corPaediatric.at(-1).recordStatusFK = 1
     }
 
@@ -399,8 +397,6 @@ const pauseConsultation = async ({
 
   newValues.corDoctorNote.signedByUserFK = user.data.id
   newValues.corDoctorNote.signedDate = moment()
-  if (!newValues.corDoctorNote.lastChangeDate)
-    newValues.corDoctorNote.lastChangeDate = moment()
 
   newValues.corScribbleNotes.forEach(
     note => (note.signedByUserFK = user.data.id),
@@ -934,7 +930,7 @@ class Main extends React.Component {
     }
     // Optometrist
     else if (clinicRoleFK == 1) {
-      if ([VISIT_STATUS.UPGRADED].includes(visit.visitStatus)) {
+      if ([VISIT_STATUS.UNGRADED].includes(visit.visitStatus)) {
         return true
       }
     }

@@ -537,13 +537,9 @@ class PatientHistory extends Component {
           {!isNurseNote && (
             <div style={{ fontSize: '0.9em' }}>
               <div style={{ fontWeight: 500, marginTop: 6 }}>
-                {`${moment(visitDate).format(
-                  dateFormatLong,
-                )} (Time In: ${moment(timeIn).format(
-                  timeFormat24Hour,
-                )} Time Out: ${
-                  timeOut ? moment(timeOut).format(timeFormat24Hour) : '-'
-                })${docotrName ? ` - ${docotrName}` : ''}`}
+                {`${moment(visitDate).format(dateFormatLong)} ${
+                  docotrName ? ` - ${docotrName}` : ''
+                }`}
               </div>
               <div style={{ marginTop: 18 }}>
                 <span>
@@ -580,7 +576,7 @@ class PatientHistory extends Component {
                         justIcon
                         disabled={
                           clinicRoleFK === CLINICAL_ROLE.STUDENT &&
-                          (visitStatus === VISIT_STATUS.UPGRADED ||
+                          (visitStatus === VISIT_STATUS.UNGRADED ||
                             visitStatus === VISIT_STATUS.VERIFIED)
                         }
                         onClick={event => {

@@ -80,6 +80,14 @@ const styles = () => ({
         .hex(),
     },
   },
+  lightOrange: {
+    backgroundColor: '#F76807',
+    '&:hover': {
+      backgroundColor: color('#F76807')
+        .darken(0.2)
+        .hex(),
+    },
+  },
 })
 
 const VisitStatusTag = props => {
@@ -121,7 +129,11 @@ const VisitStatusTag = props => {
       colorTag = 'lightGrey'
       break
     case VISIT_STATUS.COMPLETED:
+    case VISIT_STATUS.VERIFIED:
       colorTag = 'darkGrey'
+      break
+    case VISIT_STATUS.UNGRADED:
+      colorTag = 'lightOrange'
       break
     default:
       colorTag = 'lightGrey'

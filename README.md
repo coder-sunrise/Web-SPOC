@@ -1,2 +1,2 @@
 
-Medicloud is a React based application created by Medisys 
+DMRS is a React based application created by Medisys 

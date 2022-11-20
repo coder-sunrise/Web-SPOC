@@ -236,7 +236,7 @@ class ClinicalNotes extends PureComponent {
     }
 
     if (isUpdated) {
-      setFieldValue(`${editScriblenotes.prefixProp}.lastUpdateDate`, moment())
+      setFieldValue(`${editScriblenotes.prefixProp}.lastChangeDate`, moment())
     }
   }
 

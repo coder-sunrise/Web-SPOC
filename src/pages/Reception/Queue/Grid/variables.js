@@ -177,9 +177,9 @@ export const QueueTableConfig = {
     { name: 'apptType', title: 'Appt. Type' },
     { name: 'appointmentTime', title: 'Appt. Time' },
     { name: 'remarks', title: 'Remarks' },
-    { name: 'timeIn', title: 'Time In' },
+    // { name: 'timeIn', title: 'Time In' },
     { name: 'orderCreateTime', title: 'Order Created Time' },
-    { name: 'timeOut', title: 'Time Out' },
+    // { name: 'timeOut', title: 'Time Out' },
     { name: 'invoiceNo', title: 'Invoice No' },
     { name: 'invoiceStatus', title: 'Invoice Status' },
     { name: 'invoiceAmount', title: 'Invoice Amt.' },
@@ -342,30 +342,30 @@ export const QueueColumnExtensions = props => {
       currency: true,
       width: 120,
     },
-    {
-      columnName: 'timeIn',
-      width: 150,
-      type: 'date',
-      showTime: true,
-      render: row => {
-        if (row.timeIn) {
-          return moment(row.timeIn).format('DD MMM YYYY HH:mm')
-        }
-        return '-'
-      },
-    },
-    {
-      columnName: 'timeOut',
-      width: 150,
-      type: 'date',
-      showTime: true,
-      render: row => {
-        if (row.timeOut) {
-          return moment(row.timeOut).format('DD MMM YYYY HH:mm')
-        }
-        return '-'
-      },
-    },
+    // {
+    //   columnName: 'timeIn',
+    //   width: 150,
+    //   type: 'date',
+    //   showTime: true,
+    //   render: row => {
+    //     if (row.timeIn) {
+    //       return moment(row.timeIn).format('DD MMM YYYY HH:mm')
+    //     }
+    //     return '-'
+    //   },
+    // },
+    // {
+    //   columnName: 'timeOut',
+    //   width: 150,
+    //   type: 'date',
+    //   showTime: true,
+    //   render: row => {
+    //     if (row.timeOut) {
+    //       return moment(row.timeOut).format('DD MMM YYYY HH:mm')
+    //     }
+    //     return '-'
+    //   },
+    // },
     {
       columnName: 'gender/age',
       render: row => {

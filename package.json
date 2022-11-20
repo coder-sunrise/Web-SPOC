@@ -1,7 +1,7 @@
 {
-  "name": "medicloud",
+  "name": "dmrs",
   "version": "2.1.1",
-  "description": "Medicloud System",
+  "description": "DMRS",
   "private": false,
   "scripts": {
     "presite": "node ./scripts/generateMock.js && cd functions && npm install",

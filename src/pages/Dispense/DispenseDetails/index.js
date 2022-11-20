@@ -257,7 +257,7 @@ const DispenseDetails = ({
   const disableDiscard =
     totalPayment > 0 ||
     visitStatus === VISIT_STATUS.IN_CONS ||
-    visitStatus === VISIT_STATUS.UPGRADED ||
+    visitStatus === VISIT_STATUS.UNGRADED ||
     visitStatus === VISIT_STATUS.VERIFIED
   const [showRemovePayment, setShowRemovePayment] = useState(false)
 

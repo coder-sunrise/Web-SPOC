@@ -65,50 +65,51 @@ const Filterbar = props => {
     })
   }
   const clinicRoleFK = user.clinicianProfile.userProfile.role?.clinicRoleFK
+  const doctorId = user.clinicianProfile?.doctorProfile?.id
   // const { currentFilter } = queueLog
   return (
     <div className='div-reception-header'>
       <Row wrap={false}>
         <Col flex='auto'>
           <Fragment>
-            <FastField
-              name='visitType'
-              render={args => (
-                <Tooltip placement='right' title='Filter by visit type.'>
-                  <VisitTypeSelect
-                    label='Visit Type'
-                    {...args}
-                    mode='multiple'
-                    // disabled={currentFilter === 'Appointment'}
-                    style={{
-                      width: 180,
-                      marginRight: 10,
-                      marginLeft: 10,
-                    }}
-                    maxTagPlaceholder='Visit Types'
-                    allowClear={true}
-                    onChange={(v, op = {}) => {
-                      dispatch({
-                        type: 'queueLog/saveUserPreference',
-                        payload: {
-                          userPreferenceDetails: {
-                            value: {
-                              visitType: v,
+            {clinicRoleFK === 2 && (
+              <FastField
+                name='visitType'
+                render={args => (
+                  <Tooltip placement='right' title='Filter by visit type.'>
+                    <VisitTypeSelect
+                      label='Visit Type'
+                      {...args}
+                      mode='multiple'
+                      // disabled={currentFilter === 'Appointment'}
+                      style={{
+                        width: 180,
+                        marginLeft: 10,
+                      }}
+                      maxTagPlaceholder='Visit Types'
+                      allowClear={true}
+                      onChange={(v, op = {}) => {
+                        dispatch({
+                          type: 'queueLog/saveUserPreference',
+                          payload: {
+                            userPreferenceDetails: {
+                              value: {
+                                visitType: v,
+                              },
+                              Identifier: 'Queue',
                             },
-                            Identifier: 'Queue',
+                            itemIdentifier: 'Queue',
+                            type: '9',
                           },
-                          itemIdentifier: 'Queue',
-                          type: '9',
-                        },
-                      })
-                    }}
-                    maxTagCount={0}
-                  />
-                </Tooltip>
-              )}
-            />
-
-            {clinicRoleFK !== 3 && (
+                        })
+                      }}
+                      maxTagCount={0}
+                    />
+                  </Tooltip>
+                )}
+              />
+            )}
+            {clinicRoleFK === 2 && (
               <FastField
                 name='room'
                 render={args => (
@@ -116,7 +117,7 @@ const Filterbar = props => {
                     <CodeSelect
                       style={{
                         width: 160,
-                        marginRight: 10,
+                        marginLeft: 10,
                       }}
                       code='ctRoom'
                       label='Room'
@@ -145,46 +146,47 @@ const Filterbar = props => {
                 )}
               />
             )}
-
-            <FastField
-              name='doctor'
-              render={args => (
-                <Tooltip placement='right' title='Filter by optometrist.'>
-                  <DoctorProfileSelect
-                    mode='multiple'
-                    {...args}
-                    style={{
-                      width: 160,
-                      marginRight: 10,
-                    }}
-                    allValue={-99}
-                    allValueOption={{
-                      id: -99,
-                      clinicianProfile: {
-                        name: 'All',
-                      },
-                    }}
-                    onChange={(v, op = {}) => {
-                      dispatch({
-                        type: 'queueLog/saveUserPreference',
-                        payload: {
-                          userPreferenceDetails: {
-                            value: {
-                              doctor: v,
-                            },
-                            Identifier: 'Queue',
-                          },
-                          itemIdentifier: 'Queue',
-                          type: '9',
+            {clinicRoleFK === 2 && (
+              <FastField
+                name='doctor'
+                render={args => (
+                  <Tooltip placement='right' title='Filter by optometrist.'>
+                    <DoctorProfileSelect
+                      mode='multiple'
+                      {...args}
+                      style={{
+                        width: 160,
+                        marginLeft: 10,
+                      }}
+                      allValue={-99}
+                      allValueOption={{
+                        id: -99,
+                        clinicianProfile: {
+                          name: 'All',
                         },
-                      })
-                    }}
-                    maxTagCount={0}
-                    labelField='clinicianProfile.name'
-                  />
-                </Tooltip>
-              )}
-            />
+                      }}
+                      onChange={(v, op = {}) => {
+                        dispatch({
+                          type: 'queueLog/saveUserPreference',
+                          payload: {
+                            userPreferenceDetails: {
+                              value: {
+                                doctor: v,
+                              },
+                              Identifier: 'Queue',
+                            },
+                            itemIdentifier: 'Queue',
+                            type: '9',
+                          },
+                        })
+                      }}
+                      maxTagCount={0}
+                      labelField='clinicianProfile.name'
+                    />
+                  </Tooltip>
+                )}
+              />
+            )}
             <FastField
               name='search'
               render={args => (
@@ -202,6 +204,7 @@ const Filterbar = props => {
                     style={{
                       width: 290,
                       position: 'relative',
+                      marginLeft: 10,
                       top: -9,
                     }}
                     debounceDuration={500}
@@ -272,10 +275,22 @@ const Filterbar = props => {
               width: 650,
               display: 'flex',
               marginTop: 5,
+              marginBottom: 5,
               justifyContent: 'flex-end',
             }}
           >
-            <StatusFilterButton />
+            <StatusFilterButton
+              clinicRoleFK={clinicRoleFK}
+              doctorId={doctorId}
+              roomIds={
+                // Student only able to see the visit which set to current room
+                clinicRoleFK === 3
+                  ? [parseInt(localStorage.getItem('roomLocalIdentityID'), 10)]
+                  : []
+              }
+              // optometrist only able to see the visit which primary doctor is him/her self
+              doctorIds={clinicRoleFK === 1 ? [doctorId] : []}
+            />
           </div>
         </Col>
       </Row>
