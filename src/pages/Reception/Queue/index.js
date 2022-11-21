@@ -608,34 +608,34 @@ class Queue extends React.Component {
         }
         break
       }
-      case '6': {
-        // resume consultation
-        const valid = this.isAssignedDoctor(row)
-        if (valid) {
-          const version = Date.now()
+      // case '6': {
+      //   // resume consultation
+      //   const valid = this.isAssignedDoctor(row)
+      //   if (valid) {
+      //     const version = Date.now()
 
-          if (row.visitStatus === VISIT_STATUS.PAUSED) {
-            dispatch({
-              type: `consultation/resume`,
-              payload: {
-                id: row.visitFK,
-                version,
-              },
-            }).then(o => {
-              if (o)
-                history.push(
-                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
-                )
-            })
-          } else {
-            history.push(
-              `/reception/queue/consultation?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&pid=${row.patientProfileFK}&v=${version}`,
-            )
-          }
-        }
+      //     if (row.visitStatus === VISIT_STATUS.PAUSED) {
+      //       dispatch({
+      //         type: `consultation/resume`,
+      //         payload: {
+      //           id: row.visitFK,
+      //           version,
+      //         },
+      //       }).then(o => {
+      //         if (o)
+      //           history.push(
+      //             `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&pid=${row.patientProfileFK}&v=${version}`,
+      //           )
+      //       })
+      //     } else {
+      //       history.push(
+      //         `/reception/queue/consultation?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&pid=${row.patientProfileFK}&v=${version}`,
+      //       )
+      //     }
+      //   }
 
-        break
-      }
+      //   break
+      // }
       case '7': {
         // edit consultation
         const version = Date.now()
@@ -917,20 +917,23 @@ class Queue extends React.Component {
                       right: 450,
                     }}
                   >
-                    <p style={{ fontWeight: 400, fontSize: '0.8rem' }}>
+                    <p
+                      style={{
+                        fontWeight: 400,
+                        marginTop: 4,
+                        fontSize: '0.8rem',
+                      }}
+                    >
                       Last Refresh:
-                    </p>
-                    <span>
-                      <p
+                      <span
                         style={{
                           color: '#1890f8',
-                          marginTop: -5,
                           fontSize: '0.9rem',
                         }}
                       >
                         {refreshInfo ? refreshInfo : '-'}
-                      </p>
-                    </span>
+                      </span>
+                    </p>
                   </div>
                   <ProgressButton
                     color='info'

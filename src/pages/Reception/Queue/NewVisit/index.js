@@ -24,8 +24,6 @@ import Authorized from '@/utils/Authorized'
 import PatientInfoCard from './PatientInfoCard'
 import VisitInfoCard from './VisitInfoCard'
 import ReferralCard from './ReferralCard'
-import EyeVisualAcuityCard from './EyeVisualAcuityCard'
-import RefractionFormCard from './RefractionFormCard'
 import PrintLabLabelButton from '@/components/_medisys/PatientInfoSideBanner/PatientLabelBtn'
 
 // import ParticipantCard from './ParticipantCard'
@@ -117,7 +115,6 @@ class NewVisit extends PureComponent {
 
   constructor(props) {
     super(props)
-    this.myRef = React.createRef()
   }
 
   componentDidMount = async () => {
@@ -246,54 +243,6 @@ class NewVisit extends PureComponent {
     return handleSubmit()
   }
 
-  getEyeWidgets = (isReadOnly, isRetail) => {
-    const { values, classes } = this.props
-
-    const checkAccessright = authority => {
-      const accessRight = Authorized.check(authority)
-      if (accessRight) {
-        const { rights } = accessRight
-        return (rights === 'readwrite' || rights === 'enable') &&
-          (isReadOnly || isRetail)
-          ? 'disable'
-          : rights
-      }
-
-      return undefined
-    }
-
-    return [
-      {
-        title: 'Visual Acuity Test',
-        authority: 'queue.visitregistrationdetails.eyevisualacuity',
-        content: (
-          <GridItem xs={12} className={classes.row}>
-            <EyeVisualAcuityCard
-              handleUpdateAttachments={this.updateAttachments}
-              attachments={values.visitAttachment}
-            />
-          </GridItem>
-        ),
-      },
-      {
-        title: 'Refraction Form',
-        authority: 'queue.visitregistrationdetails.eyerefractionform',
-        content: (
-          <GridItem xs={12} className={classes.row}>
-            <RefractionFormCard {...this.props} />
-          </GridItem>
-        ),
-      },
-    ].reduce((result, item) => {
-      let right = checkAccessright(item.authority)
-      if (right === 'readwrite' || right === 'enable') {
-        return [...result, item]
-      }
-
-      return result
-    }, [])
-  }
-
   setBannerHeight = () => {
     const banner = document.getElementById('patientBanner')
     const bannerHeight = banner ? banner.offsetHeight : 0
@@ -333,7 +282,7 @@ class NewVisit extends PureComponent {
       theme,
       queueLog: { list = [] } = { list: [] },
       loading,
-      visitRegistration: { errorState, expandRefractionForm, visitMode },
+      visitRegistration: { errorState, visitMode },
       values,
       global,
       isSubmitting,
@@ -344,16 +293,6 @@ class NewVisit extends PureComponent {
       ctinvoiceadjustment,
       codetable,
     } = this.props
-
-    if (expandRefractionForm) {
-      let div = $(this.myRef.current).find('div[aria-expanded]:eq(1)')
-      if (div.attr('aria-expanded') === 'false') div.click()
-    }
-
-    const defaultActive = []
-    if (expandRefractionForm) {
-      defaultActive.push(1)
-    }
     const height = getHeight(this.props.height)
 
     const existingQNo = list
@@ -472,30 +411,6 @@ class NewVisit extends PureComponent {
                         </CommonCard>
                       </GridItem>
                     </React.Fragment>
-                    <Authorized.Context.Provider
-                      value={{
-                        rights: isReadOnly || isRetail ? 'disable' : 'enable',
-                      }}
-                    >
-                      <GridItem xs={12} className={classes.row}>
-                        <div ref={this.myRef}>
-                          <Accordion
-                            mode='multiple'
-                            onChange={(event, p, expanded) => {
-                              if (p.key === 1 && expanded) {
-                                dispatch({
-                                  type: 'visitRegistration/updateState',
-                                  payload: {
-                                    expandRefractionForm: false,
-                                  },
-                                })
-                              }
-                            }}
-                            collapses={this.getEyeWidgets(isReadOnly, isRetail)}
-                          />
-                        </div>
-                      </GridItem>
-                    </Authorized.Context.Provider>
                   </React.Fragment>
                 </SizeContainer>
               </ErrorWrapper>

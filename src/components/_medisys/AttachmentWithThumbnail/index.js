@@ -43,11 +43,6 @@ const AttachmentMenuItems = [
     title: 'Consultation Attachment',
     // authority:
   },
-  {
-    name: ATTACHMENT_TYPE.EYEVISUALACUITY,
-    title: 'Visual Acuity Test',
-    authority: 'queue.consultation.widgets.eyevisualacuity',
-  },
 ]
 
 class AttachmentWithThumbnail extends Component {

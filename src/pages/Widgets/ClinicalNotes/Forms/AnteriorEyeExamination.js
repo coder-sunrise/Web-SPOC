@@ -193,6 +193,7 @@ const AnteriorEyeExamination = props => {
                     {...args}
                     bordered={false}
                     autoSize={{ minRows: 1 }}
+                    style={{ textAlign: 'center' }}
                   />
                 )}
               />
@@ -210,6 +211,7 @@ const AnteriorEyeExamination = props => {
                     {...args}
                     bordered={false}
                     autoSize={{ minRows: 1 }}
+                    style={{ textAlign: 'center' }}
                   />
                 )}
               />
@@ -226,6 +228,7 @@ const AnteriorEyeExamination = props => {
                     {...args}
                     bordered={false}
                     autoSize={{ minRows: 1 }}
+                    style={{ textAlign: 'center' }}
                   />
                 )}
               />
@@ -243,6 +246,7 @@ const AnteriorEyeExamination = props => {
                     {...args}
                     bordered={false}
                     autoSize={{ minRows: 1 }}
+                    style={{ textAlign: 'center' }}
                   />
                 )}
               />
@@ -259,6 +263,7 @@ const AnteriorEyeExamination = props => {
                     {...args}
                     bordered={false}
                     autoSize={{ minRows: 1 }}
+                    style={{ textAlign: 'center' }}
                   />
                 )}
               />
@@ -276,6 +281,7 @@ const AnteriorEyeExamination = props => {
                     {...args}
                     bordered={false}
                     autoSize={{ minRows: 1 }}
+                    style={{ textAlign: 'center' }}
                   />
                 )}
               />
@@ -292,6 +298,7 @@ const AnteriorEyeExamination = props => {
                     {...args}
                     bordered={false}
                     autoSize={{ minRows: 1 }}
+                    style={{ textAlign: 'center' }}
                   />
                 )}
               />
@@ -309,6 +316,7 @@ const AnteriorEyeExamination = props => {
                     {...args}
                     bordered={false}
                     autoSize={{ minRows: 1 }}
+                    style={{ textAlign: 'center' }}
                   />
                 )}
               />
@@ -325,6 +333,7 @@ const AnteriorEyeExamination = props => {
                     {...args}
                     bordered={false}
                     autoSize={{ minRows: 1 }}
+                    style={{ textAlign: 'center' }}
                   />
                 )}
               />
@@ -342,6 +351,7 @@ const AnteriorEyeExamination = props => {
                     {...args}
                     bordered={false}
                     autoSize={{ minRows: 1 }}
+                    style={{ textAlign: 'center' }}
                   />
                 )}
               />
@@ -358,6 +368,7 @@ const AnteriorEyeExamination = props => {
                     {...args}
                     bordered={false}
                     autoSize={{ minRows: 1 }}
+                    style={{ textAlign: 'center' }}
                   />
                 )}
               />
@@ -375,6 +386,7 @@ const AnteriorEyeExamination = props => {
                     {...args}
                     bordered={false}
                     autoSize={{ minRows: 1 }}
+                    style={{ textAlign: 'center' }}
                   />
                 )}
               />
@@ -391,6 +403,7 @@ const AnteriorEyeExamination = props => {
                     {...args}
                     bordered={false}
                     autoSize={{ minRows: 1 }}
+                    style={{ textAlign: 'center' }}
                   />
                 )}
               />
@@ -408,6 +421,7 @@ const AnteriorEyeExamination = props => {
                     {...args}
                     bordered={false}
                     autoSize={{ minRows: 1 }}
+                    style={{ textAlign: 'center' }}
                   />
                 )}
               />
@@ -424,6 +438,7 @@ const AnteriorEyeExamination = props => {
                     {...args}
                     bordered={false}
                     autoSize={{ minRows: 1 }}
+                    style={{ textAlign: 'center' }}
                   />
                 )}
               />
@@ -441,6 +456,7 @@ const AnteriorEyeExamination = props => {
                     {...args}
                     bordered={false}
                     autoSize={{ minRows: 1 }}
+                    style={{ textAlign: 'center' }}
                   />
                 )}
               />
@@ -457,6 +473,7 @@ const AnteriorEyeExamination = props => {
                     {...args}
                     bordered={false}
                     autoSize={{ minRows: 1 }}
+                    style={{ textAlign: 'center' }}
                   />
                 )}
               />
@@ -474,6 +491,7 @@ const AnteriorEyeExamination = props => {
                     {...args}
                     bordered={false}
                     autoSize={{ minRows: 1 }}
+                    style={{ textAlign: 'center' }}
                   />
                 )}
               />

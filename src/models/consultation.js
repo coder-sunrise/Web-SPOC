@@ -14,35 +14,6 @@ const getSequence = (sequence, maxSeq) => {
   return sequence || maxSeq
 }
 
-const ParseEyeFormData = response => {
-  const { corEyeRefractionForm, corEyeExaminationForm } = response
-  let refractionFormData = {}
-  let examinationFormData = {}
-  if (corEyeRefractionForm && corEyeRefractionForm.formData) {
-    refractionFormData = JSON.parse(corEyeRefractionForm.formData)
-  }
-  if (corEyeExaminationForm && corEyeExaminationForm.formData) {
-    examinationFormData = JSON.parse(corEyeExaminationForm.formData)
-  }
-
-  const newResponse = {
-    ...response,
-    corEyeRefractionForm: corEyeRefractionForm
-      ? {
-          ...corEyeRefractionForm,
-          formData: refractionFormData,
-        }
-      : undefined,
-    corEyeExaminationForm: corEyeExaminationForm
-      ? {
-          ...corEyeExaminationForm,
-          formData: examinationFormData,
-        }
-      : undefined,
-  }
-  return newResponse
-}
-
 export default createFormViewModel({
   namespace: 'consultation',
   config: {},
@@ -512,11 +483,6 @@ export default createFormViewModel({
             rows: _.sortBy(data.corDiagnosis, 'sequence'),
           },
         })
-
-        let newResponse = ParseEyeFormData(data)
-        const { corEyeRefractionForm, corEyeExaminationForm } = newResponse
-        data.corEyeRefractionForm = corEyeRefractionForm
-        data.corEyeExaminationForm = corEyeExaminationForm
         data.loaded = true
         return payload
       },

@@ -62,7 +62,7 @@ const _routes = [
         name: 'reception',
         moduleName: 'Reception',
         authority: ['reception'],
-        specialist: ['GP', 'Dental'],
+        specialist: ['GP'],
         routes: [
           {
             path: '/reception/queue',
@@ -139,7 +139,7 @@ const _routes = [
         name: 'patient',
         moduleName: 'PatientDataBase',
         authority: ['patientdatabase'],
-        specialist: ['GP', 'Dental'],
+        specialist: ['GP'],
         component: './Patient',
       },
       // SMS
@@ -599,7 +599,7 @@ const _routes = [
         name: 'setting',
         moduleName: 'Settings',
         authority: ['settings'],
-        specialist: ['GP', 'Dental'],
+        specialist: ['GP'],
         hideChildrenInMenu: true,
         routes: [
           {
@@ -625,18 +625,6 @@ const _routes = [
             name: 'service',
             component: './Setting/Service',
             authority: ['settings.clinicsetting.service'],
-          },
-          {
-            path: '/setting/treatment',
-            name: 'treatment',
-            component: './Setting/Treatment',
-            authority: ['settings'],
-          },
-          {
-            path: '/setting/treatmentcategory',
-            name: 'treatmentcategory',
-            component: './Setting/TreatmentCategory',
-            authority: ['settings'],
           },
           {
             path: '/setting/room',
@@ -904,7 +892,7 @@ const _routes = [
         name: 'support',
         moduleName: 'Support',
         hideChildrenInMenu: true,
-        specialist: ['GP', 'Dental'],
+        specialist: ['GP'],
         routes: [
           {
             path: '/support',
