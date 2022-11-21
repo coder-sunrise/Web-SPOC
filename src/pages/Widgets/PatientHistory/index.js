@@ -359,7 +359,7 @@ class PatientHistory extends Component {
       user.data.clinicianProfile?.userProfile?.role?.clinicRoleFK
     if (clinicRoleFK === CLINICAL_ROLE.DOCTOR && notesBy === 'Optometrist') {
       if (
-        (visitStatus === VISIT_STATUS.UPGRADED ||
+        (visitStatus === VISIT_STATUS.UNGRADED ||
           (visitStatus === VISIT_STATUS.VERIFIED &&
             (!isBackdatedClinicalNotesEntry ||
               moment(visitDate)
@@ -374,7 +374,7 @@ class PatientHistory extends Component {
     if (clinicRoleFK === CLINICAL_ROLE.STUDENT) {
       if (
         visitStatus === VISIT_STATUS.IN_CONS ||
-        ((visitStatus === VISIT_STATUS.UPGRADED ||
+        ((visitStatus === VISIT_STATUS.UNGRADED ||
           visitStatus === VISIT_STATUS.VERIFIED) &&
           isClinicSessionClosed &&
           (!isBackdatedClinicalNotesEntry ||
@@ -610,7 +610,7 @@ class PatientHistory extends Component {
           >
             {!isNurseNote &&
               settings.showConsultationVersioning &&
-              ((visitStatus === VISIT_STATUS.UPGRADED &&
+              ((visitStatus === VISIT_STATUS.UNGRADED &&
                 (isStudent || notesBy === 'Student')) ||
                 visitStatus === VISIT_STATUS.VERIFIED) && (
                 <Tooltip title='View History'>

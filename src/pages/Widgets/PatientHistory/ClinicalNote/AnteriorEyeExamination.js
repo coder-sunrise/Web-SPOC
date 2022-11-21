@@ -41,7 +41,7 @@ const AnteriorEyeExamination = props => {
         <div style={{ position: 'absolute', left: 0, top: 6 }}>
           Grading Chart used:
         </div>
-        <div className={classes.textWithBorder}>
+        <div className={classes.textWithBorder} style={{ minHeight: 32 }}>
           {formContent.gradingChartName}
         </div>
       </GridItem>

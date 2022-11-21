@@ -41,7 +41,7 @@ const PosteriorEyeExamination = props => {
         <div style={{ position: 'absolute', left: 0, top: 6 }}>
           Instrument used:
         </div>
-        <div className={classes.textWithBorder}>
+        <div className={classes.textWithBorder} style={{ minHeight: 32 }}>
           {formContent.instrumentName}
         </div>
       </GridItem>
