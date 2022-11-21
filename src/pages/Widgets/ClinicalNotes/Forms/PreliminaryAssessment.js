@@ -1,21 +1,8 @@
-import {
-  GridContainer,
-  GridItem,
-  TextField,
-  Button,
-  FieldArray,
-  Field,
-  MultipleTextField,
-  DatePicker,
-} from '@/components'
+import { TextField, Button, MultipleTextField, DatePicker } from '@/components'
 import { FastField } from 'formik'
-import { PureComponent, useState } from 'react'
-import { Add } from '@material-ui/icons'
 import Edit from '@material-ui/icons/Edit'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
-import Grid from '@material-ui/core/Grid'
-import { getUniqueNumericId } from '@/utils/utils'
 
 const _styles = withStyles(
   theme => ({
@@ -109,7 +96,7 @@ let PreliminaryAssessment = props => {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
@@ -123,7 +110,7 @@ let PreliminaryAssessment = props => {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
@@ -152,7 +139,7 @@ let PreliminaryAssessment = props => {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
@@ -166,7 +153,7 @@ let PreliminaryAssessment = props => {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
@@ -223,7 +210,7 @@ let PreliminaryAssessment = props => {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
@@ -237,7 +224,7 @@ let PreliminaryAssessment = props => {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
@@ -294,7 +281,7 @@ let PreliminaryAssessment = props => {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
@@ -308,7 +295,7 @@ let PreliminaryAssessment = props => {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
@@ -352,7 +339,7 @@ let PreliminaryAssessment = props => {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
@@ -366,7 +353,7 @@ let PreliminaryAssessment = props => {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
@@ -397,7 +384,7 @@ let PreliminaryAssessment = props => {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
