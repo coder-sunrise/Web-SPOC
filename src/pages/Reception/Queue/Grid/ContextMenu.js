@@ -170,34 +170,48 @@ const ContextMenu = ({
       const isDisabled = rights === 'disable'
       switch (opt.id) {
         case 0: // edit visit
-          return { ...opt, hidden: editVisitRights.rights !== 'enable' }
+          return {
+            ...opt,
+            hidden:
+              row.isClinicSessionClosed || editVisitRights.rights !== 'enable',
+          }
         case 0.1: // view visit
           // return { ...opt, hidden: false }
-          return { ...opt, hidden: editVisitRights.rights === 'enable' }
+          return {
+            ...opt,
+            hidden:
+              row.isClinicSessionClosed || editVisitRights.rights === 'enable',
+          }
         case 1: // dispense
           return {
             ...opt,
             disabled: !row.patientIsActive || row.isFinalized,
+            hidden: row.isClinicSessionClosed,
           }
         case 1.1: // billing
           return {
             ...opt,
             disabled: !row.patientIsActive || !row.isFinalized || isDisabled,
+            hidden: row.isClinicSessionClosed,
           }
         case 2: // delete visit
-          return { ...opt, disabled: !row.patientIsActive || !isStatusWaiting }
-        case 5: // start consultation
           return {
             ...opt,
-            disabled: !row.patientIsActive || isStatusInProgress || isDisabled,
-            hidden: true,
+            disabled: !row.patientIsActive || !isStatusWaiting,
+            hidden: row.isClinicSessionClosed,
           }
-        case 6: // resume consultation
-          return {
-            ...opt,
-            disabled: !row.patientIsActive || !isStatusInProgress || isDisabled,
-            hidden: hideResumeButton || isRetailVisit || isBillFirstVisit,
-          }
+        // case 5: // start consultation
+        //   return {
+        //     ...opt,
+        //     disabled: !row.patientIsActive || isStatusInProgress || isDisabled,
+        //     hidden: true,
+        //   }
+        // case 6: // resume consultation
+        //   return {
+        //     ...opt,
+        //     disabled: !row.patientIsActive || !isStatusInProgress || isDisabled,
+        //     hidden: hideResumeButton || isRetailVisit || isBillFirstVisit,
+        //   }
         case 7: // edit consultation
           return {
             ...opt,

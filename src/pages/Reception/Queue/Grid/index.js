@@ -197,6 +197,7 @@ class Grid extends React.Component {
       visitPurposeFK,
       patientProfileFk,
       appointmentStatusFk,
+      isClinicSessionClosed,
       doctorName,
     } = row
     if (visitStatus === VISIT_STATUS.UPCOMING_APPT) {
@@ -209,6 +210,9 @@ class Grid extends React.Component {
       return
     }
 
+    if (isClinicSessionClosed) {
+      return
+    }
     switch (visitStatus) {
       case VISIT_STATUS.WAITING:
         id = '1'
@@ -333,7 +337,8 @@ class Grid extends React.Component {
                         className={classes.switchContainer}
                         row={row}
                         disabled={
-                          showConsReady && showConsReady.rights !== 'enable'
+                          row.isClinicSessionClosed ||
+                          (showConsReady && showConsReady.rights !== 'enable')
                         }
                         {...this.props}
                       />
