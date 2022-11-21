@@ -171,7 +171,7 @@ class BinocularVision extends PureComponent {
                       <MultipleTextField
                         maxLength={2000}
                         bordered={false}
-                        autoSize={true}
+                        autoSize={{ minRows: 3 }}
                         {...args}
                       />
                     )}
@@ -282,7 +282,7 @@ class BinocularVision extends PureComponent {
                       <MultipleTextField
                         maxLength={2000}
                         bordered={false}
-                        autoSize={true}
+                        autoSize={{ minRows: 3 }}
                         {...args}
                       />
                     )}
@@ -558,7 +558,7 @@ class BinocularVision extends PureComponent {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
@@ -572,7 +572,7 @@ class BinocularVision extends PureComponent {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
@@ -599,7 +599,7 @@ class BinocularVision extends PureComponent {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
@@ -613,7 +613,7 @@ class BinocularVision extends PureComponent {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
@@ -642,7 +642,7 @@ class BinocularVision extends PureComponent {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
@@ -656,7 +656,7 @@ class BinocularVision extends PureComponent {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
@@ -850,7 +850,7 @@ class BinocularVision extends PureComponent {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
@@ -878,7 +878,7 @@ class BinocularVision extends PureComponent {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
