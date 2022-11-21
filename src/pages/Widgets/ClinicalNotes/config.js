@@ -187,16 +187,13 @@ export const formConfigs = [
     thumbnailDisplaySize: { width: 260, height: 130 },
     defaultValue: {
       lastUpdateDate: moment(),
-      rightScribbleNote: {
-        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.POSTERIOREYEEXAMINATION,
-        subject: 'Right Eye',
-      },
-      leftScribbleNote: {
-        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.POSTERIOREYEEXAMINATION,
-        subject: 'Left Eye',
+      recordStatusFK: 1,
+      ocularMotilityScribbleNote: {
+        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.PAEDIATRIC,
+        subject: 'Ocular Motility',
       },
     },
-    defaultImage: PosteriorEyeExamination,
+    defaultImage: Paediatric,
   },
   {
     id: CLINICALNOTE_FORM.PAEDIATRIC,
@@ -215,6 +212,7 @@ export const formConfigs = [
     thumbnailDisplaySize: { width: 260, height: 130 },
     defaultValue: {
       lastChangeDate: moment(),
+      recordStatusFK: 1,
       ocularMotilityScribbleNote: {
         thumbnail: CLINICALNOTE_FORMTHUMBNAIL.PAEDIATRIC,
         subject: 'Ocular Motility',
