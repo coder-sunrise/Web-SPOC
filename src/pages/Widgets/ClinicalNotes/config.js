@@ -180,6 +180,7 @@ export const formConfigs = [
     }),
     prop: 'corDoctorNote.corBinocularVision',
     prefixProp: 'corDoctorNote.corBinocularVisionEntity',
+    defaultImage: Paediatric,
     cavanSize: { width: 600, height: 300 },
     imageSize: { width: 250, height: 200 },
     position: { left: 175, top: 50 },
@@ -193,7 +194,6 @@ export const formConfigs = [
         subject: 'Ocular Motility',
       },
     },
-    defaultImage: Paediatric,
   },
   {
     id: CLINICALNOTE_FORM.PAEDIATRIC,
