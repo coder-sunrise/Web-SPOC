@@ -7,7 +7,8 @@ import Loading from '@/components/PageLoading/index'
 import PosteriorEyeExamination from '@/assets/img/ClinicalNoteForm/PosteriorEyeExamination.jpg'
 import moment from 'moment'
 import Paediatric from '@/assets/img/ClinicalNoteForm/OcularMotility.jpg'
-
+import PupillaryAssessment from '@/assets/img/ClinicalNoteForm/PupillaryAssessment.jpg'
+import Confrontation from '@/assets/img/ClinicalNoteForm/Confrontation.jpg'
 export const formConfigs = [
   {
     id: CLINICALNOTE_FORM.PATIENTHISTORY,
@@ -41,6 +42,27 @@ export const formConfigs = [
     }),
     prop: 'corDoctorNote.corPreliminaryAssessment',
     prefixProp: 'corDoctorNote.corPreliminaryAssessmentEntity',
+    defaultImage: {
+      PupillaryAssessment,
+      Confrontation,
+    },
+    cavanSize: { width: '80vw', height: 300 },
+    imageSize: { width: 800, height: 120 },
+    position: { left: 175, top: 50 },
+    thumbnailSize: { width: 300, height: 150 },
+    thumbnailDisplaySize: { width: 260, height: 130 },
+    defaultValue: {
+      lastChangeDate: moment(),
+      recordStatusFK: 1,
+      pupillaryAssessmentScribbleNote: {
+        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.PUPILLARYASSESSMENT,
+        subject: 'Pupillary Assessment',
+      },
+      confrontationScribbleNote: {
+        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.CONFRONTATION,
+        subject: 'Confrontation',
+      },
+    },
   },
   {
     id: CLINICALNOTE_FORM.ANTERIOREYEEXAMINATION,

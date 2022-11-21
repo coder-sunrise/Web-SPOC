@@ -37,8 +37,22 @@ const _styles = withStyles(
   }),
   { withTheme: true },
 )
+
+const base64Prefix = 'data:image/jpeg;base64,'
 let PreliminaryAssessment = props => {
-  let { prefixProp, classes, theme } = props
+  let {
+    prefixProp,
+    classes,
+    theme,
+    editScribbleNote,
+    thumbnailDisplaySize,
+    defaultImage,
+    cavanSize,
+    imageSize,
+    thumbnailSize,
+    position,
+  } = props
+  console.log(props)
   return (
     <table className={classes.containerTable}>
       <tr>
@@ -65,10 +79,56 @@ let PreliminaryAssessment = props => {
                     justIcon
                     color='primary'
                     style={{ top: '5px', left: '5px' }}
-                    onClick={() => {}}
+                    onClick={() => {
+                      editScribbleNote(
+                        prefixProp,
+                        'pupillaryAssessmentScribbleNote',
+                        'pupillaryAssessmentScribbleNoteFK',
+                        defaultImage?.PupillaryAssessment,
+                        cavanSize,
+                        imageSize,
+                        thumbnailSize,
+                        position,
+                      )
+                    }}
                   >
                     <Edit />
                   </Button>
+                  <div
+                    style={{
+                      width: thumbnailDisplaySize.width + 6,
+                      marginTop: 6,
+                      position: 'relative',
+                      left: `calc((100% - ${thumbnailDisplaySize.width}px - 6px) / 2)`,
+                      height: '120px',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <FastField
+                      name={`${prefixProp}.pupillaryAssessmentScribbleNote`}
+                      render={args => {
+                        if (
+                          !args.field.value?.thumbnail ||
+                          args.field.value?.thumbnail === ''
+                        ) {
+                          return ''
+                        }
+                        let src = `${base64Prefix}${args.field.value.thumbnail}`
+                        return (
+                          <div style={{}}>
+                            <img
+                              src={src}
+                              alt={args.field.value.subject}
+                              style={{
+                                maxHeight: thumbnailDisplaySize.height,
+                                maxWidth: thumbnailDisplaySize.width,
+                              }}
+                            />
+                          </div>
+                        )
+                      }}
+                    />
+                  </div>
                 </div>
               </td>
             </tr>
@@ -205,7 +265,7 @@ let PreliminaryAssessment = props => {
               <td width='5%'>RE</td>
               <td width='30%'>
                 <FastField
-                  name={`${prefixProp}.tonometryInstrument`}
+                  name={`${prefixProp}.tonometryInstrumentRe`}
                   render={args => (
                     <MultipleTextField
                       maxLength={2000}
@@ -219,7 +279,7 @@ let PreliminaryAssessment = props => {
               <td width='5%'>LE</td>
               <td width='30%'>
                 <FastField
-                  name={`${prefixProp}.peratometryReadingLe`}
+                  name={`${prefixProp}.tonometryInstrumentLe`}
                   render={args => (
                     <MultipleTextField
                       maxLength={2000}
@@ -252,10 +312,57 @@ let PreliminaryAssessment = props => {
                     justIcon
                     color='primary'
                     style={{ top: '5px', left: '5px' }}
-                    onClick={() => {}}
+                    onClick={() => {
+                      editScribbleNote(
+                        prefixProp,
+                        'confrontationScribbleNote',
+                        'confrontationScribbleNoteFK',
+                        defaultImage?.Confrontation,
+                        cavanSize,
+                        imageSize,
+                        thumbnailSize,
+                        position,
+                      )
+
+                    }}
                   >
                     <Edit />
                   </Button>
+                  <div
+                    style={{
+                      width: thumbnailDisplaySize.width + 6,
+                      marginTop: 6,
+                      position: 'relative',
+                      left: `calc((100% - ${thumbnailDisplaySize.width}px - 6px) / 2)`,
+                      height: '120px',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <FastField
+                      name={`${prefixProp}.confrontationScribbleNote`}
+                      render={args => {
+                        if (
+                          !args.field.value?.thumbnail ||
+                          args.field.value?.thumbnail === ''
+                        ) {
+                          return ''
+                        }
+                        let src = `${base64Prefix}${args.field.value.thumbnail}`
+                        return (
+                          <div style={{}}>
+                            <img
+                              src={src}
+                              alt={args.field.value.subject}
+                              style={{
+                                maxHeight: thumbnailDisplaySize.height,
+                                maxWidth: thumbnailDisplaySize.width,
+                              }}
+                            />
+                          </div>
+                        )
+                      }}
+                    />
+                  </div>
                 </div>
               </td>
             </tr>
