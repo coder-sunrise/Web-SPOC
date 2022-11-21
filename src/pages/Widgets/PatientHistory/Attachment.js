@@ -12,30 +12,24 @@ export default ({ current, dispatch }) => {
   const currentAttachments =
     attachments.length > 0 ? attachments : visitAttachments
   const visitAttachment = currentAttachments.filter(
-    (item) => item.attachmentType === ATTACHMENT_TYPE.VISIT,
+    item => item.attachmentType === ATTACHMENT_TYPE.VISIT,
   )
   const visitReferralAttachment = currentAttachments.filter(
-    (item) => item.attachmentType === ATTACHMENT_TYPE.VISITREFERRAL,
+    item => item.attachmentType === ATTACHMENT_TYPE.VISITREFERRAL,
   )
   const consultationAttachment = currentAttachments.filter(
-    (item) => item.attachmentType === ATTACHMENT_TYPE.CLINICALNOTES,
-  )
-  const eyeVisualAcuityAttachment = currentAttachments.filter(
-    (item) => item.attachmentType === ATTACHMENT_TYPE.EYEVISUALACUITY,
+    item => item.attachmentType === ATTACHMENT_TYPE.CLINICALNOTES,
   )
 
   const sortAttachments = [
-    ...visitAttachment.map((o) => {
+    ...visitAttachment.map(o => {
       return { ...o, type: 'Visit Attachment' }
     }),
-    ...visitReferralAttachment.map((o) => {
+    ...visitReferralAttachment.map(o => {
       return { ...o, type: 'Referral Attachment' }
     }),
-    ...consultationAttachment.map((o) => {
+    ...consultationAttachment.map(o => {
       return { ...o, type: 'Consultation Attachment' }
-    }),
-    ...eyeVisualAcuityAttachment.map((o) => {
-      return { ...o, type: 'Visual Acuity Test' }
     }),
   ]
   let attachmentColumns = [

@@ -109,8 +109,6 @@ export default {
   'menu.setting.setting': 'Setting',
   'menu.setting.clinicinfo': 'Clinic Information',
   'menu.setting.service': 'Service',
-  'menu.setting.treatment': 'Treatment',
-  'menu.setting.treatmentcategory': 'Treatment Category',
   'menu.setting.room': 'Room',
   'menu.setting.roomassignment': 'Room Assignment',
   'menu.setting.roomblock': 'Room Block',

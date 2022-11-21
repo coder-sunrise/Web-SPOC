@@ -44,7 +44,7 @@ import PatientHistoryDrawer from './PatientHistoryDrawer'
 import LabTrackingDrawer from './LabTrackingDrawer'
 import Templates from './Templates'
 // utils
-import gpLayoutCfg, { dentalLayoutCfg } from './layoutConfigs'
+import gpLayoutCfg from './layoutConfigs'
 import { DIAGNOSIS_TYPE, VISIT_TYPE } from '@/utils/constants'
 
 const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }

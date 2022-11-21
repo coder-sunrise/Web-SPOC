@@ -25,7 +25,7 @@ export const tableConfig = {
   FuncProps: { pager: false },
 }
 
-const ServiceTypes = ['Service', 'Consumable', 'Treatment']
+const ServiceTypes = ['Service', 'Consumable']
 
 const iconStyle = {
   position: 'relative',

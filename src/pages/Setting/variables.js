@@ -139,20 +139,6 @@ export const menuData = [
     url: '/setting/appointmenttype',
   },
   {
-    authority: 'settings.clinicsetting.treatment',
-    title: 'Clinic Setting',
-    text: 'Treatment',
-    // icon: <FolderOpen />,
-    url: '/setting/treatment',
-  },
-  {
-    authority: 'settings.clinicsetting.treatmentcategory',
-    title: 'Clinic Setting',
-    text: 'Treatment Category',
-    // icon: <FolderOpen />,
-    url: '/setting/treatmentcategory',
-  },
-  {
     authority: 'settings.clinicsetting.casetype',
     title: 'Clinic Setting',
     text: 'Case Type',

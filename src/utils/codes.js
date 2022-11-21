@@ -995,12 +995,6 @@ export const corAttchementTypes = [
     type: 'Visit',
     name: 'Visit Attachment',
   },
-  {
-    id: 4,
-    type: 'EyeVisualAcuity',
-    name: 'Visual Acuity Test',
-    accessRight: 'queue.consultation.widgets.eyevisualacuity',
-  },
   // {
   //   id: 5,
   //   type: 'QueueDisplay',

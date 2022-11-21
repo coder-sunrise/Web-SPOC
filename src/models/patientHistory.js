@@ -4,32 +4,6 @@ import { formTypes } from '@/utils/codes'
 import { getUserPreference, saveUserPreference } from '@/services/user'
 import service from '../services/patientHistory'
 
-const ParseEyeFormData = response => {
-  const { corEyeRefractionForm = {}, corEyeExaminationForm = {} } = response
-  let refractionFormData = {}
-  let examinationFormData = {}
-  if (corEyeRefractionForm.formData) {
-    refractionFormData = JSON.parse(corEyeRefractionForm.formData)
-  }
-
-  if (corEyeExaminationForm.formData) {
-    examinationFormData = JSON.parse(corEyeExaminationForm.formData)
-  }
-
-  const newResponse = {
-    ...response,
-    corEyeRefractionForm: {
-      ...corEyeRefractionForm,
-      formData: refractionFormData,
-    },
-    corEyeExaminationForm: {
-      ...corEyeExaminationForm,
-      formData: examinationFormData,
-    },
-  }
-  return newResponse
-}
-
 export default createListViewModel({
   namespace: 'patientHistory',
   config: {
@@ -126,25 +100,7 @@ export default createListViewModel({
         const response = yield call(service.queryVisitHistory, payload)
         if (response.status === '200') {
           return {
-            list: (response.data.data || []).map(item => {
-              if (item.isNurseNote) return item
-              let newEntity = ParseEyeFormData(item.patientHistoryDetail)
-              newEntity = {
-                ...newEntity,
-                forms: newEntity.forms.map(o => {
-                  return {
-                    ...o,
-                    typeName: formTypes.find(
-                      type => parseInt(type.value, 10) === o.type,
-                    ).name,
-                  }
-                }),
-              }
-              return {
-                ...item,
-                patientHistoryDetail: newEntity,
-              }
-            }),
+            list: response.data.data || [],
             totalVisits: response.data.totalRecords,
           }
         }
@@ -256,52 +212,6 @@ export default createListViewModel({
       },
     },
     reducers: {
-      queryDone(st, { payload }) {
-        // const { data } = payload
-        st.list = st.list.map(item => {
-          if (!item.coHistory || item.coHistory.length === 0) return item
-          let newEntity = ParseEyeFormData(item.patientHistoryDetail)
-          newEntity = {
-            ...newEntity,
-            forms: newEntity.forms.map(o => {
-              return {
-                ...o,
-                typeName: formTypes.find(
-                  type => parseInt(type.value, 10) === o.type,
-                ).name,
-              }
-            }),
-          }
-          return {
-            ...item,
-            patientHistoryDetail: newEntity,
-          }
-        })
-        return {
-          ...st,
-        }
-      },
-      queryOneDone(st, { payload }) {
-        // const { data } = payload
-        const { entity } = st
-        st.entity = ParseEyeFormData(entity)
-
-        st.entity = {
-          ...st.entity,
-          forms: st.entity.forms.map(o => {
-            return {
-              ...o,
-              typeName: formTypes.find(
-                type => parseInt(type.value, 10) === o.type,
-              ).name,
-            }
-          }),
-        }
-
-        return {
-          ...st,
-        }
-      },
       getReferalHistory(st, { payload }) {
         const { data } = payload
         return {

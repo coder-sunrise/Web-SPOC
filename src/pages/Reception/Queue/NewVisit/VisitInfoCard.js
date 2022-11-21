@@ -39,7 +39,6 @@ import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { roundTo, getMappedVisitType } from '@/utils/utils'
 import numeral from 'numeral'
 import FormField from './formField'
-import { getMCReportLanguage } from './miscUtils'
 import Authorized from '@/utils/Authorized'
 import CannedTextButton from '@/pages/Widgets/Orders/Detail/CannedTextButton'
 

@@ -236,7 +236,6 @@ const saveConsultation = ({
     values,
     patient,
     consultationDocument = {},
-    corEyeRefractionForm,
     orders = {},
     forms = {},
     user,
@@ -264,7 +263,6 @@ const saveConsultation = ({
       {
         orders,
         consultationDocument,
-        corEyeRefractionForm,
         forms,
       },
     )
@@ -361,7 +359,6 @@ const pauseConsultation = async ({
 }) => {
   const {
     consultationDocument = {},
-    corEyeRefractionForm,
     orders = {},
     forms = {},
     user,
@@ -386,7 +383,6 @@ const pauseConsultation = async ({
     {
       orders,
       consultationDocument,
-      corEyeRefractionForm,
       forms,
     },
   )

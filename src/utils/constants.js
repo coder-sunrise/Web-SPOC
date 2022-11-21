@@ -159,7 +159,6 @@ export const INVOICE_ITEM_TYPE = {
   4: 'Service',
   5: 'OrderSet',
   6: 'Misc',
-  7: 'Treatment',
 }
 
 export const INVOICE_ITEM_TYPE_BY_TEXT = {
@@ -571,18 +570,8 @@ export const CANNED_TEXT_TYPE_BASE_TEXT = [
   CANNED_TEXT_TYPE.SERVICEINSTRUCTION,
 ]
 
-export const DENTAL_CANNED_TEXT_TYPE_FIELD = {
-  1: 'clinicalNotes',
-  2: 'complaints',
-  3: 'associatedHistory',
-  4: 'intraOral',
-  5: 'extraOral',
-  6: 'plan',
-}
-
 export const CLINIC_TYPE = {
   GP: 1,
-  DENTAL: 2,
   EYE: 4,
 }
 
@@ -657,7 +646,6 @@ export const ATTACHMENT_TYPE = {
   CLINICALNOTES: 'ClinicalNotes',
   VISITREFERRAL: 'VisitReferral',
   VISIT: 'Visit',
-  EYEVISUALACUITY: 'EyeVisualAcuity',
 }
 
 export const FORM_FROM = {
@@ -827,7 +815,6 @@ export const ORDER_TYPES = {
   CONSUMABLE: '4',
   SERVICE: '3',
   // ORDER_SET: '6',
-  // TREATMENT: '7',
 }
 
 export const VISITDOCTOR_CONSULTATIONSTATUS = {
