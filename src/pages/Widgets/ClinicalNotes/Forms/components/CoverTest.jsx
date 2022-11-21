@@ -136,7 +136,7 @@ class CoverTest extends PureComponent {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}
@@ -154,7 +154,7 @@ class CoverTest extends PureComponent {
                     <MultipleTextField
                       maxLength={2000}
                       bordered={false}
-                      autoSize={true}
+                      autoSize={{ minRows: 3 }}
                       {...args}
                     />
                   )}

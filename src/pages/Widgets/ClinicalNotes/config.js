@@ -125,6 +125,23 @@ export const formConfigs = [
     }),
     prop: 'corDoctorNote.corBinocularVision',
     prefixProp: 'corDoctorNote.corBinocularVisionEntity',
+    cavanSize: { width: 600, height: 300 },
+    imageSize: { width: 250, height: 200 },
+    position: { left: 175, top: 50 },
+    thumbnailSize: { width: 300, height: 150 },
+    thumbnailDisplaySize: { width: 260, height: 130 },
+    defaultValue: {
+      lastUpdateDate: moment(),
+      rightScribbleNote: {
+        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.POSTERIOREYEEXAMINATION,
+        subject: 'Right Eye',
+      },
+      leftScribbleNote: {
+        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.POSTERIOREYEEXAMINATION,
+        subject: 'Left Eye',
+      },
+    },
+    defaultImage: PosteriorEyeExamination,
   },
   {
     id: CLINICALNOTE_FORM.PAEDIATRIC,
@@ -171,5 +188,12 @@ export const formConfigs = [
     }),
     prop: 'corDoctorNote.corFollowUp',
     prefixProp: 'corDoctorNote.corFollowUpEntity',
+    defaultValue: {
+      lastChangeDate: moment(),
+      aided_RE_VA: '6',
+      aided_LE_VA: '6',
+      unaided_RE_VA: '6',
+      unaided_LE_VA: '6',
+    },
   },
 ]
