@@ -735,10 +735,14 @@ class AntdSelect extends React.PureComponent {
             const selectItem = vv.filter(o => o.value !== allValue)
             if (selectItem.length < 1) return null
             if (selectItem.length === 1) {
-              const selectOption = opts.find(
-                opt => opt.props.value === selectItem[0].value,
+              const selectOption = source.find(
+                opt =>
+                  Object.byString(
+                    opt,
+                    restProps.mode === 'tags' ? labelField : valueField,
+                  ) === selectItem[0].value,
               )
-              if (selectOption) return selectOption.props.label
+              if (selectOption) return Object.byString(selectOption, labelField)
               return null
             }
             return `${selectItem.length} ${customTagPlaceholder} selected`
