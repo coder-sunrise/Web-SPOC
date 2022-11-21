@@ -52,7 +52,7 @@ let PreliminaryAssessment = props => {
     thumbnailSize,
     position,
   } = props
-  console.log(props)
+
   return (
     <table className={classes.containerTable}>
       <tr>

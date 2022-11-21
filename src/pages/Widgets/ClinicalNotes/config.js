@@ -53,6 +53,7 @@ export const formConfigs = [
     thumbnailDisplaySize: { width: 260, height: 130 },
     defaultValue: {
       lastChangeDate: moment(),
+      // tonometryInstrumentTime: moment(),
       recordStatusFK: 1,
       pupillaryAssessmentScribbleNote: {
         thumbnail: CLINICALNOTE_FORMTHUMBNAIL.PUPILLARYASSESSMENT,
@@ -62,7 +63,7 @@ export const formConfigs = [
         thumbnail: CLINICALNOTE_FORMTHUMBNAIL.CONFRONTATION,
         subject: 'Confrontation',
       },
-    },
+    }, 
   },
   {
     id: CLINICALNOTE_FORM.ANTERIOREYEEXAMINATION,
