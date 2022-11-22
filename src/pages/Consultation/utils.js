@@ -154,15 +154,19 @@ const convertClinicalNotesForms = values => {
     else if (entity) {
       entity.lastChangeDate = moment()
       list.push(entity)
-      values = setIn(values, form.prop, list)
+      values = setIn(
+        values,
+        form.prop,
+        list.map(item => ({
+          ...item,
+          rightScribbleNote: undefined,
+          leftScribbleNote: undefined,
+          ocularMotilityScribbleNote: undefined,
+        })),
+      )
     }
 
     values = setIn(values, form.prefixProp, undefined)
-    list.forEach(item => {
-      item.rightScribbleNote = undefined
-      item.leftScribbleNote = undefined
-      item.ocularMotilityScribbleNote = undefined
-    })
   })
 
   return values

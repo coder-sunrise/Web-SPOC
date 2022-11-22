@@ -1347,7 +1347,7 @@ class Scribble extends React.Component {
                     />
                   </ToggleButton>
                 </Tooltip>
-                <Tooltip title='Hide'>
+                {/*<Tooltip title='Hide'>
                   <ToggleButton
                     key={10}
                     checked={this.state.hideEnable}
@@ -1369,7 +1369,7 @@ class Scribble extends React.Component {
                       <Visibility color='primary' />
                     )}
                   </ToggleButton>
-                </Tooltip>
+                  </Tooltip>*/}
               </ToggleButtonGroup>
             )}
             <div className={classes.rightButton}>
