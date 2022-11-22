@@ -13,7 +13,6 @@ import {
   ProgressButton,
   Select,
 } from '@/components'
-import AntdCascader from '@/components/Antd/AntdCascader'
 
 @withFormikExtend({
   mapPropsToValues: ({ settingCaseType }) => ({
@@ -26,54 +25,6 @@ import AntdCascader from '@/components/Antd/AntdCascader'
 class Filter extends PureComponent {
   render() {
     const { classes } = this.props
-    const options = [
-      {
-        value: '111',
-        label: 'Zhejiang',
-      },
-      {
-        value: '222',
-        label: 'Clinical Notes',
-        children: [
-          {
-            value: '1',
-            label: 'Hangzhou',
-          },
-          {
-            value: '2',
-            label: 'Hangzhou',
-          },
-          {
-            value: '3',
-            label: 'Hangzhou',
-          },
-          {
-            value: '4',
-            label: 'Hangzhou',
-          },
-          {
-            value: '5',
-            label: 'Hangzhou',
-          },
-          {
-            value: '6',
-            label: 'Hangzhou',
-          },
-        ],
-      },
-      {
-        value: '777',
-        label: 'Forms',
-      },
-      {
-        value: '888',
-        label: 'Notes',
-      },
-      {
-        value: '999',
-        label: 'Diagnosis',
-      },
-    ]
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -82,21 +33,6 @@ class Filter extends PureComponent {
               name='codeDisplayValue'
               render={args => {
                 return <TextField label='Code / Display Value' {...args} />
-              }}
-            />
-          </GridItem>
-          <GridItem xs={6} md={2}>
-            <FastField
-              name='isActive1'
-              render={args => {
-                return (
-                  <AntdCascader
-                    label='Test'
-                    options={options}
-                    multiple
-                    {...args}
-                  />
-                )
               }}
             />
           </GridItem>
@@ -118,20 +54,19 @@ class Filter extends PureComponent {
                 icon={<Search />}
                 onClick={() => {
                   const { codeDisplayValue, isActive } = this.props.values
-                  console.log(this.props.values)
-                  // this.props.dispatch({
-                  //   type: 'settingCaseType/query',
-                  //   payload: {
-                  //     isActive,
-                  //     group: [
-                  //       {
-                  //         code: codeDisplayValue,
-                  //         displayValue: codeDisplayValue,
-                  //         combineCondition: 'or',
-                  //       },
-                  //     ],
-                  //   },
-                  // })
+                  this.props.dispatch({
+                    type: 'settingCaseType/query',
+                    payload: {
+                      isActive,
+                      group: [
+                        {
+                          code: codeDisplayValue,
+                          displayValue: codeDisplayValue,
+                          combineCondition: 'or',
+                        },
+                      ],
+                    },
+                  })
                 }}
               >
                 <FormattedMessage id='form.search' />

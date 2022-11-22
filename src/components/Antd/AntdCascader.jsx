@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { CustomInput, Tooltip } from '@/components'
 import { Cascader } from 'antd'
-import { control } from '@/components/Decorator'
 import withStyles from '@material-ui/core/styles/withStyles'
 import classnames from 'classnames'
 const STYLES = theme => ({
@@ -23,7 +22,6 @@ const STYLES = theme => ({
   },
 })
 class AntdCascader extends Component {
-  constructor
   state = {
     shrink: false,
     value:
