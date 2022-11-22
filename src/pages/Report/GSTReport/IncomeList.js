@@ -101,7 +101,7 @@ class IncomeList extends PureComponent {
         },
       }
       InComeGstDetails = [
-        { name: 'doctorName', title: 'Doctor Name' },
+        { name: 'doctorName', title: 'Optometrist Name' },
         ...InComeGstDetailsCols,
       ]
     }
