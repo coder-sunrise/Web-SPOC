@@ -928,6 +928,9 @@ class Queue extends React.Component {
                       <span
                         style={{
                           color: '#1890f8',
+                          display: 'inline-block',
+                          paddingLeft: 5,
+                          fontWeight: '500',
                           fontSize: '0.9rem',
                         }}
                       >
