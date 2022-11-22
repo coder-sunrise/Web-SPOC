@@ -98,6 +98,7 @@ class Grid extends React.Component {
     const roomLocalIdentityID = localStorage.getItem('roomLocalIdentityID')
     const { clinicianProfile } = user.data
     const clinicRoleFK = clinicianProfile.userProfile.role?.clinicRoleFK
+    const doctorProfileFK = user.data.clinicianProfile?.doctorProfile?.id
     const selectRoom =
       clinicRoleFK === 3
         ? roomLocalIdentityID
@@ -162,7 +163,15 @@ class Grid extends React.Component {
           : true
       })
     }
-    return filterData(filter, data, searchQuery, visitType, doctor, selectRoom)
+    return filterData(
+      filter,
+      data,
+      searchQuery,
+      visitType,
+      clinicRoleFK == 1 ? [doctorProfileFK] : doctor,
+      selectRoom,
+      doctorProfileFK,
+    )
   }
 
   getActionButton = row => (
@@ -188,6 +197,7 @@ class Grid extends React.Component {
       visitPurposeFK,
       patientProfileFk,
       appointmentStatusFk,
+      isClinicSessionClosed,
       doctorName,
     } = row
     if (visitStatus === VISIT_STATUS.UPCOMING_APPT) {
@@ -200,6 +210,9 @@ class Grid extends React.Component {
       return
     }
 
+    if (isClinicSessionClosed) {
+      return
+    }
     switch (visitStatus) {
       case VISIT_STATUS.WAITING:
         id = '1'
@@ -222,7 +235,7 @@ class Grid extends React.Component {
       case VISIT_STATUS.BILLING:
       case VISIT_STATUS.COMPLETED:
       //case VISIT_STATUS.IN_CONS:
-      case VISIT_STATUS.UPGRADED:
+      case VISIT_STATUS.UNGRADED:
       case VISIT_STATUS.VERIFIED:
       case VISIT_STATUS.PAYMENT_REQUESTED:
       case VISIT_STATUS.PAYMENT_FAILED:
@@ -256,6 +269,7 @@ class Grid extends React.Component {
       showingVisitRegistration = false,
       statusTagClicked,
       mainDivHeight = 700,
+      sessionID,
     } = this.props
 
     const queueListingData = this.computeQueueListingData()
@@ -323,7 +337,8 @@ class Grid extends React.Component {
                         className={classes.switchContainer}
                         row={row}
                         disabled={
-                          showConsReady && showConsReady.rights !== 'enable'
+                          row.isClinicSessionClosed ||
+                          (showConsReady && showConsReady.rights !== 'enable')
                         }
                         {...this.props}
                       />

@@ -111,8 +111,6 @@ export default createFormViewModel({
             errorState: {},
             roomFK: undefined,
             appointmentFK: undefined,
-            expandRefractionForm: undefined,
-            expandExaminationForm: undefined,
             appointment: undefined,
           },
         })
@@ -134,7 +132,7 @@ export default createFormViewModel({
           const response = yield call(service.query, payload)
           const { data = {} } = response
           const {
-            visit: { patientProfileFK, visitEyeRefractionForm },
+            visit: { patientProfileFK },
           } = data
 
           if (patientProfileFK) {
@@ -149,31 +147,14 @@ export default createFormViewModel({
               })
             }
             // yield take('fetchPatientInfoByPatientID/@@end')
-            let refractionFormData
-            if (visitEyeRefractionForm) {
-              if (
-                visitEyeRefractionForm.formData &&
-                typeof visitEyeRefractionForm.formData === 'string'
-              ) {
-                refractionFormData = JSON.parse(visitEyeRefractionForm.formData)
-              } else {
-                // eslint-disable-next-line prefer-destructuring
-                refractionFormData = visitEyeRefractionForm.formData
-              }
-            }
 
             yield put({
               type: 'updateState',
               payload: {
                 visitInfo: {
                   ...data,
-                  visitEyeRefractionForm: {
-                    ...visitEyeRefractionForm,
-                    formData: refractionFormData,
-                  },
                 },
                 attachmentOriList: [...data.visit.visitAttachment],
-                expandRefractionForm: !!visitEyeRefractionForm,
               },
             })
           }

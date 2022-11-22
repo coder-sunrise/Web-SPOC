@@ -138,24 +138,27 @@ class ClinicalNotes extends PureComponent {
         { layerType: 'image', layerNumber: -100, layerContent },
       ]
     }
-    this.setState({
-      editScriblenotes: {
-        prefixProp: prefixProp,
-        selectedData: preScriblenote,
-        scribbleNoteProp,
-        scribbleNoteFKProp,
+    this.setState(
+      {
+        editScriblenotes: {
+          prefixProp: prefixProp,
+          selectedData: preScriblenote,
+          scribbleNoteProp,
+          scribbleNoteFKProp,
+        },
       },
-    })
-    dispatch({
-      type: 'scriblenotes/updateState',
-      payload: {
-        entity: { ...preScriblenote },
-        showScribbleModal: true,
-        editEnable: false,
-        cavanSize,
-        thumbnailSize,
-      },
-    })
+      () =>
+        dispatch({
+          type: 'scriblenotes/updateState',
+          payload: {
+            entity: { ...preScriblenote },
+            showScribbleModal: true,
+            editEnable: false,
+            cavanSize,
+            thumbnailSize,
+          },
+        }),
+    )
   }
 
   toggleScribbleModal = () => {
@@ -236,7 +239,7 @@ class ClinicalNotes extends PureComponent {
     }
 
     if (isUpdated) {
-      setFieldValue(`${editScriblenotes.prefixProp}.lastUpdateDate`, moment())
+      setFieldValue(`${editScriblenotes.prefixProp}.lastChangeDate`, moment())
     }
   }
 

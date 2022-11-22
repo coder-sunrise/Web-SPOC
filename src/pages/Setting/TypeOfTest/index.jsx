@@ -45,8 +45,8 @@ let TypeOfTest = props => {
           open={settingTypeOfTest.showModal}
           title={
             settingTypeOfTest.entity
-              ? 'Edit TypeOfTest (Investigative Tests)'
-              : 'Add TypeOfTest (Investigative Tests)'
+              ? 'Edit Type Of Test (Investigative Tests)'
+              : 'Add Type Of Test (Investigative Tests)'
           }
           maxWidth='md'
           bodyNoPadding

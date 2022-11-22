@@ -39,7 +39,6 @@ import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { roundTo, getMappedVisitType } from '@/utils/utils'
 import numeral from 'numeral'
 import FormField from './formField'
-import { getMCReportLanguage } from './miscUtils'
 import Authorized from '@/utils/Authorized'
 import CannedTextButton from '@/pages/Widgets/Orders/Detail/CannedTextButton'
 
@@ -155,6 +154,9 @@ const VisitInfoCard = ({
       values.visitStatus !== VISIT_STATUS.UPCOMING_APPT) ||
     visitMode === 'view'
 
+
+  const roomDisabled =
+    values.visitStatus === VISIT_STATUS.IN_CONS || visitMode === 'view'
   const hasCOR = values.clinicalObjectRecordFK
   const activeCORCreatedBy = values.activeCORCreatedBy
   return (
@@ -256,7 +258,7 @@ const VisitInfoCard = ({
             name={FormField['visit.roomFK']}
             render={args => (
               <CodeSelect
-                disabled={notWaiting || isReadOnly}
+                disabled={roomDisabled || isReadOnly}
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.room',
                 })}

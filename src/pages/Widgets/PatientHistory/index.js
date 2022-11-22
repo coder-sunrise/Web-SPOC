@@ -3,12 +3,9 @@ import { Collapse } from 'antd'
 import _ from 'lodash'
 import moment from 'moment'
 import { Edit, Print } from '@material-ui/icons'
-import SvgIcon from '@material-ui/core/SvgIcon'
 import { connect } from 'dva'
 import { history, formatMessage } from 'umi'
-import { InvoiceReplacement } from '@/components/Icon/customIcons'
 import { Field } from 'formik'
-import numeral from 'numeral'
 import Search from '@material-ui/icons/Search'
 import { VisitTypeTag } from '@/components/_medisys'
 import { withStyles, Link } from '@material-ui/core'
@@ -25,17 +22,14 @@ import {
   VisitTypeSelect,
   dateFormatLong,
   dateFormatLongWithTimeNoSec,
-  timeFormat24Hour,
+  Switch,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 // utils
-import { findGetParameter, commonDataReaderTransform } from '@/utils/utils'
-import { VISIT_TYPE, CLINIC_TYPE, CLINICAL_ROLE } from '@/utils/constants'
-import { scribbleTypes } from '@/utils/codes'
+import { findGetParameter, getDefaultLayerContent } from '@/utils/utils'
+import { VISIT_TYPE, CLINICAL_ROLE } from '@/utils/constants'
 import { DoctorProfileSelect } from '@/components/_medisys'
 import withWebSocket from '@/components/Decorator/withWebSocket'
-import { getReportContext } from '@/services/report'
-import { getFileContentByFileID } from '@/services/file'
 import * as WidgetConfig from './config'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import HistoryDetails from './HistoryDetails'
@@ -55,6 +49,7 @@ const defaultValue = {
   visitTypeIDs: [-99],
   selectCategories: [],
   isAllDate: true,
+  notesBy: 'Optometrist',
 }
 
 const styles = theme => ({
@@ -151,20 +146,11 @@ class PatientHistory extends Component {
     this.widgets = WidgetConfig.widgets(
       props,
       this.scribbleNoteUpdateState,
-      this.getSelectNoteTypes,
     ).filter(o => {
-      if (o.id === WidgetConfig.WIDGETS_ID.DOCTORNOTE) {
-        return this.getCategoriesOptions().find(
-          c =>
-            [
-              WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
-              WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
-              WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
-              WidgetConfig.WIDGETS_ID.PLAN,
-            ].indexOf(c.value) >= 0,
-        )
-      }
-      return this.getCategoriesOptions().find(c => c.value === o.id)
+      return (
+        o.id === WidgetConfig.WIDGETS_ID.ClINICALNOTES ||
+        this.getCategoriesOptions().find(c => c.value === o.id)
+      )
     })
 
     this.state = {
@@ -172,7 +158,6 @@ class PatientHistory extends Component {
       showHistoryDetails: false,
       selectHistory: undefined,
       activeKey: [],
-      selectItems: [],
       visitDate: [
         moment(new Date())
           .startOf('day')
@@ -190,8 +175,7 @@ class PatientHistory extends Component {
       totalVisits: 0,
       currentHeight: window.innerHeight,
       isLoadingData: undefined,
-      currentOrders: [],
-      showActualizationHistory: false,
+      notesBy: 'Optometrist',
     }
   }
 
@@ -243,7 +227,7 @@ class PatientHistory extends Component {
         this.setState({ selectCategories }, () => {
           setFieldValue('selectCategories', selectCategories)
         })
-        // this.queryVisitHistory(5)
+        this.queryVisitHistory()
       })
     })
   }
@@ -255,47 +239,13 @@ class PatientHistory extends Component {
   }
 
   getCategoriesOptions = () => {
-    const { clinicInfo, clinicSettings } = this.props
-    const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
-    let categories = []
-    if (clinicTypeFK === CLINIC_TYPE.GP) {
-      categories = WidgetConfig.GPCategory
-    } else if (clinicTypeFK === CLINIC_TYPE.DENTAL) {
-      categories = WidgetConfig.DentalCategory
-    } else if (clinicTypeFK === CLINIC_TYPE.EYE) {
-      categories = WidgetConfig.EyeCategory
-    }
-
-    const { settings = {} } = clinicSettings
-    const {
-      isEnableClinicNoteHistory = false,
-      isEnableClinicNoteChiefComplaints = false,
-      isEnableClinicNotes = false,
-      isEnableClinicNotePlan = false,
-    } = settings
-    categories = categories.filter(
-      c =>
-        (c !== WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY ||
-          isEnableClinicNoteHistory) &&
-        (c !== WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS ||
-          isEnableClinicNoteChiefComplaints) &&
-        (c !== WidgetConfig.WIDGETS_ID.CLINICAL_NOTE || isEnableClinicNotes) &&
-        (c !== WidgetConfig.WIDGETS_ID.PLAN || isEnableClinicNotePlan),
-    )
-
     return WidgetConfig.categoryTypes
       .filter(o => {
         const accessRight = Authorized.check(o.authority)
         if (!accessRight || accessRight.rights === 'hidden') return false
-
-        if (categories.find(c => c === o.value)) {
-          return true
-        }
-        return false
+        return true
       })
-      .map(o => {
-        return { ...o }
-      })
+      .map(o => ({ ...o }))
   }
 
   queryVisitHistory = pageSize => {
@@ -306,6 +256,7 @@ class PatientHistory extends Component {
       visitDate,
       visitTypeIDs = [],
       selectCategories = [],
+      notesBy,
     } = this.state
     const {
       dispatch,
@@ -313,7 +264,11 @@ class PatientHistory extends Component {
       patientHistory,
       setFieldValue,
       values,
+      user,
     } = this.props
+    const isStudent =
+      user.data.clinicianProfile?.userProfile?.role?.clinicRoleFK ===
+      CLINICAL_ROLE.STUDENT
     const { settings = {} } = clinicSettings
     const { viewVisitPageSize = 10 } = settings
 
@@ -348,6 +303,7 @@ class PatientHistory extends Component {
               .formatUTC(false)
           : undefined,
         isAllDate,
+        notesBy: isStudent ? 'Student' : notesBy,
         visitTypeIDs: visitTypeIDs.join(','),
         pageIndex: pageIndex + 1,
         pageSize: pageSize || viewVisitPageSize,
@@ -381,37 +337,55 @@ class PatientHistory extends Component {
             isLoadingData: false,
           }
         })
-        if (values.isSelectAll) setFieldValue('isSelectAll', false)
       }
     })
   }
 
-  selectOnChange = (e, row) => {
-    const { setFieldValue, values } = this.props
-    if (e.target.value) {
-      this.setState(
-        preState => {
-          const currentSelectItem = [...preState.selectItems, row.currentId]
-          return { ...preState, selectItems: currentSelectItem }
-        },
-        () => {
-          if (this.state.selectItems.length === this.state.loadVisits.length)
-            setFieldValue('isSelectAll', true)
-        },
-      )
-    } else {
-      this.setState(
-        preState => {
-          const currentSelectItem = preState.selectItems.filter(
-            o => o !== row.currentId,
-          )
-          return { ...preState, selectItems: currentSelectItem }
-        },
-        () => {
-          if (values.isSelectAll) setFieldValue('isSelectAll', false)
-        },
-      )
+  showEditButton = (
+    visitStatus,
+    doctorProfileFK,
+    isClinicSessionClosed,
+    visitDate,
+  ) => {
+    const { user, clinicSettings } = this.props
+    const { notesBy } = this.state
+    const { settings = [] } = clinicSettings
+    const {
+      isBackdatedClinicalNotesEntry = false,
+      backdatedClinicalNotesEntryStudent = 14,
+      backdatedClinicalNotesEntryOptometrist = 90,
+    } = settings
+    const clinicRoleFK =
+      user.data.clinicianProfile?.userProfile?.role?.clinicRoleFK
+    if (clinicRoleFK === CLINICAL_ROLE.DOCTOR && notesBy === 'Optometrist') {
+      if (
+        (visitStatus === VISIT_STATUS.UNGRADED ||
+          (visitStatus === VISIT_STATUS.VERIFIED &&
+            (!isBackdatedClinicalNotesEntry ||
+              moment(visitDate)
+                .startOf('day')
+                .add(backdatedClinicalNotesEntryOptometrist, 'day') >
+                moment()))) &&
+        doctorProfileFK === user.data.clinicianProfile.doctorProfile.id
+      ) {
+        return true
+      }
     }
+    if (clinicRoleFK === CLINICAL_ROLE.STUDENT) {
+      if (
+        visitStatus === VISIT_STATUS.IN_CONS ||
+        ((visitStatus === VISIT_STATUS.UNGRADED ||
+          visitStatus === VISIT_STATUS.VERIFIED) &&
+          isClinicSessionClosed &&
+          (!isBackdatedClinicalNotesEntry ||
+            moment(visitDate)
+              .startOf('day')
+              .add(backdatedClinicalNotesEntryStudent, 'day') > moment()))
+      )
+        return true
+    }
+
+    return false
   }
 
   getTitle = row => {
@@ -426,41 +400,31 @@ class PatientHistory extends Component {
       fromModule,
       global,
     } = this.props
+    const { notesBy } = this.state
     const {
       userTitle,
       userName,
       visitDate,
       signOffDate,
       visitPurposeFK,
-      timeIn,
-      timeOut,
-      isForInvoiceReplacement,
-      visitPurposeName,
-      coHistory = [],
       isNurseNote,
       visitStatus,
-      isExistsVerifiedReport,
+      doctorProfileFK,
+      isClinicSessionClosed,
+      doctors = [],
+      signOffByUser,
     } = row
-    const clinicRoleFK =
-      user.data.clinicianProfile.userProfile.role?.clinicRoleFK
     const { settings = [] } = clinicSettings
     const { patientID, ableToEditConsultation } = patientHistory
-    const isRetailVisit = visitPurposeFK === VISIT_TYPE.OTC
     const patientIsActive = patient.isActive
     const docotrName = userName
       ? `${userTitle || ''} ${userName || ''}`
       : undefined
-    let LastUpdateBy
-    if (coHistory.length > 0) {
-      LastUpdateBy = coHistory[0].userName
-        ? `${coHistory[0].userTitle || ''} ${coHistory[0].userName || ''}`
-        : undefined
-    } else {
-      LastUpdateBy = userName
-        ? `${userTitle || ''} ${userName || ''}`
-        : undefined
-    }
-    const isSelect = !!this.state.selectItems.find(o => o === row.currentId)
+    const student = doctors.find(doctor => !doctor.isPrimaryDoctor)
+    const optometrist = doctors.find(doctor => doctor.isPrimaryDoctor)
+    const isStudent =
+      user.data.clinicianProfile?.userProfile?.role?.clinicRoleFK ===
+      CLINICAL_ROLE.STUDENT
     return (
       <div
         style={{
@@ -489,32 +453,6 @@ class PatientHistory extends Component {
             style={{
               display: 'flex',
               alignItems: 'center',
-            }}
-          >
-            {fromModule !== 'Consultation' && (
-              <div
-                style={{
-                  marginTop: fromModule === 'History' ? -12 : -16,
-                  height: 24,
-                  width: 30,
-                }}
-                onClick={event => {
-                  event.stopPropagation()
-                }}
-              >
-                <Checkbox
-                  label=''
-                  checked={isSelect}
-                  onChange={e => this.selectOnChange(e, row)}
-                  style={{ width: 20, position: 'relative', top: 3 }}
-                />
-              </div>
-            )}
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
               marginLeft: fromModule !== 'Consultation' ? -14 : 0,
             }}
           >
@@ -537,17 +475,13 @@ class PatientHistory extends Component {
           {!isNurseNote && (
             <div style={{ fontSize: '0.9em' }}>
               <div style={{ fontWeight: 500, marginTop: 6 }}>
-                {`${moment(visitDate).format(
-                  dateFormatLong,
-                )} (Time In: ${moment(timeIn).format(
-                  timeFormat24Hour,
-                )} Time Out: ${
-                  timeOut ? moment(timeOut).format(timeFormat24Hour) : '-'
-                })${docotrName ? ` - ${docotrName}` : ''}`}
+                {`${moment(visitDate).format(dateFormatLong)} (${
+                  student ? `Student: ${student.name}, ` : ''
+                }${optometrist ? `Optometrist: ${optometrist.name}` : ''})`}
               </div>
               <div style={{ marginTop: 18 }}>
                 <span>
-                  {`Last Update By: ${LastUpdateBy || ''} on ${moment(
+                  {`Last Update By: ${signOffByUser || ''} on ${moment(
                     signOffDate,
                   ).format(dateFormatLongWithTimeNoSec)}`}
                 </span>
@@ -562,8 +496,12 @@ class PatientHistory extends Component {
               }}
             >
               {patientIsActive &&
-                !isRetailVisit &&
-                visitStatus != VISIT_STATUS.PAUSED &&
+                this.showEditButton(
+                  visitStatus,
+                  doctorProfileFK,
+                  isClinicSessionClosed,
+                  visitDate,
+                ) &&
                 fromModule !== 'Consultation' &&
                 fromModule !== 'History' &&
                 ableToEditConsultation && (
@@ -578,11 +516,6 @@ class PatientHistory extends Component {
                         }}
                         size='sm'
                         justIcon
-                        disabled={
-                          clinicRoleFK === CLINICAL_ROLE.STUDENT &&
-                          (visitStatus === VISIT_STATUS.UPGRADED ||
-                            visitStatus === VISIT_STATUS.VERIFIED)
-                        }
                         onClick={event => {
                           event.stopPropagation()
                           const closeOtherPopup = () => {
@@ -662,20 +595,6 @@ class PatientHistory extends Component {
             top: 0,
           }}
         >
-          {/* {isForInvoiceReplacement && (
-            <Tooltip title='For Invoice Replacement'>
-              <div
-                style={{
-                  display: 'inline-block',
-                  marginRight: 10,
-                  position: 'relative',
-                  top: 6,
-                }}
-              >
-                <InvoiceReplacement />
-              </div>
-            </Tooltip>
-          )} */}
           <div style={{ display: 'inline-block', width: 40, marginRight: 10 }}>
             {visitPurposeFK && <VisitTypeTag type={visitPurposeFK} />}
           </div>
@@ -689,23 +608,27 @@ class PatientHistory extends Component {
               marginRight: 6,
             }}
           >
-            {!isNurseNote && settings.showConsultationVersioning && (
-              <Tooltip title='View History'>
-                <span
-                  className='material-icons'
-                  style={{ color: 'gray' }}
-                  onClick={event => {
-                    event.stopPropagation()
-                    this.setState({
-                      showHistoryDetails: true,
-                      selectHistory: { ...row },
-                    })
-                  }}
-                >
-                  history
-                </span>
-              </Tooltip>
-            )}
+            {!isNurseNote &&
+              settings.showConsultationVersioning &&
+              ((visitStatus === VISIT_STATUS.UNGRADED &&
+                (isStudent || notesBy === 'Student')) ||
+                visitStatus === VISIT_STATUS.VERIFIED) && (
+                <Tooltip title='View History'>
+                  <span
+                    className='material-icons'
+                    style={{ color: 'gray' }}
+                    onClick={event => {
+                      event.stopPropagation()
+                      this.setState({
+                        showHistoryDetails: true,
+                        selectHistory: { ...row },
+                      })
+                    }}
+                  >
+                    history
+                  </span>
+                </Tooltip>
+              )}
           </div>
         </div>
       </div>
@@ -713,36 +636,19 @@ class PatientHistory extends Component {
   }
 
   checkSelectWidget = widgetId => {
+    if (widgetId === WidgetConfig.WIDGETS_ID.ClINICALNOTES) {
+      return true
+    }
     const { selectCategories = [] } = this.state
     if (selectCategories.length > 0) {
-      if (widgetId === WidgetConfig.WIDGETS_ID.DOCTORNOTE)
-        return selectCategories.find(
-          c =>
-            [
-              WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
-              WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
-              WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
-              WidgetConfig.WIDGETS_ID.PLAN,
-            ].indexOf(c) >= 0,
-        )
       return selectCategories.find(c => c === widgetId) || false
     }
     return true
   }
 
-  viewActualizationHistory = orders => {
-    this.setState({
-      currentOrders: orders,
-      showActualizationHistory: true,
-    })
-  }
-
-  closeActualizationHistory = () => {
-    this.setState({ currentOrders: [], showActualizationHistory: false })
-  }
-
   getDetailPanel = history => {
     const { isFullScreen = true, classes, clinicSettings } = this.props
+    const { selectCategories = [] } = this.state
     const { visitPurposeFK, isNurseNote, nurseNotes } = history
     if (isNurseNote) {
       let e = document.createElement('div')
@@ -773,17 +679,8 @@ class PatientHistory extends Component {
     }
     let current = {
       ...history.patientHistoryDetail,
-      visitAttachments: history.visitAttachments,
       visitRemarks: history.visitRemarks,
-      referralSourceFK: history.referralSourceFK,
-      referralPersonFK: history.referralPersonFK,
-      referralPatientProfileFK: history.referralPatientProfileFK,
-      referralSource: history.referralSource,
-      referralPerson: history.referralPerson,
-      referralPatientName: history.referralPatientName,
-      referralRemarks: history.referralRemarks,
       visitPurposeFK: history.visitPurposeFK,
-      patientGender: history.patientGender,
     }
     let visitDetails = {
       visitDate: history.visitDate,
@@ -812,6 +709,15 @@ class PatientHistory extends Component {
           <div>
             {currentTagWidgets.map(o => {
               const Widget = o.component
+              let selectForms = []
+              if (o.id === WidgetConfig.WIDGETS_ID.ClINICALNOTES) {
+                selectForms =
+                  selectCategories.length === 0
+                    ? WidgetConfig.formWidgets().map(fw => fw.id)
+                    : WidgetConfig.formWidgets()
+                        .filter(fw => selectCategories.indexOf(fw.id) >= 0)
+                        .map(fw => fw.id)
+              }
               return (
                 <div>
                   <span
@@ -822,22 +728,6 @@ class PatientHistory extends Component {
                     }}
                   >
                     <span>{o.name}</span>
-                    {o.name === 'Orders' &&
-                      current.isExistsActualizationHistory && (
-                        <span>
-                          <Link
-                            style={{
-                              marginLeft: 10,
-                              textDecoration: 'underline',
-                            }}
-                            onClick={() => {
-                              this.viewActualizationHistory(current.orders)
-                            }}
-                          >
-                            Actualization History
-                          </Link>
-                        </span>
-                      )}
                   </span>
                   {Widget ? (
                     <Widget
@@ -846,6 +736,7 @@ class PatientHistory extends Component {
                       {...this.props}
                       setFieldValue={this.props.setFieldValue}
                       isFullScreen={isFullScreen}
+                      selectForms={selectForms}
                     />
                   ) : (
                     ''
@@ -868,14 +759,49 @@ class PatientHistory extends Component {
       payload: {
         showViewScribbleModal: !scriblenotes.showViewScribbleModal,
         isReadonly: false,
+        cavanSize: undefined,
       },
     })
   }
 
-  scribbleNoteUpdateState = selectedDataValue => {
-    this.setState({
-      selectedData: selectedDataValue,
-    })
+  scribbleNoteUpdateState = async (
+    selectedDataValue,
+    defaultImage,
+    cavanSize,
+    imageSize,
+    position,
+    defaultSubject,
+  ) => {
+    let scribbleNote = selectedDataValue
+    if (!scribbleNote) {
+      const layerContent = await getDefaultLayerContent(
+        defaultImage,
+        imageSize,
+        position,
+      )
+      scribbleNote = {
+        subject: defaultSubject,
+        scribbleNoteLayers: [
+          { layerType: 'image', layerNumber: -100, layerContent },
+        ],
+      }
+    }
+    this.setState(
+      {
+        selectedData: scribbleNote,
+      },
+      () => {
+        this.props.dispatch({
+          type: 'scriblenotes/updateState',
+          payload: {
+            showViewScribbleModal: true,
+            isReadonly: true,
+            entity: { ...scribbleNote },
+            cavanSize,
+          },
+        })
+      },
+    )
   }
 
   setExpandAll = (isExpandAll = false) => {
@@ -887,651 +813,38 @@ class PatientHistory extends Component {
     }
   }
 
-  selectAllOnChange = e => {
-    if (e.target.value) {
-      this.setState(preState => {
-        return {
-          ...preState,
-          selectItems: [...preState.loadVisits.map(o => o.currentId)],
-        }
-      })
-    } else {
-      this.setState({ selectItems: [] })
-    }
-  }
-
-  getPatientInfo = () => {
-    const {
-      patient = {},
-      codetable: { ctnationality = [], ctgender = [] },
-    } = this.props
-    const { name, patientAccountNo, nationalityFK, dob, genderFK } = patient
-    const gender = ctgender.find(o => o.id === genderFK)
-    const nationality = ctnationality.find(o => o.id === nationalityFK)
-
-    let age = '0'
-    const years = Math.floor(moment.duration(moment().diff(dob)).asYears())
-    if (years > 0) {
-      age = `${years} ${years > 1 ? 'yrs' : 'yr'}`
-    } else {
-      const months = Math.floor(moment.duration(moment().diff(dob)).asMonths())
-      age = `{${months} ${years > 1 ? 'months' : 'month'}}`
-    }
-
-    return [
-      {
-        patientName: name,
-        patientAccountNo,
-        patientNationality: nationality ? nationality.name : '',
-        patientAge: age,
-        patientSex: gender ? gender.name : '',
-      },
-    ]
-  }
-
-  getSelectNoteTypes = () => {
-    const { selectCategories = [] } = this.state
-    if (selectCategories.length) {
-      return [
-        WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
-        WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
-        WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
-        WidgetConfig.WIDGETS_ID.PLAN,
-      ].filter(n => selectCategories.indexOf(n) >= 0)
-    }
-    return [
-      WidgetConfig.WIDGETS_ID.ASSOCIATED_HISTORY,
-      WidgetConfig.WIDGETS_ID.CHIEF_COMPLAINTS,
-      WidgetConfig.WIDGETS_ID.CLINICAL_NOTE,
-      WidgetConfig.WIDGETS_ID.PLAN,
-    ].filter(
-      n =>
-        this.getCategoriesOptions()
-          .map(c => c.value)
-          .indexOf(n) >= 0,
-    )
-  }
-
   checkShowData = (widgetId, current, visitPurposeFK, isNurseNote) => {
+    const { selectCategories = [] } = this.state
     if (isNurseNote) return false
     if (visitPurposeFK === VISIT_TYPE.OTC) {
       return (
         (widgetId === WidgetConfig.WIDGETS_ID.ORDERS ||
           widgetId === WidgetConfig.WIDGETS_ID.INVOICE ||
-          widgetId === WidgetConfig.WIDGETS_ID.VISITREMARKS ||
-          widgetId === WidgetConfig.WIDGETS_ID.REFERRAL ||
-          widgetId === WidgetConfig.WIDGETS_ID.ATTACHMENT) &&
+          widgetId === WidgetConfig.WIDGETS_ID.VISITREMARKS) &&
         this.checkSelectWidget(widgetId) &&
         WidgetConfig.showWidget(current, widgetId)
       )
     }
     return (
       this.checkSelectWidget(widgetId) &&
-      WidgetConfig.showWidget(current, widgetId, this.getSelectNoteTypes())
+      WidgetConfig.showWidget(
+        current,
+        widgetId,
+        selectCategories.length === 0
+          ? WidgetConfig.formWidgets()
+          : WidgetConfig.formWidgets().filter(
+              fw => selectCategories.indexOf(fw.id) >= 0,
+            ),
+      )
     )
-  }
-
-  checkShowNoteInReport = (widgetId, current, visitPurposeFK, isNurseNote) => {
-    if (isNurseNote) return false
-    if (visitPurposeFK === VISIT_TYPE.OTC) return false
-    const checkContainsNote = () => {
-      const notesType = WidgetConfig.notesTypes.find(
-        type => type.value === widgetId,
-      )
-      if (!notesType) return false
-
-      const { doctorNotes = [], scribbleNotes = [] } = current
-      const scribbleType = scribbleTypes.find(
-        o => o.type === notesType.fieldName,
-      )
-      if (
-        !doctorNotes.find(
-          note =>
-            note[notesType.fieldName] !== undefined &&
-            note[notesType.fieldName] !== null &&
-            note[notesType.fieldName].trim().length,
-        ) &&
-        !scribbleNotes.find(
-          sn => sn.scribbleNoteTypeFK === scribbleType?.typeFK,
-        )
-      ) {
-        return false
-      }
-      return true
-    }
-    return this.checkSelectWidget(widgetId) && checkContainsNote()
-  }
-
-  getReferral = current => {
-    let referral = ''
-    if (current.referralPatientProfileFK) {
-      referral = `Referred By Patient: ${current.referralPatientName}`
-    } else if (current.referralSourceFK) {
-      referral = `Referred By: ${current.referralSource}`
-      if (current.referralPersonFK) {
-        referral = `Referred By: ${current.referralSource}        Referral Person: ${current.referralPerson}`
-      }
-    }
-    if (current.referralRemarks) {
-      referral += `\r\n\r\nRemarks: ${current.referralRemarks}`
-    }
-    return {
-      isShowReferral: true,
-      referralContent: referral,
-    }
-  }
-
-  getEyeVisualAcuityTest = current => {
-    const eyeVisualAcuityTest = current.eyeVisualAcuityTestForms[0] || {}
-    return {
-      isAided: eyeVisualAcuityTest.isAided,
-      isOwnSpecs: eyeVisualAcuityTest.isOwnSpecs,
-      isRefractionOn: eyeVisualAcuityTest.isRefractionOn,
-      refractionOnRemarks: eyeVisualAcuityTest.refractionOnRemarks,
-      nearVADOD: eyeVisualAcuityTest.nearVADOD,
-      nearVAPHOD: eyeVisualAcuityTest.nearVAPHOD,
-      nearVANOD: eyeVisualAcuityTest.nearVANOD,
-      nearVAcmOD: eyeVisualAcuityTest.nearVAcmOD,
-      nearVADOS: eyeVisualAcuityTest.nearVADOS,
-      nearVAPHOS: eyeVisualAcuityTest.nearVAPHOS,
-      nearVANOS: eyeVisualAcuityTest.nearVANOS,
-      nearVAcmOS: eyeVisualAcuityTest.nearVAcmOS,
-      isNoSpec: eyeVisualAcuityTest.isNoSpec,
-      specsAge: eyeVisualAcuityTest.specsAge,
-      specSphereOD: eyeVisualAcuityTest.specSphereOD,
-      specCylinderOD: eyeVisualAcuityTest.specCylinderOD,
-      specAxisOD: eyeVisualAcuityTest.specAxisOD,
-      specVaOD: eyeVisualAcuityTest.specVaOD,
-      specSphereOS: eyeVisualAcuityTest.specSphereOS,
-      specCylinderOS: eyeVisualAcuityTest.specCylinderOS,
-      specAxisOS: eyeVisualAcuityTest.specAxisOS,
-      specVaOS: eyeVisualAcuityTest.specVaOS,
-      eyeVisualAcuityTestRemark: eyeVisualAcuityTest.remark,
-      isEyeVisualAcuityTest: true,
-    }
-  }
-
-  getRefractionForm = current => {
-    const { formData = {} } = current.corEyeRefractionForm
-    const {
-      Tenometry = {},
-      EyeDominance = {},
-      PupilSize = {},
-      Tests = [],
-      NearAdd = {},
-    } = formData
-    const visitRefractionFormTests = Tests.map(o => {
-      return {
-        visitFK: current.currentId,
-        sphereOD: o.SphereOD,
-        cylinderOD: o.CylinderOD,
-        axisOD: o.AxisOD,
-        vaOD: o.VaOD,
-        sphereOS: o.SphereOS,
-        cylinderOS: o.CylinderOS,
-        axisOS: o.AxisOS,
-        vaOS: o.VaOS,
-        testName: o.EyeRefractionTestType,
-      }
-    })
-
-    return {
-      isRefractionForm: true,
-      eyeRefractionFormRemarks: formData.Remarks,
-      eyeRefractionFormTestRemarks: formData.TestRemarks,
-      eyeRefractionFormTenometryR: Tenometry.R
-        ? numeral(Tenometry.R).format('0.0')
-        : undefined,
-      eyeRefractionFormTenometryL: Tenometry.L
-        ? numeral(Tenometry.L).format('0.0')
-        : undefined,
-      eyeRefractionFormDominanceL: EyeDominance.Left,
-      eyeRefractionFormDominanceR: EyeDominance.Right,
-      eyeRefractionFormPupilSizeL: PupilSize.L,
-      eyeRefractionFormPupilSizeR: PupilSize.R,
-      eyeRefractionFormVanHerick: formData.VanHerick,
-      eyeRefractionFormNearAddDOD: NearAdd.NearAddDOD,
-      eyeRefractionFormNearAddPHOD: NearAdd.NearAddPHOD,
-      eyeRefractionFormNearAddNOD: NearAdd.NearAddNOD,
-      eyeRefractionFormNearAddcmOD: NearAdd.NearAddcmOD,
-      eyeRefractionFormNearAddDOS: NearAdd.NearAddDOS,
-      eyeRefractionFormNearAddPHOS: NearAdd.NearAddPHOS,
-      eyeRefractionFormNearAddNOS: NearAdd.NearAddNOS,
-      eyeRefractionFormNearAddcmOS: NearAdd.NearAddcmOS,
-      visitRefractionFormTests,
-    }
-  }
-
-  getNoteContent = (note, selectNoteTypes, showType) => {
-    if (selectNoteTypes.indexOf(showType) >= 0) {
-      const notesType = WidgetConfig.notesTypes.find(
-        type => type.value === showType,
-      )
-      if (!notesType) return undefined
-      return note[notesType.fieldName]
-    }
-    return undefined
-  }
-
-  checkPrintNote = (note, selectNoteTypes) => {
-    return selectNoteTypes.find(selectNote => {
-      const notesType = WidgetConfig.notesTypes.find(
-        type => type.value === selectNote,
-      )
-      return (
-        note[notesType.fieldName] !== undefined &&
-        note[notesType.fieldName] !== null &&
-        note[notesType.fieldName].trim().length
-      )
-    })
-  }
-
-  getNotes = async (selectNoteTypes, current) => {
-    const { doctorNotes = [], scribbleNotes = [] } = current
-    let newNote = []
-    const base64Prefix = 'data:image/jpeg;base64,'
-    for (let indexN = 0; indexN < doctorNotes.length; indexN++) {
-      const note = doctorNotes[indexN]
-      const noteUserName = `${
-        note.signedByUserTitle && note.signedByUserTitle.trim().length
-          ? `${note.signedByUserTitle} ${note.signedByUserName || ''}`
-          : `${note.signedByUserName || ''}`
-      }`
-      const updateDate = moment(note.signedDate).format(
-        dateFormatLongWithTimeNoSec,
-      )
-      for (let index = 0; index < selectNoteTypes.length; index++) {
-        const selectNoteType = selectNoteTypes[index]
-        const notesType = WidgetConfig.notesTypes.find(
-          type => type.value === selectNoteType,
-        )
-        let sortOrder = 0
-        if (
-          WidgetConfig.hasValue(note[notesType.fieldName]) &&
-          note[notesType.fieldName].trim().length
-        ) {
-          const splites = note[notesType.fieldName].trim().split('\n')
-          splites.forEach(splite => {
-            newNote.push({
-              id: note.id,
-              visitFK: current.currentId,
-              noteType: notesType.title,
-              valueType: 'String',
-              stringValue: splite,
-              sortOrder: sortOrder,
-              doctor: noteUserName,
-              updateDate: updateDate,
-            })
-            sortOrder = sortOrder + 1
-          })
-        }
-
-        const scribbleType = scribbleTypes.find(
-          o => o.type === notesType.fieldName,
-        )
-        const filterScribbleNotes = scribbleNotes.filter(
-          sn =>
-            sn.scribbleNoteTypeFK === scribbleType?.typeFK &&
-            sn.signedByUserFK === note.signedByUserFK,
-        )
-
-        for (let indexSN = 0; indexSN < filterScribbleNotes.length; indexSN++) {
-          const scribbleNote = filterScribbleNotes[indexSN]
-          let imageContent
-          if (scribbleNote.fileIndexFK) {
-            const result = await getFileContentByFileID(
-              scribbleNote.fileIndexFK,
-            )
-            if (result && result.status === 200 && result.data) {
-              imageContent = result.data.content
-            }
-          }
-          newNote.push({
-            id: note.id,
-            visitFK: current.currentId,
-            noteType: notesType.title,
-            valueType: 'Image',
-            imageTitle: scribbleNote.subject,
-            imageValue: imageContent,
-            sortOrder: sortOrder,
-            doctor: noteUserName,
-            updateDate: updateDate,
-          })
-          sortOrder = sortOrder + 1
-        }
-      }
-    }
-    return newNote
-  }
-
-  printHandel = async () => {
-    let reportContext = []
-    const result = await getReportContext(68)
-    if (result) {
-      reportContext = result.map(o => {
-        const {
-          customLetterHeadHeight = 0,
-          isDisplayCustomLetterHead = false,
-          standardHeaderInfoHeight = 0,
-          isDisplayStandardHeader = false,
-          footerInfoHeight = 0,
-          isDisplayFooterInfo = false,
-          footerDisclaimerHeight = 0,
-          isDisplayFooterInfoDisclaimer = false,
-          ...restProps
-        } = o
-        return {
-          customLetterHeadHeight,
-          isDisplayCustomLetterHead,
-          standardHeaderInfoHeight,
-          isDisplayStandardHeader,
-          footerInfoHeight,
-          isDisplayFooterInfo,
-          footerDisclaimerHeight,
-          isDisplayFooterInfoDisclaimer,
-          ...restProps,
-        }
-      })
-    }
-    const { loadVisits, selectItems } = this.state
-    const {
-      codetable: { ctcomplication = [] },
-      handlePreviewReport,
-    } = this.props
-    let visitListing = []
-    let treatment = []
-    let diagnosis = []
-    let eyeVisualAcuityTestForms = []
-    let refractionFormTests = []
-    let eyeExaminations = []
-    let orders = []
-    let consultationDocument = []
-    let doctorNote = []
-
-    var printVisit = loadVisits.filter(visit =>
-      selectItems.find(item => item === visit.currentId),
-    )
-    for (let index = 0; index < printVisit.length; index++) {
-      const visit = printVisit[index]
-      let current = {
-        ...visit.patientHistoryDetail,
-        visitRemarks: visit.visitRemarks,
-        referralSourceFK: visit.referralSourceFK,
-        referralPersonFK: visit.referralPersonFK,
-        referralPatientProfileFK: visit.referralPatientProfileFK,
-        referralSource: visit.referralSource,
-        referralPerson: visit.referralPerson,
-        referralPatientName: visit.referralPatientName,
-        referralRemarks: visit.referralRemarks,
-        visitPurposeFK: visit.visitPurposeFK,
-        currentId: visit.currentId,
-        isNurseNote: visit.isNurseNote,
-        nurseNotes: visit.nurseNotes,
-        visitDate: visit.visitDate,
-        userName: visit.userName,
-        userTitle: visit.userTitle,
-        patientGender: visit.patientGender,
-      }
-      const { isNurseNote, nurseNotes = '', visitPurposeFK } = current
-      let isShowDoctorNote = false
-      const selectNoteTypes = this.getSelectNoteTypes()
-      if (selectNoteTypes.length) {
-        isShowDoctorNote = selectNoteTypes.find(noteType =>
-          this.checkShowNoteInReport(
-            noteType,
-            current,
-            visitPurposeFK,
-            isNurseNote,
-          ),
-        )
-      }
-      const isShowReferral = this.checkShowData(
-        WidgetConfig.WIDGETS_ID.REFERRAL,
-        current,
-        visitPurposeFK,
-        current.isNurseNote,
-      )
-      const isShowVisitRemarks = this.checkShowData(
-        WidgetConfig.WIDGETS_ID.VISITREMARKS,
-        current,
-        visitPurposeFK,
-        isNurseNote,
-      )
-      const isShowTreatment = this.checkShowData(
-        WidgetConfig.WIDGETS_ID.TREATMENT,
-        current,
-        visitPurposeFK,
-        isNurseNote,
-      )
-      const isShowDiagnosis = this.checkShowData(
-        WidgetConfig.WIDGETS_ID.DIAGNOSIS,
-        current,
-        visitPurposeFK,
-        isNurseNote,
-      )
-      const isShowEyeVisualAcuityTest = this.checkShowData(
-        WidgetConfig.WIDGETS_ID.VISUALACUITYTEST,
-        current,
-        visitPurposeFK,
-        isNurseNote,
-      )
-      const isShowRefractionForm = this.checkShowData(
-        WidgetConfig.WIDGETS_ID.REFRACTIONFORM,
-        current,
-        visitPurposeFK,
-        current.isNurseNote,
-      )
-      const isShowEyeExaminations = this.checkShowData(
-        WidgetConfig.WIDGETS_ID.EXAMINATIONFORM,
-        current,
-        visitPurposeFK,
-        current.isNurseNote,
-      )
-      const isShowOrders = this.checkShowData(
-        WidgetConfig.WIDGETS_ID.ORDERS,
-        current,
-        visitPurposeFK,
-        isNurseNote,
-      )
-      const isShowConsultationDocument = this.checkShowData(
-        WidgetConfig.WIDGETS_ID.CONSULTATION_DOCUMENT,
-        current,
-        visitPurposeFK,
-        isNurseNote,
-      )
-      if (
-        isNurseNote ||
-        isShowDoctorNote ||
-        isShowReferral ||
-        isShowVisitRemarks ||
-        isShowTreatment ||
-        isShowDiagnosis ||
-        isShowEyeVisualAcuityTest ||
-        isShowRefractionForm ||
-        isShowEyeExaminations ||
-        isShowOrders ||
-        isShowConsultationDocument
-      ) {
-        let referral = { isShowReferral: false }
-        if (isShowReferral) {
-          referral = this.getReferral(current)
-        }
-        let refractionFormDetails = {
-          isRefractionForm: false,
-          eyeRefractionFormDominanceL: false,
-          eyeRefractionFormDominanceR: false,
-        }
-        if (isShowRefractionForm) {
-          refractionFormDetails = this.getRefractionForm(current)
-        }
-
-        let eyeVisualAcuityTestDetails = {
-          isEyeVisualAcuityTest: false,
-          isAided: false,
-          isOwnSpecs: false,
-          isRefractionOn: false,
-          isNoSpec: false,
-          specsAge: 0,
-        }
-        if (isShowEyeVisualAcuityTest) {
-          eyeVisualAcuityTestDetails = this.getEyeVisualAcuityTest(current)
-        }
-
-        const {
-          visitRefractionFormTests = [],
-          ...restRefractionFormProps
-        } = refractionFormDetails
-
-        // visitListing
-        visitListing.push({
-          currentId: current.currentId,
-          visitDate: moment(current.visitDate).format(
-            dateFormatLongWithTimeNoSec,
-          ),
-          doctor: `${current.userTitle || ''} ${current.userName || ''}`,
-          isNurseNote: isNurseNote || false,
-          nurseNotes,
-          visitRemarks: isShowVisitRemarks ? current.visitRemarks : '',
-          ...referral,
-          ...restRefractionFormProps,
-          ...eyeVisualAcuityTestDetails,
-          patientGender: current.patientGender || '',
-        })
-
-        // treatment
-        if (isShowTreatment) {
-          treatment = treatment.concat(
-            current.orders
-              .filter(o => o.type === 'Treatment')
-              .map(o => {
-                return {
-                  visitFK: current.currentId,
-                  name: o.name,
-                  toothNumber: o.description,
-                  legend: o.legend,
-                  description: o.treatmentDescription,
-                }
-              }),
-          )
-        }
-
-        // diagnosis
-        if (isShowDiagnosis) {
-          diagnosis = diagnosis.concat(
-            current.diagnosis.map(o => {
-              let currentComplication = o.corComplication.map(c => {
-                const selectItem = ctcomplication.find(
-                  cc => cc.id === c.complicationFK,
-                )
-                return {
-                  ...c,
-                  name: selectItem ? selectItem.name : undefined,
-                }
-              })
-              return {
-                visitFK: current.currentId,
-                diagnosisDescription: o.diagnosisDescription,
-                complication: currentComplication
-                  .filter(c => c.name)
-                  .map(c => c.name)
-                  .join(', '),
-              }
-            }),
-          )
-        }
-
-        // Refraction Form Test
-        refractionFormTests = refractionFormTests.concat(
-          visitRefractionFormTests,
-        )
-
-        // Eye Examinations
-        if (isShowEyeExaminations) {
-          const { formData = {} } = current.corEyeExaminationForm
-          eyeExaminations = eyeExaminations.concat(
-            (formData.EyeExaminations || []).map(o => {
-              return {
-                visitFK: current.currentId,
-                rightEye: o.RightEye,
-                eyeExaminationType: o.EyeExaminationType,
-                leftEye: o.LeftEye,
-              }
-            }),
-          )
-        }
-
-        // orders
-        if (isShowOrders) {
-          orders = orders.concat(
-            current.orders.map(o => {
-              return {
-                visitFK: current.currentId,
-                type: o.type,
-                name: o.name,
-                description: o.description,
-                remarks: o.remarks,
-                quantity: o.quantity,
-                uom: o.dispenseUOMDisplayValue,
-              }
-            }),
-          )
-        }
-
-        // Consultation Document
-        if (isShowConsultationDocument) {
-          consultationDocument = consultationDocument.concat(
-            current.documents.map(o => {
-              return {
-                visitFK: current.currentId,
-                type: o.type,
-                subject: o.type === 'Others' ? o.title : o.subject,
-              }
-            }),
-          )
-        }
-
-        //show doctor notes
-        if (isShowDoctorNote) {
-          const newNote = await this.getNotes(selectNoteTypes, current)
-          doctorNote = doctorNote.concat(newNote)
-        }
-      }
-    }
-
-    // for resolve print nothing when not any data in sub table(such as consultationDocument, treatment, diagnosis...)
-    if (consultationDocument.length === 0) {
-      consultationDocument = [{ visitFK: '' }]
-    }
-    const payload = {
-      PatientInfo: this.getPatientInfo(),
-      VisitListing: visitListing,
-      Treatment: treatment,
-      Diagnosis: diagnosis,
-      EyeVisualAcuityTestForms: eyeVisualAcuityTestForms,
-      RefractionFormTests: refractionFormTests,
-      EyeExaminations: eyeExaminations,
-      Orders: orders,
-      ConsultationDocument: consultationDocument,
-      DoctorNote: doctorNote,
-      ReportContext: reportContext,
-    }
-    const payload1 = [
-      {
-        ReportId: 68,
-        Copies: 1,
-        ReportData: JSON.stringify({
-          ...commonDataReaderTransform(payload),
-        }),
-      },
-    ]
-
-    handlePreviewReport(JSON.stringify(payload1))
   }
 
   getFilterBar = () => {
-    const { values, fromModule } = this.props
+    const { values, fromModule, user } = this.props
+    const isStudent =
+      user.data.clinicianProfile?.userProfile?.role?.clinicRoleFK ===
+      CLINICAL_ROLE.STUDENT
     const { isAllDate } = values
-    const { selectItems } = this.state
     return (
       <div>
         <div style={{ display: 'flex' }}>
@@ -1588,7 +901,7 @@ class PatientHistory extends Component {
                   <Checkbox
                     {...args}
                     label='All Date'
-                    style={{ width: fromModule === 'PatientHistory' ? 75 : 70 }}
+                    style={{ width: fromModule === 'PatientHistory' ? 75 : 80 }}
                   />
                 )}
               />
@@ -1608,6 +921,9 @@ class PatientHistory extends Component {
                     marginLeft: 10,
                   }}
                   options={this.getCategoriesOptions()}
+                  groupField='title'
+                  listHeight={576}
+                  virtual={false}
                   {...args}
                 />
               )}
@@ -1622,7 +938,6 @@ class PatientHistory extends Component {
                     marginLeft: 10,
                     marginBottom: -12,
                   }}
-                  label='Doctors'
                   mode='multiple'
                   {...args}
                   maxTagCount={0}
@@ -1651,6 +966,7 @@ class PatientHistory extends Component {
                 color='primary'
                 size='sm'
                 icon={<Search />}
+                justIcon
                 onClick={this.handelSearch}
               >
                 Search
@@ -1659,33 +975,28 @@ class PatientHistory extends Component {
           </div>
         </div>
         <div style={{ display: 'flex' }}>
-          <div
-            style={{
-              position: 'relative',
-              bottom: -4,
-            }}
-          >
-            <div style={{ display: 'inline-Block' }}>
-              <Field
-                name='isSelectAll'
-                render={args => (
-                  <Checkbox
-                    onChange={this.selectAllOnChange}
-                    {...args}
-                    label='Select All'
-                  />
-                )}
-              />
+          {!isStudent && (
+            <div style={{ position: 'relative', top: 10, marginRight: 4 }}>
+              Notes By:
             </div>
-            <div
-              style={{
-                display: 'inline-Block',
-                fontWeight: 500,
-              }}
-            >
-              {`(Selected: ${selectItems.length})`}
-            </div>
-          </div>
+          )}
+          {!isStudent && (
+            <Field
+              name='notesBy'
+              render={args => (
+                <Switch
+                  style={{ width: 200, position: 'relative', top: 0 }}
+                  checkedChildren='Optom.'
+                  checkedValue='Optometrist'
+                  unCheckedChildren='Student'
+                  unCheckedValue='Student'
+                  label=''
+                  onChange={this.onNotesByChange}
+                  {...args}
+                />
+              )}
+            />
+          )}
           <div style={{ marginLeft: 'auto' }}>
             <div
               style={{
@@ -1703,7 +1014,7 @@ class PatientHistory extends Component {
                 <span
                   className='material-icons'
                   style={{
-                    marginTop: 15,
+                    marginTop: 10,
                     fontSize: '1.2rem',
                   }}
                 >
@@ -1737,21 +1048,6 @@ class PatientHistory extends Component {
                 </span>
               </span>
             </div>
-            <Button
-              color='primary'
-              icon={null}
-              size='sm'
-              style={{
-                position: 'relative',
-                bottom: 8,
-                marginLeft: 10,
-              }}
-              disabled={selectItems.length === 0}
-              onClick={this.printHandel}
-            >
-              <Print />
-              Print
-            </Button>
           </div>
         </div>
       </div>
@@ -1759,7 +1055,10 @@ class PatientHistory extends Component {
   }
 
   getConsultationFilterBar = () => {
-    const { values, isFullScreen = true } = this.props
+    const { values, isFullScreen = true, user } = this.props
+    const isStudent =
+      user.data.clinicianProfile?.userProfile?.role?.clinicRoleFK ===
+      CLINICAL_ROLE.STUDENT
     const { isAllDate } = values
     return (
       <div>
@@ -1769,7 +1068,7 @@ class PatientHistory extends Component {
               name='visitTypeIDs'
               render={args => (
                 <VisitTypeSelect
-                  label={formatMessage({ id: 'lab.search.visittype' })}
+                  label='Visit Types'
                   mode='multiple'
                   maxTagPlaceholder='Visit Types'
                   style={{
@@ -1785,7 +1084,7 @@ class PatientHistory extends Component {
             <div
               style={{
                 display: 'inline-Block',
-                marginLeft: 5,
+                marginLeft: 4,
               }}
             >
               <Field
@@ -1806,7 +1105,7 @@ class PatientHistory extends Component {
             <div
               style={{
                 display: 'inline-Block',
-                marginLeft: 5,
+                marginLeft: 4,
               }}
             >
               <Field
@@ -1826,10 +1125,15 @@ class PatientHistory extends Component {
                   style={{
                     width: !isFullScreen ? 150 : 240,
                     display: 'inline-Block',
-                    marginLeft: 5,
+                    marginLeft: 4,
                     marginBottom: -12,
                   }}
                   options={this.getCategoriesOptions()}
+                  groupField='title'
+                  listHeight={576}
+                  virtual={false}
+                  dropdownMatchSelectWidth={false}
+                  dropdownStyle={{ width: 220 }}
                   {...args}
                 />
               )}
@@ -1841,7 +1145,7 @@ class PatientHistory extends Component {
                   style={{
                     width: !isFullScreen ? 150 : 240,
                     display: 'inline-Block',
-                    marginLeft: 5,
+                    marginLeft: 4,
                     marginBottom: -12,
                   }}
                   label='Doctors'
@@ -1863,7 +1167,7 @@ class PatientHistory extends Component {
             <div
               style={{
                 display: 'inline-Block',
-                marginLeft: 5,
+                marginLeft: 4,
                 position: 'relative',
                 top: '-5px',
                 lineHeight: '46px',
@@ -1873,121 +1177,86 @@ class PatientHistory extends Component {
                 color='primary'
                 size='sm'
                 icon={<Search />}
+                justIcon
                 onClick={this.handelSearch}
               >
                 Search
               </ProgressButton>
             </div>
           </div>
-          {isFullScreen && (
-            <div
-              style={{
-                marginLeft: 'auto',
-                position: 'relative',
-                bottom: -10,
-              }}
-            >
-              <div>
-                <span
-                  style={{
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => {
-                    this.setExpandAll(true)
-                  }}
-                >
-                  <span
-                    className='material-icons'
-                    style={{
-                      marginTop: 15,
-                      fontSize: '1.2rem',
-                    }}
-                  >
-                    unfold_more
-                  </span>
-                  <span style={{ position: 'relative', top: -5 }}>
-                    Expand All
-                  </span>
-                </span>
-                <span
-                  style={{
-                    cursor: 'pointer',
-                    marginLeft: 20,
-                    marginRight: 10,
-                  }}
-                  onClick={() => {
-                    this.setExpandAll(false)
-                  }}
-                >
-                  <span
-                    className='material-icons'
-                    style={{
-                      marginTop: 10,
-                      fontSize: '1.2rem',
-                    }}
-                  >
-                    unfold_less
-                  </span>
-                  <span style={{ position: 'relative', top: -5 }}>
-                    Collapse All
-                  </span>
-                </span>
-              </div>
+        </div>
+        <div style={{ display: 'flex' }}>
+          {!isStudent && (
+            <div style={{ position: 'relative', top: 7, marginRight: 4 }}>
+              Notes By:
             </div>
           )}
-        </div>
-        {!isFullScreen && (
-          <div style={{ display: 'flex' }}>
-            <div style={{ marginLeft: 'auto' }}>
-              <div>
+          {!isStudent && (
+            <Field
+              name='notesBy'
+              render={args => (
+                <Switch
+                  style={{ width: 200, position: 'relative', top: 2 }}
+                  checkedChildren='Optom.'
+                  checkedValue='Optometrist'
+                  unCheckedChildren='Student'
+                  unCheckedValue='Student'
+                  onChange={this.onNotesByChange}
+                  label=''
+                  {...args}
+                />
+              )}
+            />
+          )}
+          <div style={{ marginLeft: 'auto' }}>
+            <div>
+              <span
+                style={{
+                  cursor: 'pointer',
+                }}
+                onClick={() => {
+                  this.setExpandAll(true)
+                }}
+              >
                 <span
+                  className='material-icons'
                   style={{
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => {
-                    this.setExpandAll(true)
+                    marginTop: 10,
+                    fontSize: '1.2rem',
                   }}
                 >
-                  <span
-                    className='material-icons'
-                    style={{
-                      marginTop: 15,
-                      fontSize: '1.2rem',
-                    }}
-                  >
-                    unfold_more
-                  </span>
-                  <span style={{ position: 'relative', top: -5 }}>
-                    Expand All
-                  </span>
+                  unfold_more
                 </span>
+                <span style={{ position: 'relative', top: -5 }}>
+                  Expand All
+                </span>
+              </span>
+              <span
+                style={{
+                  cursor: 'pointer',
+                  marginLeft: 20,
+                  marginRight: 10,
+                }}
+                onClick={() => {
+                  this.setExpandAll(false)
+                }}
+              >
                 <span
+                  className='material-icons'
                   style={{
-                    cursor: 'pointer',
-                    marginLeft: 20,
-                    marginRight: 10,
-                  }}
-                  onClick={() => {
-                    this.setExpandAll(false)
+                    marginTop: 10,
+                    fontSize: '1.2rem',
                   }}
                 >
-                  <span
-                    className='material-icons'
-                    style={{
-                      marginTop: 10,
-                      fontSize: '1.2rem',
-                    }}
-                  >
-                    unfold_less
-                  </span>
-                  <span style={{ position: 'relative', top: -5 }}>
-                    Collapse All
-                  </span>
+                  unfold_less
                 </span>
-              </div>
+                <span style={{ position: 'relative', top: -5 }}>
+                  Collapse All
+                </span>
+              </span>
             </div>
           </div>
-        )}
+        </div>
       </div>
     )
   }
@@ -2014,6 +1283,7 @@ class PatientHistory extends Component {
       selectDoctors,
       selectCategories,
       visitTypeIDs,
+      notesBy,
     } = values
     this.setState(
       {
@@ -2022,11 +1292,11 @@ class PatientHistory extends Component {
         pageIndex: 0,
         loadVisits: [],
         activeKey: [],
-        selectItems: [],
         totalVisits: 0,
         selectDoctors,
         visitTypeIDs,
         selectCategories,
+        notesBy,
         isLoadingData: true,
       },
       () => {
@@ -2076,6 +1346,20 @@ class PatientHistory extends Component {
         }
         this.queryVisitHistory()
       },
+    )
+  }
+
+  onNotesByChange = v => {
+    this.setState(
+      {
+        pageIndex: 0,
+        loadVisits: [],
+        activeKey: [],
+        totalVisits: 0,
+        notesBy: v,
+        isLoadingData: true,
+      },
+      this.queryVisitHistory,
     )
   }
 

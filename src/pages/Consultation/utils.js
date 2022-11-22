@@ -3,7 +3,6 @@ import { consultationDocumentTypes, formTypes } from '@/utils/codes'
 import Service from '@/pages/Widgets/Orders/Detail/Service'
 import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
 // import OrderSet from '@/pages/Widgets/Orders/Detail/OrderSet'
-// import Treatment from '@/pages/Widgets/Orders/Detail/Treatment'
 import { SERVICE_CENTER_CATEGORY } from '@/utils/constants'
 
 import moment from 'moment'
@@ -37,14 +36,6 @@ const orderTypes = [
   //   value: ORDER_TYPES.ORDER_SET,
   //   accessRight: 'queue.consultation.order.orderset',
   //   component: props => <OrderSet {...props} />,
-  // },
-  // {
-  //   name: 'Treatment',
-  //   value: ORDER_TYPES.TREATMENT,
-  //   prop: 'corDentalTreatments',
-  //   accessRight: 'queue.consultation.order.treatment',
-  //   getSubject: r => r.itemName,
-  //   component: props => <Treatment {...props} />,
   // },
 ]
 
@@ -86,76 +77,6 @@ const cleanFields = (obj, dirtyFields = []) => {
   return false
 }
 
-const convertEyeForms = values => {
-  const {
-    corEyeRefractionForm,
-    corEyeExaminationForm,
-    corEyeVisualAcuityTest,
-  } = values
-
-  const durtyFields = [
-    'isDeleted',
-    'isNew',
-    'IsSelected',
-    'rowIndex',
-    '_errors',
-  ]
-  if (corEyeRefractionForm) {
-    let { formData = {} } = values.corEyeRefractionForm
-    cleanFields(formData, [...durtyFields, 'OD', 'OS'])
-
-    values.corEyeRefractionForm.formData = _.isEmpty(formData)
-      ? undefined
-      : JSON.stringify(formData)
-  }
-  if (corEyeExaminationForm) {
-    let { formData = {} } = corEyeExaminationForm
-    cleanFields(formData, durtyFields)
-
-    const examinations = formData.EyeExaminations || []
-    const ignoreColumns = ['id', 'EyeExaminationTypeFK', 'EyeExaminationType']
-    const validObjects = examinations.filter(
-      f => _.difference(Object.keys(f), ignoreColumns).length > 0,
-    )
-    formData.EyeExaminations = validObjects
-    values.corEyeExaminationForm.formData =
-      validObjects.length === 0 ? undefined : JSON.stringify(formData)
-  }
-
-  if (typeof corEyeVisualAcuityTest === 'object') {
-    const { eyeVisualAcuityTestForms: testForm } = corEyeVisualAcuityTest
-    const clone = _.cloneDeep(testForm)
-    cleanFields(clone)
-
-    const newTestForm = testForm.reduce((p, c) => {
-      let newItem = clone.find(i => i.id === c.id)
-      if (!newItem) {
-        if (c.id > 0 && c.concurrencyToken && c.isDeleted === false) {
-          return [
-            ...p,
-            {
-              ...c,
-              isDeleted: true,
-            },
-          ]
-        }
-      } else {
-        return [
-          ...p,
-          {
-            ...newItem,
-            isDeleted: c.isDeleted,
-          },
-        ]
-      }
-
-      return p
-    }, [])
-
-    values.corEyeVisualAcuityTest.eyeVisualAcuityTestForms = newTestForm
-  }
-  return values
-}
 const convertConsultationDocument = consultationDocument => {
   let result = {}
   const { rows = [] } = consultationDocument
@@ -185,7 +106,6 @@ const convertToConsultation = (
   })
 
   values = convertClinicalNotesForms(values)
-  values = convertEyeForms(values)
 
   const formRows = forms.rows
   formTypes.forEach(p => {
@@ -205,7 +125,6 @@ const convertToConsultation = (
 }
 
 const convertClinicalNotesForms = values => {
-  let anyChange = false
   formConfigs.forEach(form => {
     var list = getIn(values, form.prop) || []
     var entity = getIn(values, form.prefixProp)
@@ -219,6 +138,7 @@ const convertClinicalNotesForms = values => {
         //add new after unticked
         if (!entity.id) {
           list[0].isDeleted = true
+          entity.lastChangeDate = moment()
           list.push({ ...entity })
         }
         //update old item
@@ -232,11 +152,9 @@ const convertClinicalNotesForms = values => {
     }
     //fist add
     else if (entity) {
+      entity.lastChangeDate = moment()
       list.push(entity)
       values = setIn(values, form.prop, list)
-    }
-    if (!anyChange && !_.isEqual(list, oldList)) {
-      anyChange = true
     }
 
     values = setIn(values, form.prefixProp, undefined)
@@ -246,7 +164,7 @@ const convertClinicalNotesForms = values => {
       item.ocularMotilityScribbleNote = undefined
     })
   })
-  if (anyChange) values.corDoctorNote.lastChangeDate = moment()
+
   return values
 }
 

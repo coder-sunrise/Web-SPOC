@@ -159,7 +159,7 @@ class Paediatric extends PureComponent {
                       <MultipleTextField
                         maxLength={2000}
                         bordered={false}
-                        autoSize={true}
+                        autoSize={{ minRows: 3 }}
                         {...args}
                       />
                     )}
@@ -270,7 +270,7 @@ class Paediatric extends PureComponent {
                       <MultipleTextField
                         maxLength={2000}
                         bordered={false}
-                        autoSize={true}
+                        autoSize={{ minRows: 5 }}
                         {...args}
                       />
                     )}
@@ -306,7 +306,7 @@ class Paediatric extends PureComponent {
                       <MultipleTextField
                         maxLength={2000}
                         bordered={false}
-                        autoSize={true}
+                        autoSize={{ minRows: 3 }}
                         {...args}
                       />
                     )}
@@ -342,7 +342,7 @@ class Paediatric extends PureComponent {
                       <MultipleTextField
                         maxLength={2000}
                         bordered={false}
-                        autoSize={true}
+                        autoSize={{ minRows: 3 }}
                         {...args}
                       />
                     )}

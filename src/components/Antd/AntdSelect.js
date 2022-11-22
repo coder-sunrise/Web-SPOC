@@ -636,16 +636,33 @@ class AntdSelect extends React.PureComponent {
       value: this.state.value,
     }
     let opts = []
-    if (source[0] && source[0][groupField]) {
-      const groups = _.groupBy(source, groupField)
+    if (groupField) {
+      const allOptions = source.filter(s => s[valueField] === allValue)
+      if (allOptions.length) {
+        opts = opts.concat(this.getSelectOptions(allOptions, renderDropdown))
+      }
+
+      const groupOptions = source.filter(s => s[groupField])
+      const groups = _.groupBy(groupOptions, groupField)
       const group = Object.values(groups)
-      opts = group.map(g => {
-        return (
-          <Select.OptGroup key={g[0].title} label={g[0].title}>
-            {this.getSelectOptions(g, renderDropdown)}
-          </Select.OptGroup>
+      opts = opts.concat(
+        group.map(g => {
+          return (
+            <Select.OptGroup key={g[0].title} label={g[0].title}>
+              {this.getSelectOptions(g, renderDropdown)}
+            </Select.OptGroup>
+          )
+        }),
+      )
+
+      const nonGroupOptions = source.filter(
+        s => !s[groupField] && s[valueField] !== allValue,
+      )
+      if (nonGroupOptions.length) {
+        opts = opts.concat(
+          this.getSelectOptions(nonGroupOptions, renderDropdown),
         )
-      })
+      }
     } else {
       opts = this.getSelectOptions(source, renderDropdown)
     }
@@ -718,10 +735,14 @@ class AntdSelect extends React.PureComponent {
             const selectItem = vv.filter(o => o.value !== allValue)
             if (selectItem.length < 1) return null
             if (selectItem.length === 1) {
-              const selectOption = opts.find(
-                opt => opt.props.value === selectItem[0].value,
+              const selectOption = source.find(
+                opt =>
+                  Object.byString(
+                    opt,
+                    restProps.mode === 'tags' ? labelField : valueField,
+                  ) === selectItem[0].value,
               )
-              if (selectOption) return selectOption.props.label
+              if (selectOption) return Object.byString(selectOption, labelField)
               return null
             }
             return `${selectItem.length} ${customTagPlaceholder} selected`
