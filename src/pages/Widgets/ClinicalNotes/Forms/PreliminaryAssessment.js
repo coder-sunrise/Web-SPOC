@@ -8,7 +8,7 @@ const _styles = withStyles(
   theme => ({
     containerTable: {
       width: '100%',
-      border: '1px solid #ccc',
+      // border: '1px solid #ccc',
       borderCollapse: 'separate',
       borderSpacing: '15px',
       '& > tr > td': {
