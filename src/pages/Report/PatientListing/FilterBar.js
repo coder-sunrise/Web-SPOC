@@ -68,6 +68,7 @@ const FilterBar = ({ handleSubmit, values, isSubmitting }) => {
           <ReportDateRangePicker
             fromDateLabel='Visit Date From'
             toDateLabel='Visit Date To'
+            disabled={values?.isAllDate}
           />
 
           <GridItem md={1}>
