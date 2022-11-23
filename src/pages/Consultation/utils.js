@@ -14,15 +14,6 @@ import { getIn, setIn } from 'formik'
 
 const orderTypes = [
   {
-    type: 'Consumable',
-    name: 'Product',
-    value: ORDER_TYPES.CONSUMABLE,
-    prop: 'corConsumable',
-    accessRight: 'queue.consultation.order.consumable',
-    getSubject: r => r.consumableName,
-    component: props => <Consumable {...props} />,
-  },
-  {
     type: 'Service',
     name: 'Service',
     value: ORDER_TYPES.SERVICE,
@@ -30,6 +21,15 @@ const orderTypes = [
     accessRight: 'queue.consultation.order.service',
     getSubject: r => r.serviceName,
     component: props => <Service {...props} />,
+  },
+  {
+    type: 'Consumable',
+    name: 'Product',
+    value: ORDER_TYPES.CONSUMABLE,
+    prop: 'corConsumable',
+    accessRight: 'queue.consultation.order.consumable',
+    getSubject: r => r.consumableName,
+    component: props => <Consumable {...props} />,
   },
   // {
   //   name: 'Order Set',

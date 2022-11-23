@@ -209,7 +209,7 @@ export default ({
         style={{
           textAlign: 'right',
           position: 'relative',
-          paddingRight: 192,
+          paddingRight: 175,
         }}
       >
         <div>Total</div>
@@ -228,7 +228,7 @@ export default ({
         style={{
           textAlign: 'right',
           position: 'relative',
-          paddingRight: 192,
+          paddingRight: 175,
         }}
       >
         <div>Sub Total</div>
@@ -251,7 +251,8 @@ export default ({
         <AuthorizedContext.Provider
           value={getOrderAccessRight(OrderAccessRight(), isEnableEditOrder)}
         >
-          <Checkbox
+          {/* TODO: Show based on setting */}
+          {/* <Checkbox
             simple
             label={`Inclusive GST (${numeral(gstValue).format('0.00')}%)`}
             controlStyle={{ fontWeight: 500 }}
@@ -267,7 +268,8 @@ export default ({
                 type: 'orders/calculateAmount',
               })
             }}
-          />
+          /> */}
+          <span>{`GST Amount (${numeral(gstValue).format('0.00')}%)`}</span>
         </AuthorizedContext.Provider>
         <div style={{ position: 'absolute', right: 68, top: 0 }}>
           <NumberInput value={gst} text currency style={{ width: 90 }} />
@@ -397,8 +399,8 @@ export default ({
         columns={[
           { name: 'type', title: 'Type' },
           { name: 'subject', title: 'Name' },
-          { name: 'priority', title: 'Urgent' },
-          { name: 'description', title: 'Instructions' },
+          // { name: 'priority', title: 'Urgent' },
+          // { name: 'description', title: 'Instructions' },
           { name: 'quantity', title: 'Qty.' },
           { name: 'adjAmount', title: 'Adj.' },
           { name: 'currentTotal', title: 'Total' },
@@ -458,15 +460,15 @@ export default ({
                 let newChildren = []
                 newChildren = [
                   <Table.Cell
-                    colSpan={3}
+                    colSpan={2}
                     key={1}
                     style={{
                       position: 'relative',
                       color: 'rgba(0, 0, 0, 1)',
                     }}
                   ></Table.Cell>,
-                  React.cloneElement(children[6], {
-                    colSpan: 2,
+                  React.cloneElement(children[4], {
+                    colSpan: 1,
                     ...restProps,
                   }),
                 ]
@@ -482,19 +484,16 @@ export default ({
                 const { children, column } = p
                 if (column.name === 'currentTotal') {
                   const items = children.props.children
-                  const itemAdj = items.splice(0, items.length - 3)
+                  const itemAdj = items.splice(0, items.length - 2)
                   const itemGST = items.splice(
-                    items.length - 3,
-                    items.length - 2,
-                  )
-                  const itemTotal = items.splice(
                     items.length - 2,
                     items.length - 1,
                   )
-                  const itemSubTotal = items.splice(items.length - 1)
+                  const itemTotal = items.splice(items.length - 1, items.length)
+                  const itemSubTotal = items.splice(items.length)
                   return (
                     <Table.Cell
-                      colSpan={5}
+                      colSpan={4}
                       style={{
                         fontSize: 'inherit',
                         color: 'inherit',
@@ -657,25 +656,25 @@ export default ({
               )
             },
           },
-          {
-            columnName: 'description',
-            width: isFullScreen ? 300 : 150,
-            observeFields: ['instruction', 'remark', 'remarks'],
-            render: row => {
-              return (
-                <Tooltip title={row.instruction}>
-                  <div
-                    style={{
-                      wordWrap: 'break-word',
-                      whiteSpace: 'pre-wrap',
-                    }}
-                  >
-                    {row.instruction || ''}
-                  </div>
-                </Tooltip>
-              )
-            },
-          },
+          // {
+          //   columnName: 'description',
+          //   width: isFullScreen ? 300 : 150,
+          //   observeFields: ['instruction', 'remark', 'remarks'],
+          //   render: row => {
+          //     return (
+          //       <Tooltip title={row.instruction}>
+          //         <div
+          //           style={{
+          //             wordWrap: 'break-word',
+          //             whiteSpace: 'pre-wrap',
+          //           }}
+          //         >
+          //           {row.instruction || ''}
+          //         </div>
+          //       </Tooltip>
+          //     )
+          //   },
+          // },
           {
             columnName: 'adjAmount',
             type: 'currency',
@@ -794,39 +793,39 @@ export default ({
               )
             },
           },
-          {
-            columnName: 'priority',
-            width: 70,
-            align: 'center',
-            sortingEnabled: false,
-            render: row => {
-              if (row.type !== ORDER_TYPES.SERVICE) return ''
-              const editAccessRight = OrderItemAccessRight(row)
-              return (
-                <AuthorizedContext.Provider
-                  value={getOrderAccessRight(editAccessRight)}
-                >
-                  <Switch
-                    checkedValue='Urgent'
-                    unCheckedValue='Normal'
-                    value={row.priority}
-                    className={classes.switchContainer}
-                    preventToggle
-                    disabled={row.isEditingEntity}
-                    onClick={checked => {
-                      dispatch({
-                        type: 'orders/updatePriority',
-                        payload: {
-                          uid: row.uid,
-                          priority: checked ? 'Urgent' : 'Normal',
-                        },
-                      })
-                    }}
-                  />
-                </AuthorizedContext.Provider>
-              )
-            },
-          },
+          // {
+          //   columnName: 'priority',
+          //   width: 70,
+          //   align: 'center',
+          //   sortingEnabled: false,
+          //   render: row => {
+          //     if (row.type !== ORDER_TYPES.SERVICE) return ''
+          //     const editAccessRight = OrderItemAccessRight(row)
+          //     return (
+          //       <AuthorizedContext.Provider
+          //         value={getOrderAccessRight(editAccessRight)}
+          //       >
+          //         <Switch
+          //           checkedValue='Urgent'
+          //           unCheckedValue='Normal'
+          //           value={row.priority}
+          //           className={classes.switchContainer}
+          //           preventToggle
+          //           disabled={row.isEditingEntity}
+          //           onClick={checked => {
+          //             dispatch({
+          //               type: 'orders/updatePriority',
+          //               payload: {
+          //                 uid: row.uid,
+          //                 priority: checked ? 'Urgent' : 'Normal',
+          //               },
+          //             })
+          //           }}
+          //         />
+          //       </AuthorizedContext.Provider>
+          //     )
+          //   },
+          // },
         ]}
       />
     </Fragment>
