@@ -13,13 +13,13 @@ const styles = theme => ({
   cellStyle: {
     border: '1px solid #CCCC',
     padding: '8px 4px',
-    verticalAlign: 'top',
+    whiteSpace: 'pre-wrap',
   },
   centerCellStyle: {
     border: '1px solid #CCCC',
     padding: '8px 4px',
     textAlign: 'center',
-    verticalAlign: 'top',
+    whiteSpace: 'pre-wrap',
   },
   textWithBorder: {
     border: '1px solid #CCCCCC',
