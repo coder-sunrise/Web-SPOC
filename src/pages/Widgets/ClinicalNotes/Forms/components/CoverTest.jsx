@@ -1,9 +1,9 @@
 import { Button, Field, MultipleTextField, Checkbox } from '@/components'
-import { PureComponent, useState } from 'react'
-import Grid from '@material-ui/core/Grid'
+import { useRef } from 'react'
 import Close from '@material-ui/icons/Close'
 import { compose } from 'redux'
 import { withStyles } from '@material-ui/core/styles'
+import { useHover } from 'ahooks'
 
 const _styles = withStyles(
   theme => ({
@@ -26,9 +26,19 @@ const _styles = withStyles(
   { withTheme: true },
 )
 
-class CoverTest extends PureComponent {
-  getPrefix() {
-    let { index, propName } = this.props
+const CoverTest = props => {
+  let {
+    index,
+    propName,
+    arrayHelpers: {
+      form: { values, setFieldValue },
+    },
+    targetVal,
+    theme: { spacing },
+    classes,
+  } = props
+
+  let getPrefix = () => {
     let prefix = propName
     if (index >= 0) {
       prefix += `[${index}]`
@@ -37,14 +47,7 @@ class CoverTest extends PureComponent {
     return prefix
   }
 
-  deleteCoverTest = () => {
-    let {
-      arrayHelpers: {
-        form: { values, setFieldValue },
-      },
-      targetVal,
-      propName,
-    } = this.props
+  let deleteCoverTest = () => {
     let oldCoverTestList = _.get(values, propName) || []
     let newCoverTestList = _.cloneDeep(oldCoverTestList)
     newCoverTestList.map(item => {
@@ -57,63 +60,67 @@ class CoverTest extends PureComponent {
     setFieldValue(propName, newCoverTestList)
   }
 
-  render() {
-    const {
-      theme: { spacing },
-      classes,
-    } = this.props
-    let prefix = this.getPrefix()
-    return (
-      <div>
-        <table className={classes.itemTable}>
-          <tr>
-            <td rowspan='2' width='30%'>
-              <div>
-                <div
-                  style={{ position: 'absolute', top: spacing(2), left: '5px' }}
-                >
-                  <p>CoverTest</p>
-                  <p style={{ fontSize: '0.8rem' }}>
-                    <em>(including its magnitude and direction)</em>
-                  </p>
+  let prefix = getPrefix()
+  let ref = useRef(null)
+  let isShowCloseBtn =
+    useHover(ref) &&
+    _.get(values, propName)?.filter(
+      coverTestItem =>
+        coverTestItem.isDeleted == false ||
+        coverTestItem.isDeleted == undefined,
+    ).length > 1
+  return (
+    <div>
+      <table className={classes.itemTable}>
+        <tr>
+          <td rowspan='2' width='30%'>
+            <div>
+              <div
+                style={{ position: 'absolute', top: spacing(2), left: '5px' }}
+              >
+                <p>CoverTest</p>
+                <p style={{ fontSize: '0.8rem' }}>
+                  <em>(including its magnitude and direction)</em>
+                </p>
+              </div>
+              <div
+                style={{
+                  position: 'absolute',
+                  top: spacing(10),
+                  left: '5px',
+                }}
+              >
+                <div style={{ display: 'inline-block' }}>
+                  <Field
+                    name={`${prefix}withRx`}
+                    render={args => {
+                      return (
+                        <Checkbox
+                          onChange={e => {}}
+                          label='with Rx'
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
                 </div>
                 <div
-                  style={{
-                    position: 'absolute',
-                    top: spacing(10),
-                    left: '5px',
-                  }}
+                  style={{ display: 'inline-block', marginLeft: spacing(3) }}
                 >
-                  <div style={{ display: 'inline-block' }}>
-                    <Field
-                      name={`${prefix}withRx`}
-                      render={args => {
-                        return (
-                          <Checkbox
-                            onChange={e => {}}
-                            label='with Rx'
-                            {...args}
-                          />
-                        )
-                      }}
-                    />
-                  </div>
-                  <div
-                    style={{ display: 'inline-block', marginLeft: spacing(3) }}
-                  >
-                    <Field
-                      name={`${prefix}withoutRx`}
-                      render={args => {
-                        return <Checkbox label='without Rx' {...args} />
-                      }}
-                    />
-                  </div>
+                  <Field
+                    name={`${prefix}withoutRx`}
+                    render={args => {
+                      return <Checkbox label='without Rx' {...args} />
+                    }}
+                  />
                 </div>
               </div>
-            </td>
-            <td width='5%'>D</td>
-            <td>
-              <div>
+            </div>
+          </td>
+          <td width='5%'>D</td>
+          <td>
+            <div ref={ref}>
+              {isShowCloseBtn && (
                 <Button
                   color='danger'
                   style={{
@@ -124,48 +131,48 @@ class CoverTest extends PureComponent {
                   }}
                   size='sm'
                   onClick={() => {
-                    this.deleteCoverTest()
+                    deleteCoverTest()
                   }}
                   justIcon
                 >
                   <Close />
                 </Button>
-                <Field
-                  name={`${prefix}coverTestD`}
-                  render={args => (
-                    <MultipleTextField
-                      maxLength={2000}
-                      bordered={false}
-                      autoSize={{ minRows: 3 }}
-                      {...args}
-                    />
-                  )}
-                />
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td width='5%'>N</td>
-            <td>
-              <div>
-                <Field
-                  name={`${prefix}coverTestN`}
-                  render={args => (
-                    <MultipleTextField
-                      maxLength={2000}
-                      bordered={false}
-                      autoSize={{ minRows: 3 }}
-                      {...args}
-                    />
-                  )}
-                />
-              </div>
-            </td>
-          </tr>
-        </table>
-      </div>
-    )
-  }
+              )}
+              <Field
+                name={`${prefix}coverTestD`}
+                render={args => (
+                  <MultipleTextField
+                    maxLength={2000}
+                    bordered={false}
+                    autoSize={{ minRows: 3 }}
+                    {...args}
+                  />
+                )}
+              />
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td width='5%'>N</td>
+          <td>
+            <div>
+              <Field
+                name={`${prefix}coverTestN`}
+                render={args => (
+                  <MultipleTextField
+                    maxLength={2000}
+                    bordered={false}
+                    autoSize={{ minRows: 3 }}
+                    {...args}
+                  />
+                )}
+              />
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  )
 }
 
 export default compose(_styles)(CoverTest)
