@@ -12,6 +12,8 @@ import { getUniqueId } from '@/utils/utils'
 import { Delete, Add, Edit } from '@material-ui/icons'
 import { Input } from 'antd'
 import withStyles from '@material-ui/core/styles/withStyles'
+import { CLINICALNOTE_FORMTHUMBNAIL } from '@/utils/constants'
+import _ from 'lodash'
 
 const style = theme => ({
   inputSplit: {
@@ -41,6 +43,11 @@ const style = theme => ({
 })
 const base64Prefix = 'data:image/jpeg;base64,'
 
+const defaultScribble = subject => ({
+  thumbnail: CLINICALNOTE_FORMTHUMBNAIL.CONTACTLENSFITTING,
+  subject,
+})
+
 class ContactLensFitting extends PureComponent {
   constructor(props) {
     super(props)
@@ -60,10 +67,19 @@ class ContactLensFitting extends PureComponent {
         ...items,
         {
           uid: getUniqueId(),
+          rightScribbleNote: {
+            thumbnail: CLINICALNOTE_FORMTHUMBNAIL.CONTACTLENSFITTING,
+            subject: 'Right Eye',
+          },
+          leftScribbleNote: {
+            thumbnail: CLINICALNOTE_FORMTHUMBNAIL.CONTACTLENSFITTING,
+            subject: 'Left Eye',
+          },
         },
       ],
     })
   }
+
   render() {
     const {
       prefixProp,
@@ -77,6 +93,7 @@ class ContactLensFitting extends PureComponent {
       position,
       thumbnailDisplaySize,
     } = this.props
+    const listProp = `${prefixProp}.corContactLensFitting_Item`
     return (
       <GridContainer>
         <GridItem md={12}>
@@ -96,14 +113,11 @@ class ContactLensFitting extends PureComponent {
           >
             <div style={{ fontWeight: 500 }}> Present Spectacles Details</div>
             <FieldArray
-              name={`${prefixProp}.corContactLensFitting_Item`}
+              name={listProp}
               render={arrayHelpers => {
                 this.arrayHelpers = arrayHelpers
                 const contactLensFitting_Items =
-                  getIn(
-                    arrayHelpers.form.values,
-                    `${prefixProp}.corContactLensFitting_Item`,
-                  ) || []
+                  getIn(arrayHelpers.form.values, listProp) || []
                 const activeItems = contactLensFitting_Items.filter(
                   val => !val.isDeleted,
                 )
@@ -111,7 +125,7 @@ class ContactLensFitting extends PureComponent {
                   const i = contactLensFitting_Items.findIndex(item =>
                     val.id ? item.id === val.id : val.uid === item.uid,
                   )
-                  const itemProp = `${prefixProp}.corContactLensFitting_Item[${i}]`
+                  const itemProp = `${listProp}[${i}]`
                   return (
                     <GridContainer>
                       <GridItem md={11}>
@@ -135,8 +149,19 @@ class ContactLensFitting extends PureComponent {
                                   size='sm'
                                   style={{ marginLeft: 8 }}
                                   onClick={() => {
+                                    const rsn = _.get(
+                                      `${itemProp}.rightScribbleNote`,
+                                    )
+                                    if (!rsn) {
+                                      _.set(
+                                        values,
+                                        `${itemProp}.rightScribbleNote`,
+                                        defaultScribble('Right Eye'),
+                                      )
+                                    }
+
                                     editScribbleNote(
-                                      prefixProp,
+                                      itemProp,
                                       'rightScribbleNote',
                                       'rightScribbleNoteFK',
                                       defaultImage,
@@ -160,20 +185,30 @@ class ContactLensFitting extends PureComponent {
                                 }}
                               >
                                 <FastField
-                                  name={`${prefixProp}.rightScribbleNote`}
+                                  name={`${itemProp}.rightScribbleNote`}
                                   render={args => {
+                                    let src = ''
+                                    let alt = ''
                                     if (
                                       !args.field.value?.thumbnail ||
                                       args.field.value?.thumbnail === ''
                                     ) {
-                                      return ''
+                                      const {
+                                        thumbnail,
+                                        subject,
+                                      } = defaultScribble('Right Eye')
+
+                                      src = `${base64Prefix}${thumbnail}`
+                                      alt = subject
+                                    } else {
+                                      src = `${base64Prefix}${args.field.value.thumbnail}`
+                                      alt = args.field.value.subject
                                     }
-                                    let src = `${base64Prefix}${args.field.value.thumbnail}`
                                     return (
                                       <div>
                                         <img
                                           src={src}
-                                          alt={args.field.value.subject}
+                                          alt={alt}
                                           style={{
                                             maxHeight:
                                               thumbnailDisplaySize.height,
@@ -199,8 +234,19 @@ class ContactLensFitting extends PureComponent {
                                   size='sm'
                                   style={{ marginLeft: 8 }}
                                   onClick={() => {
+                                    const lsn = _.get(
+                                      `${itemProp}.leftScribbleNote`,
+                                    )
+                                    if (!lsn) {
+                                      _.set(
+                                        values,
+                                        `${itemProp}.leftScribbleNote`,
+                                        defaultScribble('Left Eye'),
+                                      )
+                                    }
+
                                     editScribbleNote(
-                                      prefixProp,
+                                      itemProp,
                                       'leftScribbleNote',
                                       'leftScribbleNoteFK',
                                       defaultImage,
@@ -224,20 +270,31 @@ class ContactLensFitting extends PureComponent {
                                 }}
                               >
                                 <FastField
-                                  name={`${prefixProp}.leftScribbleNote`}
+                                  name={`${itemProp}.leftScribbleNote`}
                                   render={args => {
+                                    let src = ''
+                                    let alt = ''
                                     if (
                                       !args.field.value?.thumbnail ||
                                       args.field.value?.thumbnail === ''
                                     ) {
-                                      return ''
+                                      const {
+                                        thumbnail,
+                                        subject,
+                                      } = defaultScribble('Left Eye')
+
+                                      src = `${base64Prefix}${thumbnail}`
+                                      alt = subject
+                                    } else {
+                                      src = `${base64Prefix}${args.field.value.thumbnail}`
+                                      alt = args.field.value.subject
                                     }
-                                    const src = `${base64Prefix}${args.field.value.thumbnail}`
+
                                     return (
                                       <div>
                                         <img
                                           src={src}
-                                          alt={args.field.value.subject}
+                                          alt={alt}
                                           style={{
                                             maxHeight:
                                               thumbnailDisplaySize.height,
@@ -255,7 +312,7 @@ class ContactLensFitting extends PureComponent {
                           <tr>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.reLensDetails`}
+                                name={`${itemProp}.reLensDetails`}
                                 render={args => (
                                   <Input.TextArea
                                     placeholder='Brand / BC / DIA / PWR'
@@ -273,7 +330,7 @@ class ContactLensFitting extends PureComponent {
                             </td>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.leLensDetails`}
+                                name={`${itemProp}.leLensDetails`}
                                 render={args => (
                                   <Input.TextArea
                                     placeholder='Brand / BC / DIA / PWR'
@@ -290,7 +347,7 @@ class ContactLensFitting extends PureComponent {
                           <tr>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.reComfort`}
+                                name={`${itemProp}.reComfort`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -308,7 +365,7 @@ class ContactLensFitting extends PureComponent {
                             </td>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.leComfort`}
+                                name={`${itemProp}.leComfort`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -325,7 +382,7 @@ class ContactLensFitting extends PureComponent {
                           <tr>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.reCoverage`}
+                                name={`${itemProp}.reCoverage`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -343,7 +400,7 @@ class ContactLensFitting extends PureComponent {
                             </td>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.leCoverage`}
+                                name={`${itemProp}.leCoverage`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -360,7 +417,7 @@ class ContactLensFitting extends PureComponent {
                           <tr>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.reCentration`}
+                                name={`${itemProp}.reCentration`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -378,7 +435,7 @@ class ContactLensFitting extends PureComponent {
                             </td>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.leCentration`}
+                                name={`${itemProp}.leCentration`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -395,7 +452,7 @@ class ContactLensFitting extends PureComponent {
                           <tr>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.reLagSag`}
+                                name={`${itemProp}.reLagSag`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -413,7 +470,7 @@ class ContactLensFitting extends PureComponent {
                             </td>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.leLagSag`}
+                                name={`${itemProp}.leLagSag`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -430,7 +487,7 @@ class ContactLensFitting extends PureComponent {
                           <tr>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.reMovementPGM`}
+                                name={`${itemProp}.reMovementPGM`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -448,7 +505,7 @@ class ContactLensFitting extends PureComponent {
                             </td>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.leMovementPGM`}
+                                name={`${itemProp}.leMovementPGM`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -465,7 +522,7 @@ class ContactLensFitting extends PureComponent {
                           <tr>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.reMovementUpgaze`}
+                                name={`${itemProp}.reMovementUpgaze`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -483,7 +540,7 @@ class ContactLensFitting extends PureComponent {
                             </td>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.leMovementUpgaze`}
+                                name={`${itemProp}.leMovementUpgaze`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -500,7 +557,7 @@ class ContactLensFitting extends PureComponent {
                           <tr>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.reMovementPushup`}
+                                name={`${itemProp}.reMovementPushup`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -518,7 +575,7 @@ class ContactLensFitting extends PureComponent {
                             </td>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.leMovementPushup`}
+                                name={`${itemProp}.leMovementPushup`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -535,7 +592,7 @@ class ContactLensFitting extends PureComponent {
                           <tr>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.reVADN`}
+                                name={`${itemProp}.reVADN`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -553,7 +610,7 @@ class ContactLensFitting extends PureComponent {
                             </td>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.leVADN`}
+                                name={`${itemProp}.leVADN`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -570,7 +627,7 @@ class ContactLensFitting extends PureComponent {
                           <tr>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.reOverRxVA`}
+                                name={`${itemProp}.reOverRxVA`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -588,7 +645,7 @@ class ContactLensFitting extends PureComponent {
                             </td>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.leOverRxVA`}
+                                name={`${itemProp}.leOverRxVA`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -605,7 +662,7 @@ class ContactLensFitting extends PureComponent {
                           <tr>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.reConclusionOfLensFit`}
+                                name={`${itemProp}.reConclusionOfLensFit`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -623,7 +680,7 @@ class ContactLensFitting extends PureComponent {
                             </td>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${prefixProp}.leConclusionOfLensFit`}
+                                name={`${itemProp}.leConclusionOfLensFit`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''

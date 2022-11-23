@@ -158,14 +158,6 @@ export const formConfigs = [
     thumbnailDisplaySize: { width: 260, height: 130 },
     defaultValue: {
       lastChangeDate: moment(),
-      rightScribbleNote: {
-        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.CONTACTLENSFITTING,
-        subject: 'Right Eye',
-      },
-      leftScribbleNote: {
-        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.CONTACTLENSFITTING,
-        subject: 'Left Eye',
-      },
     },
     defaultImage: ContactLensFitting,
   },
