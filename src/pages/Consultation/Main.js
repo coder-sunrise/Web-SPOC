@@ -537,7 +537,7 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
   validationSchema: schema,
   enableReinitialize: false,
   onSecondConfirm: pauseConsultation,
-  secondConfirmText: 'Pause',
+  secondConfirmText: 'Save',
   confirmText: 'Discard',
   dirtyCheckMessage: onPageLeaveMessage,
   notDirtyDuration: 0, // this page should alwasy show warning message when leave
