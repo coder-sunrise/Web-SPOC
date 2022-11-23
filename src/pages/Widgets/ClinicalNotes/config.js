@@ -63,7 +63,7 @@ export const formConfigs = [
         thumbnail: CLINICALNOTE_FORMTHUMBNAIL.CONFRONTATION,
         subject: 'Confrontation',
       },
-    }, 
+    },
   },
   {
     id: CLINICALNOTE_FORM.ANTERIOREYEEXAMINATION,
@@ -128,6 +128,9 @@ export const formConfigs = [
     }),
     prop: 'corDoctorNote.corManagement',
     prefixProp: 'corDoctorNote.corManagementEntity',
+    defaultValue: {
+      lastChangeDate: moment(),
+    },
   },
   {
     id: CLINICALNOTE_FORM.CONTACTLENSFITTING,
