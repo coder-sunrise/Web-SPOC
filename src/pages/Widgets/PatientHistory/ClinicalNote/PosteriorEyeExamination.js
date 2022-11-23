@@ -27,7 +27,7 @@ const PosteriorEyeExamination = props => {
     <GridContainer>
       <GridItem md={12}>
         <span style={{ fontSize: '1.1rem', fontWeight: 500 }}>
-          Anterior Eye Examination
+          Posterior Eye Examination
         </span>
       </GridItem>
       <GridItem md={7} style={{ position: 'relative', top: 6 }}>

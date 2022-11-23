@@ -2,13 +2,13 @@ import React, { Component } from 'react'
 import { Collapse } from 'antd'
 import _ from 'lodash'
 import moment from 'moment'
-import { Edit, Print } from '@material-ui/icons'
+import { Edit } from '@material-ui/icons'
 import { connect } from 'dva'
-import { history, formatMessage } from 'umi'
+import { history } from 'umi'
 import { Field } from 'formik'
 import Search from '@material-ui/icons/Search'
 import { VisitTypeTag } from '@/components/_medisys'
-import { withStyles, Link } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import { Tooltip } from '@/components'
 import {
   CardContainer,
@@ -22,7 +22,7 @@ import {
   VisitTypeSelect,
   dateFormatLong,
   dateFormatLongWithTimeNoSec,
-  Switch,
+  RadioGroup,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 // utils
@@ -49,7 +49,6 @@ const defaultValue = {
   visitTypeIDs: [-99],
   selectCategories: [],
   isAllDate: true,
-  notesBy: 'Optometrist',
 }
 
 const styles = theme => ({
@@ -258,14 +257,7 @@ class PatientHistory extends Component {
       selectCategories = [],
       notesBy,
     } = this.state
-    const {
-      dispatch,
-      clinicSettings,
-      patientHistory,
-      setFieldValue,
-      values,
-      user,
-    } = this.props
+    const { dispatch, clinicSettings, patientHistory, user } = this.props
     const isStudent =
       user.data.clinicianProfile?.userProfile?.role?.clinicRoleFK ===
       CLINICAL_ROLE.STUDENT
@@ -430,6 +422,8 @@ class PatientHistory extends Component {
         style={{
           padding: '5px 0px 4px 0px',
           height: 40,
+          backgroundColor:
+            isStudent || notesBy === 'Optometrist' ? '#c8dafd' : '#EAEDF7',
         }}
         onClick={() => {
           this.setState(preState => {
@@ -453,7 +447,6 @@ class PatientHistory extends Component {
             style={{
               display: 'flex',
               alignItems: 'center',
-              marginLeft: fromModule !== 'Consultation' ? -14 : 0,
             }}
           >
             <span
@@ -647,7 +640,7 @@ class PatientHistory extends Component {
   }
 
   getDetailPanel = history => {
-    const { isFullScreen = true, classes, clinicSettings } = this.props
+    const { isFullScreen = true, classes } = this.props
     const { selectCategories = [] } = this.state
     const { visitPurposeFK, isNurseNote, nurseNotes } = history
     if (isNurseNote) {
@@ -695,8 +688,6 @@ class PatientHistory extends Component {
         isNurseNote,
       )
     })
-
-    const { settings = {} } = clinicSettings
     const isShowContent = currentTagWidgets.length > 0
 
     return (
@@ -976,25 +967,20 @@ class PatientHistory extends Component {
         </div>
         <div style={{ display: 'flex' }}>
           {!isStudent && (
-            <div style={{ position: 'relative', top: 10, marginRight: 4 }}>
+            <div style={{ position: 'relative', top: 10, marginRight: 8 }}>
               Notes By:
             </div>
           )}
           {!isStudent && (
-            <Field
-              name='notesBy'
-              render={args => (
-                <Switch
-                  style={{ width: 200, position: 'relative', top: 0 }}
-                  checkedChildren='Optom.'
-                  checkedValue='Optometrist'
-                  unCheckedChildren='Student'
-                  unCheckedValue='Student'
-                  label=''
-                  onChange={this.onNotesByChange}
-                  {...args}
-                />
-              )}
+            <RadioGroup
+              style={{ width: 200, position: 'relative', top: 0 }}
+              label=''
+              options={[
+                { label: 'Optometrist', value: 'Optometrist' },
+                { label: 'Student', value: 'Student' },
+              ]}
+              onChange={this.onNotesByChange}
+              value={this.state.notesBy}
             />
           )}
           <div style={{ marginLeft: 'auto' }}>
@@ -1187,25 +1173,20 @@ class PatientHistory extends Component {
         </div>
         <div style={{ display: 'flex' }}>
           {!isStudent && (
-            <div style={{ position: 'relative', top: 7, marginRight: 4 }}>
+            <div style={{ position: 'relative', top: 7, marginRight: 8 }}>
               Notes By:
             </div>
           )}
           {!isStudent && (
-            <Field
-              name='notesBy'
-              render={args => (
-                <Switch
-                  style={{ width: 200, position: 'relative', top: 2 }}
-                  checkedChildren='Optom.'
-                  checkedValue='Optometrist'
-                  unCheckedChildren='Student'
-                  unCheckedValue='Student'
-                  onChange={this.onNotesByChange}
-                  label=''
-                  {...args}
-                />
-              )}
+            <RadioGroup
+              style={{ width: 200, position: 'relative', top: 0 }}
+              label=''
+              options={[
+                { label: 'Optometrist', value: 'Optometrist' },
+                { label: 'Student', value: 'Student' },
+              ]}
+              onChange={this.onNotesByChange}
+              value={this.state.notesBy}
             />
           )}
           <div style={{ marginLeft: 'auto' }}>
@@ -1283,7 +1264,6 @@ class PatientHistory extends Component {
       selectDoctors,
       selectCategories,
       visitTypeIDs,
-      notesBy,
     } = values
     this.setState(
       {
@@ -1296,12 +1276,10 @@ class PatientHistory extends Component {
         selectDoctors,
         visitTypeIDs,
         selectCategories,
-        notesBy,
         isLoadingData: true,
       },
       () => {
         const currentSelectCategories = selectCategories.filter(o => o !== -99)
-        const currentSelectVisitTypeIds = visitTypeIDs.filter(o => o !== -99)
         const newPreference = [
           {
             SelectCategories: currentSelectCategories || [],
@@ -1356,7 +1334,7 @@ class PatientHistory extends Component {
         loadVisits: [],
         activeKey: [],
         totalVisits: 0,
-        notesBy: v,
+        notesBy: v.target.value,
         isLoadingData: true,
       },
       this.queryVisitHistory,
@@ -1421,6 +1399,7 @@ class PatientHistory extends Component {
                         key={o.currentId}
                         style={{ border: '1px solid #d9d9d9', borderRadius: 5 }}
                         className={customtyles.customPanel}
+                        showArrow={false}
                       >
                         {this.getDetailPanel(o)}
                       </Collapse.Panel>

@@ -421,7 +421,7 @@ class Scribble extends React.Component {
       })
     }
 
-    this.queryTemplateList()
+    //this.queryTemplateList()
 
     if (this.props.scribbleData !== '') {
       if (this.props.scribbleData.scribbleNoteLayers.length > 0) {
@@ -1467,7 +1467,7 @@ class Scribble extends React.Component {
                 }
               />
             </div>
-            {!isReadonly && (
+            {false && !isReadonly && (
               <div style={{ position: 'absolute', right: 0, width: 280 }}>
                 <GridContainer>
                   <GridItem xs={12} md={12}>
