@@ -17,6 +17,7 @@ export const constructPayload = values => {
     mode,
     signatureName,
     signature,
+    consReady,
   } = values
   const { invoiceItems, ...restInvoice } = invoice
   const gstValue = invoice.gstValue || 0
@@ -141,6 +142,7 @@ export const constructPayload = values => {
     concurrencyToken,
     visitId,
     visitStatus,
+    consReady,
     invoicePayment: invoicePayment
       .filter(item => {
         if (item.id && item.isCancelled) return true
