@@ -18,6 +18,7 @@ import {
   OutlinedTextField,
   WarningSnackbar,
   Field,
+  Checkbox,
   CheckboxGroup,
 } from '@/components'
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
@@ -217,6 +218,7 @@ const getDispenseEntity = (codetable, clinicSettings, entity = {}) => {
           finalPayable,
           visitId: billing.visitID,
           visitPurposeFK,
+          consReady: billing.entity.consReady,
           autoPrintReportsOnCompletePayment: autoPrintReportsOnCompletePayment.split(
             ',',
           ),
@@ -426,6 +428,7 @@ class Billing extends Component {
       visitStatus,
       invoicePayer = [],
       autoPrintReportsOnCompletePayment = [],
+      consReady,
     } = values
     try {
       const isSchemesValid = noValidation
@@ -1193,6 +1196,19 @@ class Billing extends Component {
                 >
                   Complete Payment
                 </Button>
+                <div style={{ textAlign: 'left', paddingLeft: 10 }}>
+                  <Field
+                    name='consReady'
+                    render={args => {
+                      return (
+                        <Checkbox
+                          label='Update visit consultation ready to Yes'
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </div>
               </div>
             </React.Fragment>
           </GridItem>
