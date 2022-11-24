@@ -24,6 +24,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, values, setFieldValue }) => {
           <ReportDateRangePicker
             fromDateLabel='Statement From Date'
             toDateLabel='Statement To Date'
+            disabled={values?.asAt}
           />
           <GridItem md={1}>
             <FastField
@@ -37,6 +38,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, values, setFieldValue }) => {
             toDateLabel='Statement Due End Date'
             fromDateFieldName='dueDateFrom'
             toDateFieldName='dueDateTo'
+            disabled={values?.isAllDueDate}
           />
           <GridItem md={1}>
             <FastField
