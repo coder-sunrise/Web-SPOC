@@ -967,42 +967,11 @@ class Service extends PureComponent {
             </GridItem>
           </GridContainer>
           <GridContainer>
-            <GridItem xs={4}>
+            <GridItem xs={8}>
               <TextField
                 disabled
                 label='Service Name'
                 value={editService.serviceName}
-              />
-            </GridItem>
-            <GridItem xs={4}>
-              <Field
-                name='serviceCenterFK'
-                render={args => {
-                  return (
-                    <Select
-                      disabled={!editServiceId}
-                      allowClear={false}
-                      label='Service Center Name'
-                      options={serviceCenters.filter(o =>
-                        o.services.find(m => m.value === editServiceId),
-                      )}
-                      onChange={value => {
-                        editService.serviceCenterFK = value
-                        if (value) {
-                          this.getServiceCenterService(editService)
-                          setFieldValue('quantity', editService.quantity)
-                          setFieldValue('total', editService.total)
-                          setFieldValue(
-                            'totalAfterItemAdjustment',
-                            editService.totalAfterItemAdjustment,
-                          )
-                        }
-                        setFieldValue('serviceItems', [...serviceItems])
-                      }}
-                      {...args}
-                    />
-                  )
-                }}
               />
             </GridItem>
             <GridItem xs={3}>
@@ -1041,39 +1010,36 @@ class Service extends PureComponent {
             </GridItem>
           </GridContainer>
           <GridContainer>
-            <GridItem
-              xs={8}
-              className={classes.editor}
-              style={{ paddingRight: 35 }}
-            >
-              <div style={{ position: 'relative' }}>
-                <TextField
-                  value={editService.instruction}
-                  disabled={!editServiceId}
-                  label='Instructions'
-                  onChange={e => {
-                    editService.instruction = e.target.value
-                    setFieldValue('serviceItems', [...serviceItems])
-                  }}
-                />
-                <CannedTextButton
-                  disabled={!editServiceId}
-                  cannedTextTypeFK={CANNED_TEXT_TYPE.SERVICEINSTRUCTION}
-                  style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    right: -35,
-                  }}
-                  handleSelectCannedText={cannedText => {
-                    editService.instruction = `${
-                      editService.instruction
-                        ? editService.instruction + '\n'
-                        : ''
-                    }${cannedText.text || ''}`.substring(0, 2000)
-                    setFieldValue('serviceItems', [...serviceItems])
-                  }}
-                />
-              </div>
+            <GridItem xs={8} className={classes.editor}>
+              <Field
+                name='serviceCenterFK'
+                render={args => {
+                  return (
+                    <Select
+                      disabled={!editServiceId}
+                      allowClear={false}
+                      label='Service Center Name'
+                      options={serviceCenters.filter(o =>
+                        o.services.find(m => m.value === editServiceId),
+                      )}
+                      onChange={value => {
+                        editService.serviceCenterFK = value
+                        if (value) {
+                          this.getServiceCenterService(editService)
+                          setFieldValue('quantity', editService.quantity)
+                          setFieldValue('total', editService.total)
+                          setFieldValue(
+                            'totalAfterItemAdjustment',
+                            editService.totalAfterItemAdjustment,
+                          )
+                        }
+                        setFieldValue('serviceItems', [...serviceItems])
+                      }}
+                      {...args}
+                    />
+                  )
+                }}
+              />
             </GridItem>
             <GridItem xs={3} className={classes.editor}>
               <Field
@@ -1106,17 +1072,7 @@ class Service extends PureComponent {
             </GridItem>
           </GridContainer>
           <GridContainer>
-            <GridItem xs={8} className={classes.editor}>
-              <TextField
-                value={editService.remark}
-                disabled={!editServiceId}
-                label='Remarks'
-                onChange={e => {
-                  editService.remark = e.target.value
-                  setFieldValue('serviceItems', [...serviceItems])
-                }}
-              />
-            </GridItem>
+            <GridItem xs={8}></GridItem>
             <GridItem xs={3} className={classes.editor}>
               <div style={{ position: 'relative' }}>
                 <div
@@ -1249,45 +1205,7 @@ class Service extends PureComponent {
                 />
               </GridItem>
             ) : (
-              <GridItem xs={8} className={classes.editor}>
-                <div>
-                  <div
-                    style={{ position: 'relative', display: 'inline-block' }}
-                  >
-                    <span
-                      style={{
-                        fontSize: '0.85rem',
-                        position: 'absolute',
-                        bottom: '4px',
-                        fontWeight: 500,
-                      }}
-                    >
-                      Priority:{' '}
-                    </span>
-                    <div style={{ marginLeft: 60, marginTop: 14 }}>
-                      <RadioGroup
-                        disabled={!editServiceId}
-                        value={editService.priority || 'Normal'}
-                        label=''
-                        onChange={e => {
-                          editService.priority = e.target.value
-                          setFieldValue('serviceItems', [...serviceItems])
-                        }}
-                        options={[
-                          {
-                            value: 'Normal',
-                            label: 'Normal',
-                          },
-                          {
-                            value: 'Urgent',
-                            label: 'Urgent',
-                          },
-                        ]}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </GridItem>
+              <GridItem xs={8} className={classes.editor}></GridItem>
             )}
             <GridItem xs={3} className={classes.editor}>
               <Field
@@ -1308,49 +1226,6 @@ class Service extends PureComponent {
                 }}
               />
             </GridItem>
-          </GridContainer>
-          <GridContainer>
-            {editServiceId && editService.isDisplayValueChangable && (
-              <GridItem xs={8} className={classes.editor}>
-                <div>
-                  <div
-                    style={{ position: 'relative', display: 'inline-block' }}
-                  >
-                    <span
-                      style={{
-                        fontSize: '0.85rem',
-                        position: 'absolute',
-                        bottom: '4px',
-                        fontWeight: 500,
-                      }}
-                    >
-                      Priority:{' '}
-                    </span>
-                    <div style={{ marginLeft: 60, marginTop: 14 }}>
-                      <RadioGroup
-                        disabled={!editServiceId}
-                        value={editService.priority || 'Normal'}
-                        label=''
-                        onChange={e => {
-                          editService.priority = e.target.value
-                          setFieldValue('serviceItems', [...serviceItems])
-                        }}
-                        options={[
-                          {
-                            value: 'Normal',
-                            label: 'Normal',
-                          },
-                          {
-                            value: 'Urgent',
-                            label: 'Urgent',
-                          },
-                        ]}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </GridItem>
-            )}
           </GridContainer>
           {footer({
             onSave: this.validateAndSubmitIfOk,

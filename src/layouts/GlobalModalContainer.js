@@ -237,7 +237,7 @@ class GlobalModalContainer extends PureComponent {
           cancelText={global.cancelText || 'Cancel'}
           maxWidth={global.customWidth || 'sm'}
           confirmText={global.openConfirmText || 'Confirm'}
-          secondConfirmText={global.secondConfirmText || 'Pause'}
+          secondConfirmText={global.secondConfirmText || 'Save'}
           isInformType={global.isInformType}
           footProps={{
             extraButtons: global.onConfirmDiscard ? (
@@ -252,7 +252,7 @@ class GlobalModalContainer extends PureComponent {
                       this.closeConfirmationPrompt()
                     }}
                   >
-                    {global.secondConfirmText || 'Pause'}
+                    {global.secondConfirmText || 'Save'}
                   </Button>
                 ) : null}
                 {!global.onConfirmSave ? (

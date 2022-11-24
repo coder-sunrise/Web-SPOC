@@ -239,7 +239,7 @@ class PaymentCollectionList extends PureComponent {
       { name: 'receiptNo', title: 'Receipt No.' },
       { name: 'referenceNo', title: 'Ref. No.' },
       { name: 'payerName', title: 'Payer Name' },
-      { name: 'doctorName', title: 'OD.' },
+      { name: 'doctorName', title: 'Optom.' },
       { name: 'visitType', title: 'Visit Type' },
       { name: 'invoiceNo', title: 'Invoice No.' },
       { name: 'invoiceDate', title: 'Inv. Date' },

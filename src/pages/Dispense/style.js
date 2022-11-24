@@ -1,4 +1,4 @@
-const DispenseIndexStyle = (theme) => ({
+const DispenseIndexStyle = theme => ({
   root: {
     position: 'relative',
     marginBottom: theme.spacing(2),
@@ -10,6 +10,7 @@ const DispenseIndexStyle = (theme) => ({
   },
   content: {
     marginTop: theme.spacing(1),
+    overflowX: 'hidden!important',
   },
   footerRow: {
     marginTop: theme.spacing(2),

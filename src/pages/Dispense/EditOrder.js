@@ -365,7 +365,7 @@ class EditOrder extends Component {
                   }}
                 />
               </GridItem>
-              {!isRetail && (
+              {/* {!isRetail && (
                 <GridItem xs={12} md={6}>
                   <FastField
                     name='dispenseAcknowledgement.editDispenseReasonFK'
@@ -417,7 +417,7 @@ class EditOrder extends Component {
                     }}
                   />
                 </GridItem>
-              )}
+              )} */}
             </GridItem>
             <GridItem xs={12} md={6}>
               {!isRetail &&
