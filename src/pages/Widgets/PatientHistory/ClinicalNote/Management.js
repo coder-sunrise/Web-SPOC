@@ -53,7 +53,6 @@ export default props => {
         <RadioGroup
           valueField='code'
           textField='description'
-          disabled
           value={formContent.referralTimeline}
           options={[
             {
