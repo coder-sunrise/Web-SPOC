@@ -635,7 +635,7 @@ export default createListViewModel({
             payload: {
               filters: {
                 filterByDoctor: doctor,
-                filterByApptType: appType,
+                filterByApptType: filterByApptType.join(),
               },
             },
           }),
