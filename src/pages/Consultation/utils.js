@@ -159,11 +159,6 @@ const convertClinicalNotesForms = values => {
     }
 
     tempValues = setIn(tempValues, form.prefixProp, undefined)
-    list.forEach(item => {
-      item.rightScribbleNote = undefined
-      item.leftScribbleNote = undefined
-      item.ocularMotilityScribbleNote = undefined
-    })
   })
   return tempValues.corDoctorNote
 }
