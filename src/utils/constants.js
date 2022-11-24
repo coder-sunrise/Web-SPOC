@@ -472,9 +472,9 @@ export const PharmacyWorkitemStatus = {
 }
 
 export const VISIT_TYPE = {
-  OTC: 2,
-  BF: 3,
-}
+         OTC: 2,
+         BF: 1,
+       }
 
 export const VISIT_TYPE_NAME = [
   {
