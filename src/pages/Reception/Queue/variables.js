@@ -9,6 +9,7 @@ import PlayCircle from '@material-ui/icons/PlayCircleOutlineOutlined'
 import Assignment from '@material-ui/icons/Assignment'
 import Description from '@material-ui/icons/Description'
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf'
+import PostAddIcon from '@material-ui/icons/PostAdd'
 
 export const StatusIndicator = {
   ALL: 'All',
@@ -82,6 +83,12 @@ export const ContextMenuOptions = [
     Icon: Assignment,
     disabled: false,
     hidden: true,
+  },
+  {
+    id: 0.2,
+    label: 'Register OTC',
+    Icon: PostAddIcon,
+    disabled: false,
   },
   {
     id: 1,

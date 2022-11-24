@@ -182,6 +182,11 @@ const ContextMenu = ({
             hidden:
               row.isClinicSessionClosed || editVisitRights.rights === 'enable',
           }
+        case 0.2: // Register OTC
+          return {
+            ...opt,
+            disabled: ![VISIT_STATUS.UNGRADED].includes(row.visitStatus),
+          }
         case 1: // dispense
           return {
             ...opt,
