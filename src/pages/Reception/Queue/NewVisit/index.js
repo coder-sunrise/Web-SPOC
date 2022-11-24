@@ -220,14 +220,16 @@ class NewVisit extends PureComponent {
 
     if (Object.keys(errors).length > 0) return handleSubmit()
 
-    const alreadyRegisteredVisit = list.reduce(
-      (registered, queue) =>
-        !registered
-          ? queue.patientProfileFK === patientInfo.id &&
-            queue.visitPurposeFK == visitPurposeFK
-          : registered,
-      false,
-    )
+    const alreadyRegisteredVisit = list
+      .filter(queue => !queue.isClinicSessionClosed)
+      .reduce(
+        (registered, queue) =>
+          !registered
+            ? queue.patientProfileFK === patientInfo.id &&
+              queue.visitPurposeFK == visitPurposeFK
+            : registered,
+        false,
+      )
 
     if (!values.id && alreadyRegisteredVisit)
       return dispatch({
