@@ -64,6 +64,7 @@ const AnteriorEyeExamination = props => {
               </div>
               <div
                 style={{
+                  cursor: 'pointer',
                   width: thumbnailDisplaySize.width + 6,
                   marginTop: 6,
                   position: 'relative',
@@ -102,6 +103,7 @@ const AnteriorEyeExamination = props => {
               </div>
               <div
                 style={{
+                  cursor: 'pointer',
                   width: 260,
                   marginTop: 6,
                   position: 'relative',
