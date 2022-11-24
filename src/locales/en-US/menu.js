@@ -171,6 +171,7 @@ export default {
   'menu.report.sessionsummary': 'Session Summary Report',
   'menu.report.patientageingreport': 'Patient Ageing Report',
   'menu.report.statementsummaryreport': 'Statement Summary Report',
+  'menu.report.saleslistingbyperformer': 'Sales Listing By Performer Report',
   'menu.report.viewreport': 'View Report',
   'menu.report.expiringstockreport': 'Expiring Stock Report',
   'menu.report.partialdispensereport': 'Dispensary Report',

@@ -168,4 +168,10 @@ export const menuData = [
     url: '/report/referralsourcereport',
     authority: 'report.other.referralsource',
   },
+  {
+    title: 'Finance',
+    text: 'Sales Listing By Performer Report',
+    url: '/report/saleslistingbyperformer',
+    authority: 'report.finance.saleslistingbyperformerreport',
+  },
 ]

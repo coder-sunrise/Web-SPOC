@@ -10,6 +10,7 @@ import {
   Checkbox,
   CodeSelect,
 } from '@/components'
+import { ITEM_TYPE } from '@/utils/constants'
 import { DoctorProfileSelect } from '@/components/_medisys'
 import ReportDateRangePicker from '../ReportDateRangePicker'
 
@@ -22,7 +23,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={1}>
             <FastField
               name='asAt'
-              render={(args) => <Checkbox {...args} label='As At' />}
+              render={args => <Checkbox {...args} label='As At' />}
             />
           </GridItem>
           <GridItem md={2}>
@@ -38,7 +39,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={4}>
             <FastField
               name='performerIDs'
-              render={(args) => (
+              render={args => (
                 <DoctorProfileSelect
                   mode='multiple'
                   {...args}
@@ -57,13 +58,21 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <GridItem md={4}>
             <FastField
               name='categoryIDs'
-              render={(args) => (
+              render={args => (
                 <CodeSelect
                   {...args}
-                  code='ltinvoiceitemtype'
+                  options={[
+                    {
+                      id: ITEM_TYPE.CONSUMABLE,
+                      name: 'Product',
+                    },
+                    {
+                      id: ITEM_TYPE.SERVICE,
+                      name: 'Service',
+                    },
+                  ]}
                   mode='multiple'
                   label='Category'
-                  localFilter={(item) => [ 1,2,3,4,6 ].includes(item.id)}
                 />
               )}
             />
