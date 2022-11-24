@@ -170,7 +170,7 @@ class NewVisit extends PureComponent {
     // unmount will be invoked too when submit succeeded,
     // but this.props.values will be empty after submit succeeed
 
-    const { values } = this.props
+    const { values, dispatch } = this.props
     if (values && values.visitAttachment) {
       const { visitAttachment } = values
 
@@ -180,6 +180,14 @@ class NewVisit extends PureComponent {
 
       notConfirmedFiles.forEach(item => {
         !item.isDeleted && deleteFileByFileID(item.id)
+      })
+    }
+    if (values?.visitPurposeFK == VISIT_TYPE.OTC) {
+      dispatch({
+        type: 'visitRegistration/updateState',
+        payload: {
+          isRegisterOtc: false,
+        },
       })
     }
   }

@@ -32,6 +32,7 @@ export default createFormViewModel({
           visitRemarks: undefined,
         },
       },
+      isRegisterOtc: false,
       maxQueueNo: '',
       patientInfo: {},
       visitInfo: {},
@@ -83,6 +84,14 @@ export default createFormViewModel({
               payload: { visitMode: query.visitMode || 'view' },
             })
           }
+          if (query.isRegisterOtc) {
+            dispatch({
+              type: 'updateState',
+              payload: {
+                isRegisterOtc: true,
+              },
+            })
+          }
           dispatch(openModal)
         }
       })
@@ -101,6 +110,7 @@ export default createFormViewModel({
             'type',
             'apptid',
             'visitMode',
+            'isRegisterOtc',
           ]),
         )
         yield put({

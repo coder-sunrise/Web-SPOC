@@ -111,6 +111,7 @@ const styles = theme => ({
     queueCalling,
     clinicSettings,
     codetable,
+    global,
   }) => ({
     patientSearchResult: patientSearch.list,
     queueLog,
@@ -121,6 +122,7 @@ const styles = theme => ({
     queueCalling,
     clinicSettings,
     codetable,
+    global,
   }),
 )
 class Queue extends React.Component {
@@ -188,8 +190,6 @@ class Queue extends React.Component {
     if (visitID) parameter.vis = visitID
     if (appointmentID) parameter.apptid = appointmentID
     if (visitMode) parameter.visitMode = visitMode
-
-    // console.log(parameter)
     this.togglePatientSearch(false)
     this.props.history.push(getAppendUrl(parameter))
   }
@@ -276,6 +276,21 @@ class Queue extends React.Component {
     })
   }
 
+  registerOtcVisit = ({ patientProfileFK: patientId }) => {
+    const { dispatch, global } = this.props
+    if (global.showVisitRegistration) {
+      dispatch({
+        type: 'visitRegistration/closeModal',
+      })
+    }
+    const parameter = {
+      md: 'visreg',
+      pid: patientId,
+      visitMode: 'edit',
+      isRegisterOtc: true,
+    }
+    history.push(getAppendUrl(parameter))
+  }
   togglePatientSearch = override => {
     const { showPatientSearch } = this.state
     const target = !showPatientSearch
@@ -530,6 +545,9 @@ class Queue extends React.Component {
           visitID: row.id,
           visitMode: 'view',
         })
+        break
+      case '0.2':
+        this.registerOtcVisit(row)
         break
       case '1': {
         // dispense
