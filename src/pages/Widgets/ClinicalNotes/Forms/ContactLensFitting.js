@@ -105,13 +105,16 @@ class ContactLensFitting extends PureComponent {
         <GridItem md={12}>
           <div
             style={{
-              border: '2px solid #CCCCCC',
+              border: '1px solid #CCCCCC',
               width: '100%',
               // borderBottom: 'none',
               padding: 6,
             }}
           >
-            <div style={{ fontWeight: 500 }}> Present Spectacles Details</div>
+            <div style={{ fontWeight: 500, marginLeft: 8 }}>
+              {' '}
+              Present Spectacles Details
+            </div>
             <FieldArray
               name={listProp}
               render={arrayHelpers => {
@@ -127,8 +130,10 @@ class ContactLensFitting extends PureComponent {
                   )
                   const itemProp = `${listProp}[${i}]`
                   return (
-                    <GridContainer>
-                      <GridItem md={11}>
+                    <GridContainer
+                      style={{ position: 'relative', paddingRight: 30 }}
+                    >
+                      <GridItem md={12}>
                         <table style={{ width: '100%', margin: '8px 0px' }}>
                           <tr>
                             <td style={{ width: '40%' }}></td>
@@ -708,7 +713,14 @@ class ContactLensFitting extends PureComponent {
                           )}
                         />
                       </GridItem>
-                      <GridItem md={1}>
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: 12,
+                          right: 6,
+                          width: 22,
+                        }}
+                      >
                         {activeItems.length > 1 && (
                           <Button justIcon color='danger'>
                             <Delete
@@ -721,7 +733,7 @@ class ContactLensFitting extends PureComponent {
                             />
                           </Button>
                         )}
-                      </GridItem>
+                      </div>
                     </GridContainer>
                   )
                 })

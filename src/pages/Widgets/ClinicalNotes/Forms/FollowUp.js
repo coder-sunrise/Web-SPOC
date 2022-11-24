@@ -73,7 +73,7 @@ const FollowUp = props => {
               label=''
               {...args}
               maxLength={2000}
-              autoSize={{ minRows: 4, maxRows: 4 }}
+              autoSize={{ minRows: 3, maxRows: 3 }}
             />
           )}
         />
@@ -83,8 +83,7 @@ const FollowUp = props => {
       </GridItem>
       <GridContainer md={12}>
         <GridItem md={6} container>
-          <GridItem md={1} />
-          <GridItem md={2} style={{ paddingTop: 8 }}>
+          <GridItem md={3} style={{ paddingTop: 8, textAlign: 'right' }}>
             Aided
           </GridItem>
           <GridItem md={9} container>
@@ -117,8 +116,7 @@ const FollowUp = props => {
           </GridItem>
         </GridItem>
         <GridItem md={6} container>
-          <GridItem md={1} />
-          <GridItem md={2} style={{ paddingTop: 8 }}>
+          <GridItem md={3} style={{ paddingTop: 8, textAlign: 'right' }}>
             Unaided
           </GridItem>
           <GridItem md={9} container>
