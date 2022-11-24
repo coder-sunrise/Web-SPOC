@@ -3,7 +3,6 @@ import {
   GridContainer,
   GridItem,
   TextField,
-  NumberInput,
   RadioGroup,
   Button,
   FieldArray,
@@ -11,6 +10,53 @@ import {
 import { FastField, getIn } from 'formik'
 import { Delete, Add } from '@material-ui/icons'
 import { getUniqueId } from '@/utils/utils'
+import { Input } from 'antd'
+import withStyles from '@material-ui/core/styles/withStyles'
+
+const style = theme => ({
+  inputSplit: {
+    backgroundColor: '#fff !important',
+    width: '16px !important',
+    borderLeft: 0,
+    borderRight: 0,
+    pointerEvents: 'none',
+    textAlign: 'center !important',
+    margin: '4px 0 !important',
+    lineHeight: '1.3',
+  },
+  inputLeft: {
+    width: '50px !important',
+    textAlign: 'center !important',
+    borderRightWidth: '0 !important',
+    margin: '4px 0 !important',
+    lineHeight: '1.3',
+  },
+  inputRight: {
+    width: '50px !important',
+    textAlign: 'center !important',
+    borderLeftWidth: '0 !important',
+    margin: '4px 0 !important',
+    lineHeight: '1.3',
+  },
+})
+
+const InputGroup = (leftProp, rightProp, classes) => (
+  <Input.Group compact>
+    <FastField
+      name={leftProp}
+      render={args => (
+        <Input className={classes.inputLeft} {...args} {...args.field} />
+      )}
+    />
+    <Input className={classes.inputSplit} placeholder='/' disabled />
+    <FastField
+      name={rightProp}
+      render={args => (
+        <Input className={classes.inputRight} {...args} {...args.field} />
+      )}
+    />
+  </Input.Group>
+)
 class VisionRefraction extends PureComponent {
   constructor(props) {
     super(props)
@@ -23,10 +69,17 @@ class VisionRefraction extends PureComponent {
     const { setFieldValue, values } = form
     const present = getIn(values, prefixProp) || {}
     const presentSpectacles =
-      getIn(values, `${prefixProp}.presentSpectacles`) || []
+      getIn(values, `${prefixProp}.corVisionRefraction_PresentSpectacles`) || []
     setFieldValue(prefixProp, {
       ...present,
-      presentSpectacles: [...presentSpectacles, { uid: getUniqueId() }],
+      corVisionRefraction_PresentSpectacles: [
+        ...presentSpectacles,
+        {
+          uid: getUniqueId(),
+          distancePrescription_RE_VA: '6',
+          distancePrescription_LE_VA: '6',
+        },
+      ],
     })
   }
   render() {
@@ -51,13 +104,13 @@ class VisionRefraction extends PureComponent {
           >
             <div style={{ fontWeight: 500 }}> Present Spectacles Details</div>
             <FieldArray
-              name={`${prefixProp}.presentSpectacles`}
+              name={`${prefixProp}.corVisionRefraction_PresentSpectacles`}
               render={arrayHelpers => {
                 this.arrayHelpers = arrayHelpers
                 const presentSpectacles =
                   getIn(
                     arrayHelpers.form.values,
-                    `${prefixProp}.presentSpectacles`,
+                    `${prefixProp}.corVisionRefraction_PresentSpectacles`,
                   ) || []
                 const activePresentSpectacles = presentSpectacles.filter(
                   val => !val.isDeleted,
@@ -68,6 +121,7 @@ class VisionRefraction extends PureComponent {
                       ? presentSpectacle.id === val.id
                       : val.uid === presentSpectacle.uid,
                   )
+                  const presentSpectaclesItem = `${prefixProp}.corVisionRefraction_PresentSpectacles[${i}]`
                   return (
                     <div key={i} style={{ margin: '6px 0px' }}>
                       <GridContainer
@@ -93,9 +147,13 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${prefixProp}.chequeNo`}
+                              name={`${presentSpectaclesItem}.distancePrescription_RE_SPH`}
                               render={args => (
-                                <NumberInput label='' {...args} />
+                                <TextField
+                                  maxLength={500}
+                                  label='SPH'
+                                  {...args}
+                                />
                               )}
                             />
                           </GridItem>
@@ -104,9 +162,13 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${prefixProp}.chequeNo`}
+                              name={`${presentSpectaclesItem}.distancePrescription_RE_CYL`}
                               render={args => (
-                                <NumberInput label='' {...args} />
+                                <TextField
+                                  maxLength={500}
+                                  label='CYL'
+                                  {...args}
+                                />
                               )}
                             />
                           </GridItem>
@@ -115,31 +177,27 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${prefixProp}.chequeNo`}
+                              name={`${presentSpectaclesItem}.distancePrescription_RE_AXIS`}
                               render={args => (
-                                <NumberInput label='' {...args} />
+                                <TextField
+                                  maxLength={500}
+                                  label='AXIS'
+                                  {...args}
+                                />
                               )}
                             />
                           </GridItem>
-                          <GridItem md={1} className={classes.symbolText}>
-                            VA
-                          </GridItem>
-                          <GridItem
-                            md={2}
-                            container
-                            style={{ position: 'relative', paddingLeft: 30 }}
-                          >
-                            <div
-                              style={{ position: 'absolute', left: 8, top: 8 }}
-                            >
-                              6 /
-                            </div>
-                            <FastField
-                              name={`${prefixProp}.chequeNo`}
-                              render={args => (
-                                <NumberInput label='' {...args} />
+                          <GridItem md={3} container>
+                            <GridItem md={3} className={classes.symbolText}>
+                              VA
+                            </GridItem>
+                            <GridItem md={9}>
+                              {InputGroup(
+                                `${presentSpectaclesItem}.distancePrescription_RE_VA`,
+                                `${presentSpectaclesItem}.distancePrescription_RE_VA_Comments`,
+                                classes,
                               )}
-                            />
+                            </GridItem>
                           </GridItem>
                           <GridItem
                             md={1}
@@ -149,9 +207,13 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${prefixProp}.chequeNo`}
+                              name={`${presentSpectaclesItem}.distancePrescription_LE_SPH`}
                               render={args => (
-                                <NumberInput label='' {...args} />
+                                <TextField
+                                  maxLength={500}
+                                  label='SPH'
+                                  {...args}
+                                />
                               )}
                             />
                           </GridItem>
@@ -160,9 +222,13 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${prefixProp}.chequeNo`}
+                              name={`${presentSpectaclesItem}.distancePrescription_LE_CYL`}
                               render={args => (
-                                <NumberInput label='' {...args} />
+                                <TextField
+                                  maxLength={500}
+                                  label='CYL'
+                                  {...args}
+                                />
                               )}
                             />
                           </GridItem>
@@ -171,31 +237,27 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${prefixProp}.chequeNo`}
+                              name={`${presentSpectaclesItem}.distancePrescription_LE_AXIS`}
                               render={args => (
-                                <NumberInput label='' {...args} />
+                                <TextField
+                                  maxLength={500}
+                                  label='AXIS'
+                                  {...args}
+                                />
                               )}
                             />
                           </GridItem>
-                          <GridItem md={1} className={classes.symbolText}>
-                            VA
-                          </GridItem>
-                          <GridItem
-                            md={2}
-                            container
-                            style={{ position: 'relative', paddingLeft: 30 }}
-                          >
-                            <div
-                              style={{ position: 'absolute', left: 8, top: 8 }}
-                            >
-                              6 /
-                            </div>
-                            <FastField
-                              name={`${prefixProp}.chequeNo`}
-                              render={args => (
-                                <NumberInput label='' {...args} />
+                          <GridItem md={3} container>
+                            <GridItem md={3} className={classes.symbolText}>
+                              VA
+                            </GridItem>
+                            <GridItem md={9}>
+                              {InputGroup(
+                                `${presentSpectaclesItem}.distancePrescription_LE_VA`,
+                                `${presentSpectaclesItem}.distancePrescription_LE_VA_Comments`,
+                                classes,
                               )}
-                            />
+                            </GridItem>
                           </GridItem>
                         </GridItem>
                         <GridItem md={1}>
@@ -206,7 +268,7 @@ class VisionRefraction extends PureComponent {
                                   const { form } = this.arrayHelpers
                                   const { setFieldValue } = form
                                   setFieldValue(
-                                    `${prefixProp}.presentSpectacles[${i}].isDeleted`,
+                                    `${presentSpectaclesItem}.isDeleted`,
                                     true,
                                   )
                                 }}
@@ -238,9 +300,9 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${prefixProp}.chequeNo`}
+                              name={`${presentSpectaclesItem}.nearAddition_RE_Value`}
                               render={args => (
-                                <NumberInput label='' {...args} />
+                                <TextField maxLength={500} label='' {...args} />
                               )}
                             />
                           </GridItem>
@@ -249,9 +311,9 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${prefixProp}.chequeNo`}
+                              name={`${presentSpectaclesItem}.nearAddition_RE_NVA`}
                               render={args => (
-                                <NumberInput label='' {...args} />
+                                <TextField maxLength={500} label='' {...args} />
                               )}
                             />
                           </GridItem>
@@ -260,9 +322,9 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${prefixProp}.chequeNo`}
+                              name={`${presentSpectaclesItem}.nearAddition_RE_CM`}
                               render={args => (
-                                <NumberInput label='' {...args} />
+                                <TextField maxLength={500} label='' {...args} />
                               )}
                             />
                           </GridItem>
@@ -281,9 +343,9 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${prefixProp}.chequeNo`}
+                              name={`${presentSpectaclesItem}.nearAddition_LE_Value`}
                               render={args => (
-                                <NumberInput label='' {...args} />
+                                <TextField maxLength={500} label='' {...args} />
                               )}
                             />
                           </GridItem>
@@ -292,9 +354,9 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${prefixProp}.chequeNo`}
+                              name={`${presentSpectaclesItem}.nearAddition_LE_NVA`}
                               render={args => (
-                                <NumberInput label='' {...args} />
+                                <TextField maxLength={500} label='' {...args} />
                               )}
                             />
                           </GridItem>
@@ -303,9 +365,9 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${prefixProp}.chequeNo`}
+                              name={`${presentSpectaclesItem}.nearAddition_LE_CM`}
                               render={args => (
-                                <NumberInput label='' {...args} />
+                                <TextField maxLength={500} label='' {...args} />
                               )}
                             />
                           </GridItem>
@@ -334,8 +396,10 @@ class VisionRefraction extends PureComponent {
                         </div>
                         <GridItem md={11} container>
                           <FastField
-                            name={`${prefixProp}.chequeNo`}
-                            render={args => <TextField label='' {...args} />}
+                            name={`${presentSpectaclesItem}.remarks`}
+                            render={args => (
+                              <TextField maxLength={2000} label='' {...args} />
+                            )}
                           />
                         </GridItem>
                       </GridContainer>
@@ -379,41 +443,33 @@ class VisionRefraction extends PureComponent {
                 <GridItem md={1} style={{ position: 'relative', top: 8 }}>
                   RE
                 </GridItem>
-                <GridItem md={1} className={classes.symbolText}>
-                  VA
-                </GridItem>
-                <GridItem
-                  md={2}
-                  container
-                  style={{ position: 'relative', paddingLeft: 30 }}
-                >
-                  <div style={{ position: 'absolute', left: 8, top: 8 }}>
-                    6 /
-                  </div>
-                  <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
-                  />
+                <GridItem md={3} container>
+                  <GridItem md={3} className={classes.symbolText}>
+                    VA
+                  </GridItem>
+                  <GridItem md={9}>
+                    {InputGroup(
+                      `${prefixProp}.unaidedVA_Distance_RE_VA`,
+                      `${prefixProp}.unaidedVA_Distance_RE_VA_Comments`,
+                      classes,
+                    )}
+                  </GridItem>
                 </GridItem>
                 <GridItem md={8} />
                 <GridItem md={1} style={{ position: 'relative', top: 8 }}>
                   LE
                 </GridItem>
-                <GridItem md={1} className={classes.symbolText}>
-                  VA
-                </GridItem>
-                <GridItem
-                  md={2}
-                  container
-                  style={{ position: 'relative', paddingLeft: 30 }}
-                >
-                  <div style={{ position: 'absolute', left: 8, top: 8 }}>
-                    6 /
-                  </div>
-                  <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
-                  />
+                <GridItem md={3} container>
+                  <GridItem md={3} className={classes.symbolText}>
+                    VA
+                  </GridItem>
+                  <GridItem md={9}>
+                    {InputGroup(
+                      `${prefixProp}.unaidedVA_Distance_LE_VA`,
+                      `${prefixProp}.unaidedVA_Distance_LE_VA_Comments`,
+                      classes,
+                    )}
+                  </GridItem>
                 </GridItem>
               </GridItem>
             </GridContainer>
@@ -438,8 +494,10 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.unaidedVA_NearHabitualVA_RE_NVA`}
+                    render={args => (
+                      <TextField maxLength={500} label='' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem md={1} className={classes.symbolText}>
@@ -447,8 +505,10 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.unaidedVA_NearHabitualVA_RE_CM`}
+                    render={args => (
+                      <TextField maxLength={500} label='' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem md={1} style={{ position: 'relative', top: 8 }}>
@@ -463,8 +523,10 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.unaidedVA_NearHabitualVA_LE_NVA`}
+                    render={args => (
+                      <TextField maxLength={500} label='' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem md={1} className={classes.symbolText}>
@@ -472,8 +534,10 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.unaidedVA_NearHabitualVA_LE_CM`}
+                    render={args => (
+                      <TextField maxLength={500} label='' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem md={1} style={{ position: 'relative', top: 8 }}>
@@ -495,8 +559,10 @@ class VisionRefraction extends PureComponent {
               </div>
               <GridItem md={11} container>
                 <FastField
-                  name={`${prefixProp}.chequeNo`}
-                  render={args => <TextField label='' {...args} />}
+                  name={`${prefixProp}.unaidedVA_Remarks`}
+                  render={args => (
+                    <TextField maxLength={2000} label='' {...args} />
+                  )}
                 />
               </GridItem>
             </GridContainer>
@@ -525,8 +591,10 @@ class VisionRefraction extends PureComponent {
               <GridItem md={11} container>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.pupillaryDistance_Far`}
+                    render={args => (
+                      <TextField maxLength={500} label='' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem md={1} className={classes.symbolText}>
@@ -534,8 +602,10 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.pupillaryDistance_NearPD`}
+                    render={args => (
+                      <TextField maxLength={500} label='' {...args} />
+                    )}
                   />
                 </GridItem>
               </GridItem>
@@ -564,7 +634,7 @@ class VisionRefraction extends PureComponent {
               </div>
               <GridItem md={11} container>
                 <FastField
-                  name={`${prefixProp}.ObjectiveRefractionMethod`}
+                  name={`${prefixProp}.objectiveRefraction_Method`}
                   render={args => (
                     <RadioGroup
                       label=' '
@@ -602,8 +672,10 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.objectiveRefraction_RE_SPH`}
+                    render={args => (
+                      <TextField maxLength={500} label='' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem md={1} className={classes.symbolText}>
@@ -611,8 +683,10 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.objectiveRefraction_RE_CYL`}
+                    render={args => (
+                      <TextField maxLength={500} label='' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem md={1} className={classes.symbolText}>
@@ -620,33 +694,33 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.objectiveRefraction_RE_AXIS`}
+                    render={args => (
+                      <TextField maxLength={500} label='' {...args} />
+                    )}
                   />
                 </GridItem>
-                <GridItem md={1} className={classes.symbolText}>
-                  VA
-                </GridItem>
-                <GridItem
-                  md={2}
-                  container
-                  style={{ position: 'relative', paddingLeft: 30 }}
-                >
-                  <div style={{ position: 'absolute', left: 8, top: 8 }}>
-                    6 /
-                  </div>
-                  <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
-                  />
+                <GridItem md={3} container>
+                  <GridItem md={3} className={classes.symbolText}>
+                    VA
+                  </GridItem>
+                  <GridItem md={9}>
+                    {InputGroup(
+                      `${prefixProp}.objectiveRefraction_RE_VA`,
+                      `${prefixProp}.objectiveRefraction_RE_VA_Comments`,
+                      classes,
+                    )}
+                  </GridItem>
                 </GridItem>
                 <GridItem md={1} style={{ position: 'relative', top: 8 }}>
                   LE
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.objectiveRefraction_LE_SPH`}
+                    render={args => (
+                      <TextField maxLength={500} label='' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem md={1} className={classes.symbolText}>
@@ -654,8 +728,10 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.objectiveRefraction_LE_CYL`}
+                    render={args => (
+                      <TextField maxLength={500} label='' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem md={1} className={classes.symbolText}>
@@ -663,25 +739,23 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.objectiveRefraction_LE_AXIS`}
+                    render={args => (
+                      <TextField maxLength={500} label='' {...args} />
+                    )}
                   />
                 </GridItem>
-                <GridItem md={1} className={classes.symbolText}>
-                  VA
-                </GridItem>
-                <GridItem
-                  md={2}
-                  container
-                  style={{ position: 'relative', paddingLeft: 30 }}
-                >
-                  <div style={{ position: 'absolute', left: 8, top: 8 }}>
-                    6 /
-                  </div>
-                  <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
-                  />
+                <GridItem md={3} container>
+                  <GridItem md={3} className={classes.symbolText}>
+                    VA
+                  </GridItem>
+                  <GridItem md={9}>
+                    {InputGroup(
+                      `${prefixProp}.objectiveRefraction_LE_VA`,
+                      `${prefixProp}.objectiveRefraction_LE_VA_Comments`,
+                      classes,
+                    )}
+                  </GridItem>
                 </GridItem>
               </GridItem>
             </GridContainer>
@@ -699,8 +773,10 @@ class VisionRefraction extends PureComponent {
               </div>
               <GridItem md={11} container>
                 <FastField
-                  name={`${prefixProp}.chequeNo`}
-                  render={args => <TextField label='' {...args} />}
+                  name={`${prefixProp}.objectiveRefraction_Remarks`}
+                  render={args => (
+                    <TextField maxLength={2000} label='' {...args} />
+                  )}
                 />
               </GridItem>
             </GridContainer>
@@ -729,8 +805,10 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.subjectiveRefraction_RE_SPH`}
+                    render={args => (
+                      <TextField maxLength={500} label='SPH' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem md={1} className={classes.symbolText}>
@@ -738,8 +816,10 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.subjectiveRefraction_RE_CYL`}
+                    render={args => (
+                      <TextField maxLength={500} label='CYL' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem md={1} className={classes.symbolText}>
@@ -747,33 +827,33 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.subjectiveRefraction_RE_AXIS`}
+                    render={args => (
+                      <TextField maxLength={500} label='AXIS' {...args} />
+                    )}
                   />
                 </GridItem>
-                <GridItem md={1} className={classes.symbolText}>
-                  VA
-                </GridItem>
-                <GridItem
-                  md={2}
-                  container
-                  style={{ position: 'relative', paddingLeft: 30 }}
-                >
-                  <div style={{ position: 'absolute', left: 8, top: 8 }}>
-                    6 /
-                  </div>
-                  <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
-                  />
+                <GridItem md={3} container>
+                  <GridItem md={3} className={classes.symbolText}>
+                    VA
+                  </GridItem>
+                  <GridItem md={9}>
+                    {InputGroup(
+                      `${prefixProp}.subjectiveRefraction_RE_VA`,
+                      `${prefixProp}.subjectiveRefraction_RE_VA_Comments`,
+                      classes,
+                    )}
+                  </GridItem>
                 </GridItem>
                 <GridItem md={1} style={{ position: 'relative', top: 8 }}>
                   LE
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.subjectiveRefraction_LE_SPH`}
+                    render={args => (
+                      <TextField maxLength={500} label='SPH' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem md={1} className={classes.symbolText}>
@@ -781,8 +861,10 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.subjectiveRefraction_LE_CYL`}
+                    render={args => (
+                      <TextField maxLength={500} label='CYL' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem md={1} className={classes.symbolText}>
@@ -790,25 +872,23 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.subjectiveRefraction_LE_AXIS`}
+                    render={args => (
+                      <TextField maxLength={500} label='AXIS' {...args} />
+                    )}
                   />
                 </GridItem>
-                <GridItem md={1} className={classes.symbolText}>
-                  VA
-                </GridItem>
-                <GridItem
-                  md={2}
-                  container
-                  style={{ position: 'relative', paddingLeft: 30 }}
-                >
-                  <div style={{ position: 'absolute', left: 8, top: 8 }}>
-                    6 /
-                  </div>
-                  <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
-                  />
+                <GridItem md={3} container>
+                  <GridItem md={3} className={classes.symbolText}>
+                    VA
+                  </GridItem>
+                  <GridItem md={9}>
+                    {InputGroup(
+                      `${prefixProp}.subjectiveRefraction_LE_VA`,
+                      `${prefixProp}.subjectiveRefraction_LE_VA_Comments`,
+                      classes,
+                    )}
+                  </GridItem>
                 </GridItem>
               </GridItem>
             </GridContainer>
@@ -830,8 +910,10 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.subjectiveRefraction_NearAddition_RE_Value`}
+                    render={args => (
+                      <TextField maxLength={500} label='' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem md={1} className={classes.symbolText}>
@@ -839,8 +921,10 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.subjectiveRefraction_NearAddition_RE_NVA`}
+                    render={args => (
+                      <TextField maxLength={500} label='' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem md={1} className={classes.symbolText}>
@@ -848,8 +932,10 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.subjectiveRefraction_NearAddition_RE_CM`}
+                    render={args => (
+                      <TextField maxLength={500} label='' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem md={1} style={{ position: 'relative', top: 8 }}>
@@ -861,8 +947,10 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.subjectiveRefraction_NearAddition_LE_Value`}
+                    render={args => (
+                      <TextField maxLength={500} label='' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem md={1} className={classes.symbolText}>
@@ -870,8 +958,10 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.subjectiveRefraction_NearAddition_LE_NVA`}
+                    render={args => (
+                      <TextField maxLength={500} label='' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem md={1} className={classes.symbolText}>
@@ -879,8 +969,10 @@ class VisionRefraction extends PureComponent {
                 </GridItem>
                 <GridItem md={2}>
                   <FastField
-                    name={`${prefixProp}.chequeNo`}
-                    render={args => <NumberInput label='' {...args} />}
+                    name={`${prefixProp}.subjectiveRefraction_NearAddition_LE_CM`}
+                    render={args => (
+                      <TextField maxLength={500} label='' {...args} />
+                    )}
                   />
                 </GridItem>
                 <GridItem md={1} style={{ position: 'relative', top: 8 }}>
@@ -903,8 +995,10 @@ class VisionRefraction extends PureComponent {
               </div>
               <GridItem md={11} container>
                 <FastField
-                  name={`${prefixProp}.chequeNo`}
-                  render={args => <TextField label='' {...args} />}
+                  name={`${prefixProp}.subjectiveRefraction_NearAddition_Remarks`}
+                  render={args => (
+                    <TextField maxLength={2000} label='' {...args} />
+                  )}
                 />
               </GridItem>
             </GridContainer>
@@ -914,4 +1008,4 @@ class VisionRefraction extends PureComponent {
     )
   }
 }
-export default VisionRefraction
+export default withStyles(style, { name: 'VisionRefraction' })(VisionRefraction)

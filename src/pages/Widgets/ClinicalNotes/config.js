@@ -31,6 +31,14 @@ export const formConfigs = [
     }),
     prop: 'corDoctorNote.corVisionRefraction',
     prefixProp: 'corDoctorNote.corVisionRefractionEntity',
+    defaultValue: {
+      unaidedVA_Distance_RE_VA: '6',
+      unaidedVA_Distance_LE_VA: '6',
+      objectiveRefraction_RE_VA: '6',
+      objectiveRefraction_LE_VA: '6',
+      subjectiveRefraction_RE_VA: '6',
+      subjectiveRefraction_LE_VA: '6',
+    },
   },
   {
     id: CLINICALNOTE_FORM.PRELIMINARYASSESSMENT,
