@@ -176,7 +176,6 @@ class Details extends PureComponent {
       clinicSettings,
     } = props
     const { type } = orders
-    console.log(orders)
     const cfg = {
       disableEdit: this.state.disableEdit,
       setDisable: this.setDisable,

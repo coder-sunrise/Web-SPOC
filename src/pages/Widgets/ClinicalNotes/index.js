@@ -45,13 +45,11 @@ const styles = theme => ({
   cellStyle: {
     border: '1px solid #CCCC',
     padding: '0px 4px',
-    verticalAlign: 'top',
   },
   centerCellStyle: {
     border: '1px solid #CCCC',
     padding: '8px 4px 0px 4px',
     textAlign: 'center',
-    verticalAlign: 'top',
   },
 })
 

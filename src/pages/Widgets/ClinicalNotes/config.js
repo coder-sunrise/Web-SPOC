@@ -7,6 +7,8 @@ import Loading from '@/components/PageLoading/index'
 import PosteriorEyeExamination from '@/assets/img/ClinicalNoteForm/PosteriorEyeExamination.jpg'
 import moment from 'moment'
 import Paediatric from '@/assets/img/ClinicalNoteForm/OcularMotility.jpg'
+import PupillaryAssessment from '@/assets/img/ClinicalNoteForm/PupillaryAssessment.jpg'
+import Confrontation from '@/assets/img/ClinicalNoteForm/Confrontation.jpg'
 import ContactLensFitting from '@/assets/img/ClinicalNoteForm/ContactLensFitting.png'
 
 export const formConfigs = [
@@ -50,6 +52,28 @@ export const formConfigs = [
     }),
     prop: 'corDoctorNote.corPreliminaryAssessment',
     prefixProp: 'corDoctorNote.corPreliminaryAssessmentEntity',
+    defaultImage: {
+      PupillaryAssessment,
+      Confrontation,
+    },
+    cavanSize: { width: '80vw', height: 300 },
+    imageSize: { width: 800, height: 120 },
+    position: { left: 175, top: 50 },
+    thumbnailSize: { width: 300, height: 150 },
+    thumbnailDisplaySize: { width: 260, height: 130 },
+    defaultValue: {
+      lastChangeDate: moment(),
+      // tonometryInstrumentTime: moment(),
+      recordStatusFK: 1,
+      pupillaryAssessmentScribbleNote: {
+        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.PUPILLARYASSESSMENT,
+        subject: 'Pupillary Assessment',
+      },
+      confrontationScribbleNote: {
+        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.CONFRONTATION,
+        subject: 'Confrontation',
+      },
+    },
   },
   {
     id: CLINICALNOTE_FORM.ANTERIOREYEEXAMINATION,
@@ -114,6 +138,9 @@ export const formConfigs = [
     }),
     prop: 'corDoctorNote.corManagement',
     prefixProp: 'corDoctorNote.corManagementEntity',
+    defaultValue: {
+      lastChangeDate: moment(),
+    },
   },
   {
     id: CLINICALNOTE_FORM.CONTACTLENSFITTING,
@@ -151,6 +178,7 @@ export const formConfigs = [
     }),
     prop: 'corDoctorNote.corBinocularVision',
     prefixProp: 'corDoctorNote.corBinocularVisionEntity',
+    defaultImage: Paediatric,
     cavanSize: { width: 600, height: 300 },
     imageSize: { width: 250, height: 200 },
     position: { left: 175, top: 50 },
@@ -158,16 +186,12 @@ export const formConfigs = [
     thumbnailDisplaySize: { width: 260, height: 130 },
     defaultValue: {
       lastUpdateDate: moment(),
-      rightScribbleNote: {
-        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.POSTERIOREYEEXAMINATION,
-        subject: 'Right Eye',
-      },
-      leftScribbleNote: {
-        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.POSTERIOREYEEXAMINATION,
-        subject: 'Left Eye',
+      recordStatusFK: 1,
+      ocularMotilityScribbleNote: {
+        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.PAEDIATRIC,
+        subject: 'Ocular Motility',
       },
     },
-    defaultImage: PosteriorEyeExamination,
   },
   {
     id: CLINICALNOTE_FORM.PAEDIATRIC,
@@ -186,6 +210,7 @@ export const formConfigs = [
     thumbnailDisplaySize: { width: 260, height: 130 },
     defaultValue: {
       lastChangeDate: moment(),
+      recordStatusFK: 1,
       ocularMotilityScribbleNote: {
         thumbnail: CLINICALNOTE_FORMTHUMBNAIL.PAEDIATRIC,
         subject: 'Ocular Motility',

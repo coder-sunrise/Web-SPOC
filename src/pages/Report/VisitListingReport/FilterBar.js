@@ -129,6 +129,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, ctcopayer = [], classes }) => {
                       name: 'All',
                     },
                   }}
+                  maxTagCount={0}
                   labelField='clinicianProfile.name'
                 />
               )}
@@ -143,6 +144,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, ctcopayer = [], classes }) => {
                   {...args}
                   allValue={-99}
                   clinicRole='opto'
+                  maxTagCount={0}
                   allValueOption={{
                     id: -99,
                     clinicianProfile: {
@@ -164,6 +166,7 @@ const FilterBar = ({ handleSubmit, isSubmitting, ctcopayer = [], classes }) => {
                   labelField='displayValue'
                   mode='multiple'
                   label='Co-Payers'
+                  maxTagCount={0}
                   renderDropdown={option => (
                     <CopayerDropdownOption option={option} />
                   )}

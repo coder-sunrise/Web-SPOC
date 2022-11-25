@@ -1,200 +1,170 @@
-import { GridContainer, GridItem, TextField } from '@/components'
-import { FastField } from 'formik'
-import React, { useContext, useEffect, useRef, useState } from 'react'
-import { Button, Form, Input, Popconfirm, Table } from 'antd'
+import {
+  GridContainer,
+  GridItem,
+  EditableTableGrid,
+  FieldArray,
+  MultipleTextField,
+  RadioGroup,
+  FastField,
+} from '@/components'
+import { PureComponent } from 'react'
+import { getUniqueId } from '@/utils/utils'
+import { withStyles } from '@material-ui/core/styles'
+import _ from 'lodash'
+const styles = theme => ({})
 
-const EditableContext = React.createContext(null)
-const EditableRow = ({ index, ...props }) => {
-  const [form] = Form.useForm()
-  return (
-    <Form form={form} component={false}>
-      <EditableContext.Provider value={form}>
-        <tr {...props} />
-      </EditableContext.Provider>
-    </Form>
-  )
-}
-const EditableCell = ({
-  title,
-  editable,
-  children,
-  dataIndex,
-  record,
-  handleSave,
-  ...restProps
-}) => {
-  const [editing, setEditing] = useState(false)
-  const inputRef = useRef(null)
-  const form = useContext(EditableContext)
-  useEffect(() => {
-    if (editing) {
-      inputRef.current.focus()
-    }
-  }, [editing])
-  const toggleEdit = () => {
-    setEditing(!editing)
-    form.setFieldsValue({
-      [dataIndex]: record[dataIndex],
+class Management extends PureComponent {
+  constructor(props) {
+    super(props)
+    this.listProp = `${props.prefixProp}.corManagement_Item`
+  }
+
+  handleAddedRowsChange = addedRows => {
+    const rows = _.get(this.arrayHelpers.form.values, this.listProp) || []
+    addedRows.forEach(row => {
+      row.id = 0
+      row.uid = getUniqueId()
+      row.isNew = true
+      row.sequence = rows.filter(r => !r.isDeleted).length + 1
+      row.assessment = ''
+      row.managementPlan = ''
     })
+    const { setFieldValue } = this.arrayHelpers.form
+    setFieldValue(this.listProp, [...rows, ...addedRows])
+    return []
   }
-  const save = async () => {
-    try {
-      const values = await form.validateFields()
-      toggleEdit()
-      handleSave({
-        ...record,
-        ...values,
-      })
-    } catch (errInfo) {
-      console.log('Save failed:', errInfo)
+
+  handleCommitChanges = ({ rows, added, changed, deleted }) => {
+    const { setFieldValue } = this.arrayHelpers.form
+    let newRows = rows
+    if (deleted) {
+      newRows = rows
+        .filter(row => !row.isDeleted)
+        .map((row, index) => ({
+          ...row,
+          sequence: (row.sequence = index + 1),
+        }))
     }
+    setFieldValue(this.listProp, newRows)
   }
-  let childNode = children
-  if (editable) {
-    childNode = editing ? (
-      <Form.Item
-        style={{
-          margin: 0,
-        }}
-        name={dataIndex}
-        rules={[
-          {
-            required: true,
-            message: `${title} is required.`,
-          },
-        ]}
-      >
-        <Input ref={inputRef} onPressEnter={save} onBlur={save} />
-      </Form.Item>
-    ) : (
-      <div
-        className='editable-cell-value-wrap'
-        style={{
-          paddingRight: 24,
-        }}
-        onClick={toggleEdit}
-      >
-        {children}
-      </div>
+
+  render() {
+    return (
+      <GridContainer style={{ marginTop: 8 }}>
+        <GridItem md={12}>
+          <span style={{ fontWeight: 500, fontSize: '1rem', marginRight: 8 }}>
+            Management
+          </span>
+        </GridItem>
+        <GridItem md={12}>
+          <span style={{ fontWeight: 500, fontSize: '1rem', marginRight: 8 }}>
+            Assessment & Plan
+          </span>
+        </GridItem>
+        <GridItem md={12} style={{ marginTop: 4 }}>
+          <FieldArray
+            name={this.listProp}
+            render={arrayHelpers => {
+              this.arrayHelpers = arrayHelpers
+              const rows = _.get(arrayHelpers.form.values, this.listProp) || []
+              return (
+                <EditableTableGrid
+                  rows={rows}
+                  getRowId={r => r.id || r.uid}
+                  columns={[
+                    { name: 'sequence', title: 'S/N' },
+                    { name: 'assessment', title: 'Assessment' },
+                    { name: 'managementPlan', title: 'Plan' },
+                  ]}
+                  columnExtensions={[
+                    {
+                      columnName: 'sequence',
+                      type: 'number',
+                      precision: 0,
+                      width: 60,
+                      disabled: true,
+                    },
+                    {
+                      columnName: 'assessment',
+                      type: 'text',
+                      disabled: false,
+                    },
+                    {
+                      columnName: 'managementPlan',
+                      type: 'text',
+                      disabled: false,
+                    },
+                  ]}
+                  EditingProps={{
+                    showAddCommand: true,
+                    onAddedRowsChange: this.handleAddedRowsChange,
+                    onCommitChanges: this.handleCommitChanges,
+                  }}
+                  FuncProps={{ pager: false }}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem md={12} style={{ marginTop: 10 }}>
+          <span style={{ fontWeight: 500, fontSize: '1rem', marginRight: 8 }}>
+            Referral Timeline (If applicable)
+          </span>
+        </GridItem>
+        <GridItem md={12} style={{ marginTop: 5 }}>
+          <FastField
+            name={`${this.props.prefixProp}.referralTimeline`}
+            render={args => {
+              return (
+                <RadioGroup
+                  valueField='code'
+                  isAllowReset
+                  textField='description'
+                  options={[
+                    {
+                      code: 'NonUrgent',
+                      description: 'Non-Urgent (Within 2-4 weeks)',
+                    },
+                    {
+                      code: 'Early',
+                      description: 'Early (Within 2 weeks)',
+                    },
+                    {
+                      code: 'UrgentReferral',
+                      description: 'Urgent referral (same day)',
+                    },
+                    {
+                      code: 'Immediate',
+                      description: 'Immediate (A&E)',
+                    },
+                  ]}
+                  noUnderline
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem md={12} style={{ marginTop: 10 }}>
+          <span style={{ fontWeight: 500, fontSize: '1rem', marginRight: 8 }}>
+            Follow Up Action & Next Review
+          </span>
+        </GridItem>
+        <GridItem md={12}>
+          <FastField
+            name={`${this.props.prefixProp}.followUpActionAndNextPreview`}
+            render={args => (
+              <MultipleTextField
+                label=''
+                maxLength={2000}
+                autoSize={{ minRows: 3 }}
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+      </GridContainer>
     )
   }
-  return <td {...restProps}>{childNode}</td>
 }
-
-const Management = props => {
-  const { prefixProp } = props
-
-  const [dataSource, setDataSource] = useState([
-    {
-      key: '0',
-      name: 'Edward King 0',
-      age: '32',
-      address: 'London, Park Lane no. 0',
-    },
-    {
-      key: '1',
-      name: 'Edward King 1',
-      age: '32',
-      address: 'London, Park Lane no. 1',
-    },
-  ])
-  const [count, setCount] = useState(2)
-  const handleDelete = key => {
-    const newData = dataSource.filter(item => item.key !== key)
-    setDataSource(newData)
-  }
-  const defaultColumns = [
-    {
-      title: 'name',
-      dataIndex: 'name',
-      width: '30%',
-      editable: true,
-    },
-    {
-      title: 'age',
-      dataIndex: 'age',
-    },
-    {
-      title: 'address',
-      dataIndex: 'address',
-    },
-    {
-      title: 'operation',
-      dataIndex: 'operation',
-      render: (_, record) =>
-        dataSource.length >= 1 ? (
-          <Popconfirm
-            title='Sure to delete?'
-            onConfirm={() => handleDelete(record.key)}
-          >
-            <a>Delete</a>
-          </Popconfirm>
-        ) : null,
-    },
-  ]
-  const handleAdd = () => {
-    const newData = {
-      key: count,
-      name: `Edward King ${count}`,
-      age: '32',
-      address: `London, Park Lane no. ${count}`,
-    }
-    setDataSource([...dataSource, newData])
-    setCount(count + 1)
-  }
-  const handleSave = row => {
-    const newData = [...dataSource]
-    const index = newData.findIndex(item => row.key === item.key)
-    const item = newData[index]
-    newData.splice(index, 1, {
-      ...item,
-      ...row,
-    })
-    setDataSource(newData)
-  }
-  const components = {
-    body: {
-      row: EditableRow,
-      cell: EditableCell,
-    },
-  }
-  const columns = defaultColumns.map(col => {
-    if (!col.editable) {
-      return col
-    }
-    return {
-      ...col,
-      onCell: record => ({
-        record,
-        editable: col.editable,
-        dataIndex: col.dataIndex,
-        title: col.title,
-        handleSave,
-      }),
-    }
-  })
-  return (
-    <div>
-      <GridContainer>
-        <GridItem md={12}>Management</GridItem>
-      </GridContainer>
-      <Button
-        onClick={handleAdd}
-        type='primary'
-        style={{
-          marginBottom: 16,
-        }}
-      >
-        Add a row
-      </Button>
-      <Table
-        components={components}
-        rowClassName={() => 'editable-row'}
-        bordered
-        dataSource={dataSource}
-        columns={columns}
-      />
-    </div>
-  )
-}
-export default Management
+export default withStyles(styles, { name: 'Management' })(Management)

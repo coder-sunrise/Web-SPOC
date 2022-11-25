@@ -275,7 +275,7 @@ class AddCrNote extends Component {
             selectable: true,
             selectConfig: {
               showSelectAll: true,
-              rowSelectionEnabled: true,
+              rowSelectionEnabled: () => true,
             },
             pager: false,
           }}
