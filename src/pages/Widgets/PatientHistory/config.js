@@ -9,6 +9,7 @@ import PosteriorEyeExamination from '@/assets/img/ClinicalNoteForm/PosteriorEyeE
 import PupillaryAssessment from '@/assets/img/ClinicalNoteForm/PupillaryAssessment.jpg'
 import Confrontation from '@/assets/img/ClinicalNoteForm/Confrontation.jpg'
 import Paediatric from '@/assets/img/ClinicalNoteForm/OcularMotility.jpg'
+import ContactLensFitting from '@/assets/img/ClinicalNoteForm/ContactLensFitting.png'
 
 export const WIDGETS_ID = {
   ClINICALNOTES: '-99',
@@ -358,6 +359,12 @@ export const formWidgets = (props, scribbleNoteUpdateState = () => {}) => [
       },
       loading: Loading,
     }),
+    cavanSize: { width: 600, height: 300 },
+    imageSize: { width: 190, height: 92 },
+    position: { left: 220, top: 104 },
+    thumbnailDisplaySize: { width: 190, height: 92 },
+    defaultThumbnail: CLINICALNOTE_FORMTHUMBNAIL.CONTACTLENSFITTING,
+    defaultImage: ContactLensFitting,
   },
   {
     id: WIDGETS_ID.BINOCULARVISION,

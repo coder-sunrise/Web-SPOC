@@ -14,19 +14,53 @@ const styles = theme => ({
     border: '1px solid #CCCC',
     padding: '8px 4px',
     whiteSpace: 'pre-wrap',
+    overflowWrap: 'anywhere',
   },
   centerCellStyle: {
     border: '1px solid #CCCC',
     padding: '8px 4px',
     textAlign: 'center',
     whiteSpace: 'pre-wrap',
+    overflowWrap: 'anywhere',
   },
   textWithBorder: {
     border: '1px solid #CCCCCC',
     padding: 4,
     width: '100%',
   },
+  textWithUnderline: {
+    borderBottom: '1px solid #CCCCCC',
+    overflowWrap: 'anywhere',
+    padding: 4,
+    width: '100%',
+  },
+  sectionTitle: {
+    fontWeight: 500,
+    marginTop: 8,
+  },
+  tableWithoutBorder: {
+    width: '100%',
+    '& > tr > td': {
+      textAlign: 'center',
+      padding: '4px',
+      overflowWrap: 'anywhere',
+    },
+  },
+  tableWithBorder: {
+    width: '100%',
+    '& > tr > td': {
+      border: '1px solid #CCCCCC',
+      textAlign: 'center',
+      padding: '4px',
+      overflowWrap: 'anywhere',
+    },
+  },
+  cellLabel: {
+    textAlign: 'right !important',
+    paddingRight: '16px !important',
+  },
 })
+
 const ClinicalNotes = props => {
   const { current, selectForms = [], scribbleNoteUpdateState } = props
   return (

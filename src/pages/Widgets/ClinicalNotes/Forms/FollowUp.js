@@ -71,9 +71,9 @@ const FollowUp = props => {
           render={args => (
             <MultipleTextField
               label=''
-              {...args}
               maxLength={2000}
-              autoSize={{ minRows: 3, maxRows: 3 }}
+              autoSize={{ minRows: 2 }}
+              {...args}
             />
           )}
         />
