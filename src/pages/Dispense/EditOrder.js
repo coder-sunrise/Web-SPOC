@@ -420,7 +420,7 @@ class EditOrder extends Component {
               )} */}
             </GridItem>
             <GridItem xs={12} md={6}>
-              {!isRetail &&
+              {/* {!isRetail &&
                 formAccessRight &&
                 formAccessRight.rights !== 'hidden' && (
                   <div>
@@ -432,7 +432,7 @@ class EditOrder extends Component {
                     </h5>
                     <Forms />
                   </div>
-                )}
+                )} */}
               {consultationDocumentAccessRight &&
                 consultationDocumentAccessRight.rights !== 'hidden' && (
                   <div>

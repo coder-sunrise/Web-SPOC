@@ -154,7 +154,6 @@ const VisitInfoCard = ({
       values.visitStatus !== VISIT_STATUS.UPCOMING_APPT) ||
     visitMode === 'view'
 
-
   const roomDisabled =
     values.visitStatus === VISIT_STATUS.IN_CONS || visitMode === 'view'
   const hasCOR = values.clinicalObjectRecordFK
@@ -180,7 +179,7 @@ const VisitInfoCard = ({
           />
         </GridItem>
         <GridItem xs md={2}>
-          <Field
+          <FastField
             name={FormField['visit.salesType']}
             render={args => (
               <CodeSelect

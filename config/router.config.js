@@ -572,6 +572,12 @@ const _routes = [
             authority: ['report.finance.paymentcollectionsummary'],
           },
           {
+            path: '/report/saleslistingbyperformer',
+            name: 'saleslistingbyperformer',
+            component: './Report/SalesListingByPerformer',
+            authority: ['report.finance.saleslistingbyperformerreport'],
+          },
+          {
             path: '/report/xeroinvoicesreport',
             name: 'xeroinvoicesreport',
             component: './Report/XeroInvoicesReport',
