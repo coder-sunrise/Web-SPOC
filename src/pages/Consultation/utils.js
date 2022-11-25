@@ -105,7 +105,7 @@ const convertToConsultation = (
     }
   })
 
-  values = convertClinicalNotesForms(values)
+  values.corDoctorNote = convertClinicalNotesForms(values)
 
   const formRows = forms.rows
   formTypes.forEach(p => {
@@ -125,10 +125,11 @@ const convertToConsultation = (
 }
 
 const convertClinicalNotesForms = values => {
+  let corDoctorNote = _.cloneDeep(values.corDoctorNote)
+  let tempValues = { corDoctorNote }
   formConfigs.forEach(form => {
-    var list = getIn(values, form.prop) || []
-    var entity = getIn(values, form.prefixProp)
-    var oldList = list.map(x => ({ ...x }))
+    var list = getIn(tempValues, form.prop) || []
+    var entity = getIn(tempValues, form.prefixProp)
     //check list any old item
     if (list && list.length > 0) {
       //unticked form
@@ -154,18 +155,17 @@ const convertClinicalNotesForms = values => {
     else if (entity) {
       entity.lastChangeDate = moment()
       list.push(entity)
-      values = setIn(values, form.prop, list)
+      tempValues = setIn(tempValues, form.prop, list)
     }
 
-    values = setIn(values, form.prefixProp, undefined)
+    tempValues = setIn(tempValues, form.prefixProp, undefined)
     list.forEach(item => {
       item.rightScribbleNote = undefined
       item.leftScribbleNote = undefined
       item.ocularMotilityScribbleNote = undefined
     })
   })
-
-  return values
+  return tempValues.corDoctorNote
 }
 
 const cleanConsultation = values => {

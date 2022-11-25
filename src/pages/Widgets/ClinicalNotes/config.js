@@ -7,6 +7,7 @@ import Loading from '@/components/PageLoading/index'
 import PosteriorEyeExamination from '@/assets/img/ClinicalNoteForm/PosteriorEyeExamination.jpg'
 import moment from 'moment'
 import Paediatric from '@/assets/img/ClinicalNoteForm/OcularMotility.jpg'
+import ContactLensFitting from '@/assets/img/ClinicalNoteForm/ContactLensFitting.png'
 
 export const formConfigs = [
   {
@@ -123,6 +124,23 @@ export const formConfigs = [
     }),
     prop: 'corDoctorNote.corContactLensFitting',
     prefixProp: 'corDoctorNote.corContactLensFittingEntity',
+    cavanSize: { width: 600, height: 300 },
+    imageSize: { width: 250, height: 200 },
+    position: { left: 175, top: 50 },
+    thumbnailSize: { width: 300, height: 150 },
+    thumbnailDisplaySize: { width: 260, height: 130 },
+    defaultValue: {
+      lastChangeDate: moment(),
+      rightScribbleNote: {
+        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.CONTACTLENSFITTING,
+        subject: 'Right Eye',
+      },
+      leftScribbleNote: {
+        thumbnail: CLINICALNOTE_FORMTHUMBNAIL.CONTACTLENSFITTING,
+        subject: 'Left Eye',
+      },
+    },
+    defaultImage: ContactLensFitting,
   },
   {
     id: CLINICALNOTE_FORM.BINOCULARVISION,

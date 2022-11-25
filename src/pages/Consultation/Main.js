@@ -432,7 +432,7 @@ const pauseConsultation = async ({
 }
 
 const saveDraftDoctorNote = ({ values, visitRegistration }) => {
-  const { corDoctorNote = {} } = convertClinicalNotesForms(values)
+  const corDoctorNote = convertClinicalNotesForms(values)
   const { entity: visit = {} } = visitRegistration
   const { id } = visit
   const payload = {
