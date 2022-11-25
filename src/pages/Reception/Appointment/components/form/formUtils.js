@@ -38,50 +38,48 @@ export const parseDateToServerDateFormatString = (date, format) => {
 }
 
 export const ValidationSchema = Yup.object().shape({
-  patientName: Yup.string().required('Patient Name is required'),
-  patientContactNo: Yup.string().required('Contact No. is required'),
-  email: Yup.string()
-    .email()
-    .required('Email is required'),
-  currentAppointment: Yup.object().shape({
-    appointmentDate: Yup.string().required(),
-  }),
-  // isEnableRecurrence: Yup.boolean(),
-  // recurrenceDto: Yup.object().when(
-  //   ['isEnableRecurrence', 'currentAppointment'],
-  //   (isEnableRecurrence, currentAppointment, recurrenceDto) => {
-  //     return recurrenceDto.shape({
-  //       recurrenceFrequency: Yup.number()
-  //         .min(1)
-  //         .max(99, 'Frequence must be less than or equal to 99')
-  //         .required(),
-  //       recurrenceCount: Yup.number()
-  //         .min(1)
-  //         .max(99, 'Number of Ocurrence must be less than or equal to 99')
-  //         .required(),
-  //       recurrenceDayOfTheMonth: Yup.number()
-  //         .transform(value => {
-  //           if (Number.isNaN(value)) return -1
-  //           return value
-  //         })
-  //         .when('recurrencePatternFK', {
-  //           is: recurrencePatternFK => recurrencePatternFK === 3,
-  //           then: Yup.number()
-  //             .min(1, 'Day of month cannot be less than 1')
-  //             .max(endOfMonth, `Day of month cannot exceed ${endOfMonth}`),
-  //         }),
-  //       recurrenceDaysOfTheWeek: Yup.array()
-  //         .transform(value => (value === null ? [] : value))
-  //         .when('recurrencePatternFK', {
-  //           is: recurrencePatternFK => recurrencePatternFK === 2,
-  //           then: Yup.array()
-  //             .min(1, 'Day(s) of week is required')
-  //             .required('Day(s) of week is required'),
-  //         }),
-  //     })
-  //   },
-  // ),
-})
+         patientName: Yup.string().required('Patient Name is required'),
+         patientContactNo: Yup.string().required('Contact No. is required'),
+         email: Yup.string().required('Email is required'),
+         currentAppointment: Yup.object().shape({
+           appointmentDate: Yup.string().required(),
+         }),
+         // isEnableRecurrence: Yup.boolean(),
+         // recurrenceDto: Yup.object().when(
+         //   ['isEnableRecurrence', 'currentAppointment'],
+         //   (isEnableRecurrence, currentAppointment, recurrenceDto) => {
+         //     return recurrenceDto.shape({
+         //       recurrenceFrequency: Yup.number()
+         //         .min(1)
+         //         .max(99, 'Frequence must be less than or equal to 99')
+         //         .required(),
+         //       recurrenceCount: Yup.number()
+         //         .min(1)
+         //         .max(99, 'Number of Ocurrence must be less than or equal to 99')
+         //         .required(),
+         //       recurrenceDayOfTheMonth: Yup.number()
+         //         .transform(value => {
+         //           if (Number.isNaN(value)) return -1
+         //           return value
+         //         })
+         //         .when('recurrencePatternFK', {
+         //           is: recurrencePatternFK => recurrencePatternFK === 3,
+         //           then: Yup.number()
+         //             .min(1, 'Day of month cannot be less than 1')
+         //             .max(endOfMonth, `Day of month cannot exceed ${endOfMonth}`),
+         //         }),
+         //       recurrenceDaysOfTheWeek: Yup.array()
+         //         .transform(value => (value === null ? [] : value))
+         //         .when('recurrencePatternFK', {
+         //           is: recurrencePatternFK => recurrencePatternFK === 2,
+         //           then: Yup.array()
+         //             .min(1, 'Day(s) of week is required')
+         //             .required('Day(s) of week is required'),
+         //         }),
+         //     })
+         //   },
+         // ),
+       })
 
 const convertReccurenceDaysOfTheWeek = (week = '') =>
   week.split(', ').map(eachDay => parseInt(eachDay, 10))
