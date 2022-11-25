@@ -87,11 +87,13 @@ class Management extends PureComponent {
                     {
                       columnName: 'assessment',
                       type: 'text',
+                      maxLength: 2000,
                       disabled: false,
                     },
                     {
                       columnName: 'managementPlan',
                       type: 'text',
+                      maxLength: 2000,
                       disabled: false,
                     },
                   ]}
