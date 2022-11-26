@@ -4,7 +4,7 @@ import { ReportDataGrid } from '@/components/_medisys'
 import { dateFormatLongWithTimeNoSec12h } from '@/components'
 
 class VoidCNList extends PureComponent {
-  render () {
+  render() {
     let listData = []
     const { reportDatas } = this.props
     if (!reportDatas) return null
@@ -31,8 +31,8 @@ class VoidCNList extends PureComponent {
     if (filterType === 'Payment') {
       generatedDateTitle = 'Payment Date'
       itemNoTitle = 'Payment No.'
-    } 
-    
+    }
+
     const listCols = [
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'invoiceNo', title: 'Invoice No.' },
@@ -66,9 +66,9 @@ class VoidCNList extends PureComponent {
         columnName: 'voidedDate',
         sortingEnabled: false,
         width: 200,
-        type: 'date',
-        format: dateFormatLongWithTimeNoSec12h,
-        showTime: true,
+        // type: 'date',
+        // format: dateFormatLongWithTimeNoSec12h,
+        // showTime: true,
       },
       {
         columnName: 'totalAmt',
@@ -88,9 +88,7 @@ class VoidCNList extends PureComponent {
       summary: true,
       summaryConfig: {
         state: {
-          totalItems: [
-            { columnName: 'totalAmt', type: 'sum' },
-          ],
+          totalItems: [{ columnName: 'totalAmt', type: 'sum' }],
         },
         integrated: {
           calculator: IntegratedSummary.defaultCalculator,
