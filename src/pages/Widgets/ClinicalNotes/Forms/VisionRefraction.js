@@ -16,27 +16,30 @@ import withStyles from '@material-ui/core/styles/withStyles'
 const style = theme => ({
   inputSplit: {
     backgroundColor: '#fff !important',
-    width: '16px !important',
+    width: '10px !important',
     borderLeft: 0,
     borderRight: 0,
     pointerEvents: 'none',
     textAlign: 'center !important',
     margin: '4px 0 !important',
     lineHeight: '1.3',
+    padding: '4px 0 ',
   },
   inputLeft: {
-    width: '50px !important',
+    width: '30px !important',
     textAlign: 'center !important',
     borderRightWidth: '0 !important',
     margin: '4px 0 !important',
     lineHeight: '1.3',
+    padding: '4px 0px 4px 2px',
   },
   inputRight: {
-    width: '50px !important',
+    width: '30px !important',
     textAlign: 'center !important',
     borderLeftWidth: '0 !important',
     margin: '4px 0 !important',
     lineHeight: '1.3',
+    padding: '4px 2px 4px 0',
   },
 })
 
@@ -85,18 +88,14 @@ class VisionRefraction extends PureComponent {
   render() {
     const { prefixProp, classes } = this.props
     return (
-      <div style={{ marginTop: 8 }}>
-        <span style={{ fontWeight: 500, fontSize: '1rem' }}>
+      <div style={{ margin: '8px 0' }}>
+        <span style={{ fontWeight: 500, fontSize: '1rem', margin: 8 }}>
           Vision and Refraction
         </span>
-        <div
-          style={{
-            padding: '0px 8px',
-          }}
-        >
+        <div style={{ padding: 8 }}>
           <div
             style={{
-              border: '2px solid #CCCCCC',
+              border: '1px solid #CCCCCC',
               width: '100%',
               borderBottom: 'none',
               padding: 6,
@@ -125,24 +124,19 @@ class VisionRefraction extends PureComponent {
                   return (
                     <div key={i} style={{ margin: '6px 0px' }}>
                       <GridContainer
-                        style={{ position: 'relative', paddingLeft: 160 }}
+                        style={{ position: 'relative', paddingRight: 30 }}
                       >
-                        <div
+                        <GridItem
+                          md={3}
                           style={{
                             textAlign: 'right',
-                            position: 'absolute',
-                            top: 8,
-                            left: 0,
-                            width: 160,
                           }}
+                          className={classes.symbolText}
                         >
                           Distance Prescription
-                        </div>
-                        <GridItem md={11} container>
-                          <GridItem
-                            md={1}
-                            style={{ position: 'relative', top: 8 }}
-                          >
+                        </GridItem>
+                        <GridItem md={9} container>
+                          <GridItem md={1} className={classes.symbolText}>
                             RE
                           </GridItem>
                           <GridItem md={2}>
@@ -187,22 +181,17 @@ class VisionRefraction extends PureComponent {
                               )}
                             />
                           </GridItem>
-                          <GridItem md={3} container>
-                            <GridItem md={3} className={classes.symbolText}>
-                              VA
-                            </GridItem>
-                            <GridItem md={9}>
-                              {InputGroup(
-                                `${presentSpectaclesItem}.distancePrescription_RE_VA`,
-                                `${presentSpectaclesItem}.distancePrescription_RE_VA_Comments`,
-                                classes,
-                              )}
-                            </GridItem>
+                          <GridItem md={1} className={classes.symbolText}>
+                            VA
                           </GridItem>
-                          <GridItem
-                            md={1}
-                            style={{ position: 'relative', top: 8 }}
-                          >
+                          <GridItem md={2}>
+                            {InputGroup(
+                              `${presentSpectaclesItem}.distancePrescription_RE_VA`,
+                              `${presentSpectaclesItem}.distancePrescription_RE_VA_Comments`,
+                              classes,
+                            )}
+                          </GridItem>
+                          <GridItem md={1} className={classes.symbolText}>
                             LE
                           </GridItem>
                           <GridItem md={2}>
@@ -247,20 +236,25 @@ class VisionRefraction extends PureComponent {
                               )}
                             />
                           </GridItem>
-                          <GridItem md={3} container>
-                            <GridItem md={3} className={classes.symbolText}>
-                              VA
-                            </GridItem>
-                            <GridItem md={9}>
-                              {InputGroup(
-                                `${presentSpectaclesItem}.distancePrescription_LE_VA`,
-                                `${presentSpectaclesItem}.distancePrescription_LE_VA_Comments`,
-                                classes,
-                              )}
-                            </GridItem>
+                          <GridItem md={1} className={classes.symbolText}>
+                            VA
+                          </GridItem>
+                          <GridItem md={2}>
+                            {InputGroup(
+                              `${presentSpectaclesItem}.distancePrescription_LE_VA`,
+                              `${presentSpectaclesItem}.distancePrescription_LE_VA_Comments`,
+                              classes,
+                            )}
                           </GridItem>
                         </GridItem>
-                        <GridItem md={1}>
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: 6,
+                            right: 8,
+                            width: 22,
+                          }}
+                        >
                           {activePresentSpectacles.length > 1 && (
                             <Button justIcon color='danger'>
                               <Delete
@@ -275,27 +269,20 @@ class VisionRefraction extends PureComponent {
                               />
                             </Button>
                           )}
-                        </GridItem>
+                        </div>
                       </GridContainer>
                       <GridContainer
-                        style={{ position: 'relative', paddingLeft: 160 }}
+                        style={{ position: 'relative', paddingRight: 30 }}
                       >
-                        <div
-                          style={{
-                            textAlign: 'right',
-                            position: 'absolute',
-                            top: 8,
-                            left: 0,
-                            width: 160,
-                          }}
+                        <GridItem
+                          md={3}
+                          style={{ textAlign: 'right' }}
+                          className={classes.symbolText}
                         >
                           Near Addition
-                        </div>
-                        <GridItem md={11} container>
-                          <GridItem
-                            md={1}
-                            style={{ position: 'relative', top: 8 }}
-                          >
+                        </GridItem>
+                        <GridItem md={9} container>
+                          <GridItem md={1} className={classes.symbolText}>
                             RE
                           </GridItem>
                           <GridItem md={2}>
@@ -328,17 +315,11 @@ class VisionRefraction extends PureComponent {
                               )}
                             />
                           </GridItem>
-                          <GridItem
-                            md={1}
-                            style={{ position: 'relative', top: 8 }}
-                          >
+                          <GridItem md={1} className={classes.symbolText}>
                             cm
                           </GridItem>
-                          <GridItem md={2}></GridItem>
-                          <GridItem
-                            md={1}
-                            style={{ position: 'relative', top: 8 }}
-                          >
+                          <GridItem md={2} />
+                          <GridItem md={1} className={classes.symbolText}>
                             LE
                           </GridItem>
                           <GridItem md={2}>
@@ -371,30 +352,25 @@ class VisionRefraction extends PureComponent {
                               )}
                             />
                           </GridItem>
-                          <GridItem
-                            md={1}
-                            style={{ position: 'relative', top: 8 }}
-                          >
+                          <GridItem md={1} className={classes.symbolText}>
                             cm
                           </GridItem>
-                          <GridItem md={2}></GridItem>
                         </GridItem>
                       </GridContainer>
                       <GridContainer
-                        style={{ position: 'relative', paddingLeft: 160 }}
+                        style={{ position: 'relative', paddingRight: 30 }}
                       >
-                        <div
+                        <GridItem
+                          md={3}
                           style={{
                             textAlign: 'right',
-                            position: 'absolute',
+                            position: 'relative',
                             top: 8,
-                            left: 0,
-                            width: 160,
                           }}
                         >
                           Remarks
-                        </div>
-                        <GridItem md={11} container>
+                        </GridItem>
+                        <GridItem md={9} container>
                           <FastField
                             name={`${presentSpectaclesItem}.remarks`}
                             render={args => (
@@ -420,72 +396,57 @@ class VisionRefraction extends PureComponent {
           </div>
           <div
             style={{
-              border: '2px solid #CCCCCC',
+              border: '1px solid #CCCCCC',
               width: '100%',
               borderBottom: 'none',
               padding: 6,
             }}
           >
             <div style={{ fontWeight: 500 }}> Unaided VA</div>
-            <GridContainer style={{ position: 'relative', paddingLeft: 160 }}>
-              <div
-                style={{
-                  textAlign: 'right',
-                  position: 'absolute',
-                  top: 8,
-                  left: 0,
-                  width: 160,
-                }}
+            <GridContainer>
+              <GridItem
+                md={3}
+                style={{ textAlign: 'right', position: 'relative', top: 8 }}
               >
                 Distance
-              </div>
-              <GridItem md={11} container>
+              </GridItem>
+              <GridItem md={9} container>
                 <GridItem md={1} style={{ position: 'relative', top: 8 }}>
                   RE
                 </GridItem>
-                <GridItem md={3} container>
-                  <GridItem md={3} className={classes.symbolText}>
-                    VA
-                  </GridItem>
-                  <GridItem md={9}>
-                    {InputGroup(
-                      `${prefixProp}.unaidedVA_Distance_RE_VA`,
-                      `${prefixProp}.unaidedVA_Distance_RE_VA_Comments`,
-                      classes,
-                    )}
-                  </GridItem>
+                <GridItem md={1} className={classes.symbolText}>
+                  VA
                 </GridItem>
-                <GridItem md={8} />
+                <GridItem md={10}>
+                  {InputGroup(
+                    `${prefixProp}.unaidedVA_Distance_RE_VA`,
+                    `${prefixProp}.unaidedVA_Distance_RE_VA_Comments`,
+                    classes,
+                  )}
+                </GridItem>
                 <GridItem md={1} style={{ position: 'relative', top: 8 }}>
                   LE
                 </GridItem>
-                <GridItem md={3} container>
-                  <GridItem md={3} className={classes.symbolText}>
-                    VA
-                  </GridItem>
-                  <GridItem md={9}>
-                    {InputGroup(
-                      `${prefixProp}.unaidedVA_Distance_LE_VA`,
-                      `${prefixProp}.unaidedVA_Distance_LE_VA_Comments`,
-                      classes,
-                    )}
-                  </GridItem>
+                <GridItem md={1} className={classes.symbolText}>
+                  VA
+                </GridItem>
+                <GridItem md={10}>
+                  {InputGroup(
+                    `${prefixProp}.unaidedVA_Distance_LE_VA`,
+                    `${prefixProp}.unaidedVA_Distance_LE_VA_Comments`,
+                    classes,
+                  )}
                 </GridItem>
               </GridItem>
             </GridContainer>
-            <GridContainer style={{ position: 'relative', paddingLeft: 160 }}>
-              <div
-                style={{
-                  textAlign: 'right',
-                  position: 'absolute',
-                  top: 8,
-                  left: 0,
-                  width: 160,
-                }}
+            <GridContainer>
+              <GridItem
+                md={3}
+                style={{ textAlign: 'right', position: 'relative', top: 8 }}
               >
                 Near Habitual VA
-              </div>
-              <GridItem md={11} container>
+              </GridItem>
+              <GridItem md={9} container>
                 <GridItem md={1} style={{ position: 'relative', top: 8 }}>
                   RE
                 </GridItem>
@@ -511,10 +472,9 @@ class VisionRefraction extends PureComponent {
                     )}
                   />
                 </GridItem>
-                <GridItem md={1} style={{ position: 'relative', top: 8 }}>
+                <GridItem md={5} style={{ position: 'relative', top: 8 }}>
                   cm
                 </GridItem>
-                <GridItem md={4} />
                 <GridItem md={1} style={{ position: 'relative', top: 8 }}>
                   LE
                 </GridItem>
@@ -540,24 +500,23 @@ class VisionRefraction extends PureComponent {
                     )}
                   />
                 </GridItem>
-                <GridItem md={1} style={{ position: 'relative', top: 8 }}>
+                <GridItem md={5} style={{ position: 'relative', top: 8 }}>
                   cm
                 </GridItem>
               </GridItem>
             </GridContainer>
-            <GridContainer style={{ position: 'relative', paddingLeft: 160 }}>
-              <div
+            <GridContainer>
+              <GridItem
+                md={3}
                 style={{
                   textAlign: 'right',
-                  position: 'absolute',
+                  position: 'relative',
                   top: 8,
-                  left: 0,
-                  width: 160,
                 }}
               >
                 Remarks
-              </div>
-              <GridItem md={11} container>
+              </GridItem>
+              <GridItem md={9} container>
                 <FastField
                   name={`${prefixProp}.unaidedVA_Remarks`}
                   render={args => (
@@ -569,26 +528,24 @@ class VisionRefraction extends PureComponent {
           </div>
           <div
             style={{
-              border: '2px solid #CCCCCC',
+              border: '1px solid #CCCCCC',
               width: '100%',
               borderBottom: 'none',
               padding: 6,
             }}
           >
             <div style={{ fontWeight: 500 }}> Pupillary Distance</div>
-            <GridContainer style={{ position: 'relative', paddingLeft: 160 }}>
-              <div
+            <GridContainer>
+              <GridItem
+                md={3}
                 style={{
                   textAlign: 'right',
-                  position: 'absolute',
-                  top: 8,
-                  left: 0,
-                  width: 160,
                 }}
+                className={classes.symbolText}
               >
                 Far / Near PD
-              </div>
-              <GridItem md={11} container>
+              </GridItem>
+              <GridItem md={9} container>
                 <GridItem md={2}>
                   <FastField
                     name={`${prefixProp}.pupillaryDistance_Far`}
@@ -613,26 +570,18 @@ class VisionRefraction extends PureComponent {
           </div>
           <div
             style={{
-              border: '2px solid #CCCCCC',
+              border: '1px solid #CCCCCC',
               width: '100%',
               borderBottom: 'none',
               padding: 6,
             }}
           >
             <div style={{ fontWeight: 500 }}> Objective Refraction</div>
-            <GridContainer style={{ position: 'relative', paddingLeft: 160 }}>
-              <div
-                style={{
-                  textAlign: 'right',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: 160,
-                }}
-              >
+            <GridContainer>
+              <GridItem md={3} style={{ textAlign: 'right' }}>
                 Method
-              </div>
-              <GridItem md={11} container>
+              </GridItem>
+              <GridItem md={9} container>
                 <FastField
                   name={`${prefixProp}.objectiveRefraction_Method`}
                   render={args => (
@@ -656,17 +605,9 @@ class VisionRefraction extends PureComponent {
                 />
               </GridItem>
             </GridContainer>
-            <GridContainer style={{ position: 'relative', paddingLeft: 160 }}>
-              <div
-                style={{
-                  textAlign: 'right',
-                  position: 'absolute',
-                  top: 8,
-                  left: 0,
-                  width: 160,
-                }}
-              ></div>
-              <GridItem md={11} container>
+            <GridContainer>
+              <GridItem md={3} />
+              <GridItem md={9} container>
                 <GridItem md={1} style={{ position: 'relative', top: 8 }}>
                   RE
                 </GridItem>
@@ -700,17 +641,15 @@ class VisionRefraction extends PureComponent {
                     )}
                   />
                 </GridItem>
-                <GridItem md={3} container>
-                  <GridItem md={3} className={classes.symbolText}>
-                    VA
-                  </GridItem>
-                  <GridItem md={9}>
-                    {InputGroup(
-                      `${prefixProp}.objectiveRefraction_RE_VA`,
-                      `${prefixProp}.objectiveRefraction_RE_VA_Comments`,
-                      classes,
-                    )}
-                  </GridItem>
+                <GridItem md={1} className={classes.symbolText}>
+                  VA
+                </GridItem>
+                <GridItem md={2}>
+                  {InputGroup(
+                    `${prefixProp}.objectiveRefraction_RE_VA`,
+                    `${prefixProp}.objectiveRefraction_RE_VA_Comments`,
+                    classes,
+                  )}
                 </GridItem>
                 <GridItem md={1} style={{ position: 'relative', top: 8 }}>
                   LE
@@ -745,33 +684,26 @@ class VisionRefraction extends PureComponent {
                     )}
                   />
                 </GridItem>
-                <GridItem md={3} container>
-                  <GridItem md={3} className={classes.symbolText}>
-                    VA
-                  </GridItem>
-                  <GridItem md={9}>
-                    {InputGroup(
-                      `${prefixProp}.objectiveRefraction_LE_VA`,
-                      `${prefixProp}.objectiveRefraction_LE_VA_Comments`,
-                      classes,
-                    )}
-                  </GridItem>
+                <GridItem md={1} className={classes.symbolText}>
+                  VA
+                </GridItem>
+                <GridItem md={2}>
+                  {InputGroup(
+                    `${prefixProp}.objectiveRefraction_LE_VA`,
+                    `${prefixProp}.objectiveRefraction_LE_VA_Comments`,
+                    classes,
+                  )}
                 </GridItem>
               </GridItem>
             </GridContainer>
-            <GridContainer style={{ position: 'relative', paddingLeft: 160 }}>
-              <div
-                style={{
-                  textAlign: 'right',
-                  position: 'absolute',
-                  top: 8,
-                  left: 0,
-                  width: 160,
-                }}
+            <GridContainer>
+              <GridItem
+                md={3}
+                style={{ textAlign: 'right', position: 'relative', top: 8 }}
               >
                 Remarks
-              </div>
-              <GridItem md={11} container>
+              </GridItem>
+              <GridItem md={9} container>
                 <FastField
                   name={`${prefixProp}.objectiveRefraction_Remarks`}
                   render={args => (
@@ -783,23 +715,15 @@ class VisionRefraction extends PureComponent {
           </div>
           <div
             style={{
-              border: '2px solid #CCCCCC',
+              border: '1px solid #CCCCCC',
               width: '100%',
               padding: 6,
             }}
           >
             <div style={{ fontWeight: 500 }}> Subjective Refraction</div>
-            <GridContainer style={{ position: 'relative', paddingLeft: 160 }}>
-              <div
-                style={{
-                  textAlign: 'right',
-                  position: 'absolute',
-                  top: 8,
-                  left: 0,
-                  width: 160,
-                }}
-              ></div>
-              <GridItem md={11} container>
+            <GridContainer>
+              <GridItem md={3} />
+              <GridItem md={9} container>
                 <GridItem md={1} style={{ position: 'relative', top: 8 }}>
                   RE
                 </GridItem>
@@ -833,17 +757,15 @@ class VisionRefraction extends PureComponent {
                     )}
                   />
                 </GridItem>
-                <GridItem md={3} container>
-                  <GridItem md={3} className={classes.symbolText}>
-                    VA
-                  </GridItem>
-                  <GridItem md={9}>
-                    {InputGroup(
-                      `${prefixProp}.subjectiveRefraction_RE_VA`,
-                      `${prefixProp}.subjectiveRefraction_RE_VA_Comments`,
-                      classes,
-                    )}
-                  </GridItem>
+                <GridItem md={1} className={classes.symbolText}>
+                  VA
+                </GridItem>
+                <GridItem md={2}>
+                  {InputGroup(
+                    `${prefixProp}.subjectiveRefraction_RE_VA`,
+                    `${prefixProp}.subjectiveRefraction_RE_VA_Comments`,
+                    classes,
+                  )}
                 </GridItem>
                 <GridItem md={1} style={{ position: 'relative', top: 8 }}>
                   LE
@@ -878,33 +800,26 @@ class VisionRefraction extends PureComponent {
                     )}
                   />
                 </GridItem>
-                <GridItem md={3} container>
-                  <GridItem md={3} className={classes.symbolText}>
-                    VA
-                  </GridItem>
-                  <GridItem md={9}>
-                    {InputGroup(
-                      `${prefixProp}.subjectiveRefraction_LE_VA`,
-                      `${prefixProp}.subjectiveRefraction_LE_VA_Comments`,
-                      classes,
-                    )}
-                  </GridItem>
+                <GridItem md={1} className={classes.symbolText}>
+                  VA
+                </GridItem>
+                <GridItem md={2}>
+                  {InputGroup(
+                    `${prefixProp}.subjectiveRefraction_LE_VA`,
+                    `${prefixProp}.subjectiveRefraction_LE_VA_Comments`,
+                    classes,
+                  )}
                 </GridItem>
               </GridItem>
             </GridContainer>
-            <GridContainer style={{ position: 'relative', paddingLeft: 160 }}>
-              <div
-                style={{
-                  textAlign: 'right',
-                  position: 'absolute',
-                  top: 8,
-                  left: 0,
-                  width: 160,
-                }}
+            <GridContainer>
+              <GridItem
+                md={3}
+                style={{ textAlign: 'right', position: 'relative', top: 8 }}
               >
                 Near Addition
-              </div>
-              <GridItem md={11} container>
+              </GridItem>
+              <GridItem md={9} container>
                 <GridItem md={1} style={{ position: 'relative', top: 8 }}>
                   RE
                 </GridItem>
@@ -938,10 +853,10 @@ class VisionRefraction extends PureComponent {
                     )}
                   />
                 </GridItem>
-                <GridItem md={1} style={{ position: 'relative', top: 8 }}>
+                <GridItem md={1} className={classes.symbolText}>
                   cm
                 </GridItem>
-                <GridItem md={2}></GridItem>
+                <GridItem md={2} />
                 <GridItem md={1} style={{ position: 'relative', top: 8 }}>
                   LE
                 </GridItem>
@@ -975,25 +890,20 @@ class VisionRefraction extends PureComponent {
                     )}
                   />
                 </GridItem>
-                <GridItem md={1} style={{ position: 'relative', top: 8 }}>
+                <GridItem md={1} className={classes.symbolText}>
                   cm
                 </GridItem>
-                <GridItem md={2}></GridItem>
+                <GridItem md={2} />
               </GridItem>
             </GridContainer>
-            <GridContainer style={{ position: 'relative', paddingLeft: 160 }}>
-              <div
-                style={{
-                  textAlign: 'right',
-                  position: 'absolute',
-                  top: 8,
-                  left: 0,
-                  width: 160,
-                }}
+            <GridContainer>
+              <GridItem
+                md={3}
+                style={{ textAlign: 'right', position: 'relative', top: 8 }}
               >
                 Remarks
-              </div>
-              <GridItem md={11} container>
+              </GridItem>
+              <GridItem md={9} container>
                 <FastField
                   name={`${prefixProp}.subjectiveRefraction_NearAddition_Remarks`}
                   render={args => (
