@@ -152,10 +152,10 @@ export const formConfigs = [
     prop: 'corDoctorNote.corContactLensFitting',
     prefixProp: 'corDoctorNote.corContactLensFittingEntity',
     cavanSize: { width: 600, height: 300 },
-    imageSize: { width: 250, height: 200 },
-    position: { left: 175, top: 50 },
+    imageSize: { width: 190, height: 92 },
+    position: { left: 220, top: 104 },
     thumbnailSize: { width: 300, height: 150 },
-    thumbnailDisplaySize: { width: 260, height: 130 },
+    thumbnailDisplaySize: { width: 190, height: 92 },
     defaultValue: {
       lastChangeDate: moment(),
     },

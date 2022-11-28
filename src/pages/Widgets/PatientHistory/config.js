@@ -6,6 +6,10 @@ import { VISIT_TYPE, CLINICALNOTE_FORMTHUMBNAIL } from '@/utils/constants'
 import { getIn } from 'formik'
 import _ from 'lodash'
 import PosteriorEyeExamination from '@/assets/img/ClinicalNoteForm/PosteriorEyeExamination.jpg'
+import PupillaryAssessment from '@/assets/img/ClinicalNoteForm/PupillaryAssessment.jpg'
+import Confrontation from '@/assets/img/ClinicalNoteForm/Confrontation.jpg'
+import Paediatric from '@/assets/img/ClinicalNoteForm/OcularMotility.jpg'
+import ContactLensFitting from '@/assets/img/ClinicalNoteForm/ContactLensFitting.png'
 
 export const WIDGETS_ID = {
   ClINICALNOTES: '-99',
@@ -260,10 +264,25 @@ export const formWidgets = (props, scribbleNoteUpdateState = () => {}) => [
       loader: () => import('./ClinicalNote/PreliminaryAssessment'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
+        return (
+          <Cmpnet
+            {...props}
+            {...p}
+            scribbleNoteUpdateState={scribbleNoteUpdateState}
+          />
+        )
       },
       loading: Loading,
     }),
+    defaultImage: {
+      PupillaryAssessment,
+      Confrontation,
+    },
+    cavanSize: { width: '80vw', height: 300 },
+    imageSize: { width: 800, height: 120 },
+    position: { left: 175, top: 50 },
+    thumbnailSize: { width: 300, height: 150 },
+    thumbnailDisplaySize: { width: 260, height: 130 },
   },
   {
     id: WIDGETS_ID.ANTERIOREYEEXAMINATION,
@@ -340,6 +359,12 @@ export const formWidgets = (props, scribbleNoteUpdateState = () => {}) => [
       },
       loading: Loading,
     }),
+    cavanSize: { width: 600, height: 300 },
+    imageSize: { width: 190, height: 92 },
+    position: { left: 220, top: 104 },
+    thumbnailDisplaySize: { width: 190, height: 92 },
+    defaultThumbnail: CLINICALNOTE_FORMTHUMBNAIL.CONTACTLENSFITTING,
+    defaultImage: ContactLensFitting,
   },
   {
     id: WIDGETS_ID.BINOCULARVISION,
@@ -349,10 +374,22 @@ export const formWidgets = (props, scribbleNoteUpdateState = () => {}) => [
       loader: () => import('./ClinicalNote/BinocularVision'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
+        return (
+          <Cmpnet
+            {...props}
+            {...p}
+            scribbleNoteUpdateState={scribbleNoteUpdateState}
+          />
+        )
       },
       loading: Loading,
     }),
+    defaultImage: Paediatric,
+    cavanSize: { width: 600, height: 300 },
+    imageSize: { width: 250, height: 200 },
+    position: { left: 175, top: 50 },
+    thumbnailSize: { width: 300, height: 150 },
+    thumbnailDisplaySize: { width: 260, height: 130 },
   },
   {
     id: WIDGETS_ID.PAEDIATRIC,
@@ -362,10 +399,22 @@ export const formWidgets = (props, scribbleNoteUpdateState = () => {}) => [
       loader: () => import('./ClinicalNote/Paediatric'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
+        return (
+          <Cmpnet
+            {...props}
+            {...p}
+            scribbleNoteUpdateState={scribbleNoteUpdateState}
+          />
+        )
       },
       loading: Loading,
     }),
+    defaultImage: Paediatric,
+    cavanSize: { width: 600, height: 300 },
+    imageSize: { width: 250, height: 200 },
+    position: { left: 175, top: 50 },
+    thumbnailSize: { width: 300, height: 150 },
+    thumbnailDisplaySize: { width: 260, height: 130 },
   },
   {
     id: WIDGETS_ID.INVESTIGATIVETESTS,
