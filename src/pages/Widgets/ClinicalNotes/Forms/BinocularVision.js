@@ -58,6 +58,13 @@ const _styles = withStyles(
     gridItem: {
       marginBottom: theme.spacing(1),
     },
+    extraDom: {
+      '&::after': {
+        content: "' + '",
+        position: 'relative',
+        top: '-10px',
+      },
+    },
   }),
   { withTheme: true },
 )
@@ -160,7 +167,14 @@ class BinocularVision extends PureComponent {
             <tr>
               <td width='30%'>
                 <div>
-                  <span className={classes.itemTitle}>NPC*</span>
+                  <span
+                    className={classnames({
+                      [classes.itemTitle]: true,
+                      [classes.extraDom]: true,
+                    })}
+                  >
+                    NPC
+                  </span>
                 </div>
               </td>
               <td width='70%'>
@@ -188,7 +202,14 @@ class BinocularVision extends PureComponent {
             <tr>
               <td width='30%'>
                 <div>
-                  <span className={classes.itemTitle}>Ocular Motility*</span>
+                  <span
+                    className={classnames({
+                      [classes.itemTitle]: true,
+                      [classes.extraDom]: true,
+                    })}
+                  >
+                    Ocular Motility
+                  </span>
                 </div>
               </td>
               <td width='70%'>
@@ -263,7 +284,14 @@ class BinocularVision extends PureComponent {
             <tr>
               <td width='30%'>
                 <div>
-                  <span className={classes.itemTitle}>Stereopsis*</span>
+                  <span
+                    className={classnames({
+                      [classes.itemTitle]: true,
+                      [classes.extraDom]: true,
+                    })}
+                  >
+                    Stereopsis
+                  </span>
                   <div className={classes.itemTitleField}>
                     <FastField
                       name={`${prefixProp}.stereopsisTot`}
@@ -304,13 +332,18 @@ class BinocularVision extends PureComponent {
             <tr>
               <td rowSpan='2' width='30%'>
                 <div>
-                  <span className={classes.itemTitle}>
-                    Subjective Phoria Test*
-                    <br />
-                    <em style={{ fontSize: '0.8rem' }}>
-                      (including its magnitude and direction)
-                    </em>
+                  <span
+                    className={classnames({
+                      [classes.itemTitle]: true,
+                      [classes.extraDom]: true,
+                    })}
+                  >
+                    Subjective Phoria Test
                   </span>
+                  <br />
+                  <em style={{ fontSize: '0.8rem' }}>
+                    (including its magnitude and direction)
+                  </em>
                   <div className={classes.itemTitleField}>
                     <FastField
                       name={`${prefixProp}.subjectivePhoriaTestTot`}
@@ -402,7 +435,14 @@ class BinocularVision extends PureComponent {
             <tr>
               <td rowSpan='3' width='30%'>
                 <div>
-                  <span className={classes.itemTitle}>AC / A Ratio*</span>
+                  <span
+                    className={classnames({
+                      [classes.itemTitle]: true,
+                      [classes.extraDom]: true,
+                    })}
+                  >
+                    AC / A Ratio
+                  </span>
                   <span
                     style={{
                       position: 'absolute',
@@ -836,7 +876,7 @@ class BinocularVision extends PureComponent {
                     <FastField
                       name={`${prefixProp}.vergenceFacilityEightB`}
                       render={args => {
-                        return <Checkbox label='8 BO/B' {...args} />
+                        return <Checkbox label='8 BO/BI' {...args} />
                       }}
                     />
                   </div>
