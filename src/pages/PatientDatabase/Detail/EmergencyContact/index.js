@@ -42,10 +42,6 @@ class EmergencyContact extends PureComponent {
             disabled={disabledByAccessRight}
           />
         </GridItem>
-        <GridItem style={{ marginTop: 50 }}>
-          <h4 style={{ fontWeight: 500 }}>Family Group</h4>
-          <FamilyMemberGrid {...this.props} disabled={disabledByAccessRight} />
-        </GridItem>
       </GridContainer>
     )
   }
