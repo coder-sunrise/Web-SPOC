@@ -335,14 +335,15 @@ class BinocularVision extends PureComponent {
                   <span
                     className={classnames({
                       [classes.itemTitle]: true,
+                      [classes.extraDom]: true,
                     })}
                   >
                     Subjective Phoria Test
-                    <br />
-                    <em style={{ fontSize: '0.8rem' }}>
-                      (including its magnitude and direction)
-                    </em>
                   </span>
+                  <br />
+                  <em style={{ fontSize: '0.8rem' }}>
+                    (including its magnitude and direction)
+                  </em>
                   <div className={classes.itemTitleField}>
                     <FastField
                       name={`${prefixProp}.subjectivePhoriaTestTot`}
