@@ -43,6 +43,7 @@ const CoverTest = props => {
     targetVal,
     theme: { spacing },
     classes,
+    dispatch,
   } = props
 
   let getPrefix = () => {
@@ -145,7 +146,14 @@ const CoverTest = props => {
                   }}
                   size='sm'
                   onClick={() => {
-                    deleteCoverTest()
+                    dispatch({
+                      type: 'global/updateAppState',
+                      payload: {
+                        openConfirm: true,
+                        openConfirmContent: `Confirm to delete?`,
+                        onConfirmSave: deleteCoverTest,
+                      },
+                    })
                   }}
                   justIcon
                 >
