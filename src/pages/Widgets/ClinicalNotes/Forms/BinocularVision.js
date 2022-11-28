@@ -335,7 +335,6 @@ class BinocularVision extends PureComponent {
                   <span
                     className={classnames({
                       [classes.itemTitle]: true,
-                      // [classes.extraDom]: true,
                     })}
                   >
                     Subjective Phoria Test
