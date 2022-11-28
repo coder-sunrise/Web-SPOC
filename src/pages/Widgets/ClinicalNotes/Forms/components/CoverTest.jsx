@@ -105,6 +105,7 @@ const CoverTest = props => {
                         <Checkbox
                           onChange={e => {}}
                           label='with Rx'
+                          disabled={_.get(values, `${prefix}withoutRx`)}
                           {...args}
                         />
                       )
@@ -117,7 +118,13 @@ const CoverTest = props => {
                   <Field
                     name={`${prefix}withoutRx`}
                     render={args => {
-                      return <Checkbox label='without Rx' {...args} />
+                      return (
+                        <Checkbox
+                          label='without Rx'
+                          {...args}
+                          disabled={_.get(values, `${prefix}withRx`)}
+                        />
+                      )
                     }}
                   />
                 </div>

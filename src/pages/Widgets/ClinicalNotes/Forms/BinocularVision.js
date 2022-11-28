@@ -18,6 +18,7 @@ import Grid from '@material-ui/core/Grid'
 import { getUniqueNumericId } from '@/utils/utils'
 import CoverTest from './components/CoverTest'
 import classnames from 'classnames'
+import _ from 'lodash'
 
 const _styles = withStyles(
   theme => ({
@@ -460,25 +461,31 @@ class BinocularVision extends PureComponent {
                       left: '80px',
                     }}
                   >
-                    <FastField
+                    <Field
                       name={`${prefixProp}.acaRatioMaddoxWing`}
                       render={args => {
                         return (
                           <Checkbox
-                            onChange={e => {}}
                             label='Maddox Wing'
+                            disabled={_.get(
+                              args?.form?.values,
+                              `${prefixProp}.acaRatioHowellPhoriaCard`,
+                            )}
                             {...args}
                           />
                         )
                       }}
                     />
-                    <FastField
+                    <Field
                       name={`${prefixProp}.acaRatioHowellPhoriaCard`}
                       render={args => {
                         return (
                           <Checkbox
-                            onChange={e => {}}
                             label='Howell Phoria Card'
+                            disabled={_.get(
+                              args?.form?.values,
+                              `${prefixProp}.acaRatioMaddoxWing`,
+                            )}
                             {...args}
                           />
                         )
