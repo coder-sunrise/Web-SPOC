@@ -222,9 +222,9 @@ class GlobalModalContainer extends PureComponent {
           open={global.showVisitRegistration}
           title='Visit Registration'
           overrideLoading
+          maxWidth='lg'
           onClose={this.closeVisitRegistration}
           onConfirm={this.closeVisitRegistration}
-          fullScreen
           observe='VisitRegistration'
         >
           <VisitRegistration history={this.props.history} />

@@ -289,7 +289,7 @@ const VisitInfoCard = ({
             />
           </Authorized>
         </GridItem>
-        <GridItem xs md={6}>
+        <GridItem xs md={10}>
           <div style={{ position: 'relative' }}>
             <Field
               name={FormField['visit.visitRemarks']}
@@ -311,8 +311,8 @@ const VisitInfoCard = ({
               cannedTextTypeFK={CANNED_TEXT_TYPE.APPOINTMENTREMARKS}
               style={{
                 position: 'absolute',
-                bottom: 0,
-                right: -5,
+                bottom: 5,
+                right: -10,
               }}
               handleSelectCannedText={cannedText => {
                 const remarks = values.visitRemarks
