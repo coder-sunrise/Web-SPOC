@@ -362,7 +362,7 @@ export const formWidgets = (props, scribbleNoteUpdateState = () => {}) => [
     cavanSize: { width: 600, height: 300 },
     imageSize: { width: 190, height: 92 },
     position: { left: 220, top: 104 },
-    thumbnailDisplaySize: { width: 190, height: 92 },
+    thumbnailDisplaySize: { width: 300, height: 150 },
     defaultThumbnail: CLINICALNOTE_FORMTHUMBNAIL.CONTACTLENSFITTING,
     defaultImage: ContactLensFitting,
   },

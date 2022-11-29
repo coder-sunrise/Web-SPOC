@@ -33,6 +33,7 @@ const styles = theme => ({
     overflowWrap: 'anywhere',
     padding: 4,
     width: '100%',
+    minHeight: 31,
   },
   sectionTitle: {
     fontWeight: 500,
