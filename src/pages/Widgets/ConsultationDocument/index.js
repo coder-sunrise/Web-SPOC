@@ -149,6 +149,9 @@ class ConsultationDocument extends PureComponent {
     super(props)
     const { dispatch } = props
 
+    this.state = {
+      openFormType: false, 
+    }
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
@@ -319,25 +322,70 @@ class ConsultationDocument extends PureComponent {
                 : 'enable',
           }}
         >
-          <Tooltip title='Add Consultation Document'>
-            <ProgressButton
-              color='primary'
-              icon={<Add />}
-              style={{ margin: theme.spacing(1) }}
-              onClick={() => {
-                window.g_app._store.dispatch({
-                  type: 'consultationDocument/updateState',
-                  payload: {
-                    showModal: true,
-                    type: '5',
-                    entity: undefined,
-                  },
-                })
-              }}
-            >
-              Add New
-            </ProgressButton>
-          </Tooltip>
+          <Popover
+            icon={null}
+            trigger='click'
+            placement='bottom'
+            visible={this.state.openFormType}
+            onVisibleChange={this.toggleVisibleChange}
+            content={
+              <div className={classes.popoverContainer}>
+                <TextField
+                  label='Filter Template'
+                  onChange={e => {
+                    this.debouncedFilterFormTemplateAction(e)
+                  }}
+                />
+                <div className={classes.listContainer}>
+                  {orderedTemplates.map(item => {
+                    return (
+                      <this.ListItem
+                        key={item.formTemplateFK}
+                        title={item.name}
+                        classes={classes}
+                        onClick={() => {
+                          dispatch({
+                            type: 'forms/updateState',
+                            payload: {
+                              showModal: true,
+                              type: item.value,
+                              entity: undefined,
+                              formCategory: FORM_CATEGORY.CORFORM,
+                              formName: item.name,
+                              templateContent: null,
+                              formTemplateFK: item.formTemplateFK,
+                            },
+                          })
+                          this.toggleVisibleChange()
+                        }}
+                        {...item}
+                      />
+                    )
+                  })}
+                </div>
+              </div>
+            }
+          >
+            <Tooltip title='Add Consultation Document'>
+              <ProgressButton
+                color='primary'
+                icon={<Add />}
+                style={{ margin: theme.spacing(1) }}
+                onClick={() => {
+                  window.g_app._store.dispatch({
+                    type: 'consultationDocument/updateState',
+                    payload: {
+                      showModal: true,
+                      type: '5',
+                      entity: undefined,
+                    },
+                  })
+                }}
+              >
+                Add New
+              </ProgressButton>
+            </Tooltip>
+          </Popover>
         </AuthorizedContext.Provider>
         <CommonModal
           open={showModal}
