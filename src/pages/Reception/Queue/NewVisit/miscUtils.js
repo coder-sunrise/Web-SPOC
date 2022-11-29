@@ -160,7 +160,7 @@ export const formikMapPropsToValues = ({
       visitPurposeFK: visitRegistration.isRegisterOtc
         ? VISIT_TYPE.OTC
         : VISIT_TYPE.BF,
-      consReady,
+      consReady: visitRegistration.isRegisterOtc ? false : consReady,
       roomFK: resourceRoomFK || roomAssignmentFK || roomFK,
       visitStatus: VISIT_STATUS.WAITING,
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
