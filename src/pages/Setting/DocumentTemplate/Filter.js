@@ -86,7 +86,7 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={3}>
+          {/* <GridItem xs={6} md={3}>
             <FastField
               shouldUpdate={() => true}
               name='documentTemplateTypeFK'
@@ -106,7 +106,7 @@ class Filter extends PureComponent {
                 )
               }}
             />
-          </GridItem>
+          </GridItem> */}
           <GridItem xs={6} md={2}>
             <FastField
               name='isActive'
@@ -115,10 +115,8 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-        </GridContainer>
 
-        <GridContainer>
-          <GridItem>
+          <GridItem xs={6} md={2}>
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
@@ -152,7 +150,6 @@ class Filter extends PureComponent {
 
               <Button
                 color='primary'
-                onClick={() => {}}
                 id='pp-positioned-button'
                 aria-haspopup='true'
                 aria-expanded={

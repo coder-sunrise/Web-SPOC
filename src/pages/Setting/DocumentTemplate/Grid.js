@@ -40,7 +40,7 @@ class Grid extends PureComponent {
         }}
         columns={[
           { name: 'documentCategoryFK', title: 'Document Category' },
-          { name: 'documentTemplateTypeFK', title: 'Document Type' },
+          // { name: 'documentTemplateTypeFK', title: 'Document Type' },
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },
           // { name: 'templateContent', title: 'Template Message' },

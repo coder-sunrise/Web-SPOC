@@ -36,7 +36,7 @@ const styles = theme => ({})
     },
   validationSchema: Yup.object().shape({
     documentCategoryFK: Yup.string().required(),
-    documentTemplateTypeFK: Yup.string().required(),
+    // documentTemplateTypeFK: Yup.string().required(),
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     templateContent: Yup.string().when('documentCategoryFK', {
@@ -179,30 +179,12 @@ class Detail extends PureComponent {
       height,
       values,
     } = props
-    const { documentTemplateTypeFK, displayValue, documentCategoryFK } = values
+    const { displayValue, documentCategoryFK } = values
     return (
       <SizeContainer size='sm'>
         <div style={{ margin: theme.spacing(1) }}>
           <GridContainer>
-            <GridItem md={6}>
-              <FastField
-                name='documentCategoryFK'
-                render={args => {
-                  return (
-                    <CodeSelect
-                      disabled
-                      code='LTDocumentCategory'
-                      label='Document Category'
-                      onChange={() => {
-                        setFieldValue('documentTemplateTypeFK', undefined)
-                      }}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={6}>
+            {/* <GridItem md={6}>
               <FastField
                 shouldUpdate={() => true}
                 name='documentTemplateTypeFK'
@@ -232,7 +214,7 @@ class Detail extends PureComponent {
                   )
                 }}
               />
-            </GridItem>
+            </GridItem>*/}
           </GridContainer>
           <GridContainer>
             <GridItem md={6}>
@@ -252,6 +234,25 @@ class Detail extends PureComponent {
               <FastField
                 name='displayValue'
                 render={args => <TextField label='Display Value' {...args} />}
+              />
+            </GridItem>
+
+            <GridItem md={6}>
+              <FastField
+                name='documentCategoryFK'
+                render={args => {
+                  return (
+                    <CodeSelect
+                      disabled
+                      code='LTDocumentCategory'
+                      label='Document Category'
+                      onChange={() => {
+                        // setFieldValue('documentTemplateTypeFK', undefined)
+                      }}
+                      {...args}
+                    />
+                  )
+                }}
               />
             </GridItem>
             <GridItem md={6}>
@@ -287,10 +288,11 @@ class Detail extends PureComponent {
                       <div
                         style={{
                           marginLeft: 8,
+                          marginTop: 15,
                           height: '25px',
                           lineHeight: '25px',
                           fontWeight: 'inherit',
-                          color: 'rgb(0,0,0,0.54)',
+                          color: 'rgb(0,0,0,0.84)',
                           transform: 'translate(0,3px) scale(0.8)',
                           transformOrigin: 'top left',
                         }}
@@ -366,16 +368,7 @@ class Detail extends PureComponent {
                   ) : (
                     <RichEditor
                       label='Template Message'
-                      tagList={
-                        documentTemplateTypeFK === 3
-                          ? tagList.filter(
-                              t =>
-                                ['Order', 'ExternalPrescription'].indexOf(
-                                  t.value,
-                                ) < 0,
-                            )
-                          : tagList
-                      }
+                      tagList={tagList}
                       {...cfg}
                       {...args}
                     />

@@ -80,7 +80,7 @@ const styles = theme => ({
   },
   groupPanel: {
     margin: '0px 5px',
-    maxHeight: 175,
+    maxHeight: 105,
     overflowY: 'auto',
     overflowX: 'hidden',
   },
