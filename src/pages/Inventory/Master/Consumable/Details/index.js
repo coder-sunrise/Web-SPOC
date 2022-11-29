@@ -167,6 +167,7 @@ export default compose(
       }),
       code: Yup.string().required(),
       displayValue: Yup.string().required(),
+      consumableCategoryFK: Yup.number().required(),
       revenueCategoryFK: Yup.string().required(),
       effectiveDates: Yup.array()
         .of(Yup.date())
