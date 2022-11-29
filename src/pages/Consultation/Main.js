@@ -434,6 +434,9 @@ const checkUpdateNotes = (oldNotes = {}, newNotes = {}) => {
   delete oldNotesEntity.corDoctorNote.lastChangeDate
   delete oldNotesEntity.corDoctorNote._lastChangeDateIn
   delete oldNotesEntity.corDoctorNote._lastChangeDateOut
+  delete oldNotesEntity.corDoctorNote.signedDate
+  delete oldNotesEntity.corDoctorNote._signedDateIn
+  delete oldNotesEntity.corDoctorNote._signedDateOut
 
   let newNotesEntity = { corDoctorNote: _.cloneDeep(newNotes) }
   delete newNotesEntity.corDoctorNote.id
@@ -442,6 +445,9 @@ const checkUpdateNotes = (oldNotes = {}, newNotes = {}) => {
   delete newNotesEntity.corDoctorNote.lastChangeDate
   delete newNotesEntity.corDoctorNote._lastChangeDateIn
   delete newNotesEntity.corDoctorNote._lastChangeDateOut
+  delete newNotesEntity.corDoctorNote.signedDate
+  delete newNotesEntity.corDoctorNote._signedDateIn
+  delete newNotesEntity.corDoctorNote._signedDateOut
   formConfigs.forEach(form => {
     var oldList = getIn(oldNotesEntity, form.prop)
     if (oldList && oldList.length > 0) {
