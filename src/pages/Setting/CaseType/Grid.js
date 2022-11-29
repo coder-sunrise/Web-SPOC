@@ -3,11 +3,12 @@ import Edit from '@material-ui/icons/Edit'
 import { CommonTableGrid, Button, Tooltip } from '@/components'
 import { status } from '@/utils/codes'
 
+
 class Grid extends PureComponent {
   editRow = (row, e) => {
+    
     if (row.isUserMaintainable) {
       const { dispatch, settingCaseType } = this.props
-
       const { list } = settingCaseType
       dispatch({
         type: 'settingCaseType/updateState',

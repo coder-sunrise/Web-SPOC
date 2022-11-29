@@ -273,4 +273,10 @@ export const menuData = [
     textExtension: '(Investigative Tests)',
     url: '/setting/typeoftest',
   },
+  {
+    // authority: 'settings.clinicsetting.frametype',
+    title: 'Clinic Setting',
+    text: 'Frame Type',
+    url: '/setting/frametype',
+  },
 ]

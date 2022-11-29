@@ -882,6 +882,12 @@ const _routes = [
             component: './Setting/TypeOfTest',
             authority: ['settings.clinicsetting.typeoftest'],
           },
+          {
+            path: '/setting/frametype',
+            name: 'frametype',
+            component: './Setting/FrameType',
+            authority: ['settings.clinicsetting.frametype'],
+          },
         ],
       },
       // Settings

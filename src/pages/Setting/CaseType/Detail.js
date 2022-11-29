@@ -16,7 +16,7 @@ const styles = theme => ({})
 @withFormikExtend({
   mapPropsToValues: ({ settingCaseType }) =>
     settingCaseType.entity || settingCaseType.default,
-  validationSchema: Yup.object().shape({
+    validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     effectiveDates: Yup.array()

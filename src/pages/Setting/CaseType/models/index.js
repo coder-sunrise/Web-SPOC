@@ -27,11 +27,11 @@ export default createListViewModel({
     },
     effects: {},
     reducers: {
-      queryDone(st, { payload }) {
+      queryDone(state, { payload }) {
         const { data } = payload
 
         return {
-          ...st,
+          ...state,
           list: data.data.map(o => {
             return {
               ...o,
@@ -40,6 +40,7 @@ export default createListViewModel({
           }),
         }
       },
+      
     },
   },
 })

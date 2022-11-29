@@ -173,6 +173,7 @@ export default compose(
         .min(2)
         .required(),
       uomfk: Yup.number().required(),
+      consumableCategoryFK: Yup.string().required(),
       averageCostPrice: Yup.number()
         .min(0, 'Average Cost Price must between 0 and 999,999.9999')
         .max(999999.9999, 'Average Cost Price must between 0 and 999,999.9999'),

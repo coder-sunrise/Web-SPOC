@@ -27,6 +27,7 @@ const tabHeader = (tabName, detailsProps) => {
         code,
         displayValue,
         revenueCategoryFK,
+        consumableCategoryFK,
         effectiveDates,
         uomfk,
         averageCostPrice,
@@ -42,7 +43,8 @@ const tabHeader = (tabName, detailsProps) => {
           displayValue ||
           revenueCategoryFK ||
           effectiveDates ||
-          uomfk) &&
+          uomfk||
+          consumableCategoryFK) &&
         tabName === 'General'
       ) {
         return errorHeader

@@ -20,16 +20,19 @@ const styles = theme => ({
   mainDivHeight: global.mainDivHeight,
 }))
 @withSettingBase({ modelName: 'settingCaseType' })
+
 class CaseType extends PureComponent {
   state = {}
 
   componentDidMount() {
+  
     this.props.dispatch({
       type: 'settingCaseType/query',
       payload: {
         isActive: true,
       },
     })
+    
   }
 
   toggleModal = () => {
@@ -40,7 +43,7 @@ class CaseType extends PureComponent {
       },
     })
   }
-
+  
   render() {
     const { settingCaseType, mainDivHeight = 700 } = this.props
     const cfg = {
@@ -64,7 +67,9 @@ class CaseType extends PureComponent {
           onConfirm={this.toggleModal}
         >
           <Detail {...cfg} {...this.props} />
+          
         </CommonModal>
+     
       </CardContainer>
     )
   }
