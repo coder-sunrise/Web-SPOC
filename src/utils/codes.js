@@ -1372,8 +1372,8 @@ const orderItemCategory = [
 ]
 
 export const documentCategorys = [
-         { value: 1, name: 'Template with Placeholder' },
-         { value: 2, name: 'Template with Word-Style' },
+         { value: 1, name: 'Consultation Document' },
+         { value: 2, name: 'Form' },
        ]
 
 export const documentTemplateTypes = [
