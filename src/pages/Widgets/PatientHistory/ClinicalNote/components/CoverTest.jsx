@@ -19,6 +19,13 @@ const _styles = withStyles(
         textAlign: 'center',
       },
     },
+    extraDom: {
+      '&::after': {
+        content: "' + '",
+        position: 'relative',
+        top: '-10px',
+      },
+    },
   }),
   { withTheme: true },
 )
@@ -38,7 +45,7 @@ const CoverTest = props => {
               <div
                 style={{ position: 'absolute', top: spacing(2), left: '5px' }}
               >
-                <p>CoverTest</p>
+                <p className={classes.extraDom}>CoverTest</p>
                 <p style={{ fontSize: '0.8rem' }}>
                   <em>(including its magnitude and direction)</em>
                 </p>

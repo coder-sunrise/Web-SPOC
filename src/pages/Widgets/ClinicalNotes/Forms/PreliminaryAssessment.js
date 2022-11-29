@@ -1,4 +1,4 @@
-import { TextField, Button, MultipleTextField, DatePicker } from '@/components'
+import { TextField, Button, MultipleTextField, TimePicker } from '@/components'
 import { FastField } from 'formik'
 import Edit from '@material-ui/icons/Edit'
 import { withStyles } from '@material-ui/core/styles'
@@ -257,7 +257,7 @@ let PreliminaryAssessment = props => {
                   >
                     <FastField
                       name={`${prefixProp}.tonometryInstrumentTime`}
-                      render={args => <DatePicker label='Time' {...args} />}
+                      render={args => <TimePicker label='Time' {...args} />}
                     />
                   </div>
                 </div>
@@ -323,7 +323,6 @@ let PreliminaryAssessment = props => {
                         thumbnailSize,
                         position,
                       )
-
                     }}
                   >
                     <Edit />
