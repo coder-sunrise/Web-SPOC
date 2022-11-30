@@ -155,7 +155,7 @@ export const formConfigs = [
     imageSize: { width: 190, height: 92 },
     position: { left: 220, top: 104 },
     thumbnailSize: { width: 300, height: 150 },
-    thumbnailDisplaySize: { width: 190, height: 92 },
+    thumbnailDisplaySize: { width: 300, height: 150 },
     defaultValue: {
       lastChangeDate: moment(),
     },

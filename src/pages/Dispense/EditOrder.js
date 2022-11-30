@@ -253,11 +253,15 @@ class EditOrder extends Component {
         return
       }
 
-      const payload = convertToConsultation(values, {
-        consultationDocument,
-        orders,
-        forms,
-      })
+      const payload = convertToConsultation(
+        values,
+        {
+          consultationDocument,
+          orders,
+          forms,
+        },
+        true,
+      )
       const signResult = await dispatch({
         type: `consultation/signOrder`,
         payload: {

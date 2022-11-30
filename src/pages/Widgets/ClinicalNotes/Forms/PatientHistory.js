@@ -110,7 +110,7 @@ const PatientHistory = props => {
           name={`${prefixProp}.refraction`}
           render={args => (
             <TextField
-              label='Refraction / Optical Appliances Hx'
+              label='Refraction / Optical Appliances Hx / Contact Lens Hx'
               multiline
               maxLength={500}
               {...args}
@@ -140,10 +140,10 @@ const PatientHistory = props => {
         <FastField
           name={`${prefixProp}.otherObservations`}
           render={args => (
-            <MultipleTextField
-              label=''
+            <TextField
+              label='Others Observations'
+              multiline
               maxLength={2000}
-              autoSize={{ minRows: 2 }}
               {...args}
             />
           )}

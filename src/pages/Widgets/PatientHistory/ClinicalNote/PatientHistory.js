@@ -16,44 +16,28 @@ export default ({ formContent, classes }) => {
       </GridItem>
       <GridItem md={12} container>
         <div className={classes.sectionTitle}>Ocular & General History</div>
-        {!_.isEmpty(formContent.personalOcularHealth) && (
-          <div className={classes.textWithUnderline}>
-            {formContent.personalOcularHealth}
-          </div>
-        )}
-        {!_.isEmpty(formContent.personalGeneralHealth) && (
-          <div className={classes.textWithUnderline}>
-            {formContent.personalGeneralHealth}
-          </div>
-        )}
-        {!_.isEmpty(formContent.allergies) && (
-          <div className={classes.textWithUnderline}>
-            {formContent.allergies}
-          </div>
-        )}
-        {!_.isEmpty(formContent.familyOcularHealth) && (
-          <div className={classes.textWithUnderline}>
-            {formContent.familyOcularHealth}
-          </div>
-        )}
-        {!_.isEmpty(formContent.familyGeneralHealth) && (
-          <div className={classes.textWithUnderline}>
-            {formContent.familyGeneralHealth}
-          </div>
-        )}
+        <div className={classes.textWithUnderline}>
+          {formContent.personalOcularHealth}
+        </div>
+        <div className={classes.textWithUnderline}>
+          {formContent.personalGeneralHealth}
+        </div>
+        <div className={classes.textWithUnderline}>{formContent.allergies}</div>
+        <div className={classes.textWithUnderline}>
+          {formContent.familyOcularHealth}
+        </div>
+        <div className={classes.textWithUnderline}>
+          {formContent.familyGeneralHealth}
+        </div>
       </GridItem>
       <GridItem md={12} container>
         <div className={classes.sectionTitle}>Visual Requirements</div>
-        {!_.isEmpty(formContent.refraction) && (
-          <div className={classes.textWithUnderline}>
-            {formContent.refraction}
-          </div>
-        )}
-        {!_.isEmpty(formContent.visualTasks) && (
-          <div className={classes.textWithUnderline}>
-            {formContent.visualTasks}
-          </div>
-        )}
+        <div className={classes.textWithUnderline}>
+          {formContent.refraction}
+        </div>
+        <div className={classes.textWithUnderline}>
+          {formContent.visualTasks}
+        </div>
       </GridItem>
       <GridItem md={12} container>
         <div className={classes.sectionTitle}>Other Observations</div>

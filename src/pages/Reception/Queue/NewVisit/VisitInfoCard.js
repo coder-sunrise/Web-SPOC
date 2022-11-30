@@ -186,7 +186,7 @@ const VisitInfoCard = ({
           />
         </GridItem>
         <GridItem xs md={2}>
-          <FastField
+          <Field
             name={FormField['visit.salesType']}
             render={args => (
               <CodeSelect
