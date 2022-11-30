@@ -8,7 +8,7 @@ export const getClinicianProfile = (codetable, visitEntity) => {
         : undefined
 
     const visitDoctorProfile = doctorprofile.find(
-      (dp) => dp.id === visitDoctorProfileFK,
+      dp => dp.id === visitDoctorProfileFK,
     )
 
     const {
@@ -20,3 +20,12 @@ export const getClinicianProfile = (codetable, visitEntity) => {
     return { userProfileFK: undefined }
   }
 }
+
+export const CONSULTATION_DOCUMENTS = [
+  'Spectacle Prescription',
+  'Spectacle Order Form',
+  'Contact Lens Prescription',
+  'Contact Lens Order Form',
+  'Referral Letter',
+  'Medical Report',
+]
