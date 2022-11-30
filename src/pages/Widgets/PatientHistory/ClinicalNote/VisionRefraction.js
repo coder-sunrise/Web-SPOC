@@ -1,4 +1,4 @@
-import { GridContainer, GridItem, RadioGroup } from '@/components'
+import { GridContainer, GridItem, RadioGroup, Checkbox } from '@/components'
 const TableHeader = (
   <tr>
     <th style={{ width: '20%' }}></th>
@@ -65,7 +65,10 @@ export default ({ formContent, classes }) => {
               {CellUnderline(ps.distancePrescription_RE_AXIS)}
               <td>VA</td>
               {CellBordered(
-                `${ps.distancePrescription_RE_VA} / ${ps.distancePrescription_RE_VA_Comments}`,
+                <span>
+                  {ps.distancePrescription_RE_VA} /{' '}
+                  {ps.distancePrescription_RE_VA_Comments}
+                </span>,
               )}
             </tr>
             <tr>
@@ -78,7 +81,10 @@ export default ({ formContent, classes }) => {
               {CellUnderline(ps.distancePrescription_LE_AXIS)}
               <td>VA</td>
               {CellBordered(
-                `${ps.distancePrescription_LE_VA} / ${ps.distancePrescription_LE_VA_Comments}`,
+                <span>
+                  {ps.distancePrescription_LE_VA} /{' '}
+                  {ps.distancePrescription_LE_VA_Comments}
+                </span>,
               )}
             </tr>
             <tr>
@@ -128,7 +134,10 @@ export default ({ formContent, classes }) => {
             <td>RE</td>
             <td>VA</td>
             {CellBordered(
-              `${formContent.unaidedVA_Distance_RE_VA} / ${formContent.unaidedVA_Distance_RE_VA_Comments}`,
+              <span>
+                {formContent.unaidedVA_Distance_RE_VA} /{' '}
+                {formContent.unaidedVA_Distance_RE_VA_Comments}
+              </span>,
             )}
           </tr>
           <tr>
@@ -136,7 +145,10 @@ export default ({ formContent, classes }) => {
             <td>LE</td>
             <td>VA</td>
             {CellBordered(
-              `${formContent.unaidedVA_Distance_LE_VA} / ${formContent.unaidedVA_Distance_LE_VA_Comments}`,
+              <span>
+                {formContent.unaidedVA_Distance_LE_VA} /{' '}
+                {formContent.unaidedVA_Distance_LE_VA_Comments}
+              </span>,
             )}
           </tr>
           <tr>
@@ -218,7 +230,10 @@ export default ({ formContent, classes }) => {
             {CellUnderline(formContent.objectiveRefraction_RE_AXIS)}
             <td>VA</td>
             {CellBordered(
-              `${formContent.objectiveRefraction_RE_VA} / ${formContent.objectiveRefraction_RE_VA_Comments}`,
+              <span>
+                {formContent.objectiveRefraction_RE_VA} /{' '}
+                {formContent.objectiveRefraction_RE_VA_Comments}
+              </span>,
             )}
           </tr>
           <tr>
@@ -231,7 +246,10 @@ export default ({ formContent, classes }) => {
             {CellUnderline(formContent.objectiveRefraction_LE_AXIS)}
             <td>VA</td>
             {CellBordered(
-              `${formContent.objectiveRefraction_LE_VA} / ${formContent.objectiveRefraction_LE_VA_Comments}`,
+              <span>
+                {formContent.objectiveRefraction_LE_VA} /{' '}
+                {formContent.objectiveRefraction_LE_VA_Comments}
+              </span>,
             )}
           </tr>
           <tr>
@@ -245,7 +263,19 @@ export default ({ formContent, classes }) => {
       <GridItem md={12} container>
         <div className={classes.sectionTitle}>Subjective Refraction</div>
         <table className={classes.tableWithoutBorder}>
-          {TableHeader}
+          <tr>
+            <th style={{ width: '20%' }}></th>
+            <th style={{ width: 50 }}></th>
+            <th style={{ width: '15%' }}></th>
+            <th style={{ width: 50 }}></th>
+            <th style={{ width: '15%' }}></th>
+            <th style={{ width: 50 }}></th>
+            <th style={{ width: '15%' }}></th>
+            <th style={{ width: 50 }}></th>
+            <th style={{ width: '10%' }}></th>
+            <th style={{ width: '10%' }}></th>
+            <th></th>
+          </tr>
           <tr>
             <td></td>
             <td>RE</td>
@@ -256,8 +286,12 @@ export default ({ formContent, classes }) => {
             {CellUnderline(formContent.subjectiveRefraction_RE_AXIS)}
             <td>VA</td>
             {CellBordered(
-              `${formContent.subjectiveRefraction_RE_VA} / ${formContent.subjectiveRefraction_RE_VA_Comments}`,
+              <span>
+                {formContent.subjectiveRefraction_RE_VA} /{' '}
+                {formContent.subjectiveRefraction_RE_VA_Comments}
+              </span>,
             )}
+            {CellBordered(formContent.subjectiveRefraction_RE_PH)}
           </tr>
           <tr>
             <td></td>
@@ -269,8 +303,12 @@ export default ({ formContent, classes }) => {
             {CellUnderline(formContent.subjectiveRefraction_LE_AXIS)}
             <td>VA</td>
             {CellBordered(
-              `${formContent.subjectiveRefraction_LE_VA} / ${formContent.subjectiveRefraction_LE_VA_Comments}`,
+              <span>
+                {formContent.subjectiveRefraction_LE_VA} /{' '}
+                {formContent.subjectiveRefraction_LE_VA_Comments}
+              </span>,
             )}
+            {CellBordered(formContent.subjectiveRefraction_LE_PH)}
           </tr>
           <tr>
             <td className={classes.cellLabel}>Near Addition</td>
@@ -300,9 +338,29 @@ export default ({ formContent, classes }) => {
             <td className={classes.cellLabel}>Remarks</td>
             {CellBordered(
               formContent.subjectiveRefraction_NearAddition_Remarks,
-              9,
+              10,
               { textAlign: 'left' },
             )}
+          </tr>
+          <tr>
+            <td></td>
+            <td colspan='10' style={{ textAlign: 'left' }}>
+              <Checkbox
+                simple
+                label={
+                  <span>
+                    verified by Optomertist
+                    <span style={{ color: 'red' }}>
+                      {' '}
+                      (for Optometrist only)
+                    </span>
+                  </span>
+                }
+                checked={
+                  formContent.subjectiveRefraction_IsVerifiedByOptomertist
+                }
+              />
+            </td>
           </tr>
         </table>
       </GridItem>

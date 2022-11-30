@@ -17,13 +17,6 @@ export const filterData = (
   currentDoctorId,
 ) => {
   if (filter === 'Past') {
-    console.log(
-      data.filter(eachRow => {
-        return (
-          eachRow.isClinicSessionClosed && eachRow.doctor.id === currentDoctorId
-        )
-      }),
-    )
     return data.filter(eachRow => {
       return (
         eachRow.isClinicSessionClosed && eachRow.doctor.id === currentDoctorId

@@ -947,7 +947,7 @@ class VisionRefraction extends PureComponent {
                 >
                   x
                 </GridItem>
-                <GridItem md={2}>
+                <GridItem md={1}>
                   <Field
                     name={`${prefixProp}.subjectiveRefraction_RE_AXIS`}
                     render={args => (
@@ -979,11 +979,28 @@ class VisionRefraction extends PureComponent {
                     },
                     {
                       name: `${prefixProp}.subjectiveRefraction_RE_VA_Comments`,
-                      label: 'PH',
                       disabled: this.state.isVerifiedByOptomertist,
                     },
                     classes,
                   )}
+                </GridItem>
+                <GridItem
+                  md={1}
+                  className={classes.symbolText}
+                  style={{ top: 16 }}
+                >
+                  <Field
+                    name={`${prefixProp}.subjectiveRefraction_RE_PH`}
+                    render={args => (
+                      <Input
+                        disabled={this.state.isVerifiedByOptomertist}
+                        maxLength={500}
+                        placeholder='PH'
+                        className={classes.antdInput}
+                        {...args.field}
+                      />
+                    )}
+                  />
                 </GridItem>
                 <GridItem md={1} style={{ position: 'relative', top: 24 }}>
                   LE
@@ -1028,7 +1045,7 @@ class VisionRefraction extends PureComponent {
                 >
                   x
                 </GridItem>
-                <GridItem md={2}>
+                <GridItem md={1}>
                   <Field
                     name={`${prefixProp}.subjectiveRefraction_LE_AXIS`}
                     render={args => (
@@ -1060,11 +1077,28 @@ class VisionRefraction extends PureComponent {
                     },
                     {
                       name: `${prefixProp}.subjectiveRefraction_LE_VA_Comments`,
-                      label: 'PH',
                       disabled: this.state.isVerifiedByOptomertist,
                     },
                     classes,
                   )}
+                </GridItem>
+                <GridItem
+                  md={1}
+                  className={classes.symbolText}
+                  style={{ top: 16 }}
+                >
+                  <Field
+                    name={`${prefixProp}.subjectiveRefraction_LE_PH`}
+                    render={args => (
+                      <Input
+                        disabled={this.state.isVerifiedByOptomertist}
+                        maxLength={500}
+                        placeholder='PH'
+                        className={classes.antdInput}
+                        {...args.field}
+                      />
+                    )}
+                  />
                 </GridItem>
               </GridItem>
             </GridContainer>
