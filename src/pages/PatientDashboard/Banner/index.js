@@ -669,7 +669,10 @@ class Banner extends PureComponent {
     const { ctsalutation = [] } = codetable
     const info = entity
     const name = `${info.name}`
-
+    const referralSourcePerson =
+      visitInfo?.referralPatientProfile ||
+      visitInfo?.referralPerson?.name ||
+      visitInfo?.referralSource?.name
     const year = Math.floor(moment.duration(moment().diff(info.dob)).asYears())
 
     // get scheme details based on scheme type
@@ -848,7 +851,8 @@ class Banner extends PureComponent {
           </span>
         </Col>
         <Col flex='auto' className={contentClass}>
-          <span>{info.referralSource ? info.referralSource : '-'}</span>
+          {/* info.referralSource */}
+          <span>{referralSourcePerson ? referralSourcePerson : '-'}</span>
         </Col>
       </Row>
     )
