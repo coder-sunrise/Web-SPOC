@@ -182,14 +182,6 @@ class NewVisit extends PureComponent {
         !item.isDeleted && deleteFileByFileID(item.id)
       })
     }
-    if (values?.visitPurposeFK == VISIT_TYPE.OTC) {
-      dispatch({
-        type: 'visitRegistration/updateState',
-        payload: {
-          isRegisterOtc: false,
-        },
-      })
-    }
   }
 
   updateAttachments = ({ added, deleted }) => {

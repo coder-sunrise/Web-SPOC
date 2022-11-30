@@ -288,6 +288,10 @@ export const formikHandleSubmit = (
       ...restValues, // override using formik values
       visitDoctor: newVisitDoctor,
       referralBy: _referralBy,
+      billFirstVisitFK:
+        visitRegistration.isRegisterOtc == true
+          ? visitRegistration?.billFirstVisitFK
+          : undefined,
     },
   }
 
