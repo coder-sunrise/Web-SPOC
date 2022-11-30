@@ -67,6 +67,8 @@ class ContactLensFitting extends PureComponent {
         ...items,
         {
           uid: getUniqueId(),
+          reComfort: '/ 10',
+          leComfort: '/ 10',
           rightScribbleNote: {
             thumbnail: CLINICALNOTE_FORMTHUMBNAIL.CONTACTLENSFITTING,
             subject: 'Right Eye',
@@ -101,7 +103,7 @@ class ContactLensFitting extends PureComponent {
             Contact Lens Fitting
           </span>
         </GridItem>
-        <GridItem md={12}>Please draw out relevant diagram below.</GridItem>
+        <GridItem md={12}>Please illustrate the lens fitting below.</GridItem>
         <GridItem md={12}>
           <div
             style={{
@@ -597,7 +599,7 @@ class ContactLensFitting extends PureComponent {
                           <tr>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${itemProp}.reVADN`}
+                                name={`${itemProp}.revadn`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
@@ -615,7 +617,7 @@ class ContactLensFitting extends PureComponent {
                             </td>
                             <td className={classes.cellStyle}>
                               <FastField
-                                name={`${itemProp}.leVADN`}
+                                name={`${itemProp}.levadn`}
                                 render={args => (
                                   <MultipleTextField
                                     label=''
