@@ -8,6 +8,8 @@ import { orderTypes } from '@/pages/Consultation/utils'
 import { getUserPreference, saveUserPreference } from '@/services/user'
 import service from '../services/consultation'
 import { USER_PREFERENCE_TYPE } from '@/utils/constants'
+import { formConfigs } from '@/pages/Widgets/ClinicalNotes/config'
+import { getIn } from 'formik'
 
 const getSequence = (sequence, maxSeq) => {
   if (sequence === 0) return sequence
@@ -477,6 +479,32 @@ export default createFormViewModel({
           }
         })
 
+        if (data.corDoctorNote) {
+          let corDoctorNote = _.cloneDeep(data.corDoctorNote)
+          let tempValues = { corDoctorNote }
+          formConfigs.forEach(form => {
+            var list = getIn(tempValues, form.prop) || []
+            list.forEach(item => {
+              delete item.rightScribbleNote
+              delete item.leftScribbleNote
+              delete item.ocularMotilityScribbleNote
+              delete item.pupillaryAssessmentScribbleNote
+              delete item.confrontationScribbleNote
+              if (item.corContactLensFitting_Item) {
+                item.corContactLensFitting_Item.forEach(itemFitting => {
+                  delete itemFitting.rightScribbleNote
+                  delete itemFitting.leftScribbleNote
+                })
+              }
+            })
+          })
+          yield put({
+            type: 'consultation/updateState',
+            payload: {
+              draftDoctorNote: tempValues.corDoctorNote,
+            },
+          })
+        }
         yield put({
           type: 'diagnosis/updateState',
           payload: {

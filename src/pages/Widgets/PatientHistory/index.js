@@ -174,7 +174,7 @@ class PatientHistory extends Component {
       totalVisits: 0,
       currentHeight: window.innerHeight,
       isLoadingData: undefined,
-      notesBy: 'Optometrist',
+      notesBy: 'Student',
     }
   }
 
@@ -919,32 +919,34 @@ class PatientHistory extends Component {
                 />
               )}
             />
-            <Field
-              name='selectDoctors'
-              render={args => (
-                <DoctorProfileSelect
-                  style={{
-                    width: 240,
-                    display: 'inline-Block',
-                    marginLeft: 10,
-                    marginBottom: -12,
-                  }}
-                  mode='multiple'
-                  {...args}
-                  maxTagCount={0}
-                  allValue={-99}
-                  allValueOption={{
-                    id: -99,
-                    clinicianProfile: {
-                      name: 'All',
-                      isActive: true,
-                    },
-                  }}
-                  labelField='clinicianProfile.name'
-                  localFilter={option => option.clinicianProfile.isActive}
-                />
-              )}
-            />
+            {!isStudent && (
+              <Field
+                name='selectDoctors'
+                render={args => (
+                  <DoctorProfileSelect
+                    style={{
+                      width: 240,
+                      display: 'inline-Block',
+                      marginLeft: 10,
+                      marginBottom: -12,
+                    }}
+                    mode='multiple'
+                    {...args}
+                    maxTagCount={0}
+                    allValue={-99}
+                    allValueOption={{
+                      id: -99,
+                      clinicianProfile: {
+                        name: 'All',
+                        isActive: true,
+                      },
+                    }}
+                    labelField='clinicianProfile.name'
+                    localFilter={option => option.clinicianProfile.isActive}
+                  />
+                )}
+              />
+            )}
             <div
               style={{
                 display: 'inline-Block',
@@ -976,8 +978,8 @@ class PatientHistory extends Component {
               style={{ width: 200, position: 'relative', top: 0 }}
               label=''
               options={[
-                { label: 'Optometrist', value: 'Optometrist' },
                 { label: 'Student', value: 'Student' },
+                { label: 'Optometrist', value: 'Optometrist' },
               ]}
               onChange={this.onNotesByChange}
               value={this.state.notesBy}
@@ -1124,32 +1126,33 @@ class PatientHistory extends Component {
                 />
               )}
             />
-            <Field
-              name='selectDoctors'
-              render={args => (
-                <DoctorProfileSelect
-                  style={{
-                    width: !isFullScreen ? 150 : 240,
-                    display: 'inline-Block',
-                    marginLeft: 4,
-                    marginBottom: -12,
-                  }}
-                  label='Doctors'
-                  mode='multiple'
-                  {...args}
-                  allValue={-99}
-                  allValueOption={{
-                    id: -99,
-                    clinicianProfile: {
-                      name: 'All',
-                      isActive: true,
-                    },
-                  }}
-                  labelField='clinicianProfile.name'
-                  localFilter={option => option.clinicianProfile.isActive}
-                />
-              )}
-            />
+            {!isStudent && (
+              <Field
+                name='selectDoctors'
+                render={args => (
+                  <DoctorProfileSelect
+                    style={{
+                      width: !isFullScreen ? 150 : 240,
+                      display: 'inline-Block',
+                      marginLeft: 4,
+                      marginBottom: -12,
+                    }}
+                    mode='multiple'
+                    {...args}
+                    allValue={-99}
+                    allValueOption={{
+                      id: -99,
+                      clinicianProfile: {
+                        name: 'All',
+                        isActive: true,
+                      },
+                    }}
+                    labelField='clinicianProfile.name'
+                    localFilter={option => option.clinicianProfile.isActive}
+                  />
+                )}
+              />
+            )}
             <div
               style={{
                 display: 'inline-Block',
@@ -1182,8 +1185,8 @@ class PatientHistory extends Component {
               style={{ width: 200, position: 'relative', top: 0 }}
               label=''
               options={[
-                { label: 'Optometrist', value: 'Optometrist' },
                 { label: 'Student', value: 'Student' },
+                { label: 'Optometrist', value: 'Optometrist' },
               ]}
               onChange={this.onNotesByChange}
               value={this.state.notesBy}
