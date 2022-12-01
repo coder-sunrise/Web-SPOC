@@ -276,7 +276,7 @@ class Queue extends React.Component {
     })
   }
 
-  registerOtcVisit = ({ patientProfileFK: patientId }) => {
+  registerOtcVisit = ({ patientProfileFK: patientId, id }) => {
     const { dispatch, global } = this.props
     if (global.showVisitRegistration) {
       dispatch({
@@ -288,6 +288,7 @@ class Queue extends React.Component {
       pid: patientId,
       visitMode: 'edit',
       isRegisterOtc: true,
+      billFirstVisitFK: id,
     }
     history.push(getAppendUrl(parameter))
   }

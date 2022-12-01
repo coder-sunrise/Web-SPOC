@@ -86,7 +86,7 @@ const CoverTest = props => {
               <div
                 style={{ position: 'absolute', top: spacing(2), left: '5px' }}
               >
-                <p className={classes.extraDom}>CoverTest</p>
+                <p className={classes.extraDom}>Cover Test</p>
                 <p style={{ fontSize: '0.8rem' }}>
                   <em>(including its magnitude and direction)</em>
                 </p>
