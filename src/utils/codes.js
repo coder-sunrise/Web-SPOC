@@ -222,89 +222,18 @@ const coPayerType = [
 
 const consultationDocumentTypes = [
   {
-    value: '5',
-    name: 'Medical Certificate',
-    prop: 'corMedicalCertificate',
-    getSubject: r => {
-      return `${moment(r.mcStartDate).format(dateFormatLong)} - ${moment(
-        r.mcEndDate,
-      ).format(dateFormatLong)} - ${r.mcDays} Day${r.mcDays > 1 ? 's' : ''}`
-    },
-    convert: r => {
-      return {
-        ...r,
-        mcStartEndDate: [moment(r.mcStartDate), moment(r.mcEndDate)],
-      }
-    },
+    value: '1',
+    name: 'Spectacle Prescription',
+    prop: 'corSpectaclePrescription',
     downloadConfig: {
       id: 7,
-      key: 'MedicalCertificateId',
-      subject: 'Medical Certificate',
+      key: 'SpectaclePrescriptionId',
+      subject: 'Spectacle Prescription',
       draft: row => {
         return {
-          MedicalCertificateDetails: [
+          SpectaclePrescriptionDetails: [
             {
               ...row,
-              unfitType: UNFIT_TYPE[row.unfitTypeFK],
-              mcIssueDate: moment(row.mcIssueDate).format(dateFormatLong),
-              mcStartDate: moment(row.mcStartDate).format(dateFormatLong),
-              mcEndDate: moment(row.mcEndDate).format(dateFormatLong),
-              otherUnfitTypeDescription: row.otherUnfitTypeDescription,
-            },
-          ],
-        }
-      },
-    },
-  },
-  {
-    value: '6',
-    name: 'Certificate of Attendance',
-    prop: 'corCertificateOfAttendance',
-    getSubject: r => {
-      return `Certificate of Attendance ${r.accompaniedBy || ''}`
-    },
-    convert: r => {
-      return {
-        ...r,
-        issueDate: moment(r.issueDate).format(dateFormatLong),
-      }
-    },
-    downloadConfig: {
-      id: 8,
-      key: 'CertificateOfAttendanceId',
-      subject: 'Certificate Of Attendance',
-      draft: row => {
-        return {
-          CertificateOfAttendanceDetails: [
-            {
-              ...row,
-              issueDate: moment(row.issueDate).format(dateFormatLong),
-              attendanceStartTime: moment(row.attendanceStartTime).format(
-                'hh:mm A',
-              ),
-              attendanceEndTime: moment(row.attendanceEndTime).format(
-                'hh:mm A',
-              ),
-            },
-          ],
-        }
-      },
-    },
-  },
-  {
-    value: '1',
-    name: 'Referral Letter',
-    prop: 'corReferralLetter',
-    downloadConfig: {
-      id: 9,
-      key: 'ReferralLetterId',
-      subject: 'Referral Letter',
-      draft: row => {
-        return {
-          ReferralLetterDetails: [
-            {
-              ...row,
-              referralDate: moment(row.referralDate).format(dateFormatLong),
             },
           ],
         }
@@ -313,18 +242,36 @@ const consultationDocumentTypes = [
   },
   {
     value: '2',
-    name: 'Memo',
-    prop: 'corMemo',
+    name: 'Spectacle Order Form',
+    prop: 'corSpectacleOrderForm',
     downloadConfig: {
-      id: 11,
-      key: 'memoid',
-      subject: 'Memo',
+      id: 8,
+      key: 'SpectacleOrderFormId',
+      subject: 'Spectacle Order Form',
       draft: row => {
         return {
-          MemoDetails: [
+          SpectacleOrderFormDetails: [
             {
               ...row,
-              memoDate: moment(row.memoDate).format(dateFormatLong),
+            },
+          ],
+        }
+      },
+    },
+  },
+  {
+    value: '3',
+    name: 'Contact Lens Prescription',
+    prop: 'corContactLensPrescription',
+    downloadConfig: {
+      id: 9,
+      key: 'ContactLensPrescriptionId',
+      subject: 'Contact Lens Prescription',
+      draft: row => {
+        return {
+          ContactLensPrescriptionDetails: [
+            {
+              ...row,
             },
           ],
         }
@@ -333,19 +280,55 @@ const consultationDocumentTypes = [
   },
   {
     value: '4',
-    name: 'Others',
-    prop: 'corOtherDocuments',
-    downloadKey: 'documentid',
+    name: 'Contact Lens Order Form',
+    prop: 'corContactLensOrderForm',
+    downloadConfig: {
+      id: 11,
+      key: 'ContactLensOrderFormId',
+      subject: 'Contact Lens Order Form',
+      draft: row => {
+        return {
+          ContactLensOrderFormDetails: [
+            {
+              ...row,
+            },
+          ],
+        }
+      },
+    },
+  },
+  {
+    value: '5',
+    name: 'Referral Letter',
+    prop: 'corReferralLetter',
     downloadConfig: {
       id: 12,
-      key: 'documentid',
-      subject: 'Other Documents',
+      key: 'ReferralLetterId',
+      subject: 'Referral Letter',
       draft: row => {
         return {
           DocumentDetails: [
             {
               ...row,
-              issueDate: moment(row.issueDate).format(dateFormatLong),
+            },
+          ],
+        }
+      },
+    },
+  },
+  {
+    value: '6',
+    name: 'Medical Report',
+    prop: 'corMedicalReport',
+    downloadConfig: {
+      id: 12,
+      key: 'MedicalReportId',
+      subject: 'Medical Report',
+      draft: row => {
+        return {
+          DocumentDetails: [
+            {
+              ...row,
             },
           ],
         }
@@ -1372,9 +1355,9 @@ const orderItemCategory = [
 ]
 
 export const documentCategorys = [
-         { value: 1, name: 'Consultation Document' },
-         { value: 2, name: 'Form' },
-       ]
+  { value: 1, name: 'Consultation Document' },
+  { value: 2, name: 'Form' },
+]
 
 export const documentTemplateTypes = [
   {

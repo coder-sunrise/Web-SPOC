@@ -9,7 +9,6 @@ import { consultationDocumentTypes } from '@/utils/codes'
 import { download } from '@/utils/request'
 import { commonDataReaderTransform } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
-import { CONSULTATION_DOCUMENTS } from './utils'
 import { List } from 'antd'
 
 import {
@@ -20,13 +19,11 @@ import {
   notification,
   ProgressButton,
   Popover,
-  TextField,
   Tooltip,
   AuthorizedContext,
   withFormikExtend,
 } from '@/components'
 import AddConsultationDocument from './AddConsultationDocument'
-import SpectacleOrderForm from './SpectacleOrderForm'
 
 // import model from './models'
 
@@ -154,11 +151,8 @@ class ConsultationDocument extends PureComponent {
   constructor(props) {
     super(props)
     const { dispatch } = props
-
-    console.log('consultation document props:', props)
     this.state = {
       openFormType: false,
-      consultationDocumentTemplate: [...CONSULTATION_DOCUMENTS],
     }
     dispatch({
       type: 'codetable/fetchCodes',
@@ -175,6 +169,8 @@ class ConsultationDocument extends PureComponent {
       type: 'consultationDocument/updateState',
       payload: {
         showModal: !showModal,
+        entity: undefined,
+        type: undefined,
       },
     })
   }
@@ -187,9 +183,9 @@ class ConsultationDocument extends PureComponent {
       payload: {
         entity: row,
         type: row.type,
+        showModal: true,
       },
     })
-    this.toggleModal()
   }
 
   handleViewReport = uid => {
@@ -213,6 +209,7 @@ class ConsultationDocument extends PureComponent {
     }
     return right
   }
+
   toggleVisibleChange = () => {
     this.setState(ps => {
       return {
@@ -221,26 +218,26 @@ class ConsultationDocument extends PureComponent {
       }
     })
   }
+
   openConsultationDocumentModal = item => {
-    this.toggleSpectacleOrderForm()
-    this.toggleVisibleChange()
-  }
-  toggleSpectacleOrderForm = () => {
-    const { consultationDocument } = this.props
-    const { showSpectacleOrderForm } = consultationDocument
     this.props.dispatch({
       type: 'consultationDocument/updateState',
       payload: {
-        showSpectacleOrderForm: !showSpectacleOrderForm,
+        entity: undefined,
+        type: item.value,
+        showModal: true,
       },
     })
+    this.toggleVisibleChange()
   }
 
   render() {
-    const { consultationDocument, dispatch, classes, theme } = this.props
-    const { showModal } = consultationDocument
-    const { showSpectacleOrderForm } = consultationDocument
-    const { rows } = consultationDocument
+    const { consultationDocument, dispatch, theme } = this.props
+    const { showModal, rows, entity, type } = consultationDocument
+    const selectType = consultationDocumentTypes.find(
+      item => item.value === type,
+    )
+    const title = `${_.isEmpty(entity) ? 'Add' : 'Edit'} ${selectType?.name}`
     return (
       <div>
         <AuthorizedContext.Provider value={this.getDocumentAccessRight()}>
@@ -266,17 +263,7 @@ class ConsultationDocument extends PureComponent {
               {
                 columnName: 'issuedByUserFK',
                 render: r => {
-                  const { codetable } = this.props
-                  const { clinicianprofile = [] } = codetable
-                  const obj =
-                    clinicianprofile.find(
-                      o =>
-                        o.userProfileFK ===
-                        (r.issuedByUserFK
-                          ? r.issuedByUserFK
-                          : r.referredByUserFK),
-                    ) || {}
-                  return `${obj.title || ''} ${obj.name || ''}`
+                  return `${r.issuedByUserTitle || ''} ${r.issuedByUser || ''}`
                 },
               },
               {
@@ -287,7 +274,7 @@ class ConsultationDocument extends PureComponent {
                 type: 'link',
                 linkField: 'href',
                 getLinkText: row => {
-                  return row.type === '4' ? row.title : row.subject
+                  return row.subject
                 },
               },
               {
@@ -351,40 +338,20 @@ class ConsultationDocument extends PureComponent {
                 <List
                   size='small'
                   bordered
-                  dataSource={this.state.consultationDocumentTemplate}
+                  dataSource={consultationDocumentTypes.map(item => ({
+                    value: item.value,
+                    name: item.name,
+                  }))}
                   renderItem={item => (
                     <List.Item
-                      onClick={item => {
+                      onClick={() => {
                         this.openConsultationDocumentModal(item)
                       }}
                     >
-                      {item}
+                      {item.name}
                     </List.Item>
                   )}
                 />
-                {/* {this.state.consultationDocumentTemplate.map(item => {
-                    return (
-                      <this.ListItem
-                        key={item.id}
-                        title={item.name}
-                        classes={classes}
-                        onClick={() => {
-                          dispatch({
-                            type: 'consultationDocument/updateState',
-                            payload: {
-                              showModal: true,
-                              type: item.value,
-                              entity: undefined,
-                              formName: item.name,
-                              templateContent: null,
-                            },
-                          })
-                          this.toggleVisibleChange()
-                        }}
-                        {...item}
-                      />
-                    )
-                  })} */}
               </div>
             }
           >
@@ -404,30 +371,15 @@ class ConsultationDocument extends PureComponent {
         </AuthorizedContext.Provider>
         <CommonModal
           open={showModal}
-          title='Add Consultation Document'
+          title={title}
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
           observe='AddConsultationDocument'
           maxWidth='md'
           bodyNoPadding
         >
-          <AddConsultationDocument
-            {...this.props}
-            types={consultationDocumentTypes}
-          />
+          <AddConsultationDocument {...this.props} />
         </CommonModal>
-        {showSpectacleOrderForm && (
-          <CommonModal
-            open={true}
-            title='Spectacle Order Form'
-            onClose={this.toggleSpectacleOrderForm}
-            onConfirm={this.toggleSpectacleOrderForm}
-            maxWidth='md'
-            bodyNoPadding
-          >
-            <SpectacleOrderForm {...this.props} />
-          </CommonModal>
-        )}
       </div>
     )
   }

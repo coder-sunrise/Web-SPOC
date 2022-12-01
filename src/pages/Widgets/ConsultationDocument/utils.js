@@ -20,12 +20,3 @@ export const getClinicianProfile = (codetable, visitEntity) => {
     return { userProfileFK: undefined }
   }
 }
-
-export const CONSULTATION_DOCUMENTS = [
-  'Spectacle Prescription',
-  'Spectacle Order Form',
-  'Contact Lens Prescription',
-  'Contact Lens Order Form',
-  'Referral Letter',
-  'Medical Report',
-]

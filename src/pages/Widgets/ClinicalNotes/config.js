@@ -10,6 +10,7 @@ import Paediatric from '@/assets/img/ClinicalNoteForm/OcularMotility.jpg'
 import PupillaryAssessment from '@/assets/img/ClinicalNoteForm/PupillaryAssessment.jpg'
 import Confrontation from '@/assets/img/ClinicalNoteForm/Confrontation.jpg'
 import ContactLensFitting from '@/assets/img/ClinicalNoteForm/ContactLensFitting.png'
+import { getUniqueId } from '@/utils/utils'
 
 export const formConfigs = [
   {
@@ -41,6 +42,7 @@ export const formConfigs = [
       objectiveRefraction_LE_VA: '6',
       subjectiveRefraction_RE_VA: '6',
       subjectiveRefraction_LE_VA: '6',
+      corVisionRefraction_PresentSpectacles: [{ uid: getUniqueId() }],
     },
   },
   {
@@ -158,6 +160,21 @@ export const formConfigs = [
     thumbnailDisplaySize: { width: 300, height: 150 },
     defaultValue: {
       lastChangeDate: moment(),
+      corContactLensFitting_Item: [
+        {
+          uid: getUniqueId(),
+          reComfort: '/ 10',
+          leComfort: '/ 10',
+          rightScribbleNote: {
+            thumbnail: CLINICALNOTE_FORMTHUMBNAIL.CONTACTLENSFITTING,
+            subject: 'Right Eye',
+          },
+          leftScribbleNote: {
+            thumbnail: CLINICALNOTE_FORMTHUMBNAIL.CONTACTLENSFITTING,
+            subject: 'Left Eye',
+          },
+        },
+      ],
     },
     defaultImage: ContactLensFitting,
   },
