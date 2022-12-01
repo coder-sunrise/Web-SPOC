@@ -126,9 +126,9 @@ const ReferralLetter = props => {
             </GridItem>
             <GridItem xs={2}>
               <FastField
-                name='leftPH'
+                name='leftNVA'
                 render={args => {
-                  return <TextField maxLength={500} label='PH' {...args} />
+                  return <TextField maxLength={500} label='NVA' {...args} />
                 }}
               />
             </GridItem>
@@ -177,9 +177,9 @@ const ReferralLetter = props => {
             </GridItem>
             <GridItem xs={2}>
               <FastField
-                name='rightPH'
+                name='rightNVA'
                 render={args => {
-                  return <TextField maxLength={500} label='PH' {...args} />
+                  return <TextField maxLength={500} label='NVA' {...args} />
                 }}
               />
             </GridItem>
