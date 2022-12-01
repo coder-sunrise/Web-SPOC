@@ -5,15 +5,15 @@ import {
   Button,
   FieldArray,
   MultipleTextField,
+  Popconfirm,
 } from '@/components'
-import { FastField, getIn } from 'formik'
+import { FastField } from 'formik'
 import { PureComponent } from 'react'
 import { getUniqueId } from '@/utils/utils'
 import { Delete, Add, Edit } from '@material-ui/icons'
 import { Input } from 'antd'
 import withStyles from '@material-ui/core/styles/withStyles'
 import { CLINICALNOTE_FORMTHUMBNAIL } from '@/utils/constants'
-import _ from 'lodash'
 
 const style = theme => ({
   inputSplit: {
@@ -58,9 +58,9 @@ class ContactLensFitting extends PureComponent {
     const { prefixProp, classes } = this.props
     const { form } = this.arrayHelpers
     const { setFieldValue, values } = form
-    const present = getIn(values, prefixProp) || {}
+    const present = _.get(values, prefixProp) || {}
     const items =
-      getIn(values, `${prefixProp}.corContactLensFitting_Item`) || []
+      _.get(values, `${prefixProp}.corContactLensFitting_Item`) || []
     setFieldValue(prefixProp, {
       ...present,
       corContactLensFitting_Item: [
@@ -122,7 +122,7 @@ class ContactLensFitting extends PureComponent {
               render={arrayHelpers => {
                 this.arrayHelpers = arrayHelpers
                 const contactLensFitting_Items =
-                  getIn(arrayHelpers.form.values, listProp) || []
+                  _.get(arrayHelpers.form.values, listProp) || []
                 const activeItems = contactLensFitting_Items.filter(
                   val => !val.isDeleted,
                 )
@@ -133,6 +133,7 @@ class ContactLensFitting extends PureComponent {
                   const itemProp = `${listProp}[${i}]`
                   return (
                     <GridContainer
+                      key={val.uid || val.id}
                       style={{ position: 'relative', paddingRight: 30 }}
                     >
                       <GridItem md={12}>
@@ -724,16 +725,26 @@ class ContactLensFitting extends PureComponent {
                         }}
                       >
                         {activeItems.length > 1 && (
-                          <Button justIcon color='danger'>
-                            <Delete
-                              onClick={() => {
-                                const {
-                                  form: { setFieldValue },
-                                } = this.arrayHelpers
-                                setFieldValue(`${itemProp}.isDeleted`, true)
-                              }}
-                            />
-                          </Button>
+                          <Popconfirm
+                            title='Confirm to delete?'
+                            onConfirm={() => {
+                              const {
+                                form: { setFieldValue },
+                              } = this.arrayHelpers
+                              if (!val.id)
+                                setFieldValue(
+                                  `${listProp}`,
+                                  contactLensFitting_Items.filter(
+                                    i => i.uid != val.uid,
+                                  ),
+                                )
+                              else setFieldValue(`${itemProp}.isDeleted`, true)
+                            }}
+                          >
+                            <Button justIcon color='danger'>
+                              <Delete />
+                            </Button>
+                          </Popconfirm>
                         )}
                       </div>
                     </GridContainer>

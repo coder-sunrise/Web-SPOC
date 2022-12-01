@@ -9,7 +9,7 @@ import {
   Checkbox,
   Popconfirm,
 } from '@/components'
-import { FastField, Field, getIn } from 'formik'
+import { FastField, Field } from 'formik'
 import { Delete, Add } from '@material-ui/icons'
 import { getUniqueId } from '@/utils/utils'
 import { Input } from 'antd'
@@ -91,9 +91,9 @@ class VisionRefraction extends PureComponent {
     const { prefixProp, classes } = this.props
     const { form } = this.arrayHelpers
     const { setFieldValue, values } = form
-    const present = getIn(values, prefixProp) || {}
+    const present = _.get(values, prefixProp) || {}
     const presentSpectacles =
-      getIn(values, `${prefixProp}.corVisionRefraction_PresentSpectacles`) || []
+      _.get(values, `${prefixProp}.corVisionRefraction_PresentSpectacles`) || []
     setFieldValue(prefixProp, {
       ...present,
       corVisionRefraction_PresentSpectacles: [
@@ -108,6 +108,7 @@ class VisionRefraction extends PureComponent {
   }
   render() {
     const { prefixProp, classes } = this.props
+    const listProp = `${prefixProp}.corVisionRefraction_PresentSpectacles`
     return (
       <div style={{ margin: '8px 0' }}>
         <span style={{ fontWeight: 500, fontSize: '1rem', margin: 8 }}>
@@ -124,14 +125,11 @@ class VisionRefraction extends PureComponent {
           >
             <div style={{ fontWeight: 500 }}> Present Spectacles Details</div>
             <FieldArray
-              name={`${prefixProp}.corVisionRefraction_PresentSpectacles`}
+              name={listProp}
               render={arrayHelpers => {
                 this.arrayHelpers = arrayHelpers
                 const presentSpectacles =
-                  getIn(
-                    arrayHelpers.form.values,
-                    `${prefixProp}.corVisionRefraction_PresentSpectacles`,
-                  ) || []
+                  _.get(arrayHelpers.form.values, listProp) || []
                 const activePresentSpectacles = presentSpectacles.filter(
                   val => !val.isDeleted,
                 )
@@ -141,9 +139,9 @@ class VisionRefraction extends PureComponent {
                       ? presentSpectacle.id === val.id
                       : val.uid === presentSpectacle.uid,
                   )
-                  const presentSpectaclesItem = `${prefixProp}.corVisionRefraction_PresentSpectacles[${i}]`
+                  const itemProp = `${prefixProp}.corVisionRefraction_PresentSpectacles[${i}]`
                   return (
-                    <div key={i} style={{ margin: '6px 0px' }}>
+                    <div key={val.uid || val.id} style={{ margin: '6px 0px' }}>
                       <GridContainer
                         style={{ position: 'relative', paddingRight: 30 }}
                       >
@@ -163,7 +161,7 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${presentSpectaclesItem}.distancePrescription_RE_SPH`}
+                              name={`${itemProp}.distancePrescription_RE_SPH`}
                               render={args => (
                                 <TextField
                                   maxLength={500}
@@ -182,7 +180,7 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${presentSpectaclesItem}.distancePrescription_RE_CYL`}
+                              name={`${itemProp}.distancePrescription_RE_CYL`}
                               render={args => (
                                 <TextField
                                   maxLength={500}
@@ -201,7 +199,7 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${presentSpectaclesItem}.distancePrescription_RE_AXIS`}
+                              name={`${itemProp}.distancePrescription_RE_AXIS`}
                               render={args => (
                                 <TextField
                                   maxLength={500}
@@ -225,10 +223,10 @@ class VisionRefraction extends PureComponent {
                           >
                             {InputGroup(
                               {
-                                name: `${presentSpectaclesItem}.distancePrescription_RE_VA`,
+                                name: `${itemProp}.distancePrescription_RE_VA`,
                               },
                               {
-                                name: `${presentSpectaclesItem}.distancePrescription_RE_VA_Comments`,
+                                name: `${itemProp}.distancePrescription_RE_VA_Comments`,
                               },
                               classes,
                             )}
@@ -241,7 +239,7 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${presentSpectaclesItem}.distancePrescription_LE_SPH`}
+                              name={`${itemProp}.distancePrescription_LE_SPH`}
                               render={args => (
                                 <TextField
                                   maxLength={500}
@@ -260,7 +258,7 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${presentSpectaclesItem}.distancePrescription_LE_CYL`}
+                              name={`${itemProp}.distancePrescription_LE_CYL`}
                               render={args => (
                                 <TextField
                                   maxLength={500}
@@ -279,7 +277,7 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${presentSpectaclesItem}.distancePrescription_LE_AXIS`}
+                              name={`${itemProp}.distancePrescription_LE_AXIS`}
                               render={args => (
                                 <TextField
                                   maxLength={500}
@@ -303,10 +301,10 @@ class VisionRefraction extends PureComponent {
                           >
                             {InputGroup(
                               {
-                                name: `${presentSpectaclesItem}.distancePrescription_LE_VA`,
+                                name: `${itemProp}.distancePrescription_LE_VA`,
                               },
                               {
-                                name: `${presentSpectaclesItem}.distancePrescription_LE_VA_Comments`,
+                                name: `${itemProp}.distancePrescription_LE_VA_Comments`,
                               },
                               classes,
                             )}
@@ -326,10 +324,16 @@ class VisionRefraction extends PureComponent {
                               onConfirm={() => {
                                 const { form } = this.arrayHelpers
                                 const { setFieldValue } = form
-                                setFieldValue(
-                                  `${presentSpectaclesItem}.isDeleted`,
-                                  true,
-                                )
+                                console.log('val.id', val.id)
+                                if (!val.id)
+                                  setFieldValue(
+                                    `${listProp}`,
+                                    presentSpectacles.filter(
+                                      i => i.uid != val.uid,
+                                    ),
+                                  )
+                                else
+                                  setFieldValue(`${itemProp}.isDeleted`, true)
                               }}
                             >
                               <Button justIcon color='danger'>
@@ -362,7 +366,7 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${presentSpectaclesItem}.nearAddition_RE_Value`}
+                              name={`${itemProp}.nearAddition_RE_Value`}
                               render={args => (
                                 <Input
                                   className={classes.antdInput}
@@ -377,7 +381,7 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${presentSpectaclesItem}.nearAddition_RE_NVA`}
+                              name={`${itemProp}.nearAddition_RE_NVA`}
                               render={args => (
                                 <Input
                                   className={classes.antdInput}
@@ -392,7 +396,7 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${presentSpectaclesItem}.nearAddition_RE_CM`}
+                              name={`${itemProp}.nearAddition_RE_CM`}
                               render={args => (
                                 <Input
                                   className={classes.antdInput}
@@ -414,7 +418,7 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${presentSpectaclesItem}.nearAddition_LE_Value`}
+                              name={`${itemProp}.nearAddition_LE_Value`}
                               render={args => (
                                 <Input
                                   className={classes.antdInput}
@@ -429,7 +433,7 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${presentSpectaclesItem}.nearAddition_LE_NVA`}
+                              name={`${itemProp}.nearAddition_LE_NVA`}
                               render={args => (
                                 <Input
                                   className={classes.antdInput}
@@ -444,7 +448,7 @@ class VisionRefraction extends PureComponent {
                           </GridItem>
                           <GridItem md={2}>
                             <FastField
-                              name={`${presentSpectaclesItem}.nearAddition_LE_CM`}
+                              name={`${itemProp}.nearAddition_LE_CM`}
                               render={args => (
                                 <Input
                                   className={classes.antdInput}
@@ -474,7 +478,7 @@ class VisionRefraction extends PureComponent {
                         </GridItem>
                         <GridItem md={9} container style={{ paddingTop: 4 }}>
                           <FastField
-                            name={`${presentSpectaclesItem}.remarks`}
+                            name={`${itemProp}.remarks`}
                             render={args => (
                               <MUIInput
                                 maxLength={2000}
