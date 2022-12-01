@@ -23,10 +23,6 @@ import {
   AuthorizedContext,
 } from '@/components'
 import AddConsultationDocument from './AddConsultationDocument'
-
-// import model from './models'
-
-// window.g_app.replaceModel(model)
 const styles = () => ({})
 export const printRow = async (row, props) => {
   const type = consultationDocumentTypes.find(
@@ -47,21 +43,14 @@ export const printRow = async (row, props) => {
       },
     )
   } else {
-    const { codetable, patient } = props
-    const { clinicianprofile = [] } = codetable
-    const { entity } = patient
+    const { codetable, visitEntity } = props
+    const { doctorprofile = [] } = codetable
     const obj =
-      clinicianprofile.find(
-        o =>
-          o.userProfileFK ===
-          (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
-      ) || {}
-
-    row.doctorName = (obj.title ? `${obj.title} ` : '') + obj.name
-    row.doctorMCRNo = obj.doctorProfile.doctorMCRNo
-
-    row.patientName = entity.name
-    row.patientAccountNo = entity.patientAccountNo
+      doctorprofile.find(o => o.id === visitEntity?.visit?.doctorProfileFK) ||
+      {}
+    row.optometristName =
+      (obj?.clinicianProfile?.title ? `${obj?.clinicianProfile?.title} ` : '') +
+      obj?.clinicianProfile?.name
 
     download(
       `/api/Reports/${downloadConfig.id}?ReportFormat=pdf`,
@@ -103,24 +92,15 @@ export const viewReport = (row, props, useID = false) => {
       },
     })
   } else {
-    const { codetable, patient } = props
-    const { clinicianprofile = [] } = codetable
-    const { entity } = patient
+    const { codetable, visitEntity } = props
+    const { doctorprofile = [] } = codetable
     const obj =
-      clinicianprofile.find(
-        o =>
-          o.userProfileFK ===
-          (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
-      ) || {}
-
+      doctorprofile.find(o => o.id === visitEntity?.visit?.doctorProfileFK) ||
+      {}
     const reportParameters = { ...row }
-    reportParameters.doctorName = (obj.title ? `${obj.title} ` : '') + obj.name
-    reportParameters.doctorMCRNo = obj.doctorProfile
-      ? obj.doctorProfile.doctorMCRNo
-      : ''
-
-    reportParameters.patientName = entity.name
-    reportParameters.patientAccountNo = entity.patientAccountNo
+    reportParameters.optometristName =
+      (obj?.clinicianProfile?.title ? `${obj?.clinicianProfile?.title} ` : '') +
+      obj?.clinicianProfile?.name
     window.g_app._store.dispatch({
       type: 'report/updateState',
       payload: {
@@ -137,12 +117,21 @@ export const viewReport = (row, props, useID = false) => {
 
   return true
 }
-@connect(({ consultationDocument, codetable, patient, consultation }) => ({
-  consultationDocument,
-  codetable,
-  patient,
-  consultation,
-}))
+@connect(
+  ({
+    consultationDocument,
+    codetable,
+    patient,
+    consultation,
+    visitRegistration,
+  }) => ({
+    consultationDocument,
+    codetable,
+    patient,
+    consultation,
+    visitEntity: visitRegistration.entity || {},
+  }),
+)
 class ConsultationDocument extends PureComponent {
   constructor(props) {
     super(props)

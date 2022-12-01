@@ -221,6 +221,7 @@ export const REPORT_TYPE = {
   61: 'Refraction Form Report',
   68: 'Patient History Report',
   80: 'Invoice',
+  96: 'Spectacle Prescription',
 }
 
 export const IGNORED_REPORT_SETTING_REPORT_IDS = [
@@ -335,6 +336,7 @@ export const REPORT_FILE_NAME = {
   90: 'Drug Summary Label Report 80mmx45mm',
   91: 'Purchase Request',
   93: 'Medical Report',
+  96: 'Spectacle Prescription',
 }
 export const REPORT_ID = {
   DRUG_LABEL_80MM_45MM: 24,
