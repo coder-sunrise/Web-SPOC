@@ -192,6 +192,35 @@ const PreliminaryAssessment = props => {
         </td>
       </tr>
 
+      {/* Corneal Pachymetry */}
+      <tr>
+        <td>
+          <table className={classes.itemTable}>
+            <tr>
+              <td width='30%'>
+                <div>
+                  <span className={classes.itemTitle}>Corneal Pachymetry</span>
+                  <div
+                    style={{
+                      width: '80%',
+                      position: 'absolute',
+                      top: '15px',
+                      left: '5px',
+                    }}
+                  >
+                    {formContent?.cornealPachymetryInstrument}
+                  </div>
+                </div>
+              </td>
+              <td width='5%'>RE</td>
+              <td width='30%'>{formContent?.cornealPachymetryRe}</td>
+              <td width='5%'>LE</td>
+              <td width='30%'>{formContent?.cornealPachymetryLe}</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
       {/* Confrontation  */}
       <tr>
         <td>
@@ -247,8 +276,8 @@ const PreliminaryAssessment = props => {
                       fontSize: '0.8rem',
                     }}
                   >
-                    Please scan and upload into Patient Document(if there's any
-                    findings)
+                    {`Please scan and upload into Patient Document(if there's any
+                    findings)`}
                   </span>
                 </div>
               </td>
@@ -288,6 +317,9 @@ const PreliminaryAssessment = props => {
             </tr>
           </table>
         </td>
+      </tr>
+      <tr>
+        <span>{`  + Compulsory Test for Paediatric (< 16 years old)`}</span>
       </tr>
 
       {/* Other relevant Tests  */}
