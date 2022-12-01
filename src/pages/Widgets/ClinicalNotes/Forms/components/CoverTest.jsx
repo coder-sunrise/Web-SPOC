@@ -1,7 +1,7 @@
 import { Button, Field, MultipleTextField, Checkbox } from '@/components'
 import { useRef } from 'react'
-import Close from '@material-ui/icons/Close'
 import { compose } from 'redux'
+import { Delete, Add } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles'
 import { useHover } from 'ahooks'
 
@@ -157,7 +157,7 @@ const CoverTest = props => {
                   }}
                   justIcon
                 >
-                  <Close />
+                  <Delete />
                 </Button>
               )}
               <Field
