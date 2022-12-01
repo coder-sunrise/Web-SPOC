@@ -1,13 +1,13 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-
+import { FastField } from 'formik'
 import withStyles from '@material-ui/core/styles/withStyles'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import Add from '@material-ui/icons/Add'
 import { consultationDocumentTypes } from '@/utils/codes'
 import { download } from '@/utils/request'
-import { commonDataReaderTransform } from '@/utils/utils'
+import { commonDataReaderTransform, ableToViewByAuthority } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import { List } from 'antd'
 
@@ -21,7 +21,6 @@ import {
   Popover,
   Tooltip,
   AuthorizedContext,
-  withFormikExtend,
 } from '@/components'
 import AddConsultationDocument from './AddConsultationDocument'
 
@@ -144,9 +143,6 @@ export const viewReport = (row, props, useID = false) => {
   patient,
   consultation,
 }))
-@withFormikExtend({
-  displayName: 'ConsultationDocumentList',
-})
 class ConsultationDocument extends PureComponent {
   constructor(props) {
     super(props)
@@ -338,10 +334,12 @@ class ConsultationDocument extends PureComponent {
                 <List
                   size='small'
                   bordered
-                  dataSource={consultationDocumentTypes.map(item => ({
-                    value: item.value,
-                    name: item.name,
-                  }))}
+                  dataSource={consultationDocumentTypes
+                    .filter(item => ableToViewByAuthority(item.authority))
+                    .map(item => ({
+                      value: item.value,
+                      name: item.name,
+                    }))}
                   renderItem={item => (
                     <List.Item
                       onClick={() => {
@@ -369,17 +367,29 @@ class ConsultationDocument extends PureComponent {
             </Tooltip>
           </Popover>
         </AuthorizedContext.Provider>
-        <CommonModal
-          open={showModal}
-          title={title}
-          onClose={this.toggleModal}
-          onConfirm={this.toggleModal}
-          observe='AddConsultationDocument'
-          maxWidth='md'
-          bodyNoPadding
-        >
-          <AddConsultationDocument {...this.props} />
-        </CommonModal>
+        {showModal && (
+          <FastField
+            name='corDoctorNote.corVisionRefractionEntity'
+            render={args => {
+              return (
+                <CommonModal
+                  open={true}
+                  title={title}
+                  onClose={this.toggleModal}
+                  onConfirm={this.toggleModal}
+                  observe='AddConsultationDocument'
+                  maxWidth='md'
+                  bodyNoPadding
+                >
+                  <AddConsultationDocument
+                    {...this.props}
+                    corVisionRefraction={args.field?.value}
+                  />
+                </CommonModal>
+              )
+            }}
+          />
+        )}
       </div>
     )
   }

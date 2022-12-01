@@ -225,6 +225,8 @@ const consultationDocumentTypes = [
     value: '1',
     name: 'Spectacle Prescription',
     prop: 'corSpectaclePrescription',
+    authority:
+      'queue.consultation.widgets.consultationdocument.spectacleprescription',
     downloadConfig: {
       id: 7,
       key: 'SpectaclePrescriptionId',
