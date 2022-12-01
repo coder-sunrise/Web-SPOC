@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { ReportDataGrid } from '@/components/_medisys'
-import { dateFormatLongWithTimeNoSec12h } from '@/components'
+import { dateFormatLongWithTimeNoSec } from '@/components'
 
 class VoidCNList extends PureComponent {
   render() {
@@ -66,9 +66,9 @@ class VoidCNList extends PureComponent {
         columnName: 'voidedDate',
         sortingEnabled: false,
         width: 200,
-        // type: 'date',
-        // format: dateFormatLongWithTimeNoSec12h,
-        // showTime: true,
+        type: 'date',
+        format: dateFormatLongWithTimeNoSec,
+        showTime: true,
       },
       {
         columnName: 'totalAmt',
