@@ -136,7 +136,7 @@ let PreliminaryAssessment = props => {
         </td>
       </tr>
 
-      {/* Pupillary Size (Bright / dm)  */}
+      {/* Pupil Size (Bright / dim)  */}
       <tr>
         <td>
           <table className={classes.itemTable}>
@@ -144,7 +144,7 @@ let PreliminaryAssessment = props => {
               <td width='30%'>
                 <div>
                   <span className={classes.itemTitle}>
-                    Pupillary Size (Bright / dm){' '}
+                    Pupil Size (Bright / dim){' '}
                   </span>
                 </div>
               </td>
@@ -295,6 +295,64 @@ let PreliminaryAssessment = props => {
         </td>
       </tr>
 
+      {/* Corneal Pachymetry */}
+      <tr>
+        <td>
+          <table className={classes.itemTable}>
+            <tr>
+              <td width='30%'>
+                <div>
+                  <span className={classes.itemTitle}>Corneal Pachymetry</span>
+                  <div
+                    style={{
+                      width: '80%',
+                      position: 'absolute',
+                      top: '15px',
+                      left: '5px',
+                    }}
+                  >
+                    <FastField
+                      name={`${prefixProp}.cornealPachymetryInstrument`}
+                      render={args => (
+                        <TextField label='Instrument' {...args} />
+                      )}
+                    />
+                  </div>
+                </div>
+              </td>
+              <td width='5%'>RE</td>
+              <td width='30%'>
+                <FastField
+                  name={`${prefixProp}.cornealPachymetryRe`}
+                  render={args => (
+                    <MultipleTextField
+                      maxLength={2000}
+                      bordered={false}
+                      autoSize={{ minRows: 3 }}
+                      {...args}
+                    />
+                  )}
+                />
+              </td>
+              <td width='5%'>LE</td>
+              <td width='30%'>
+                <FastField
+                  name={`${prefixProp}.cornealPachymetryLe`}
+                  render={args => (
+                    <MultipleTextField
+                      maxLength={2000}
+                      bordered={false}
+                      autoSize={{ minRows: 3 }}
+                      {...args}
+                    />
+                  )}
+                />
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
       {/* Confrontation  */}
       <tr>
         <td>
@@ -377,6 +435,18 @@ let PreliminaryAssessment = props => {
               <td width='30%'>
                 <div>
                   <span className={classes.itemTitle}>Amsler</span>
+                  <br />
+                  <span
+                    style={{
+                      fontSize: '0.8rem',
+                      position: 'absolute',
+                      top: '25px',
+                      left: '5px',
+                    }}
+                  >
+                    {`Please scan and upload into Patient Document (if there's any
+                    findings)`}
+                  </span>
                 </div>
               </td>
               <td width='5%'>RE</td>
@@ -468,6 +538,10 @@ let PreliminaryAssessment = props => {
             </tr>
           </table>
         </td>
+      </tr>
+
+      <tr>
+        <span>{`  + Compulsory Test for Paediatric (< 16 years old)`}</span>
       </tr>
 
       {/* Other relevant Tests  */}
