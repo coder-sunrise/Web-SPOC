@@ -18,6 +18,7 @@ import { updateAPIType } from '@/utils/request'
 import { navigateDirtyCheck } from '@/utils/utils'
 import styles from './index.less'
 import { APPNOTIFICATION_SCHEMA } from '@/utils/constants'
+import { MsalContext } from '@azure/msal-react'
 
 @connect(({ user, clinicInfo, header, codetable }) => ({
   user,
@@ -26,6 +27,9 @@ import { APPNOTIFICATION_SCHEMA } from '@/utils/constants'
   codetable,
 }))
 class HeaderLinks extends React.Component {
+
+  static contextType = MsalContext;
+
   state = {
     openNotification: false,
     openAccount: false,
@@ -62,9 +66,17 @@ class HeaderLinks extends React.Component {
       onProceed: () =>
         this.props.dispatch({
           type: 'login/logout',
-        }),
+        }).then(this.logoutMicrosoftAADAccount),
       displayName: rt.observe,
     })(event)
+  }
+
+  logoutMicrosoftAADAccount = () => {
+    const { instance } = this.props
+    if (localStorage.getItem('aadUserAccount')) {
+      localStorage.removeItem('aadUserAccount')
+      instance.logoutRedirect({ logoutHint: localStorage.getItem('loginHint') })
+    }
   }
 
   openUserProfileForm = () => {
@@ -156,9 +168,11 @@ class HeaderLinks extends React.Component {
                     <MenuItem onClick={this.openUserProfileForm}>
                       My Account
                     </MenuItem>
+                    {/*
                     <MenuItem onClick={this.openChangePasswordForm}>
                       Change Password
-                    </MenuItem>
+                      </MenuItem> 
+                      */}
                     <MenuItem onClick={this.onLogoutClick}>Logout</MenuItem>
                   </MenuList>
                 }

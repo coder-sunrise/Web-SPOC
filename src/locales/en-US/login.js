@@ -11,6 +11,10 @@ export default {
   // 'app.login.message-invalid-credentials':
   //   'Invalid username or password（admin/ant.design）',
   'app.login.message-invalid-verification-code': 'Invalid verification code',
+  'app.login.message-maad-invalid-credentials': 'Invalid Microsoft AAD Account',
+  'app.login.message-maad-invalid-credentials-info':
+  'The user account entered does not match any account in the medicloud',
+
   'app.login.tab-login-credentials': 'Credentials',
   'app.login.tab-login-mobile': 'Mobile number',
   'app.login.remember-me': 'Remember me',

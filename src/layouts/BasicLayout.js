@@ -32,6 +32,9 @@ import RightContent from './components/RightContent'
 import ErrorBoundary from './ErrorBoundary'
 import GlobalModalContainer from './GlobalModalContainer'
 import HeaderBreadcrumb from './components/HeaderBreadcrumb'
+import { MsalProvider, withMsal } from "@azure/msal-react";
+import { msalConfig } from "../../config/authConfig";
+import { PublicClientApplication } from "@azure/msal-browser";
 
 initClinicSettings()
 // setInterval(() => {
@@ -65,6 +68,7 @@ const _theme = createMuiTheme({
 const refreshTokenTimer = 10 * 60 * 1000
 const sessionTimeoutTimer = 30 * 60 * 1000
 // const sessionTimeoutTimer = 2500
+const msalInstance = new PublicClientApplication(msalConfig);
 
 class BasicLayout extends React.PureComponent {
   constructor(props) {
@@ -340,6 +344,7 @@ class BasicLayout extends React.PureComponent {
       location: { pathname },
     } = this.props
     return (
+      <MsalProvider instance={msalInstance}>
       <React.Fragment>
         <MuiThemeProvider theme={_theme}>
           <CssBaseline />
@@ -353,7 +358,7 @@ class BasicLayout extends React.PureComponent {
                 headerContentRender={p => (
                   <HeaderBreadcrumb {...this.props} breadcrumb={p.breadcrumb} />
                 )}
-                rightContentRender={() => <RightContent {...this.props} />}
+                rightContentRender={() => <RightContent {...this.props} instance={msalInstance} />}
                 fixedHeader
                 fixSiderbar
                 formatMessage={formatMessage}
@@ -401,12 +406,13 @@ class BasicLayout extends React.PureComponent {
               >
                 {children}
               </ProLayout>
-              {this.state.authorized && <GlobalModalContainer {...props} />}
+              {this.state.authorized && <GlobalModalContainer {...props} instance={msalInstance}  />}
             </ErrorBoundary>
           </div>
           {/* <Suspense fallback={<PageLoading />}>{this.renderSettingDrawer()}</Suspense> */}
         </MuiThemeProvider>
       </React.Fragment>
+      </MsalProvider>
     )
   }
 }
@@ -417,5 +423,5 @@ export default withStyles(appStyle)(
     clinicSettings,
     setting,
     loading,
-  }))(BasicLayout),
+  }))(withMsal(BasicLayout)),
 )

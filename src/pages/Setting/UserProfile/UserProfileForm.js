@@ -80,6 +80,9 @@ const styles = theme => ({
       userProfile: Yup.object().shape({
         countryCodeFK: Yup.string().required(),
         userName: Yup.string().required('Login ID is a required field'),
+        microsoftAADAccount: Yup.string().email('Invalid email').required(
+          'Microsoft AAD Acount is a required field',
+        ),
       }),
       name: Yup.string().required('Name is a required field'),
       // phoneNumber: Yup.string().required('Contact No. is a required field'),
@@ -120,6 +123,9 @@ const styles = theme => ({
                 'Must have at least 2 letter, do not contains whitespace and special characters.',
               )
               .required('Login ID is a required field'),
+            microsoftAADAccount: Yup.string()
+              .email('Invalid email')
+              .required('Microsft AAD Account is a required field'),
           }),
         })
   },
@@ -464,6 +470,7 @@ class UserProfileForm extends React.PureComponent {
                     />
                   )}
                 </GridItem>
+                {/*
                 {isEdit && (
                   <GridItem md={6}>
                     <Button color='primary' onClick={this.handleResetPassword}>
@@ -472,6 +479,19 @@ class UserProfileForm extends React.PureComponent {
                     </Button>
                   </GridItem>
                 )}
+                */}
+                <GridItem md={6}>
+                  <FastField
+                    name='userProfile.microsoftAADAccount'
+                    render={args => (
+                      <TextField
+                      {...args}
+                        label='Microsoft AAD Account'
+                        autocomplete='off'
+                      />
+                    )}
+                  />
+                </GridItem>
               </GridContainer>
 
               <GridItem md={12} className={classes.verticalSpacing}>
