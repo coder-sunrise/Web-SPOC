@@ -17,12 +17,18 @@ import authStyle from '@/assets/jss/material-dashboard-pro-react/layouts/authSty
 import loginBackground from '@/assets/img/login_background.jpg'
 import defaultSettings from '@/defaultSettings'
 
+import { PublicClientApplication } from "@azure/msal-browser";
+import { msalConfig } from "../../config/authConfig";
+import { MsalProvider, withMsal } from "@azure/msal-react";
+
 // console.log(moment.locale())
 moment.locale('en') // TODO should be removed in furture, solve deafult display chinese date bug
 // console.log(moment.locale())
 const styles = theme => ({
   ...authStyle(theme),
 })
+
+const msalInstance = new PublicClientApplication(msalConfig);
 
 class LandingLayout extends React.Component {
   componentWillMount() {
@@ -35,11 +41,12 @@ class LandingLayout extends React.Component {
   getBgImage = () => {
     return loginBackground
   }
-
+  
   render() {
     NProgress.done()
     const { children, classes } = this.props
     return (
+      <MsalProvider instance={msalInstance}>
       <DocumentTitle title={defaultSettings.appTitle}>
         <div className={classes.wrapper}>
           <SizeContainer size='lg'>
@@ -57,8 +64,9 @@ class LandingLayout extends React.Component {
           </SizeContainer>
         </div>
       </DocumentTitle>
+      </MsalProvider>
     )
   }
 }
 
-export default withStyles(styles)(LandingLayout)
+export default withStyles(styles)(withMsal(LandingLayout))

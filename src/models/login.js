@@ -44,10 +44,12 @@ export default createFormViewModel({
         localStorage.removeItem('token')
         sessionStorage.clear()
         reloadAuthorized()
-
+        
         // yield put({ type: 'RESET_APP_STATE' })
-        history.push('/user/login')
-        window.location.reload(true)
+        if (!localStorage.getItem('aadUserAccount')) {
+          history.push('/user/login')
+          window.location.reload(true)
+        }
 
         return true
       },
