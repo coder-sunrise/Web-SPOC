@@ -225,8 +225,10 @@ const consultationDocumentTypes = [
     value: '1',
     name: 'Spectacle Prescription',
     prop: 'corSpectaclePrescription',
+    authority:
+      'queue.consultation.widgets.consultationdocument.spectacleprescription',
     downloadConfig: {
-      id: 7,
+      id: 96,
       key: 'SpectaclePrescriptionId',
       subject: 'Spectacle Prescription',
       draft: row => {
@@ -234,6 +236,9 @@ const consultationDocumentTypes = [
           SpectaclePrescriptionDetails: [
             {
               ...row,
+              dateofPrescription: row.dateofPrescription
+                ? moment(row.dateofPrescription).format(dateFormatLong)
+                : '',
             },
           ],
         }

@@ -3,178 +3,137 @@ import { FastField, withFormik, Field } from 'formik'
 import { compose } from 'redux'
 import moment from 'moment'
 import Yup from '@/utils/yup'
-import { GridContainer, GridItem, TextField, DatePicker } from '@/components'
+import {
+  GridContainer,
+  GridItem,
+  TextField,
+  DatePicker,
+  MultipleTextField,
+} from '@/components'
+import { ableToViewByAuthority } from '@/utils/utils'
+import AuthorizedContext from '@/components/Context/Authorized'
+import CommonPrescription from './CommonPrescription'
 
 const SpectaclePrescription = props => {
   const { footer, handleSubmit } = props
+  const editEnable = ableToViewByAuthority(
+    'queue.consultation.widgets.consultationdocument.spectacleprescription',
+  )
   return (
     <div>
-      <div style={{ paddingBottom: 8 }}>
-        <GridContainer>
-          <GridItem xs={4}>
-            <FastField
-              name='patientReferenceNo'
-              render={args => {
-                return <TextField label='SPOC ID' disabled {...args} />
-              }}
-            />
-          </GridItem>
-          <GridItem xs={4}>
-            <FastField
-              name='patientName'
-              render={args => {
-                return <TextField label='Name' disabled {...args} />
-              }}
-            />
-          </GridItem>
-          <GridItem xs={4}>
-            <FastField
-              name='dateOfPrescription'
-              render={args => {
-                return <DatePicker label='Date of Prescription' {...args} />
-              }}
-            />
-          </GridItem>
-        </GridContainer>
-        <div style={{ border: '0.5px solid #CCCCCC', margin: 8, padding: 8 }}>
-          <div style={{ fontWeight: 'bold' }}>Prescription</div>
-          <div style={{ lineHeight: '16px' }}>Left Eye (LE)</div>
+      <AuthorizedContext.Provider
+        value={{
+          rights: editEnable ? 'enable' : 'disable',
+        }}
+      >
+        <div style={{ paddingBottom: 8 }}>
           <GridContainer>
-            <GridItem xs={2}>
+            <GridItem xs={4}>
               <FastField
-                name='leftSPH'
+                name='patientReferenceNo'
                 render={args => {
-                  return <TextField label='SPH' {...args} />
+                  return <TextField label='SPOC ID' disabled {...args} />
                 }}
               />
             </GridItem>
-            <GridItem xs={2}>
+            <GridItem xs={4}>
               <FastField
-                name='leftCYL'
+                name='patientName'
                 render={args => {
-                  return <TextField label='CYL' {...args} />
+                  return <TextField label='Name' disabled {...args} />
                 }}
               />
             </GridItem>
-            <GridItem xs={2}>
+            <GridItem xs={4}>
               <FastField
-                name='leftAXIS'
+                name='dateofPrescription'
                 render={args => {
-                  return <TextField label='AXIS' {...args} />
-                }}
-              />
-            </GridItem>
-            <GridItem xs={2}>
-              <FastField
-                name='leftADD'
-                render={args => {
-                  return <TextField label='ADD' {...args} />
-                }}
-              />
-            </GridItem>
-            <GridItem xs={2}>
-              <FastField
-                name='leftVA'
-                render={args => {
-                  return <TextField label='VA' {...args} />
-                }}
-              />
-            </GridItem>
-            <GridItem xs={2}>
-              <FastField
-                name='leftPH'
-                render={args => {
-                  return <TextField label='PH' {...args} />
+                  return <DatePicker label='Date of Prescription' {...args} />
                 }}
               />
             </GridItem>
           </GridContainer>
-          <div style={{ marginTop: 8, lineHeight: '16px' }}>Right Eye (RE)</div>
+          <div style={{ margin: 8 }}>
+            <CommonPrescription />
+          </div>
           <GridContainer>
-            <GridItem xs={2}>
-              <FastField
-                name='rightSPH'
-                render={args => {
-                  return <TextField label='SPH' {...args} />
-                }}
-              />
+            <GridItem xs={12}>
+              <div style={{ fontWeight: 500 }}>Remarks:</div>
             </GridItem>
-            <GridItem xs={2}>
+            <GridItem xs={12}>
               <FastField
-                name='rightCYL'
+                name='remarks'
                 render={args => {
-                  return <TextField label='CYL' {...args} />
-                }}
-              />
-            </GridItem>
-            <GridItem xs={2}>
-              <FastField
-                name='rightAXIS'
-                render={args => {
-                  return <TextField label='AXIS' {...args} />
-                }}
-              />
-            </GridItem>
-            <GridItem xs={2}>
-              <FastField
-                name='rightADD'
-                render={args => {
-                  return <TextField label='ADD' {...args} />
-                }}
-              />
-            </GridItem>
-            <GridItem xs={2}>
-              <FastField
-                name='rightVA'
-                render={args => {
-                  return <TextField label='VA' {...args} />
-                }}
-              />
-            </GridItem>
-            <GridItem xs={2}>
-              <FastField
-                name='rightPH'
-                render={args => {
-                  return <TextField label='PH' {...args} />
+                  return (
+                    <MultipleTextField
+                      label=''
+                      maxLength={2000}
+                      autoSize={{ minRows: 4 }}
+                      {...args}
+                    />
+                  )
                 }}
               />
             </GridItem>
           </GridContainer>
         </div>
-        <GridContainer>
-          <GridItem xs={12}>
-            <FastField
-              name='remarks'
-              render={args => {
-                return <TextField label='Remarks' {...args} />
-              }}
-            />
-          </GridItem>
-        </GridContainer>
-      </div>
+      </AuthorizedContext.Provider>
       {footer &&
         footer({
           onConfirm: handleSubmit,
           confirmBtnText: 'Save',
+          confirmProps: {
+            disabled: !editEnable,
+          },
         })}
     </div>
   )
 }
 export default compose(
   withFormik({
-    mapPropsToValues: ({ consultationDocument, patient, user }) => {
+    mapPropsToValues: ({
+      consultationDocument,
+      patient,
+      user,
+      corVisionRefraction,
+      forDispense,
+      consultation,
+    }) => {
       if (consultationDocument.entity) return consultationDocument.entity
       const {
         entity: { name = '', patientReferenceNo = '' },
       } = patient
+      let formVisionRefraction = corVisionRefraction || {}
+      if (forDispense) {
+        formVisionRefraction =
+          consultation.entity?.latestCORVisionRefraction || {}
+      }
       return {
         type: consultationDocument.type,
         patientName: name,
         patientReferenceNo,
-        dateOfPrescription: moment(),
+        dateofPrescription: moment(),
         issuedByUserFK: user.data.clinicianProfile.userProfileFK,
         issuedByUser: user.data.clinicianProfile.name,
         issuedByUserTitle: user.data.clinicianProfile.title,
+        leftSPH: formVisionRefraction.subjectiveRefraction_LE_SPH,
+        leftCYL: formVisionRefraction.subjectiveRefraction_LE_CYL,
+        leftAXIS: formVisionRefraction.subjectiveRefraction_LE_AXIS,
+        leftADD:
+          formVisionRefraction.subjectiveRefraction_NearAddition_LE_Value,
+        leftVA: `${formVisionRefraction.subjectiveRefraction_LE_VA ||
+          ''}/${formVisionRefraction.subjectiveRefraction_LE_VA_Comments ||
+          ''}`,
+        leftPH: formVisionRefraction.subjectiveRefraction_LE_PH,
+        rightSPH: formVisionRefraction.subjectiveRefraction_RE_SPH,
+        rightCYL: formVisionRefraction.subjectiveRefraction_RE_CYL,
+        rightAXIS: formVisionRefraction.subjectiveRefraction_RE_AXIS,
+        rightADD:
+          formVisionRefraction.subjectiveRefraction_NearAddition_RE_Value,
+        rightVA: `${formVisionRefraction.subjectiveRefraction_RE_VA ||
+          ''}/${formVisionRefraction.subjectiveRefraction_RE_VA_Comments ||
+          ''}`,
+        rightPH: formVisionRefraction.subjectiveRefraction_RE_PH,
       }
     },
     validationSchema: Yup.object().shape({}),

@@ -1,13 +1,13 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-
+import { FastField } from 'formik'
 import withStyles from '@material-ui/core/styles/withStyles'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import Add from '@material-ui/icons/Add'
 import { consultationDocumentTypes } from '@/utils/codes'
 import { download } from '@/utils/request'
-import { commonDataReaderTransform } from '@/utils/utils'
+import { commonDataReaderTransform, ableToViewByAuthority } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import { List } from 'antd'
 
@@ -21,13 +21,8 @@ import {
   Popover,
   Tooltip,
   AuthorizedContext,
-  withFormikExtend,
 } from '@/components'
 import AddConsultationDocument from './AddConsultationDocument'
-
-// import model from './models'
-
-// window.g_app.replaceModel(model)
 const styles = () => ({})
 export const printRow = async (row, props) => {
   const type = consultationDocumentTypes.find(
@@ -48,21 +43,14 @@ export const printRow = async (row, props) => {
       },
     )
   } else {
-    const { codetable, patient } = props
-    const { clinicianprofile = [] } = codetable
-    const { entity } = patient
+    const { codetable, visitEntity } = props
+    const { doctorprofile = [] } = codetable
     const obj =
-      clinicianprofile.find(
-        o =>
-          o.userProfileFK ===
-          (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
-      ) || {}
-
-    row.doctorName = (obj.title ? `${obj.title} ` : '') + obj.name
-    row.doctorMCRNo = obj.doctorProfile.doctorMCRNo
-
-    row.patientName = entity.name
-    row.patientAccountNo = entity.patientAccountNo
+      doctorprofile.find(o => o.id === visitEntity?.visit?.doctorProfileFK) ||
+      {}
+    row.optometristName =
+      (obj?.clinicianProfile?.title ? `${obj?.clinicianProfile?.title} ` : '') +
+      obj?.clinicianProfile?.name
 
     download(
       `/api/Reports/${downloadConfig.id}?ReportFormat=pdf`,
@@ -104,24 +92,15 @@ export const viewReport = (row, props, useID = false) => {
       },
     })
   } else {
-    const { codetable, patient } = props
-    const { clinicianprofile = [] } = codetable
-    const { entity } = patient
+    const { codetable, visitEntity } = props
+    const { doctorprofile = [] } = codetable
     const obj =
-      clinicianprofile.find(
-        o =>
-          o.userProfileFK ===
-          (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
-      ) || {}
-
+      doctorprofile.find(o => o.id === visitEntity?.visit?.doctorProfileFK) ||
+      {}
     const reportParameters = { ...row }
-    reportParameters.doctorName = (obj.title ? `${obj.title} ` : '') + obj.name
-    reportParameters.doctorMCRNo = obj.doctorProfile
-      ? obj.doctorProfile.doctorMCRNo
-      : ''
-
-    reportParameters.patientName = entity.name
-    reportParameters.patientAccountNo = entity.patientAccountNo
+    reportParameters.optometristName =
+      (obj?.clinicianProfile?.title ? `${obj?.clinicianProfile?.title} ` : '') +
+      obj?.clinicianProfile?.name
     window.g_app._store.dispatch({
       type: 'report/updateState',
       payload: {
@@ -138,15 +117,21 @@ export const viewReport = (row, props, useID = false) => {
 
   return true
 }
-@connect(({ consultationDocument, codetable, patient, consultation }) => ({
-  consultationDocument,
-  codetable,
-  patient,
-  consultation,
-}))
-@withFormikExtend({
-  displayName: 'ConsultationDocumentList',
-})
+@connect(
+  ({
+    consultationDocument,
+    codetable,
+    patient,
+    consultation,
+    visitRegistration,
+  }) => ({
+    consultationDocument,
+    codetable,
+    patient,
+    consultation,
+    visitEntity: visitRegistration.entity || {},
+  }),
+)
 class ConsultationDocument extends PureComponent {
   constructor(props) {
     super(props)
@@ -338,10 +323,12 @@ class ConsultationDocument extends PureComponent {
                 <List
                   size='small'
                   bordered
-                  dataSource={consultationDocumentTypes.map(item => ({
-                    value: item.value,
-                    name: item.name,
-                  }))}
+                  dataSource={consultationDocumentTypes
+                    .filter(item => ableToViewByAuthority(item.authority))
+                    .map(item => ({
+                      value: item.value,
+                      name: item.name,
+                    }))}
                   renderItem={item => (
                     <List.Item
                       onClick={() => {
@@ -369,17 +356,29 @@ class ConsultationDocument extends PureComponent {
             </Tooltip>
           </Popover>
         </AuthorizedContext.Provider>
-        <CommonModal
-          open={showModal}
-          title={title}
-          onClose={this.toggleModal}
-          onConfirm={this.toggleModal}
-          observe='AddConsultationDocument'
-          maxWidth='md'
-          bodyNoPadding
-        >
-          <AddConsultationDocument {...this.props} />
-        </CommonModal>
+        {showModal && (
+          <FastField
+            name='corDoctorNote.corVisionRefractionEntity'
+            render={args => {
+              return (
+                <CommonModal
+                  open={true}
+                  title={title}
+                  onClose={this.toggleModal}
+                  onConfirm={this.toggleModal}
+                  observe='AddConsultationDocument'
+                  maxWidth='md'
+                  bodyNoPadding
+                >
+                  <AddConsultationDocument
+                    {...this.props}
+                    corVisionRefraction={args.field?.value}
+                  />
+                </CommonModal>
+              )
+            }}
+          />
+        )}
       </div>
     )
   }
