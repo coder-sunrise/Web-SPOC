@@ -814,16 +814,34 @@ class BinocularVision extends PureComponent {
                     Accommodation Facility
                   </span>
                   <div className={classes.itemTitleField}>
-                    <FastField
+                    <Field
                       name={`${prefixProp}.acommodationFacilityOne`}
                       render={args => {
-                        return <Checkbox label='+/- 1' {...args} />
+                        return (
+                          <Checkbox
+                            label='+/- 1'
+                            disabled={_.get(
+                              args?.form?.values,
+                              `${prefixProp}.acommodationFacilityTwo`,
+                            )}
+                            {...args}
+                          />
+                        )
                       }}
                     />
-                    <FastField
+                    <Field
                       name={`${prefixProp}.acommodationFacilityTwo`}
                       render={args => {
-                        return <Checkbox label='+/- 2' {...args} />
+                        return (
+                          <Checkbox
+                            label='+/- 2'
+                            disabled={_.get(
+                              args?.form?.values,
+                              `${prefixProp}.acommodationFacilityOne`,
+                            )}
+                            {...args}
+                          />
+                        )
                       }}
                     />
                   </div>
@@ -874,16 +892,34 @@ class BinocularVision extends PureComponent {
                     className={classes.itemTitleField}
                     style={{ bottom: '0px' }}
                   >
-                    <FastField
+                    <Field
                       name={`${prefixProp}.vergenceFacilityFifteenB`}
                       render={args => {
-                        return <Checkbox label='12 BO/3 BI' {...args} />
+                        return (
+                          <Checkbox
+                            label='12 BO/3 BI'
+                            disabled={_.get(
+                              args?.form?.values,
+                              `${prefixProp}.vergenceFacilityEightB`,
+                            )}
+                            {...args}
+                          />
+                        )
                       }}
                     />
-                    <FastField
+                    <Field
                       name={`${prefixProp}.vergenceFacilityEightB`}
                       render={args => {
-                        return <Checkbox label='8 BO/BI' {...args} />
+                        return (
+                          <Checkbox
+                            label='8 BO/BI'
+                            disabled={_.get(
+                              args?.form?.values,
+                              `${prefixProp}.vergenceFacilityFifteenB`,
+                            )}
+                            {...args}
+                          />
+                        )
                       }}
                     />
                   </div>
