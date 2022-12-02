@@ -82,9 +82,7 @@ const WebSocketWrapper = ({
       }
     } else {
       const documentType = consultationDocumentTypes.find(
-        o =>
-          o.name.toLowerCase() === row.type.toLowerCase() ||
-          (o.name === 'Others' && row.type === 'Other Documents'),
+        o => o.name.toLowerCase() === row.type.toLowerCase(),
       )
       if (!documentType || !documentType.downloadConfig) {
         notification.error({ message: 'No configuration found' })
@@ -92,7 +90,7 @@ const WebSocketWrapper = ({
       }
       const { downloadConfig } = documentType
       const reportParameters = {
-        [downloadConfig.key]: row.sourceFK,
+        [downloadConfig.key]: row.id,
       }
       restProps.dispatch({
         type: 'report/updateState',
