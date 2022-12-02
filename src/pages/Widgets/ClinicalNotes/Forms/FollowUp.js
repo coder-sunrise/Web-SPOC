@@ -11,23 +11,26 @@ import withStyles from '@material-ui/core/styles/withStyles'
 const style = theme => ({
   inputSplit: {
     backgroundColor: '#fff !important',
-    width: '16px !important',
+    width: '10px !important',
     borderLeft: 0,
     borderRight: 0,
     pointerEvents: 'none',
     textAlign: 'center !important',
     margin: '4px 0 !important',
     lineHeight: '1.3',
+    padding: '4px 0 ',
   },
   inputLeft: {
-    width: '60px !important',
+    backgroundColor: '#fff !important',
+    width: 'calc(50% - 5px) !important',
     textAlign: 'center !important',
     borderRightWidth: '0 !important',
     margin: '4px 0 !important',
     lineHeight: '1.3',
   },
   inputRight: {
-    width: '60px !important',
+    backgroundColor: '#fff !important',
+    width: 'calc(50% - 5px) !important',
     textAlign: 'center !important',
     borderLeftWidth: '0 !important',
     margin: '4px 0 !important',
@@ -93,12 +96,14 @@ const FollowUp = props => {
             <GridItem md={1} style={{ paddingTop: 8 }}>
               VA
             </GridItem>
-            <GridItem md={10}>
-              {InputGroup(
-                `${prefixProp}.aided_RE_VA`,
-                `${prefixProp}.aided_RE_VA_Comments`,
-                classes,
-              )}
+            <GridItem md={10} container>
+              <GridItem md={8}>
+                {InputGroup(
+                  `${prefixProp}.aided_RE_VA`,
+                  `${prefixProp}.aided_RE_VA_Comments`,
+                  classes,
+                )}
+              </GridItem>
             </GridItem>
             <GridItem md={1} style={{ paddingTop: 8 }}>
               LE
@@ -106,12 +111,14 @@ const FollowUp = props => {
             <GridItem md={1} style={{ paddingTop: 8 }}>
               VA
             </GridItem>
-            <GridItem md={10}>
-              {InputGroup(
-                `${prefixProp}.aided_LE_VA`,
-                `${prefixProp}.aided_LE_VA_Comments`,
-                classes,
-              )}
+            <GridItem md={10} container>
+              <GridItem md={8}>
+                {InputGroup(
+                  `${prefixProp}.aided_LE_VA`,
+                  `${prefixProp}.aided_LE_VA_Comments`,
+                  classes,
+                )}
+              </GridItem>
             </GridItem>
           </GridItem>
         </GridItem>
@@ -126,12 +133,14 @@ const FollowUp = props => {
             <GridItem md={1} style={{ paddingTop: 8 }}>
               VA
             </GridItem>
-            <GridItem md={10}>
-              {InputGroup(
-                `${prefixProp}.unaided_RE_VA`,
-                `${prefixProp}.unaided_RE_VA_Comments`,
-                classes,
-              )}
+            <GridItem md={10} container>
+              <GridItem md={8}>
+                {InputGroup(
+                  `${prefixProp}.unaided_RE_VA`,
+                  `${prefixProp}.unaided_RE_VA_Comments`,
+                  classes,
+                )}
+              </GridItem>
             </GridItem>
             <GridItem md={1} style={{ paddingTop: 8 }}>
               LE
@@ -139,12 +148,14 @@ const FollowUp = props => {
             <GridItem md={1} style={{ paddingTop: 8 }}>
               VA
             </GridItem>
-            <GridItem md={10}>
-              {InputGroup(
-                `${prefixProp}.unaided_LE_VA`,
-                `${prefixProp}.unaided_LE_VA_Comments`,
-                classes,
-              )}
+            <GridItem md={10} container>
+              <GridItem md={8}>
+                {InputGroup(
+                  `${prefixProp}.unaided_LE_VA`,
+                  `${prefixProp}.unaided_LE_VA_Comments`,
+                  classes,
+                )}
+              </GridItem>
             </GridItem>
           </GridItem>
         </GridItem>

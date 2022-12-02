@@ -35,18 +35,24 @@ const style = theme => ({
     padding: '4px 0 ',
   },
   inputLeft: {
-    width: '30px !important',
+    width: 'calc(50% - 5px) !important',
     textAlign: 'center !important',
     borderRightWidth: '0 !important',
     ...antdInput,
   },
   inputRight: {
-    width: '30px !important',
+    width: 'calc(50% - 5px) !important',
     textAlign: 'center !important',
     borderLeftWidth: '0 !important',
     ...antdInput,
   },
   antdInput,
+  compactTextColumn: {
+    position: 'relative',
+    top: 24,
+    textAlign: 'center',
+    width: '2.78%',
+  },
 })
 
 const InputGroup = (leftProp, rightProp, classes) => (
@@ -106,6 +112,7 @@ class VisionRefraction extends PureComponent {
       ],
     })
   }
+
   render() {
     const { prefixProp, classes } = this.props
     const listProp = `${prefixProp}.corVisionRefraction_PresentSpectacles`
@@ -924,13 +931,7 @@ class VisionRefraction extends PureComponent {
                     )}
                   />
                 </GridItem>
-                <GridItem
-                  md={1}
-                  className={classes.symbolText}
-                  style={{ top: 24 }}
-                >
-                  / -
-                </GridItem>
+                <div className={classes.compactTextColumn}>/ -</div>
                 <GridItem md={2}>
                   <Field
                     name={`${prefixProp}.subjectiveRefraction_RE_CYL`}
@@ -944,14 +945,8 @@ class VisionRefraction extends PureComponent {
                     )}
                   />
                 </GridItem>
-                <GridItem
-                  md={1}
-                  className={classes.symbolText}
-                  style={{ top: 24 }}
-                >
-                  x
-                </GridItem>
-                <GridItem md={1}>
+                <div className={classes.compactTextColumn}>x</div>
+                <GridItem md={2}>
                   <Field
                     name={`${prefixProp}.subjectiveRefraction_RE_AXIS`}
                     render={args => (
@@ -964,13 +959,7 @@ class VisionRefraction extends PureComponent {
                     )}
                   />
                 </GridItem>
-                <GridItem
-                  md={1}
-                  className={classes.symbolText}
-                  style={{ top: 24 }}
-                >
-                  VA
-                </GridItem>
+                <div className={classes.compactTextColumn}>VA</div>
                 <GridItem
                   md={2}
                   className={classes.symbolText}
@@ -989,7 +978,7 @@ class VisionRefraction extends PureComponent {
                   )}
                 </GridItem>
                 <GridItem
-                  md={1}
+                  md={2}
                   className={classes.symbolText}
                   style={{ top: 16 }}
                 >
@@ -1022,13 +1011,7 @@ class VisionRefraction extends PureComponent {
                     )}
                   />
                 </GridItem>
-                <GridItem
-                  md={1}
-                  className={classes.symbolText}
-                  style={{ top: 24 }}
-                >
-                  / -
-                </GridItem>
+                <div className={classes.compactTextColumn}>/ -</div>
                 <GridItem md={2}>
                   <Field
                     name={`${prefixProp}.subjectiveRefraction_LE_CYL`}
@@ -1042,14 +1025,8 @@ class VisionRefraction extends PureComponent {
                     )}
                   />
                 </GridItem>
-                <GridItem
-                  md={1}
-                  className={classes.symbolText}
-                  style={{ top: 24 }}
-                >
-                  x
-                </GridItem>
-                <GridItem md={1}>
+                <div className={classes.compactTextColumn}>x</div>
+                <GridItem md={2}>
                   <Field
                     name={`${prefixProp}.subjectiveRefraction_LE_AXIS`}
                     render={args => (
@@ -1062,13 +1039,7 @@ class VisionRefraction extends PureComponent {
                     )}
                   />
                 </GridItem>
-                <GridItem
-                  md={1}
-                  className={classes.symbolText}
-                  style={{ top: 24 }}
-                >
-                  VA
-                </GridItem>
+                <div className={classes.compactTextColumn}>VA</div>
                 <GridItem
                   md={2}
                   className={classes.symbolText}
@@ -1087,7 +1058,7 @@ class VisionRefraction extends PureComponent {
                   )}
                 </GridItem>
                 <GridItem
-                  md={1}
+                  md={2}
                   className={classes.symbolText}
                   style={{ top: 16 }}
                 >
