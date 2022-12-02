@@ -250,7 +250,7 @@ const consultationDocumentTypes = [
     name: 'Spectacle Order Form',
     prop: 'corSpectacleOrderForm',
     downloadConfig: {
-      id: 8,
+      id: 99,
       key: 'SpectacleOrderFormId',
       subject: 'Spectacle Order Form',
       draft: row => {

@@ -164,10 +164,10 @@ export const DispenseItemsColumns = [
     name: 'stockBalance',
     title: 'Balance Qty.',
   },
-  {
-    name: 'instruction',
-    title: 'Instructions',
-  },
+  // {
+  //   name: 'instruction',
+  //   title: 'Instructions',
+  // },
   {
     name: 'remarks',
     title: 'Remarks',
@@ -556,30 +556,30 @@ export const DispenseItemsColumns1 = (viewOnly = false, onValueChange) => {
         )
       },
     },
-    {
-      dataIndex: 'instruction',
-      key: 'instruction',
-      title: 'Instructions',
-      width: 140,
-      onCell: row => ({
-        colSpan: row.isGroup ? 0 : 1,
-        rowSpan: row.groupNumber === 1 ? row.groupRowSpan : 0,
-      }),
-      render: (_, row) => {
-        return (
-          <Tooltip title={<div>{row.instruction}</div>}>
-            <div
-              style={{
-                wordWrap: 'break-word',
-                whiteSpace: 'pre-wrap',
-              }}
-            >
-              {row.instruction}
-            </div>
-          </Tooltip>
-        )
-      },
-    },
+    // {
+    //   dataIndex: 'instruction',
+    //   key: 'instruction',
+    //   title: 'Instructions',
+    //   width: 140,
+    //   onCell: row => ({
+    //     colSpan: row.isGroup ? 0 : 1,
+    //     rowSpan: row.groupNumber === 1 ? row.groupRowSpan : 0,
+    //   }),
+    //   render: (_, row) => {
+    //     return (
+    //       <Tooltip title={<div>{row.instruction}</div>}>
+    //         <div
+    //           style={{
+    //             wordWrap: 'break-word',
+    //             whiteSpace: 'pre-wrap',
+    //           }}
+    //         >
+    //           {row.instruction}
+    //         </div>
+    //       </Tooltip>
+    //     )
+    //   },
+    // },
     {
       dataIndex: 'remarks',
       key: 'remarks',
@@ -1110,10 +1110,10 @@ export const ServiceColumns = [
     name: 'description',
     title: 'Name',
   },
-  {
-    name: 'instruction',
-    title: 'Instructions',
-  },
+  // {
+  //   name: 'instruction',
+  //   title: 'Instructions',
+  // },
   {
     name: 'remarks',
     title: 'Remarks',
@@ -1230,12 +1230,12 @@ export const ServiceColumns1 = (
       title: 'Service Center',
       width: 200,
     },
-    {
-      dataIndex: 'instruction',
-      key: 'instruction',
-      title: 'Instructions',
-      width: 230,
-    },
+    // {
+    //   dataIndex: 'instruction',
+    //   key: 'instruction',
+    //   title: 'Instructions',
+    //   width: 230,
+    // },
     {
       dataIndex: 'remarks',
       key: 'remarks',
