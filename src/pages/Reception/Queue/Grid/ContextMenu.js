@@ -185,7 +185,9 @@ const ContextMenu = ({
         case 0.2: // Register OTC
           return {
             ...opt,
-            disabled: ![VISIT_STATUS.UNGRADED,VISIT_STATUS.VERIFIED].includes(row.visitStatus),
+            disabled: ![VISIT_STATUS.UNGRADED, VISIT_STATUS.VERIFIED].includes(
+              row.visitStatus,
+            ),
           }
         case 1: // dispense
           return {
