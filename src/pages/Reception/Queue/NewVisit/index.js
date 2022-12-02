@@ -118,7 +118,13 @@ class NewVisit extends PureComponent {
   }
 
   componentDidMount = async () => {
-    const { dispatch, patientInfo, values, visitRegistration } = this.props
+    const {
+      dispatch,
+      patientInfo,
+      values,
+      visitRegistration,
+      validateForm,
+    } = this.props
     this.setBannerHeight()
 
     const bizSession = await dispatch({
@@ -132,6 +138,7 @@ class NewVisit extends PureComponent {
       hasActiveSession: data.length > 0,
     })
     await this.getCodeTables()
+    await validateForm()
   }
 
   getCodeTables = async () => {
