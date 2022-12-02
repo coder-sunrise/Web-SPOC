@@ -242,14 +242,18 @@ class ConsultationDocument extends PureComponent {
             columnExtensions={[
               {
                 columnName: 'type',
-                type: 'select',
-                options: consultationDocumentTypes,
+                render: r => {
+                  return consultationDocumentTypes.find(t => t.value === r.type)
+                    .name
+                },
+                width: 250,
               },
               {
                 columnName: 'issuedByUserFK',
                 render: r => {
                   return `${r.issuedByUserTitle || ''} ${r.issuedByUser || ''}`
                 },
+                width: 250,
               },
               {
                 columnName: 'subject',

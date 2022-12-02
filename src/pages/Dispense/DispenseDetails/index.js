@@ -697,7 +697,7 @@ const DispenseDetails = ({
 
             <div className={classes.tableContainer}>
               <div>
-                <h5>Document</h5>
+                <h5>Consultation Document</h5>
               </div>
               <div style={{ overflowX: 'auto' }}>
                 <AntdTable

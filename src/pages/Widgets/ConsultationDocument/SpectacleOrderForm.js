@@ -1,4 +1,5 @@
 import React, { Component, PureComponent } from 'react'
+import moment from 'moment'
 
 import Yup from '@/utils/yup'
 import {
@@ -38,7 +39,6 @@ import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
     consultation,
   }) => {
     if (consultationDocument.entity) return consultationDocument.entity
-    const clinicianProfile = getClinicianProfile(codetable, visitEntity)
     let formVisionRefraction = corVisionRefraction || {}
     if (forDispense) {
       formVisionRefraction =
@@ -48,23 +48,27 @@ import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
       type: consultationDocument.type,
       ...(consultationDocument.entity ||
         consultationDocument.defaultSpectacleOrderForm()),
-      issuedByUserFK: clinicianProfile.userProfileFK,
+      issuedByUserFK: user.data.clinicianProfile.userProfileFK,
       issuedByUser: user.data.clinicianProfile.name,
       issuedByUserTitle: user.data.clinicianProfile.title,
-      leftSPH: formVisionRefraction.subjectiveRefraction_LE_SPH,
-      leftCYL: formVisionRefraction.subjectiveRefraction_LE_CYL,
-      leftAXIS: formVisionRefraction.subjectiveRefraction_LE_AXIS,
-      leftADD: formVisionRefraction.subjectiveRefraction_NearAddition_LE_Value,
-      leftVA: `${formVisionRefraction.subjectiveRefraction_LE_VA ||
+      dateOrdered: moment(),
+      issuedByUserTitle: user.data.clinicianProfile.title,
+      prescription_LE_SPH: formVisionRefraction.subjectiveRefraction_LE_SPH,
+      prescription_LE_CYL: formVisionRefraction.subjectiveRefraction_LE_CYL,
+      prescription_LE_AXIS: formVisionRefraction.subjectiveRefraction_LE_AXIS,
+      prescription_LE_ADD:
+        formVisionRefraction.subjectiveRefraction_NearAddition_LE_Value,
+      prescription_LE_VA: `${formVisionRefraction.subjectiveRefraction_LE_VA ||
         ''}/${formVisionRefraction.subjectiveRefraction_LE_VA_Comments || ''}`,
-      leftPH: formVisionRefraction.subjectiveRefraction_LE_PH,
-      rightSPH: formVisionRefraction.subjectiveRefraction_RE_SPH,
-      rightCYL: formVisionRefraction.subjectiveRefraction_RE_CYL,
-      rightAXIS: formVisionRefraction.subjectiveRefraction_RE_AXIS,
-      rightADD: formVisionRefraction.subjectiveRefraction_NearAddition_RE_Value,
-      rightVA: `${formVisionRefraction.subjectiveRefraction_RE_VA ||
+      prescription_LE_PH: formVisionRefraction.subjectiveRefraction_LE_PH,
+      prescription_RE_SPH: formVisionRefraction.subjectiveRefraction_RE_SPH,
+      prescription_RE_CYL: formVisionRefraction.subjectiveRefraction_RE_CYL,
+      prescription_RE_AXIS: formVisionRefraction.subjectiveRefraction_RE_AXIS,
+      prescription_RE_ADD:
+        formVisionRefraction.subjectiveRefraction_NearAddition_RE_Value,
+      prescription_RE_VA: `${formVisionRefraction.subjectiveRefraction_RE_VA ||
         ''}/${formVisionRefraction.subjectiveRefraction_RE_VA_Comments || ''}`,
-      rightPH: formVisionRefraction.subjectiveRefraction_RE_PH,
+      prescription_RE_PH: formVisionRefraction.subjectiveRefraction_RE_PH,
     }
     return values
   },
@@ -110,7 +114,7 @@ class SpectacleOrderForm extends PureComponent {
               <FastField
                 name='jobReferenceNumber'
                 render={args => {
-                  return <TextField label='Job Reference Numer' {...args} />
+                  return <TextField disabled label='Job Reference Numer' {...args} />
                 }}
               />
             </GridItem>
@@ -156,18 +160,28 @@ class SpectacleOrderForm extends PureComponent {
             <GridContainer>
               <GridItem xs={6}>
                 <FastField
-                  name='leftLens'
-                  render={args => {
-                    return <TextField label='Left Lens' {...args} />
-                  }}
+                  name='leftLensProductFK'
+                  render={args => (
+                    <CodeSelect
+                      {...args}
+                      code='inventoryconsumable'
+                      labelField='displayValue'
+                      label='Left Lens'
+                    />
+                  )}
                 />
               </GridItem>
               <GridItem xs={6}>
                 <FastField
-                  name='rightLens'
-                  render={args => {
-                    return <TextField label='Right Lens' {...args} />
-                  }}
+                  name='rightLensProductFK'
+                  render={args => (
+                    <CodeSelect
+                      {...args}
+                      code='inventoryconsumable'
+                      labelField='displayValue'
+                      label='Right Lens'
+                    />
+                  )}
                 />
               </GridItem>
             </GridContainer>
@@ -189,7 +203,7 @@ class SpectacleOrderForm extends PureComponent {
             <GridContainer>
               <GridItem xs={2}>
                 <FastField
-                  name='leftSPH'
+                  name='prescription_LE_SPH'
                   render={args => {
                     return <TextField label='SPH' {...args} />
                   }}
@@ -197,7 +211,7 @@ class SpectacleOrderForm extends PureComponent {
               </GridItem>
               <GridItem xs={2}>
                 <FastField
-                  name='leftCYL'
+                  name='prescription_LE_CYL'
                   render={args => {
                     return <TextField label='CYL' {...args} />
                   }}
@@ -205,7 +219,7 @@ class SpectacleOrderForm extends PureComponent {
               </GridItem>
               <GridItem xs={2}>
                 <FastField
-                  name='leftAXIS'
+                  name='prescription_LE_AXIS'
                   render={args => {
                     return <TextField label='AXIS' {...args} />
                   }}
@@ -213,7 +227,7 @@ class SpectacleOrderForm extends PureComponent {
               </GridItem>
               <GridItem xs={2}>
                 <FastField
-                  name='leftADD'
+                  name='prescription_LE_ADD'
                   render={args => {
                     return <TextField label='ADD' {...args} />
                   }}
@@ -221,7 +235,7 @@ class SpectacleOrderForm extends PureComponent {
               </GridItem>
               <GridItem xs={2}>
                 <FastField
-                  name='leftVA'
+                  name='prescription_LE_VA'
                   render={args => {
                     return <TextField label='VA' {...args} />
                   }}
@@ -229,7 +243,7 @@ class SpectacleOrderForm extends PureComponent {
               </GridItem>
               <GridItem xs={2}>
                 <FastField
-                  name='leftPH'
+                  name='prescription_LE_PH'
                   render={args => {
                     return <TextField label='PH' {...args} />
                   }}
@@ -251,7 +265,7 @@ class SpectacleOrderForm extends PureComponent {
             <GridContainer>
               <GridItem xs={2}>
                 <FastField
-                  name='rightSPH'
+                  name='prescription_RE_SPH'
                   render={args => {
                     return <TextField label='SPH' {...args} />
                   }}
@@ -259,7 +273,7 @@ class SpectacleOrderForm extends PureComponent {
               </GridItem>
               <GridItem xs={2}>
                 <FastField
-                  name='rightCYL'
+                  name='prescription_RE_CYL'
                   render={args => {
                     return <TextField label='CYL' {...args} />
                   }}
@@ -267,7 +281,7 @@ class SpectacleOrderForm extends PureComponent {
               </GridItem>
               <GridItem xs={2}>
                 <FastField
-                  name='rightAXIS'
+                  name='prescription_RE_AXIS'
                   render={args => {
                     return <TextField label='AXIS' {...args} />
                   }}
@@ -275,7 +289,7 @@ class SpectacleOrderForm extends PureComponent {
               </GridItem>
               <GridItem xs={2}>
                 <FastField
-                  name='rightADD'
+                  name='prescription_RE_ADD'
                   render={args => {
                     return <TextField label='ADD' {...args} />
                   }}
@@ -283,7 +297,7 @@ class SpectacleOrderForm extends PureComponent {
               </GridItem>
               <GridItem xs={2}>
                 <FastField
-                  name='rightVA'
+                  name='prescription_RE_VA'
                   render={args => {
                     return <TextField label='VA' {...args} />
                   }}
@@ -291,7 +305,7 @@ class SpectacleOrderForm extends PureComponent {
               </GridItem>
               <GridItem xs={2}>
                 <FastField
-                  name='rightPH'
+                  name='prescription_RE_PH'
                   render={args => {
                     return <TextField label='PH' {...args} />
                   }}
