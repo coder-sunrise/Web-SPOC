@@ -92,10 +92,6 @@ const getBatchOptions = row => {
 
 export const getRowId = (r, idPrefix) => {
   const suffix = r.type
-  if (idPrefix === 'OtherOrders') {
-    const itemFK = r.invoiceItemFK || r.sourceFK
-    return `${idPrefix}-${r.id}-${itemFK}-${suffix}`
-  }
   return `${idPrefix}-${r.id}-${suffix}`
 }
 
@@ -1329,61 +1325,37 @@ export const ServiceColumns1 = (
   return columns
 }
 
-export const OtherOrdersColumns = [
-  {
-    name: 'type',
-    title: 'Type',
-  },
-  {
-    name: 'description',
-    title: 'Name',
-  },
-  {
-    name: 'remarks',
-    title: 'Remarks',
-  },
-  {
-    name: 'action',
-    title: 'Action',
-  },
-]
-
-export const OtherOrdersColumns1 = onPrint => [
+export const OtherOrdersColumns = onPrint => [
   {
     dataIndex: 'type',
     key: 'type',
     title: 'Type',
-    width: 180,
+    width: 250,
   },
   {
-    dataIndex: 'description',
-    key: 'description',
-    title: 'Name',
-    width: 700,
-    render: (_, row) => (
-      <span className='threeline_textblock'>{row.description}</span>
+    dataIndex: 'subject',
+    key: 'subject',
+    title: 'Subject',
+    render: (text, row) => (
+      <a
+        onClick={() => {
+          onPrint({ type: CONSTANTS.DOCUMENTS, row })
+        }}
+      >
+        {row.subject}
+      </a>
     ),
   },
-  { dataIndex: 'remarks', key: 'remarks', title: 'Remarks', width: 700 },
   {
-    dataIndex: 'action',
-    key: 'action',
-    title: 'Action',
-    width: 70,
-    render: (_, row) => {
-      return (
-        <Tooltip title='Print'>
-          <Button
-            color='primary'
-            justIcon
-            onClick={() => {
-              onPrint({ type: CONSTANTS.DOCUMENTS, row })
-            }}
-          >
-            <Print />
-          </Button>
-        </Tooltip>
-      )
+    dataIndex: 'from',
+    key: 'from',
+    title: 'From',
+    width: 400,
+    render: (text, row) => {
+      const title = row.from.clinicianProfile.title
+        ? `${row.from.clinicianProfile.title} `
+        : ''
+      return `${title}${row.from.clinicianProfile.name}`
     },
   },
 ]
@@ -1412,157 +1384,3 @@ const urgentIndicator = (row, right) => {
     )
   )
 }
-
-export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
-  {
-    columnName: 'type',
-    compare: compareString,
-    width: 180,
-    render: row => {
-      let paddingRight = 0
-      let urgentRight = 0
-
-      if (row.priority === 'Urgent') {
-        paddingRight += 34
-        urgentRight = -paddingRight
-      }
-      return (
-        <div
-          style={{
-            wordWrap: 'break-word',
-            whiteSpace: 'pre-wrap',
-            display: 'flex',
-            justifyContent: 'space-between',
-          }}
-        >
-          <span style={{ width: 80 }}>{row.type}</span>
-          <Space
-            direction='horizontal'
-            align='end'
-            style={{
-              flexGrow: 1,
-              alignItems: 'start',
-            }}
-          >
-            {urgentIndicator(row, urgentRight)}
-          </Space>
-        </div>
-      )
-    },
-  },
-  {
-    columnName: 'description',
-    compare: compareString,
-    width: '60%',
-    render: row => {
-      const { code = '', description = '', unitPrice = 0 } = row
-      return (
-        <Tooltip
-          title={
-            <div>
-              {`Code: ${code}`}
-              <br />
-              {`Name: ${description}`}
-            </div>
-          }
-        >
-          <div style={{ position: 'relative' }}>
-            <div
-              style={{
-                wordWrap: 'break-word',
-                whiteSpace: 'pre-wrap',
-              }}
-            >
-              {row.description}
-              <div style={{ position: 'relative', top: 2 }}>
-                {lowStockIndicator(row, 'itemFK')}
-              </div>
-            </div>
-          </div>
-        </Tooltip>
-      )
-    },
-  },
-  {
-    columnName: 'instruction',
-    width: 200,
-  },
-  {
-    columnName: 'remarks',
-    width: '40%',
-  },
-  {
-    columnName: 'quantity',
-    type: 'number',
-    align: 'right',
-    width: 130,
-    render: row => {
-      let qty = `${numeral(row.quantity || 0).format(
-        '0,0.0',
-      )} ${row.dispenseUOM || ''}`
-      return (
-        <Tooltip title={qty}>
-          <span>{qty}</span>
-        </Tooltip>
-      )
-    },
-  },
-  {
-    columnName: 'unitPrice',
-    // type: 'currency',
-    align: 'right',
-    width: 100,
-    render: row => {
-      const { type } = row
-      if (!ServiceTypes.includes(type)) return 'N/A'
-      return showMoney(row.unitPrice)
-    },
-  },
-  {
-    columnName: 'adjAmt',
-    // type: 'currency',
-    align: 'right',
-    width: 100,
-    render: row => {
-      const { type } = row
-      if (!ServiceTypes.includes(type)) return 'N/A'
-      return showMoney(row.adjAmt)
-    },
-  },
-  {
-    columnName: 'totalAfterItemAdjustment',
-    // type: 'currency',
-    align: 'right',
-    width: 100,
-    render: row => {
-      const { type } = row
-      if (!ServiceTypes.includes(type)) return 'N/A'
-      return showMoney(row.hasPaid ? 0 : row.totalAfterItemAdjustment)
-    },
-  },
-  {
-    columnName: 'action',
-    align: 'left',
-    width: 70,
-    render: r => {
-      const { type } = r
-
-      if (!viewOnly && ServiceTypes.includes(type)) {
-        return <div></div>
-      }
-      return (
-        <Tooltip title='Print'>
-          <Button
-            color='primary'
-            justIcon
-            onClick={() => {
-              onPrint({ type: CONSTANTS.DOCUMENTS, row: r })
-            }}
-          >
-            <Print />
-          </Button>
-        </Tooltip>
-      )
-    },
-  },
-]

@@ -255,9 +255,6 @@ class Main extends Component {
     dispatch({
       type: 'dispense/incrementLoadCount',
     })
-    const { otherOrder = [] } = values
-    const isEmptyDispense = otherOrder.length === 0
-
     // set default language based on patient tranlsation and clinic setting.
     const preferLanguage =
       (patient && patient.translationLinkFK) === 5
