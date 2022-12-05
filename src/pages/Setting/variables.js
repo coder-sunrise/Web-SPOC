@@ -198,12 +198,12 @@ export const menuData = [
     text: 'SMS Template',
     url: '/setting/smstemplate',
   },
-  {
-    authority: 'settings.templates.documenttemplate',
-    title: 'Templates',
-    text: 'Document Template',
-    url: '/setting/documenttemplate',
-  },
+  // {
+  //   authority: 'settings.templates.documenttemplate',
+  //   title: 'Templates',
+  //   text: 'Document Template',
+  //   url: '/setting/documenttemplate',
+  // },
   {
     authority: 'settings.contact.supplier',
     title: 'Contact',
