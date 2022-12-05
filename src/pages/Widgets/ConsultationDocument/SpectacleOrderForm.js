@@ -75,13 +75,32 @@ import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
   validationSchema: Yup.object().shape({}),
 
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, getNextSequence } = props
+    const { dispatch, onConfirm, getNextSequence, codetable } = props
+    const supplier = codetable?.ctsupplier?.find(
+      ct => ct.id === values.supplierFK,
+    )?.displayValue
+    const frameType = codetable?.ctframetype?.find(
+      ct => ct.id === values.frameTypeFK,
+    )?.displayValue
+    const polish = codetable?.ctpolish?.find(ct => ct.id === values.polishFK)
+      ?.displayValue
+    const rightLens = codetable?.inventoryconsumable?.find(
+      ct => ct.id === values.rightLensProductFK,
+    )?.displayValue
+    const leftLens = codetable?.inventoryconsumable?.find(
+      ct => ct.id === values.leftLensProductFK,
+    )?.displayValue
     const nextSequence = getNextSequence()
     dispatch({
       type: 'consultationDocument/upsertRow',
       payload: {
         sequence: nextSequence,
         subject: 'Spectacle Order Form',
+        supplier: supplier,
+        rightLens: rightLens,
+        leftLens: leftLens,
+        frameType: frameType,
+        polish: polish,
         ...values,
       },
     })
