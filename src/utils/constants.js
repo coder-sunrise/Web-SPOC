@@ -1,7 +1,3 @@
-/**
- * ENUM constants that maps with SEMR Gen2 codeset
- */
-
 export const APPOINTMENT_STATUS = {
   CONFIRMED: 1,
   CANCELLED: 3,
@@ -222,6 +218,7 @@ export const REPORT_TYPE = {
   68: 'Patient History Report',
   80: 'Invoice',
   96: 'Spectacle Prescription',
+  99: 'Spectacle Order Form',
 }
 
 export const IGNORED_REPORT_SETTING_REPORT_IDS = [
@@ -337,6 +334,7 @@ export const REPORT_FILE_NAME = {
   91: 'Purchase Request',
   93: 'Medical Report',
   96: 'Spectacle Prescription',
+  99: 'Spectacle Order Form',
 }
 export const REPORT_ID = {
   DRUG_LABEL_80MM_45MM: 24,
