@@ -310,14 +310,17 @@ const consultationDocumentTypes = [
     name: 'Referral Letter',
     prop: 'corReferralLetter',
     downloadConfig: {
-      id: 12,
+      id: 9,
       key: 'ReferralLetterId',
       subject: 'Referral Letter',
       draft: row => {
         return {
-          DocumentDetails: [
+          ReferralLetterDetails: [
             {
               ...row,
+              referralDate: row.generateDate
+                ? moment(row.generateDate).format(dateFormatLong)
+                : '',
             },
           ],
         }
@@ -1000,7 +1003,7 @@ export const corAttchementTypes = [
 export const ReportsOnSignOffOption = {
   MedicalCertificate: 'Medical Certificate',
   CertificateofAttendance: 'Certificate of Attendance',
-  ReferralLetter: 'Referral Letter',
+  // ReferralLetter: 'Referral Letter',
   Memo: 'Memo',
   OtherDocuments: 'Other Documents',
 }
@@ -1013,10 +1016,10 @@ export const ReportsOnSignOff = [
     code: ReportsOnSignOffOption.CertificateofAttendance,
     description: 'Certificate of Attendance',
   },
-  {
-    code: ReportsOnSignOffOption.ReferralLetter,
-    description: 'Referral Letter',
-  },
+  // {
+  //   code: ReportsOnSignOffOption.ReferralLetter,
+  //   description: 'Referral Letter',
+  // },
   { code: ReportsOnSignOffOption.Memo, description: 'Memo' },
   {
     code: ReportsOnSignOffOption.OtherDocuments,

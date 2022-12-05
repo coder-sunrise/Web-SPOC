@@ -288,6 +288,8 @@ export default compose(
       user,
       visitRegistration,
       corVisionRefraction = {},
+      forDispense,
+      consultation,
     }) => {
       if (consultationDocument.entity) return consultationDocument.entity
       const {
