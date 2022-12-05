@@ -218,6 +218,7 @@ export const REPORT_TYPE = {
   68: 'Patient History Report',
   80: 'Invoice',
   96: 'Spectacle Prescription',
+  97: 'Medical Report',
   98: 'Contact Lens Prescription',
   99: 'Spectacle Order Form',
 }
@@ -335,6 +336,7 @@ export const REPORT_FILE_NAME = {
   91: 'Purchase Request',
   93: 'Medical Report',
   96: 'Spectacle Prescription',
+  97: 'Medical Report',
   98: 'Contact Lens Prescription',
   99: 'Spectacle Order Form',
 }

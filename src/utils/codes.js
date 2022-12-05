@@ -311,6 +311,7 @@ const consultationDocumentTypes = [
     value: '5',
     name: 'Referral Letter',
     prop: 'corReferralLetter',
+    authority: 'queue.consultation.widgets.consultationdocument.referralletter',
     downloadConfig: {
       id: 9,
       key: 'ReferralLetterId',
@@ -320,8 +321,8 @@ const consultationDocumentTypes = [
           ReferralLetterDetails: [
             {
               ...row,
-              referralDate: row.generateDate
-                ? moment(row.generateDate).format(dateFormatLong)
+              referralDate: row.referralDate
+                ? moment(row.referralDate).format(dateFormatLong)
                 : '',
             },
           ],
@@ -333,7 +334,7 @@ const consultationDocumentTypes = [
     value: '6',
     name: 'Medical Report',
     prop: 'corMedicalReport',
-    authority: 'queue.consultation.widgets.consultationdocument.medicalReport',
+    authority: 'queue.consultation.widgets.consultationdocument.medicalreport',
     downloadConfig: {
       id: 97,
       key: 'MedicalReportId',
