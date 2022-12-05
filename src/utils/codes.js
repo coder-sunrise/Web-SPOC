@@ -269,7 +269,7 @@ const consultationDocumentTypes = [
     name: 'Contact Lens Prescription',
     prop: 'corContactLensPrescription',
     downloadConfig: {
-      id: 9,
+      id: 98,
       key: 'ContactLensPrescriptionId',
       subject: 'Contact Lens Prescription',
       draft: row => {
@@ -277,6 +277,9 @@ const consultationDocumentTypes = [
           ContactLensPrescriptionDetails: [
             {
               ...row,
+              dateofPrescription: row.dateofPrescription
+                ? moment(row.dateofPrescription).format(dateFormatLong)
+                : '',
             },
           ],
         }
