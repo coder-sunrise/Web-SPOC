@@ -149,10 +149,10 @@ const generatePrintData = async (
       )
     if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.OtherDocuments) > -1)
       printData = printData.concat(getPrintData('Others', corOtherDocuments))
-    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.ReferralLetter) > -1)
-      printData = printData.concat(
-        getPrintData('Referral Letter', corReferralLetter),
-      )
+    // if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.ReferralLetter) > -1)
+    //   printData = printData.concat(
+    //     getPrintData('Referral Letter', corReferralLetter),
+    //   )
     return printData
   }
   return []
@@ -1259,7 +1259,7 @@ class Main extends React.Component {
       'corMemo',
       'corOrderAdjustment',
       'corOtherDocuments',
-      'corReferralLetter',
+      // 'corReferralLetter',
       'corService',
     ]
     const currentValue = convertToConsultation(exist, {
