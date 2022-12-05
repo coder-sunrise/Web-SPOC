@@ -249,6 +249,8 @@ const consultationDocumentTypes = [
     value: '2',
     name: 'Spectacle Order Form',
     prop: 'corSpectacleOrderForm',
+    authority:
+      'queue.consultation.widgets.consultationdocument.spectacleorderform',
     downloadConfig: {
       id: 99,
       key: 'SpectacleOrderFormId',
