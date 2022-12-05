@@ -18,12 +18,7 @@ import {
 } from '@/components'
 import { DiagnosisSelect } from '@/components/_medisys'
 
-const filterOptions = [
-  {
-    value: 'all',
-    name: 'All',
-  },
-]
+const filterOptions = []
 
 const DiagnosisItem = ({
   dispatch,
@@ -109,61 +104,63 @@ const DiagnosisItem = ({
   return (
     <Paper className={classes.diagnosisRow}>
       <GridContainer style={{ marginTop: theme.spacing(1) }}>
-        <GridItem xs={12}>
-          <div style={{ display: 'flex', height: 24 }}>
-            <div>
-              <CheckboxGroup
-                label='Selected Widgets'
-                simple
-                valueField='value'
-                textField='name'
-                value={currentSelectCategory}
-                options={filterOptions}
-                onChange={(v, newVal) => {
-                  if (newVal.all === true) {
-                    updateSelectCategory(filterOptions.map(o => o.value))
-                  } else if (newVal.all === false) {
-                    updateSelectCategory([])
-                  } else {
-                    updateSelectCategory(
-                      (v.target.value || []).filter(c => c !== 'all'),
-                    )
-                  }
-                }}
-              />
-            </div>
-            {favouriteDiagnosisCategoryMessage && (
-              <div
-                style={{
-                  color: 'green',
-                  marginLeft: 'auto',
-                }}
-              >
-                {favouriteDiagnosisCategoryMessage}
+        {false && (
+          <GridItem xs={12}>
+            <div style={{ display: 'flex', height: 24 }}>
+              <div>
+                <CheckboxGroup
+                  label='Selected Widgets'
+                  simple
+                  valueField='value'
+                  textField='name'
+                  value={currentSelectCategory}
+                  options={filterOptions}
+                  onChange={(v, newVal) => {
+                    if (newVal.all === true) {
+                      updateSelectCategory(filterOptions.map(o => o.value))
+                    } else if (newVal.all === false) {
+                      updateSelectCategory([])
+                    } else {
+                      updateSelectCategory(
+                        (v.target.value || []).filter(c => c !== 'all'),
+                      )
+                    }
+                  }}
+                />
               </div>
-            )}
-            {!_.isEqual(
-              favouriteDiagnosisCategory.sort(),
-              currentSelectCategory.filter(c => c !== 'all').sort(),
-            ) && (
-              <a
-                style={{
-                  fontStyle: 'italic',
-                  textDecoration: 'underline',
-                  marginLeft: 'auto',
-                }}
-                onClick={() => {
-                  saveCategoryAsFavourite(
-                    currentSelectCategory.filter(c => c !== 'all'),
-                    uid,
-                  )
-                }}
-              >
-                Save categories as favourite
-              </a>
-            )}
-          </div>
-        </GridItem>
+              {favouriteDiagnosisCategoryMessage && (
+                <div
+                  style={{
+                    color: 'green',
+                    marginLeft: 'auto',
+                  }}
+                >
+                  {favouriteDiagnosisCategoryMessage}
+                </div>
+              )}
+              {!_.isEqual(
+                favouriteDiagnosisCategory.sort(),
+                currentSelectCategory.filter(c => c !== 'all').sort(),
+              ) && (
+                <a
+                  style={{
+                    fontStyle: 'italic',
+                    textDecoration: 'underline',
+                    marginLeft: 'auto',
+                  }}
+                  onClick={() => {
+                    saveCategoryAsFavourite(
+                      currentSelectCategory.filter(c => c !== 'all'),
+                      uid,
+                    )
+                  }}
+                >
+                  Save categories as favourite
+                </a>
+              )}
+            </div>
+          </GridItem>
+        )}
         <GridItem xs={6} style={{ paddingRight: 35 }}>
           <Field
             name={`corDiagnosis[${index}].diagnosisFK`}
