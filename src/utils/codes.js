@@ -250,7 +250,7 @@ const consultationDocumentTypes = [
     name: 'Spectacle Order Form',
     prop: 'corSpectacleOrderForm',
     downloadConfig: {
-      id: 8,
+      id: 99,
       key: 'SpectacleOrderFormId',
       subject: 'Spectacle Order Form',
       draft: row => {
@@ -328,15 +328,19 @@ const consultationDocumentTypes = [
     value: '6',
     name: 'Medical Report',
     prop: 'corMedicalReport',
+    authority: 'queue.consultation.widgets.consultationdocument.medicalReport',
     downloadConfig: {
-      id: 12,
+      id: 97,
       key: 'MedicalReportId',
       subject: 'Medical Report',
       draft: row => {
         return {
-          DocumentDetails: [
+          MedicalReportDetails: [
             {
               ...row,
+              generateDate: row.generateDate
+                ? moment(row.generateDate).format(dateFormatLong)
+                : '',
             },
           ],
         }

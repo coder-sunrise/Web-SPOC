@@ -253,6 +253,18 @@ const tenantCodesMap = new Map([
       ...defaultParams,
     },
   ],
+  [
+    'ctframetype',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctpolish',
+    {
+      ...defaultParams,
+    },
+  ],
 ])
 
 // always get latest codetable
