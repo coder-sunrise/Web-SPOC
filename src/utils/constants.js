@@ -339,6 +339,7 @@ export const REPORT_FILE_NAME = {
   93: 'Medical Report',
   96: 'Spectacle Prescription',
   98: 'Contact Lens Prescription',
+  100: 'Contact Order Form',
 }
 export const REPORT_ID = {
   DRUG_LABEL_80MM_45MM: 24,
