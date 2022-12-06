@@ -249,6 +249,8 @@ const consultationDocumentTypes = [
     value: '2',
     name: 'Spectacle Order Form',
     prop: 'corSpectacleOrderForm',
+    authority:
+      'queue.consultation.widgets.consultationdocument.spectacleorderform',
     downloadConfig: {
       id: 99,
       key: 'SpectacleOrderFormId',
@@ -309,15 +311,19 @@ const consultationDocumentTypes = [
     value: '5',
     name: 'Referral Letter',
     prop: 'corReferralLetter',
+    authority: 'queue.consultation.widgets.consultationdocument.referralletter',
     downloadConfig: {
-      id: 12,
+      id: 9,
       key: 'ReferralLetterId',
       subject: 'Referral Letter',
       draft: row => {
         return {
-          DocumentDetails: [
+          ReferralLetterDetails: [
             {
               ...row,
+              referralDate: row.referralDate
+                ? moment(row.referralDate).format(dateFormatLong)
+                : '',
             },
           ],
         }
@@ -328,7 +334,7 @@ const consultationDocumentTypes = [
     value: '6',
     name: 'Medical Report',
     prop: 'corMedicalReport',
-    authority: 'queue.consultation.widgets.consultationdocument.medicalReport',
+    authority: 'queue.consultation.widgets.consultationdocument.medicalreport',
     downloadConfig: {
       id: 97,
       key: 'MedicalReportId',
@@ -1000,7 +1006,7 @@ export const corAttchementTypes = [
 export const ReportsOnSignOffOption = {
   MedicalCertificate: 'Medical Certificate',
   CertificateofAttendance: 'Certificate of Attendance',
-  ReferralLetter: 'Referral Letter',
+  // ReferralLetter: 'Referral Letter',
   Memo: 'Memo',
   OtherDocuments: 'Other Documents',
 }
@@ -1013,10 +1019,10 @@ export const ReportsOnSignOff = [
     code: ReportsOnSignOffOption.CertificateofAttendance,
     description: 'Certificate of Attendance',
   },
-  {
-    code: ReportsOnSignOffOption.ReferralLetter,
-    description: 'Referral Letter',
-  },
+  // {
+  //   code: ReportsOnSignOffOption.ReferralLetter,
+  //   description: 'Referral Letter',
+  // },
   { code: ReportsOnSignOffOption.Memo, description: 'Memo' },
   {
     code: ReportsOnSignOffOption.OtherDocuments,
@@ -1451,7 +1457,7 @@ const visitDoctorConsultationStatusColor = [
 ]
 
 const orderItemTypes = [
-  { type: 'Consumable', displayValue: 'Con' },
+  { type: 'Consumable', displayValue: 'Prd' },
   { type: 'Service', displayValue: 'Svc' },
 ]
 

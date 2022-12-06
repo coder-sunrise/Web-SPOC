@@ -288,15 +288,13 @@ export default compose(
       user,
       visitRegistration,
       corVisionRefraction = {},
+      forDispense,
+      consultation,
     }) => {
       if (consultationDocument.entity) return consultationDocument.entity
       const {
         entity: { name = '' },
       } = patient
-      const {
-        entity: { visit: { visitDoctor = [] } = {} } = {},
-      } = visitRegistration
-      const primaryDoctor = visitDoctor.find(d => d.isPrimaryDoctor)?.name
       const formVisionRefraction =
         (forDispense
           ? consultation.entity?.latestCORVisionRefraction
@@ -304,7 +302,7 @@ export default compose(
       return {
         type: consultationDocument.type,
         patientName: name,
-        from: primaryDoctor,
+        from: user.data.clinicianProfile.name,
         to: '',
         subject:
           'Referral on Eye Examination at Singapore Polytechnic Optometry Centre',
