@@ -159,6 +159,7 @@ class CardItem extends Component {
       isEnableDeleteDocument = true,
       isEnableEditDocument = true,
       isEnableEditFolder = true,
+      isLimitingCurrentUser = () => false,
     } = this.props
     const { loading, thumbnail } = this.state
     return (
@@ -172,75 +173,78 @@ class CardItem extends Component {
                 </span>
               </GridItem>
               <GridItem md={6} align='Right' style={{ padding: 0, height: 20 }}>
-                <div className={classes.Toolbar}>
-                  {isEnableEditDocument && (
-                    <Tooltip title='Edit'>
-                      <Button
-                        type='primary'
-                        size='small'
-                        disabled={readOnly}
-                        onClick={() => {
-                          onEditFileName(file)
-                        }}
-                        style={{ marginRight: 8 }}
-                        icon={<EditFilled />}
-                      ></Button>
-                    </Tooltip>
-                  )}
-                  {isEnableEditDocument && (
-                    <SetFolderWithPopover
-                      key={file.id}
-                      folderList={folderList}
-                      isEnableEditFolder={isEnableEditFolder}
-                      selectedFolderFKs={file.folderFKs || []}
-                      onClose={selectedFolder => {
-                        const originalFolders = _.sortedUniq(
-                          file.folderFKs || [],
-                        )
-                        const newFolders = _.sortedUniq(selectedFolder)
-
-                        if (
-                          originalFolders.length !== newFolders.length ||
-                          originalFolders.join(',') !== newFolders.join(',')
-                        ) {
-                          onFileUpdated({
-                            ...file,
-                            folderFKs: newFolders,
-                          })
-                        }
-                      }}
-                      onAddNewFolders={onAddNewFolders}
-                      type={this.props.type}
-                    />
-                  )}
-                  {isEnableDeleteDocument && (
-                    <Popconfirm
-                      title='Permanently delete this document in all tags?'
-                      onConfirm={() => {
-                        dispatch({
-                          type: `${modelName}/removeRow`,
-                          payload: {
-                            id: file.id,
-                          },
-                        }).then(() => {
-                          dispatch({
-                            type: `${modelName}/query`,
-                          })
-                        })
-                      }}
-                    >
-                      <Tooltip title='Delete'>
+                {!isLimitingCurrentUser(file.createByUserFK) && (
+                  <div className={classes.Toolbar}>
+                    {isEnableEditDocument && (
+                      <Tooltip title='Edit'>
                         <Button
+                          type='primary'
                           size='small'
-                          type='danger'
-                          icon={<DeleteFilled />}
                           disabled={readOnly}
+                          onClick={() => {
+                            onEditFileName(file)
+                          }}
                           style={{ marginRight: 8 }}
+                          icon={<EditFilled />}
                         ></Button>
                       </Tooltip>
-                    </Popconfirm>
-                  )}
-                </div>
+                    )}
+                    {isEnableEditDocument && (
+                      <SetFolderWithPopover
+                        key={file.id}
+                        disabled={readOnly}
+                        folderList={folderList}
+                        isEnableEditFolder={isEnableEditFolder}
+                        selectedFolderFKs={file.folderFKs || []}
+                        onClose={selectedFolder => {
+                          const originalFolders = _.sortedUniq(
+                            file.folderFKs || [],
+                          )
+                          const newFolders = _.sortedUniq(selectedFolder)
+
+                          if (
+                            originalFolders.length !== newFolders.length ||
+                            originalFolders.join(',') !== newFolders.join(',')
+                          ) {
+                            onFileUpdated({
+                              ...file,
+                              folderFKs: newFolders,
+                            })
+                          }
+                        }}
+                        onAddNewFolders={onAddNewFolders}
+                        type={this.props.type}
+                      />
+                    )}
+                    {isEnableDeleteDocument && (
+                      <Popconfirm
+                        title='Permanently delete this document in all tags?'
+                        onConfirm={() => {
+                          dispatch({
+                            type: `${modelName}/removeRow`,
+                            payload: {
+                              id: file.id,
+                            },
+                          }).then(() => {
+                            dispatch({
+                              type: `${modelName}/query`,
+                            })
+                          })
+                        }}
+                      >
+                        <Tooltip title='Delete'>
+                          <Button
+                            size='small'
+                            type='danger'
+                            icon={<DeleteFilled />}
+                            disabled={readOnly}
+                            style={{ marginRight: 8 }}
+                          ></Button>
+                        </Tooltip>
+                      </Popconfirm>
+                    )}
+                  </div>
+                )}
               </GridItem>
               <GridItem md={12}>
                 <Tooltip title={`Created by: ${file.createByUserName}`}>
