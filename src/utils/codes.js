@@ -1457,7 +1457,7 @@ const visitDoctorConsultationStatusColor = [
 ]
 
 const orderItemTypes = [
-  { type: 'Consumable', displayValue: 'Con' },
+  { type: 'Consumable', displayValue: 'Prd' },
   { type: 'Service', displayValue: 'Svc' },
 ]
 

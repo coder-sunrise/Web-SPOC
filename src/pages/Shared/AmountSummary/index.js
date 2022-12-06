@@ -309,7 +309,7 @@ class AmountSummary extends PureComponent {
                   marginRight: theme.spacing(-4),
                 }}
               >
-                <Checkbox
+                {/* <Checkbox
                   style={{ top: -1 }}
                   controlStyle={{ fontWeight: 500 }}
                   label={`Inclusive GST (${numeral(gstValue).format('0.00')}%)`}
@@ -319,7 +319,10 @@ class AmountSummary extends PureComponent {
                   onChange={e => {
                     this.onChangeGstToggle(e.target.value)
                   }}
-                />
+                /> */}
+                <span>{`GST Amount (${numeral(gstValue).format(
+                  '0.00',
+                )}%)`}</span>
               </div>
               {/* <FastField
                 name={`${poPrefix}.IsGSTEnabled`}

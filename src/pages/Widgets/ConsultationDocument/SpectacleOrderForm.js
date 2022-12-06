@@ -3,36 +3,19 @@ import moment from 'moment'
 
 import Yup from '@/utils/yup'
 import {
-  Button,
   GridContainer,
   GridItem,
   TextField,
-  notification,
-  Select,
   CodeSelect,
   DatePicker,
-  RadioGroup,
-  ProgressButton,
-  CardContainer,
-  confirm,
-  Checkbox,
-  SizeContainer,
-  RichEditor,
   withFormikExtend,
   FastField,
-  Field,
-  ButtonSelect,
-  ClinicianSelect,
 } from '@/components'
-import { getClinicianProfile } from './utils'
 import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
 
 @withFormikExtend({
   mapPropsToValues: ({
     consultationDocument,
-    codetable,
-    visitEntity,
-    patient,
     user,
     corVisionRefraction,
     forDispense,
@@ -110,20 +93,7 @@ import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
 })
 class SpectacleOrderForm extends PureComponent {
   render() {
-    const {
-      footer,
-      handleSubmit,
-      classes,
-      codetable,
-      rowHeight,
-      setFieldValue,
-      loadFromCodes,
-      templateLoader,
-      currentType,
-      height,
-    } = this.props
-    console.log(this.props)
-    // console.log(this.props.values, this.props.dirty, this.props)
+    const { footer, handleSubmit } = this.props
 
     return (
       <div style={{ height: '800px', overflowY: 'auto' }}>
@@ -133,7 +103,9 @@ class SpectacleOrderForm extends PureComponent {
               <FastField
                 name='jobReferenceNumber'
                 render={args => {
-                  return <TextField disabled label='Job Reference Numer' {...args} />
+                  return (
+                    <TextField disabled label='Job Reference Numer' {...args} />
+                  )
                 }}
               />
             </GridItem>
