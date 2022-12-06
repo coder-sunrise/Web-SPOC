@@ -1,4 +1,10 @@
-import { GridContainer, GridItem, TextField, DatePicker } from '@/components'
+import {
+  GridContainer,
+  GridItem,
+  TextField,
+  DatePicker,
+  NumberInput,
+} from '@/components'
 import { FastField, withFormik } from 'formik'
 import Yup from '@/utils/yup'
 import { withStyles } from '@material-ui/core/styles'
@@ -177,6 +183,45 @@ const ContactLensOrderForm = props => {
       </article>
       <section>
         <ContactLensPrescriptionModule />
+        <GridItem>
+          <div
+            style={{
+              marginTop: spacing(2),
+              borderRadius: '5px',
+              border: '1px solid #ccc',
+            }}
+          >
+            <GridItem xs>
+              <div
+                style={{
+                  marginBottom: '-10px',
+                  fontSize: '0.8rem',
+                  fontWeight: 'bolder',
+                }}
+              >
+                Quantity
+              </div>
+            </GridItem>
+            <GridContainer>
+              <GridItem xs={6}>
+                <FastField
+                  name='leftLensQuantity'
+                  render={args => {
+                    return <NumberInput label='Left Lens' {...args} />
+                  }}
+                />
+              </GridItem>
+              <GridItem xs={6}>
+                <FastField
+                  name='rightLensQuantity'
+                  render={args => {
+                    return <NumberInput label='Right Lens' {...args} />
+                  }}
+                />
+              </GridItem>
+            </GridContainer>
+          </div>
+        </GridItem>
         <GridItem xs>
           <FastField
             name='remarks'
