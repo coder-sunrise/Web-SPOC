@@ -64,6 +64,7 @@ const InputGroup = (leftProp, rightProp, classes) => (
           className={classes.inputLeft}
           placeholder={leftProp.label}
           disabled={leftProp.disabled}
+          maxLength={500}
           {...args.field}
         />
       )}
@@ -76,6 +77,7 @@ const InputGroup = (leftProp, rightProp, classes) => (
           className={classes.inputRight}
           placeholder={rightProp.label}
           disabled={rightProp.disabled}
+          maxLength={500}
           {...args.field}
         />
       )}
