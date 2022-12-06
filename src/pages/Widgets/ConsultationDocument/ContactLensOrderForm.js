@@ -76,7 +76,6 @@ const _formik = withFormik({
 const ContactLensOrderForm = props => {
   let { classes, footer, handleSubmit } = props
   let { spacing } = useTheme()
-  console.log(props)
   return (
     <>
       <header>

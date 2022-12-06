@@ -293,7 +293,7 @@ const consultationDocumentTypes = [
     name: 'Contact Lens Order Form',
     prop: 'corContactLensOrderForm',
     downloadConfig: {
-      id: 11,
+      id: 100,
       key: 'ContactLensOrderFormId',
       subject: 'Contact Lens Order Form',
       draft: row => {

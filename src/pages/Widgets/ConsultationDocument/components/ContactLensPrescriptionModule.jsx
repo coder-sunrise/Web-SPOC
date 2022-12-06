@@ -27,7 +27,7 @@ const ContactLensPrescriptionModule = props => {
         <GridContainer>
           <GridItem xs>
             <FastField
-              name='leftBc'
+              name='leftBC'
               render={args => {
                 return <TextField label='BC' {...args} />
               }}
@@ -35,7 +35,7 @@ const ContactLensPrescriptionModule = props => {
           </GridItem>
           <GridItem xs>
             <FastField
-              name='leftDia'
+              name='leftDIA'
               render={args => {
                 return <TextField label='DIA' {...args} />
               }}
@@ -43,7 +43,7 @@ const ContactLensPrescriptionModule = props => {
           </GridItem>
           <GridItem xs>
             <FastField
-              name='leftSph'
+              name='leftSPH'
               render={args => {
                 return <TextField label='SPH' {...args} />
               }}
@@ -51,7 +51,7 @@ const ContactLensPrescriptionModule = props => {
           </GridItem>
           <GridItem xs>
             <FastField
-              name='leftCyl'
+              name='leftCYL'
               render={args => {
                 return <TextField label='CYL' {...args} />
               }}
@@ -59,7 +59,7 @@ const ContactLensPrescriptionModule = props => {
           </GridItem>
           <GridItem xs>
             <FastField
-              name='leftAxis'
+              name='leftAXIS'
               render={args => {
                 return <TextField label='AXIS' {...args} />
               }}
@@ -67,7 +67,7 @@ const ContactLensPrescriptionModule = props => {
           </GridItem>
           <GridItem xs>
             <FastField
-              name='leftColorTint'
+              name='leftCOLOR_TINT'
               render={args => {
                 return <TextField label='COLOR/TINT' {...args} />
               }}
@@ -75,7 +75,7 @@ const ContactLensPrescriptionModule = props => {
           </GridItem>
           <GridItem xs>
             <FastField
-              name='leftAdd'
+              name='leftADD'
               render={args => {
                 return <TextField label='ADD' {...args} />
               }}
@@ -83,7 +83,7 @@ const ContactLensPrescriptionModule = props => {
           </GridItem>
           <GridItem xs>
             <FastField
-              name='leftVa'
+              name='leftVA'
               render={args => {
                 return <TextField label='VA' {...args} />
               }}
@@ -91,7 +91,7 @@ const ContactLensPrescriptionModule = props => {
           </GridItem>
           <GridItem xs>
             <FastField
-              name='leftPh'
+              name='leftPH'
               render={args => {
                 return <TextField label='PH' {...args} />
               }}
@@ -106,7 +106,7 @@ const ContactLensPrescriptionModule = props => {
         <GridContainer>
           <GridItem xs>
             <FastField
-              name='rightBc'
+              name='rightBC'
               render={args => {
                 return <TextField label='BC' {...args} />
               }}
@@ -114,7 +114,7 @@ const ContactLensPrescriptionModule = props => {
           </GridItem>
           <GridItem xs>
             <FastField
-              name='rightDia'
+              name='rightDIA'
               render={args => {
                 return <TextField label='DIA' {...args} />
               }}
@@ -122,7 +122,7 @@ const ContactLensPrescriptionModule = props => {
           </GridItem>
           <GridItem xs>
             <FastField
-              name='rightSph'
+              name='rightSPH'
               render={args => {
                 return <TextField label='SPH' {...args} />
               }}
@@ -130,7 +130,7 @@ const ContactLensPrescriptionModule = props => {
           </GridItem>
           <GridItem xs>
             <FastField
-              name='rightCyl'
+              name='rightCYL'
               render={args => {
                 return <TextField label='CYL' {...args} />
               }}
@@ -138,7 +138,7 @@ const ContactLensPrescriptionModule = props => {
           </GridItem>
           <GridItem xs>
             <FastField
-              name='rightAxis'
+              name='rightAXIS'
               render={args => {
                 return <TextField label='AXIS' {...args} />
               }}
@@ -146,7 +146,7 @@ const ContactLensPrescriptionModule = props => {
           </GridItem>
           <GridItem xs>
             <FastField
-              name='rightColorTint'
+              name='rightCOLOR_TINT'
               render={args => {
                 return <TextField label='COLOR/TINT' {...args} />
               }}
@@ -154,7 +154,7 @@ const ContactLensPrescriptionModule = props => {
           </GridItem>
           <GridItem xs>
             <FastField
-              name='rightAdd'
+              name='rightADD'
               render={args => {
                 return <TextField label='ADD' {...args} />
               }}
@@ -162,7 +162,7 @@ const ContactLensPrescriptionModule = props => {
           </GridItem>
           <GridItem xs>
             <FastField
-              name='rightVa'
+              name='rightVA'
               render={args => {
                 return <TextField label='VA' {...args} />
               }}
@@ -170,7 +170,7 @@ const ContactLensPrescriptionModule = props => {
           </GridItem>
           <GridItem xs>
             <FastField
-              name='rightPh'
+              name='rightPH'
               render={args => {
                 return <TextField label='PH' {...args} />
               }}

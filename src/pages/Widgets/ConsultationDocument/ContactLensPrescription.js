@@ -1,9 +1,4 @@
-import {
-  GridContainer,
-  GridItem,
-  TextField,
-  DatePicker,
-} from '@/components'
+import { GridContainer, GridItem, TextField, DatePicker } from '@/components'
 import { FastField, withFormik } from 'formik'
 import Yup from '@/utils/yup'
 import { withStyles } from '@material-ui/core/styles'
@@ -76,7 +71,6 @@ const _formik = withFormik({
 const ContactLensPrescription = props => {
   let { classes, footer, handleSubmit } = props
   let { spacing } = useTheme()
-  console.log(props)
   return (
     <>
       <header>
