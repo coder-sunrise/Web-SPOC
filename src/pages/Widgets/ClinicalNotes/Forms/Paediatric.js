@@ -16,6 +16,7 @@ import { compose } from 'redux'
 import Grid from '@material-ui/core/Grid'
 import { getUniqueNumericId } from '@/utils/utils'
 import CoverTest from './components/CoverTest'
+import classnames from 'classnames'
 
 const _styles = withStyles(
   theme => ({
@@ -45,6 +46,13 @@ const _styles = withStyles(
     },
     gridItem: {
       marginBottom: theme.spacing(1),
+    },
+    extraDom: {
+      '&::after': {
+        content: "' + '",
+        position: 'relative',
+        top: '-10px',
+      },
     },
   }),
   { withTheme: true },
@@ -148,7 +156,14 @@ class Paediatric extends PureComponent {
             <tr>
               <td width='30%'>
                 <div>
-                  <span className={classes.itemTitle}>NPC*</span>
+                  <span
+                    className={classnames({
+                      [classes.itemTitle]: true,
+                      [classes.extraDom]: true,
+                    })}
+                  >
+                    NPC
+                  </span>
                 </div>
               </td>
               <td width='70%'>
@@ -176,7 +191,14 @@ class Paediatric extends PureComponent {
             <tr>
               <td width='30%'>
                 <div>
-                  <span className={classes.itemTitle}>Ocular Motility*</span>
+                  <span
+                    className={classnames({
+                      [classes.itemTitle]: true,
+                      [classes.extraDom]: true,
+                    })}
+                  >
+                    Ocular Motility
+                  </span>
                 </div>
               </td>
               <td width='70%'>
@@ -251,7 +273,14 @@ class Paediatric extends PureComponent {
             <tr>
               <td width='30%'>
                 <div>
-                  <span className={classes.itemTitle}>Stereopsis*</span>
+                  <span
+                    className={classnames({
+                      [classes.itemTitle]: true,
+                      [classes.extraDom]: true,
+                    })}
+                  >
+                    Stereopsis
+                  </span>
                   <div className={classes.itemTitleField}>
                     <FastField
                       name={`${prefixProp}.stereopsisTot`}
@@ -281,13 +310,23 @@ class Paediatric extends PureComponent {
           </table>
         </GridItem>
 
+        <GridItem md={12} style={{ marginBottom: '20px' }}>
+          {' + Compulsory Test for Paediatric (< 16 years old).'}
+        </GridItem>
         {/* Colour Vision */}
         <GridItem md={12} className={classes.gridItem}>
           <table className={classes.itemTable}>
             <tr>
               <td width='30%'>
                 <div>
-                  <span className={classes.itemTitle}>Colour Vision*</span>
+                  <span
+                    className={classnames({
+                      [classes.itemTitle]: true,
+                      [classes.extraDom]: true,
+                    })}
+                  >
+                    Colour Vision
+                  </span>
                   <div className={classes.itemTitleField}>
                     <FastField
                       name={`${prefixProp}.colourVisionTot`}
@@ -323,7 +362,7 @@ class Paediatric extends PureComponent {
             <tr>
               <td width='30%'>
                 <div>
-                  <span className={classes.itemTitle}>Axial Length*</span>
+                  <span className={classes.itemTitle}>Axial Length</span>
                   <div className={classes.itemTitleField}>
                     <FastField
                       name={`${prefixProp}.axialLengthInstrument`}
