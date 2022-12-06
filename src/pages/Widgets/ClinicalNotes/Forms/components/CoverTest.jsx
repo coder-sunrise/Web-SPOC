@@ -1,7 +1,7 @@
 import { Button, Field, MultipleTextField, Checkbox } from '@/components'
 import { useRef } from 'react'
-import Close from '@material-ui/icons/Close'
 import { compose } from 'redux'
+import { Delete, Add } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles'
 import { useHover } from 'ahooks'
 
@@ -86,7 +86,7 @@ const CoverTest = props => {
               <div
                 style={{ position: 'absolute', top: spacing(2), left: '5px' }}
               >
-                <p className={classes.extraDom}>CoverTest</p>
+                <p className={classes.extraDom}>Cover Test</p>
                 <p style={{ fontSize: '0.8rem' }}>
                   <em>(including its magnitude and direction)</em>
                 </p>
@@ -157,7 +157,7 @@ const CoverTest = props => {
                   }}
                   justIcon
                 >
-                  <Close />
+                  <Delete />
                 </Button>
               )}
               <Field

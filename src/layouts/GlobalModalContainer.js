@@ -49,10 +49,20 @@ class GlobalModalContainer extends PureComponent {
     ) {
       clearTimeout(this._timer)
       this._timer = setTimeout(() => {
-        this.props.dispatch({
-          type: 'login/logout',
-        })
+        this.props
+          .dispatch({
+            type: 'login/logout',
+          })
+          .then(this.logoutMicrosoftAADAccount)
       }, 60000)
+    }
+  }
+
+  logoutMicrosoftAADAccount = () => {
+    const { instance } = this.props
+    if (localStorage.getItem('aadUserAccount')) {
+      localStorage.removeItem('aadUserAccount')
+      instance.logoutRedirect({ logoutHint: localStorage.getItem('loginHint') })
     }
   }
 
@@ -201,9 +211,11 @@ class GlobalModalContainer extends PureComponent {
           title='Session Timeout'
           maxWidth='sm'
           onClose={() => {
-            this.props.dispatch({
-              type: 'login/logout',
-            })
+            this.props
+              .dispatch({
+                type: 'login/logout',
+              })
+              .then(this.logoutMicrosoftAADAccount)
           }}
           onConfirm={() => {
             clearTimeout(this._timer)

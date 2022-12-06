@@ -8,7 +8,7 @@ export const getClinicianProfile = (codetable, visitEntity) => {
         : undefined
 
     const visitDoctorProfile = doctorprofile.find(
-      (dp) => dp.id === visitDoctorProfileFK,
+      dp => dp.id === visitDoctorProfileFK,
     )
 
     const {

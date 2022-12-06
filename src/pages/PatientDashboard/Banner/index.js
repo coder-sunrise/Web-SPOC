@@ -669,7 +669,6 @@ class Banner extends PureComponent {
     const { ctsalutation = [] } = codetable
     const info = entity
     const name = `${info.name}`
-
     const year = Math.floor(moment.duration(moment().diff(info.dob)).asYears())
 
     // get scheme details based on scheme type

@@ -8,19 +8,19 @@ const _routes = [
     routes: [
       {
         path: '/user/login',
-        component: './NewLogin',
+        component: './SystemLogin',
         hideInMenu: true,
       },
       {
-        path: '/user/login/clinic',
-        component: './NewLogin',
+        path: '/user/microsoftlogin',
+        component: './MicrosoftLogin',
         hideInMenu: true,
       },
-      {
-        path: '/user/forgotpassword',
-        component: './ForgotPassword',
-        hideInMenu: true,
-      },
+      // {
+      //   path: '/user/forgotpassword',
+      //   component: './ForgotPassword',
+      //   hideInMenu: true,
+      // },
     ],
   },
   // Queue Display Dashboard

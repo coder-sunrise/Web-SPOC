@@ -2,6 +2,8 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
 import { isNumber } from 'util'
+import { qtyFormat, currencyFormat } from '@/utils/config'
+import numeral from 'numeral'
 import {
   GridContainer,
   GridItem,
@@ -15,7 +17,11 @@ import {
   Switch,
   Checkbox,
   LocalSearchSelect,
+  Tooltip,
+  IconButton,
+  Popover,
 } from '@/components'
+import Info from '@material-ui/icons/Info'
 import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 import Yup from '@/utils/yup'
@@ -382,6 +388,177 @@ class Consumable extends PureComponent {
       option.displayValue.toLowerCase().indexOf(lowerCaseInput) >= 0
     )
   }
+  renderConsumable = option => {
+    const {
+      code,
+      displayValue,
+      combinDisplayValue,
+      stock = 0,
+      consumableCategory: { name: CategoryName, id: CategoryId },
+      uom: { name: uomName },
+      criticalThreshold,
+      sellingPrice,
+    } = option
+    console.log(option)
+    let isLowStock = stock <= criticalThreshold || stock < 0
+    let isFrames = CategoryId === 1
+    const details = () => {
+      return (
+        <div
+          style={{
+            fontSize: 14,
+          }}
+        >
+          <p>
+            Current Stock:
+            <span style={{ color: isLowStock ? 'red' : '' }}>
+              {numeral(stock).format(qtyFormat)}
+            </span>
+          </p>
+          <p>
+            Selling Price:$
+            {numeral(sellingPrice).format(currencyFormat)}
+          </p>
+        </div>
+      )
+    }
+    return (
+      <div
+        style={{
+          height: 40,
+          lineHeight: '40px',
+        }}
+      >
+        <div
+          style={{
+            height: '20px',
+            lineHeight: '20px',
+          }}
+        >
+          <Tooltip
+            useTooltip2
+            title={
+              <div>
+                <div
+                  style={{ fontWeight: 'bold' }}
+                >{`Name: ${displayValue}`}</div>
+              </div>
+            }
+          >
+            <div
+              style={{
+                width: 535,
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+              }}
+            >
+              <span
+                style={{ fontWeight: '550', fontSize: 15 }}
+              >{`${displayValue}`}</span>
+            </div>
+          </Tooltip>
+        </div>
+        <div
+          id='alterDom'
+          style={{
+            height: '20px',
+            lineHeight: '20px',
+            fontSize: '0.7rem',
+          }}
+        >
+          <Tooltip
+            title={
+              <div>
+                Code:
+                <span style={{ color: 'darkblue' }}>{` ${code}`}</span>
+              </div>
+            }
+          >
+            <div
+              style={{
+                width: 100,
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                height: '100%',
+              }}
+            >
+              Code:
+              <span style={{ color: 'darkblue' }}>{` ${code}`}</span>
+            </div>
+          </Tooltip>
+
+          <Tooltip
+            title={
+              <div>
+                Stock:
+                <span
+                  style={{
+                    color: isLowStock < 0 ? 'red' : 'black',
+                  }}
+                >{` ${numeral(stock || 0).format(qtyFormat)} `}</span>
+                {uomName || ''}
+              </div>
+            }
+          >
+            <div
+              style={{
+                width: 120,
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                marginLeft: 3,
+                height: '100%',
+              }}
+            >
+              Stock:
+              <span
+                style={{
+                  color: isLowStock < 0 ? 'red' : 'black',
+                }}
+              >{` ${numeral(stock || 0).format(qtyFormat)} `}</span>
+              {uomName || ''}
+              {isFrames && isLowStock && (
+                <Popover
+                  icon={null}
+                  trigger='hover'
+                  content={details()}
+                  getPopupContainer={() => document.getElementById('alterDom')}
+                >
+                  <IconButton style={{}} size='medium'>
+                    <Info color={'error'} />
+                  </IconButton>
+                </Popover>
+              )}
+            </div>
+          </Tooltip>
+
+          <Tooltip
+            useTooltip2
+            title={CategoryName ? `Product Category: ${CategoryName}` : ''}
+          >
+            <div
+              style={{
+                width: 290,
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                marginLeft: 3,
+                height: '100%',
+              }}
+            >
+              {CategoryName ? `Product Category: ${CategoryName}` : ''}
+            </div>
+          </Tooltip>
+        </div>
+      </div>
+    )
+  }
 
   render() {
     const {
@@ -424,10 +601,15 @@ class Consumable extends PureComponent {
                         labelField='combinDisplayValue'
                         onChange={this.changeConsumable}
                         options={this.getConsumableOptions()}
-                        {...args}
+                        renderDropdown={this.renderConsumable}
+                        dropdownStyle={{
+                          width: 600,
+                        }}
                         matchSearch={this.matchSearch}
+                        dropdownClassName='ant-select-dropdown-bottom-bordered'
+                        showOptionTitle={false}
+                        {...args}
                       />
-                      <LowStockInfo sourceType='consumable' {...this.props} />
                     </div>
                   )
                 }}

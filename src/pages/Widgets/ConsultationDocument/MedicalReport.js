@@ -9,15 +9,14 @@ import {
   TextField,
   DatePicker,
   MultipleTextField,
-  RadioGroup,
 } from '@/components'
 import { ableToViewByAuthority } from '@/utils/utils'
 import AuthorizedContext from '@/components/Context/Authorized'
 
-const ReferralLetter = props => {
+const MedicalReport = props => {
   const { footer, handleSubmit } = props
   const editEnable = ableToViewByAuthority(
-    'queue.consultation.widgets.consultationdocument.referralletter',
+    'queue.consultation.widgets.consultationdocument.medicalreport',
   )
   return (
     <div>
@@ -37,24 +36,7 @@ const ReferralLetter = props => {
               />
             </GridItem>
           </GridContainer>
-          <GridContainer>
-            <GridItem md={6}>
-              <FastField
-                name='from'
-                render={args => {
-                  return <TextField label='From' disabled {...args} />
-                }}
-              />
-            </GridItem>
-            <GridItem md={6}>
-              <FastField
-                name='to'
-                render={args => {
-                  return <TextField label='To' {...args} />
-                }}
-              />
-            </GridItem>
-          </GridContainer>
+
           <GridContainer>
             <GridItem md={6}>
               <FastField
@@ -66,13 +48,14 @@ const ReferralLetter = props => {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='referralDate'
+                name='generateDate'
                 render={args => {
-                  return <DatePicker label='On' {...args} />
+                  return <DatePicker label='Date' {...args} />
                 }}
               />
             </GridItem>
           </GridContainer>
+
           <div style={{ border: '0.5px solid #CCCCCC', margin: 8, padding: 8 }}>
             <div style={{ fontWeight: 'bold' }}>Case History</div>
             <FastField
@@ -216,9 +199,9 @@ const ReferralLetter = props => {
           </div>
 
           <div style={{ border: '0.5px solid #CCCCCC', margin: 8, padding: 8 }}>
-            <div style={{ fontWeight: 'bold' }}>Reason(s) for referral</div>
+            <div style={{ fontWeight: 'bold' }}>Management Plan</div>
             <FastField
-              name='reasonsForReferral'
+              name='managementPlan'
               render={args => {
                 return (
                   <MultipleTextField
@@ -231,42 +214,6 @@ const ReferralLetter = props => {
               }}
             />
           </div>
-
-          <GridContainer>
-            <GridItem xs={12}>
-              <FastField
-                name='degreeOfDemand'
-                render={args => {
-                  return (
-                    <RadioGroup
-                      simple
-                      label=''
-                      defaultValue=''
-                      options={[
-                        {
-                          value: 'NonUrgent',
-                          label: 'Non-urgent (within 2-4 weeks)',
-                        },
-                        {
-                          value: 'Early',
-                          label: 'Early (within 2 weeks)',
-                        },
-                        {
-                          value: 'Urgent',
-                          label: 'Urgent (Same day)',
-                        },
-                        {
-                          value: 'Immediate',
-                          label: 'Immediate (attend A+E immediately)',
-                        },
-                      ]}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-          </GridContainer>
         </div>
       </AuthorizedContext.Provider>
       {footer &&
@@ -286,7 +233,6 @@ export default compose(
       consultationDocument,
       patient,
       user,
-      visitRegistration,
       corVisionRefraction = {},
       forDispense,
       consultation,
@@ -302,11 +248,9 @@ export default compose(
       return {
         type: consultationDocument.type,
         patientName: name,
-        from: user.data.clinicianProfile.name,
-        to: '',
         subject:
-          'Referral on Eye Examination at Singapore Polytechnic Optometry Centre',
-        referralDate: moment(),
+          'Report on Eye Examination at Singapore Polytechnic Optometry Centre',
+        generateDate: moment(),
         issuedByUserFK: user.data.clinicianProfile.userProfileFK,
         issuedByUser: user.data.clinicianProfile.name,
         issuedByUserTitle: user.data.clinicianProfile.title,
@@ -343,6 +287,6 @@ export default compose(
       })
       if (onConfirm) onConfirm()
     },
-    displayName: 'ReferralLetter',
+    displayName: 'MedicalReport',
   }),
-)(ReferralLetter)
+)(MedicalReport)

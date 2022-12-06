@@ -27,6 +27,7 @@ const tabHeader = (tabName, detailsProps) => {
         code,
         displayValue,
         revenueCategoryFK,
+        consumableCategoryFK,
         effectiveDates,
         uomfk,
         averageCostPrice,
@@ -40,6 +41,7 @@ const tabHeader = (tabName, detailsProps) => {
       if (
         (code ||
           displayValue ||
+          consumableCategoryFK||
           revenueCategoryFK ||
           effectiveDates ||
           uomfk) &&

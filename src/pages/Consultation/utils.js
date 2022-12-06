@@ -89,6 +89,7 @@ const convertConsultationDocument = consultationDocument => {
 const convertToConsultation = (
   values,
   { consultationDocument, orders, forms },
+  isFromEditOrder = false,
 ) => {
   const { rows = [] } = consultationDocument
   consultationDocumentTypes.forEach(p => {
@@ -105,7 +106,9 @@ const convertToConsultation = (
     }
   })
 
-  values.corDoctorNote = convertClinicalNotesForms(values)
+  if (!isFromEditOrder) {
+    values.corDoctorNote = convertClinicalNotesForms(values)
+  }
 
   const formRows = forms.rows
   formTypes.forEach(p => {
@@ -134,13 +137,24 @@ const convertClinicalNotesForms = values => {
     if (list && list.length > 0) {
       //unticked form
       if (!entity) {
-        list[0].isDeleted = true
+        if (list[0].id) {
+          list[0].isDeleted = true
+        } else {
+          list = []
+        }
       } else {
         //add new after unticked
         if (!entity.id) {
-          list[0].isDeleted = true
-          entity.lastChangeDate = moment()
-          list.push({ ...entity })
+          if (list[0].id) {
+            list[0].isDeleted = true
+            entity.lastChangeDate = moment()
+            list.push({ ...entity })
+          } else {
+            list[0] = {
+              ...list[0],
+              ...entity,
+            }
+          }
         }
         //update old item
         else {
@@ -155,9 +169,21 @@ const convertClinicalNotesForms = values => {
     else if (entity) {
       entity.lastChangeDate = moment()
       list.push(entity)
-      tempValues = setIn(tempValues, form.prop, list)
     }
-
+    list.forEach(item => {
+      delete item.rightScribbleNote
+      delete item.leftScribbleNote
+      delete item.ocularMotilityScribbleNote
+      delete item.pupillaryAssessmentScribbleNote
+      delete item.confrontationScribbleNote
+      if (item.corContactLensFitting_Item) {
+        item.corContactLensFitting_Item.forEach(itemFitting => {
+          delete itemFitting.rightScribbleNote
+          delete itemFitting.leftScribbleNote
+        })
+      }
+    })
+    tempValues = setIn(tempValues, form.prop, list)
     tempValues = setIn(tempValues, form.prefixProp, undefined)
   })
   return tempValues.corDoctorNote

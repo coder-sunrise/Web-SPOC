@@ -253,11 +253,15 @@ class EditOrder extends Component {
         return
       }
 
-      const payload = convertToConsultation(values, {
-        consultationDocument,
-        orders,
-        forms,
-      })
+      const payload = convertToConsultation(
+        values,
+        {
+          consultationDocument,
+          orders,
+          forms,
+        },
+        true,
+      )
       const signResult = await dispatch({
         type: `consultation/signOrder`,
         payload: {
@@ -316,14 +320,11 @@ class EditOrder extends Component {
     } = this.props
     const orderWidget = widgets.find(o => o.id === '5')
     const cdWidget = widgets.find(o => o.id === '3')
-    const formsWidget = widgets.find(o => o.id === '12')
     const Order = orderWidget.component
     const ConsultationDocument = cdWidget.component
     const consultationDocumentAccessRight = Authorized.check(
       cdWidget.accessRight,
     )
-    const Forms = formsWidget.component
-    const formAccessRight = Authorized.check(formsWidget.accessRight)
 
     const visitRemarks = this.props.visitRegistration?.entity?.visit
       ?.visitRemarks

@@ -149,10 +149,10 @@ const generatePrintData = async (
       )
     if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.OtherDocuments) > -1)
       printData = printData.concat(getPrintData('Others', corOtherDocuments))
-    if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.ReferralLetter) > -1)
-      printData = printData.concat(
-        getPrintData('Referral Letter', corReferralLetter),
-      )
+    // if (reportsOnSignOff.indexOf(ReportsOnSignOffOption.ReferralLetter) > -1)
+    //   printData = printData.concat(
+    //     getPrintData('Referral Letter', corReferralLetter),
+    //   )
     return printData
   }
   return []
@@ -272,7 +272,6 @@ const saveConsultation = ({
 
     newValues.corDoctorNote.signedByUserFK = user.data.id
     newValues.corDoctorNote.signedDate = moment()
-
 
     newValues.corScribbleNotes.forEach(
       note => (note.signedByUserFK = user.data.id),
@@ -427,16 +426,78 @@ const pauseConsultation = async ({
   }
 }
 
-const saveDraftDoctorNote = ({ values, visitRegistration }) => {
+const checkUpdateNotes = (oldNotes = {}, newNotes = {}) => {
+  let oldNotesEntity = { corDoctorNote: _.cloneDeep(oldNotes) }
+  delete oldNotesEntity.corDoctorNote.id
+  delete oldNotesEntity.corDoctorNote.visitFK
+  delete oldNotesEntity.corDoctorNote.clinicalObjectRecordFK
+  delete oldNotesEntity.corDoctorNote.lastChangeDate
+  delete oldNotesEntity.corDoctorNote._lastChangeDateIn
+  delete oldNotesEntity.corDoctorNote._lastChangeDateOut
+  delete oldNotesEntity.corDoctorNote.signedDate
+  delete oldNotesEntity.corDoctorNote._signedDateIn
+  delete oldNotesEntity.corDoctorNote._signedDateOut
+
+  let newNotesEntity = { corDoctorNote: _.cloneDeep(newNotes) }
+  delete newNotesEntity.corDoctorNote.id
+  delete newNotesEntity.corDoctorNote.visitFK
+  delete newNotesEntity.corDoctorNote.clinicalObjectRecordFK
+  delete newNotesEntity.corDoctorNote.lastChangeDate
+  delete newNotesEntity.corDoctorNote._lastChangeDateIn
+  delete newNotesEntity.corDoctorNote._lastChangeDateOut
+  delete newNotesEntity.corDoctorNote.signedDate
+  delete newNotesEntity.corDoctorNote._signedDateIn
+  delete newNotesEntity.corDoctorNote._signedDateOut
+  formConfigs.forEach(form => {
+    var oldList = getIn(oldNotesEntity, form.prop)
+    if (oldList && oldList.length > 0) {
+      oldList.forEach(item => {
+        delete item.lastChangeDate
+        delete item.id
+        delete item.corDoctorNoteFK
+        delete item._lastChangeDateIn
+        delete item._lastChangeDateOut
+        delete item.recordStatusFK
+      })
+    }
+    var newList = getIn(newNotesEntity, form.prop)
+    if (newList && newList.length > 0) {
+      newList.forEach(item => {
+        delete item.lastChangeDate
+        delete item.id
+        delete item.corDoctorNoteFK
+        delete item._lastChangeDateIn
+        delete item._lastChangeDateOut
+        delete item.recordStatusFK
+      })
+    }
+  })
+  return _.isEqual(oldNotesEntity.corDoctorNote, newNotesEntity.corDoctorNote)
+}
+
+const saveDraftDoctorNote = async ({
+  values,
+  visitRegistration,
+  consultation,
+  dispatch,
+}) => {
   const corDoctorNote = convertClinicalNotesForms(values)
-  const { entity: visit = {} } = visitRegistration
-  const { id } = visit
-  const payload = {
-    ...(corDoctorNote || {}),
-    visitFK: id,
-    clinicalObjectRecordFK: values.id,
+  if (!checkUpdateNotes(consultation.draftDoctorNote, corDoctorNote)) {
+    const { entity: visit = {} } = visitRegistration
+    const { id } = visit
+    const payload = {
+      ...(corDoctorNote || {}),
+      visitFK: id,
+      clinicalObjectRecordFK: values.id,
+    }
+    await service.saveDraftDoctorNote(payload)
+    dispatch({
+      type: 'consultation/updateState',
+      payload: {
+        draftDoctorNote: payload,
+      },
+    })
   }
-  service.saveDraftDoctorNote(payload)
 }
 
 // @skeleton()
@@ -520,6 +581,7 @@ const saveDraftDoctorNote = ({ values, visitRegistration }) => {
           }
         })
       } else {
+        newEntity.corDoctorNote = { lastChangeDate: moment() }
         selectForms = consultation.default.selectForms
         formConfigs.forEach(form => {
           if (selectForms.indexOf(form.id) > -1) {
@@ -594,8 +656,6 @@ class Main extends React.Component {
     }, 500)
 
     const {
-      consultation,
-      dispatch,
       clinicSettings: {
         autoSaveClinicNoteInterval = 60,
         isEnableAutoSaveClinicNote = false,
@@ -603,6 +663,8 @@ class Main extends React.Component {
     } = this.props
     if (isEnableAutoSaveClinicNote) {
       this.interval = setInterval(() => {
+        const { consultation, global } = this.props
+        if (consultation.showSignOffModal || global.openConfirm) return
         saveDraftDoctorNote(this.props)
       }, autoSaveClinicNoteInterval * 1000)
     }
@@ -1197,7 +1259,7 @@ class Main extends React.Component {
       'corMemo',
       'corOrderAdjustment',
       'corOtherDocuments',
-      'corReferralLetter',
+      // 'corReferralLetter',
       'corService',
     ]
     const currentValue = convertToConsultation(exist, {

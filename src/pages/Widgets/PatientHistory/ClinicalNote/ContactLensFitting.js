@@ -173,9 +173,9 @@ export default ({
                     <td>{item.reMovementPushup}</td>
                   </tr>
                   <tr>
-                    <td>{item.reVADN}</td>
+                    <td>{item.revadn}</td>
                     <td colspan='2'>VA (D / N)</td>
-                    <td>{item.leVADN}</td>
+                    <td>{item.levadn}</td>
                   </tr>
                   <tr>
                     <td>{item.reOverRxVA}</td>

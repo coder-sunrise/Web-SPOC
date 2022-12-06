@@ -55,7 +55,7 @@ import {
   DispenseItemsColumns,
   getRowId,
   ServiceColumns1,
-  OtherOrdersColumns1,
+  OtherOrdersColumns,
   DispenseItemsColumns1,
 } from '../variables'
 
@@ -133,7 +133,7 @@ const DispenseDetails = ({
   const {
     dispenseItems = [],
     service,
-    otherOrder,
+    documents,
     invoice,
     visitPurposeFK,
     visitRemarks,
@@ -697,7 +697,7 @@ const DispenseDetails = ({
 
             <div className={classes.tableContainer}>
               <div>
-                <h5>Other Orders</h5>
+                <h5>Consultation Document</h5>
               </div>
               <div style={{ overflowX: 'auto' }}>
                 <AntdTable
@@ -705,8 +705,8 @@ const DispenseDetails = ({
                   size='small'
                   bordered
                   pagination={false}
-                  dataSource={otherOrder}
-                  columns={OtherOrdersColumns1(onPrint)}
+                  dataSource={documents}
+                  columns={OtherOrdersColumns(onPrint)}
                 />
               </div>
             </div>

@@ -28,6 +28,7 @@ class Diagnosis extends PureComponent {
   }
 
   fetchCodeTables = async () => {
+    const { dispatch } = this.props
     await Promise.all([
       dispatch({
         type: 'codetable/fetchCodes',
@@ -263,7 +264,6 @@ class Diagnosis extends PureComponent {
   }
   render() {
     const { rights, diagnosis, user, visitRegistration } = this.props
-    console.log(22)
     return (
       <div>
         <FieldArray

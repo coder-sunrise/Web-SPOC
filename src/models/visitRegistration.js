@@ -33,6 +33,7 @@ export default createFormViewModel({
         },
       },
       isRegisterOtc: false,
+      billFirstVisitFK: undefined,
       maxQueueNo: '',
       patientInfo: {},
       visitInfo: {},
@@ -89,6 +90,7 @@ export default createFormViewModel({
               type: 'updateState',
               payload: {
                 isRegisterOtc: true,
+                billFirstVisitFK: query?.billFirstVisitFK,
               },
             })
           }
@@ -111,6 +113,7 @@ export default createFormViewModel({
             'apptid',
             'visitMode',
             'isRegisterOtc',
+            'billFirstVisitFK',
           ]),
         )
         yield put({
@@ -122,6 +125,8 @@ export default createFormViewModel({
             roomFK: undefined,
             appointmentFK: undefined,
             appointment: undefined,
+            isRegisterOtc: false,
+            billFirstVisitFK: undefined,
           },
         })
         yield put({

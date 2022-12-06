@@ -44,6 +44,7 @@ class SalesList extends PureComponent {
         type: 'currency',
         currency: true,
         sortingEnabled: false,
+        precision: 4,
       },
       {
         columnName: 'adj',

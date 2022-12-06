@@ -6,6 +6,7 @@ import InfoCircleOutlined from '@ant-design/icons/InfoCircleOutlined'
 import { Field, FastField } from 'formik'
 // umi
 import { formatMessage } from 'umi'
+import { useSelector } from 'umi'
 // custom components
 import _ from 'lodash'
 import { Alert } from 'antd'
@@ -110,6 +111,7 @@ const VisitInfoCard = ({
   ...restProps
 }) => {
   const disableConsReady = Authorized.check('queue.modifyconsultationready')
+  const visitRegistration = useSelector(s => s.visitRegistration)
 
   const validateQNo = value => {
     const qNo = parseFloat(value).toFixed(
@@ -166,7 +168,12 @@ const VisitInfoCard = ({
             name={FormField['visit.visitType']}
             render={args => (
               <CodeSelect
-                disabled={notWaiting || isReadOnly || hasCOR}
+                disabled={
+                  notWaiting ||
+                  isReadOnly ||
+                  hasCOR ||
+                  visitRegistration.isRegisterOtc
+                }
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.visitType',
                 })}
@@ -179,7 +186,7 @@ const VisitInfoCard = ({
           />
         </GridItem>
         <GridItem xs md={2}>
-          <FastField
+          <Field
             name={FormField['visit.salesType']}
             render={args => (
               <CodeSelect

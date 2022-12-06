@@ -124,22 +124,22 @@ const widgets = [
       },
     },
   },
-  {
-    id: '12',
-    name: 'Forms',
-    accessRight: 'queue.consultation.form',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/Forms'),
-      loading: Loading,
-    }),
-    model: 'forms',
-    layoutConfig: {},
+  // {
+  //   id: '12',
+  //   name: 'Forms',
+  //   accessRight: 'queue.consultation.form',
+  //   component: Loadable({
+  //     loader: () => import('@/pages/Widgets/Forms'),
+  //     loading: Loading,
+  //   }),
+  //   model: 'forms',
+  //   layoutConfig: {},
 
-    onRemove: () => {
-      window.g_app._store.dispatch({
-        type: 'forms/deleteRow',
-      })
-    },
-  },
+  //   onRemove: () => {
+  //     window.g_app._store.dispatch({
+  //       type: 'forms/deleteRow',
+  //     })
+  //   },
+  // },
 ]
 export { widgets }

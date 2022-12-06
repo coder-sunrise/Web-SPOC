@@ -1,14 +1,16 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-
+import { FastField } from 'formik'
 import withStyles from '@material-ui/core/styles/withStyles'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import Add from '@material-ui/icons/Add'
 import { consultationDocumentTypes } from '@/utils/codes'
 import { download } from '@/utils/request'
-import { commonDataReaderTransform } from '@/utils/utils'
+import { commonDataReaderTransform, ableToViewByAuthority } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
+import { List } from 'antd'
+
 import {
   CommonTableGrid,
   Button,
@@ -16,15 +18,11 @@ import {
   Popconfirm,
   notification,
   ProgressButton,
+  Popover,
   Tooltip,
   AuthorizedContext,
-  withFormikExtend,
 } from '@/components'
 import AddConsultationDocument from './AddConsultationDocument'
-
-// import model from './models'
-
-// window.g_app.replaceModel(model)
 const styles = () => ({})
 export const printRow = async (row, props) => {
   const type = consultationDocumentTypes.find(
@@ -45,21 +43,14 @@ export const printRow = async (row, props) => {
       },
     )
   } else {
-    const { codetable, patient } = props
-    const { clinicianprofile = [] } = codetable
-    const { entity } = patient
+    const { codetable, visitEntity } = props
+    const { doctorprofile = [] } = codetable
     const obj =
-      clinicianprofile.find(
-        o =>
-          o.userProfileFK ===
-          (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
-      ) || {}
-
-    row.doctorName = (obj.title ? `${obj.title} ` : '') + obj.name
-    row.doctorMCRNo = obj.doctorProfile.doctorMCRNo
-
-    row.patientName = entity.name
-    row.patientAccountNo = entity.patientAccountNo
+      doctorprofile.find(o => o.id === visitEntity?.visit?.doctorProfileFK) ||
+      {}
+    row.optometristName =
+      (obj?.clinicianProfile?.title ? `${obj?.clinicianProfile?.title} ` : '') +
+      obj?.clinicianProfile?.name
 
     download(
       `/api/Reports/${downloadConfig.id}?ReportFormat=pdf`,
@@ -101,24 +92,15 @@ export const viewReport = (row, props, useID = false) => {
       },
     })
   } else {
-    const { codetable, patient } = props
-    const { clinicianprofile = [] } = codetable
-    const { entity } = patient
+    const { codetable, visitEntity } = props
+    const { doctorprofile = [] } = codetable
     const obj =
-      clinicianprofile.find(
-        o =>
-          o.userProfileFK ===
-          (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
-      ) || {}
-
+      doctorprofile.find(o => o.id === visitEntity?.visit?.doctorProfileFK) ||
+      {}
     const reportParameters = { ...row }
-    reportParameters.doctorName = (obj.title ? `${obj.title} ` : '') + obj.name
-    reportParameters.doctorMCRNo = obj.doctorProfile
-      ? obj.doctorProfile.doctorMCRNo
-      : ''
-
-    reportParameters.patientName = entity.name
-    reportParameters.patientAccountNo = entity.patientAccountNo
+    reportParameters.optometristName =
+      (obj?.clinicianProfile?.title ? `${obj?.clinicianProfile?.title} ` : '') +
+      obj?.clinicianProfile?.name
     window.g_app._store.dispatch({
       type: 'report/updateState',
       payload: {
@@ -135,22 +117,27 @@ export const viewReport = (row, props, useID = false) => {
 
   return true
 }
-@connect(({ consultationDocument, codetable, patient, consultation }) => ({
-  consultationDocument,
-  codetable,
-  patient,
-  consultation,
-}))
-@withFormikExtend({
-  displayName: 'ConsultationDocumentList',
-})
+@connect(
+  ({
+    consultationDocument,
+    codetable,
+    patient,
+    consultation,
+    visitRegistration,
+  }) => ({
+    consultationDocument,
+    codetable,
+    patient,
+    consultation,
+    visitEntity: visitRegistration.entity || {},
+  }),
+)
 class ConsultationDocument extends PureComponent {
   constructor(props) {
     super(props)
     const { dispatch } = props
-
     this.state = {
-      openFormType: false, 
+      openFormType: false,
     }
     dispatch({
       type: 'codetable/fetchCodes',
@@ -167,6 +154,8 @@ class ConsultationDocument extends PureComponent {
       type: 'consultationDocument/updateState',
       payload: {
         showModal: !showModal,
+        entity: undefined,
+        type: undefined,
       },
     })
   }
@@ -179,9 +168,9 @@ class ConsultationDocument extends PureComponent {
       payload: {
         entity: row,
         type: row.type,
+        showModal: true,
       },
     })
-    this.toggleModal()
   }
 
   handleViewReport = uid => {
@@ -206,10 +195,34 @@ class ConsultationDocument extends PureComponent {
     return right
   }
 
+  toggleVisibleChange = () => {
+    this.setState(ps => {
+      return {
+        ...ps,
+        openFormType: !ps.openFormType,
+      }
+    })
+  }
+
+  openConsultationDocumentModal = item => {
+    this.props.dispatch({
+      type: 'consultationDocument/updateState',
+      payload: {
+        entity: undefined,
+        type: item.value,
+        showModal: true,
+      },
+    })
+    this.toggleVisibleChange()
+  }
+
   render() {
     const { consultationDocument, dispatch, theme } = this.props
-    const { showModal } = consultationDocument
-    const { rows } = consultationDocument
+    const { showModal, rows, entity, type } = consultationDocument
+    const selectType = consultationDocumentTypes.find(
+      item => item.value === type,
+    )
+    const title = `${_.isEmpty(entity) ? 'Add' : 'Edit'} ${selectType?.name}`
     return (
       <div>
         <AuthorizedContext.Provider value={this.getDocumentAccessRight()}>
@@ -229,24 +242,18 @@ class ConsultationDocument extends PureComponent {
             columnExtensions={[
               {
                 columnName: 'type',
-                type: 'select',
-                options: consultationDocumentTypes,
+                render: r => {
+                  return consultationDocumentTypes.find(t => t.value === r.type)
+                    .name
+                },
+                width: 250,
               },
               {
                 columnName: 'issuedByUserFK',
                 render: r => {
-                  const { codetable } = this.props
-                  const { clinicianprofile = [] } = codetable
-                  const obj =
-                    clinicianprofile.find(
-                      o =>
-                        o.userProfileFK ===
-                        (r.issuedByUserFK
-                          ? r.issuedByUserFK
-                          : r.referredByUserFK),
-                    ) || {}
-                  return `${obj.title || ''} ${obj.name || ''}`
+                  return `${r.issuedByUserTitle || ''} ${r.issuedByUser || ''}`
                 },
+                width: 250,
               },
               {
                 columnName: 'subject',
@@ -256,7 +263,7 @@ class ConsultationDocument extends PureComponent {
                 type: 'link',
                 linkField: 'href',
                 getLinkText: row => {
-                  return row.type === '4' ? row.title : row.subject
+                  return row.subject
                 },
               },
               {
@@ -265,19 +272,6 @@ class ConsultationDocument extends PureComponent {
                 render: row => {
                   return (
                     <React.Fragment>
-                      {/* <Tooltip title='Print'>
-                      <Button
-                        size='sm'
-                        onClick={() => {
-                          this.printRow(row)
-                        }}
-                        justIcon
-                        color='primary'
-                        style={{ marginRight: 5 }}
-                      >
-                        <Print />
-                      </Button>
-                    </Tooltip> */}
                       <Tooltip title='Edit'>
                         <Button
                           size='sm'
@@ -325,44 +319,30 @@ class ConsultationDocument extends PureComponent {
           <Popover
             icon={null}
             trigger='click'
-            placement='bottom'
+            placement='bottomLeft'
             visible={this.state.openFormType}
             onVisibleChange={this.toggleVisibleChange}
             content={
-              <div className={classes.popoverContainer}>
-                <TextField
-                  label='Filter Template'
-                  onChange={e => {
-                    this.debouncedFilterFormTemplateAction(e)
-                  }}
+              <div>
+                <List
+                  size='small'
+                  bordered
+                  dataSource={consultationDocumentTypes
+                    .filter(item => ableToViewByAuthority(item.authority))
+                    .map(item => ({
+                      value: item.value,
+                      name: item.name,
+                    }))}
+                  renderItem={item => (
+                    <List.Item
+                      onClick={() => {
+                        this.openConsultationDocumentModal(item)
+                      }}
+                    >
+                      {item.name}
+                    </List.Item>
+                  )}
                 />
-                <div className={classes.listContainer}>
-                  {orderedTemplates.map(item => {
-                    return (
-                      <this.ListItem
-                        key={item.formTemplateFK}
-                        title={item.name}
-                        classes={classes}
-                        onClick={() => {
-                          dispatch({
-                            type: 'forms/updateState',
-                            payload: {
-                              showModal: true,
-                              type: item.value,
-                              entity: undefined,
-                              formCategory: FORM_CATEGORY.CORFORM,
-                              formName: item.name,
-                              templateContent: null,
-                              formTemplateFK: item.formTemplateFK,
-                            },
-                          })
-                          this.toggleVisibleChange()
-                        }}
-                        {...item}
-                      />
-                    )
-                  })}
-                </div>
               </div>
             }
           >
@@ -372,14 +352,7 @@ class ConsultationDocument extends PureComponent {
                 icon={<Add />}
                 style={{ margin: theme.spacing(1) }}
                 onClick={() => {
-                  window.g_app._store.dispatch({
-                    type: 'consultationDocument/updateState',
-                    payload: {
-                      showModal: true,
-                      type: '5',
-                      entity: undefined,
-                    },
-                  })
+                  this.toggleVisibleChange()
                 }}
               >
                 Add New
@@ -387,24 +360,29 @@ class ConsultationDocument extends PureComponent {
             </Tooltip>
           </Popover>
         </AuthorizedContext.Provider>
-        <CommonModal
-          open={showModal}
-          title='Add Consultation Document'
-          onClose={this.toggleModal}
-          onConfirm={this.toggleModal}
-          observe='AddConsultationDocument'
-          maxWidth='md'
-          bodyNoPadding
-          // showFooter=
-          // footProps={{
-          //   confirmBtnText: 'Save',
-          // }}
-        >
-          <AddConsultationDocument
-            {...this.props}
-            types={consultationDocumentTypes}
+        {showModal && (
+          <FastField
+            name='corDoctorNote.corVisionRefractionEntity'
+            render={args => {
+              return (
+                <CommonModal
+                  open={true}
+                  title={title}
+                  onClose={this.toggleModal}
+                  onConfirm={this.toggleModal}
+                  observe='AddConsultationDocument'
+                  maxWidth='md'
+                  bodyNoPadding
+                >
+                  <AddConsultationDocument
+                    {...this.props}
+                    corVisionRefraction={args.field?.value}
+                  />
+                </CommonModal>
+              )
+            }}
           />
-        </CommonModal>
+        )}
       </div>
     )
   }

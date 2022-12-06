@@ -28,6 +28,11 @@ export default createFormViewModel({
           memoDate: moment(),
         }
       },
+      defaultSpectacleOrderForm: () => {
+        return {
+          type: '2',
+        }
+      },
       defaultCertOfAttendance: () => {
         return {
           type: '6',

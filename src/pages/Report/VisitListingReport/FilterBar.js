@@ -197,10 +197,6 @@ const FilterBar = ({ handleSubmit, isSubmitting, ctcopayer = [], classes }) => {
                       label: 'Optometrist',
                     },
                     {
-                      value: 'Copayer',
-                      label: 'Co-payer',
-                    },
-                    {
                       value: 'None',
                       label: 'None',
                     },
