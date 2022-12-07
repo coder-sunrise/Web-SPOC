@@ -28,7 +28,7 @@ export default createFormViewModel({
           },
         })
       },
-      *saveUserPreference({ payload }, { call, put, select, take }) {
+      *saveUserPreference({ payload }, { call, put, select }) {
         const r = yield call(saveUserPreference, {
           userPreferenceDetails: JSON.stringify(payload.userPreferenceDetails),
           itemIdentifier: payload.itemIdentifier,
@@ -36,14 +36,13 @@ export default createFormViewModel({
         })
 
         if (r === 204) {
-          yield put.resolve({
+          window.g_app._store.dispatch({
             type: 'codetable/refreshCodes',
             payload: {
               code: 'userpreference',
               force: true,
             },
           })
-          // yield take('codetable/refreshCodes/@@end')
           return true
         }
 
