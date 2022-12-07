@@ -8,6 +8,12 @@ import { FastField } from 'formik'
 import { Input } from 'antd'
 import withStyles from '@material-ui/core/styles/withStyles'
 
+const antdInput = {
+  backgroundColor: '#fff !important',
+  textAlign: 'center !important',
+  margin: '4px 0 !important',
+  lineHeight: '1.3',
+}
 const style = theme => ({
   inputSplit: {
     backgroundColor: '#fff !important',
@@ -21,21 +27,16 @@ const style = theme => ({
     padding: '4px 0 ',
   },
   inputLeft: {
-    backgroundColor: '#fff !important',
+    ...antdInput,
     width: 'calc(50% - 5px) !important',
-    textAlign: 'center !important',
     borderRightWidth: '0 !important',
-    margin: '4px 0 !important',
-    lineHeight: '1.3',
   },
   inputRight: {
-    backgroundColor: '#fff !important',
+    ...antdInput,
     width: 'calc(50% - 5px) !important',
-    textAlign: 'center !important',
     borderLeftWidth: '0 !important',
-    margin: '4px 0 !important',
-    lineHeight: '1.3',
   },
+  antdInput,
 })
 
 const InputGroup = (leftProp, rightProp, classes) => (
@@ -43,14 +44,14 @@ const InputGroup = (leftProp, rightProp, classes) => (
     <FastField
       name={leftProp}
       render={args => (
-        <Input className={classes.inputLeft} {...args} {...args.field} />
+        <Input className={classes.inputLeft} maxLength={500} {...args.field} />
       )}
     />
     <Input className={classes.inputSplit} placeholder='/' disabled />
     <FastField
       name={rightProp}
       render={args => (
-        <Input className={classes.inputRight} {...args} {...args.field} />
+        <Input className={classes.inputRight} maxLength={500} {...args.field} />
       )}
     />
   </Input.Group>
@@ -97,14 +98,28 @@ const FollowUp = props => {
               VA
             </GridItem>
             <GridItem md={10} container>
-              <GridItem md={8}>
+              <GridItem md={6}>
                 {InputGroup(
                   `${prefixProp}.aided_RE_VA`,
                   `${prefixProp}.aided_RE_VA_Comments`,
                   classes,
                 )}
               </GridItem>
+              <GridItem md={4}>
+                <FastField
+                  name={`${prefixProp}.aided_RE_PH`}
+                  render={args => (
+                    <Input
+                      maxLength={500}
+                      placeholder='PH'
+                      className={classes.antdInput}
+                      {...args.field}
+                    />
+                  )}
+                />
+              </GridItem>
             </GridItem>
+
             <GridItem md={1} style={{ paddingTop: 8 }}>
               LE
             </GridItem>
@@ -112,12 +127,25 @@ const FollowUp = props => {
               VA
             </GridItem>
             <GridItem md={10} container>
-              <GridItem md={8}>
+              <GridItem md={6}>
                 {InputGroup(
                   `${prefixProp}.aided_LE_VA`,
                   `${prefixProp}.aided_LE_VA_Comments`,
                   classes,
                 )}
+              </GridItem>
+              <GridItem md={4}>
+                <FastField
+                  name={`${prefixProp}.aided_LE_PH`}
+                  render={args => (
+                    <Input
+                      maxLength={500}
+                      placeholder='PH'
+                      className={classes.antdInput}
+                      {...args.field}
+                    />
+                  )}
+                />
               </GridItem>
             </GridItem>
           </GridItem>
