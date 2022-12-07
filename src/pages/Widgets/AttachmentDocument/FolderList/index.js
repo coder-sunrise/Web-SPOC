@@ -112,6 +112,7 @@ class FolderList extends Component {
       fileCount: n.fileCount || 0,
       isDeleted: n.isDeleted,
       isEmpty: n.isEmpty,
+      createByUserFK: n.createByUserFK,
     }
   }
 
@@ -260,6 +261,7 @@ class FolderList extends Component {
       isEnableEditFolder = true,
       isEnableDeleteFolder = true,
       isEnableEditDocument = true,
+      isLimitingCurrentUser = () => false,
     } = this.props
     const {
       showNewFolder,
@@ -268,7 +270,19 @@ class FolderList extends Component {
       isShowEmptyTags = true,
       filterValue,
     } = this.state
-
+    const fittedFolderList = folderList.filter(
+      f =>
+        !f.isDeleted &&
+        (!isEditMode || !isLimitingCurrentUser(f.createByUserFK)) &&
+        (f.id === -99 ||
+          ((f.displayValue || '')
+            .toUpperCase()
+            .indexOf((filterValue || '').toUpperCase()) >= 0 &&
+            (isShowEmptyTags || f.fileCount > 0))),
+    )
+    const anyTagBelongCurrentUser = fittedFolderList.some(
+      f => !isLimitingCurrentUser(f.createByUserFK),
+    )
     return (
       <GridContainer style={{ height: 'auto' }}>
         {!readOnly && (
@@ -375,14 +389,16 @@ class FolderList extends Component {
                       </Tooltip>
                     </React.Fragment>
                   ) : (
-                    <Button
-                      type='primary'
-                      size='small'
-                      onClick={() => {
-                        this.setState({ isEditMode: true })
-                      }}
-                      icon={<EditFilled />}
-                    ></Button>
+                    anyTagBelongCurrentUser && (
+                      <Button
+                        type='primary'
+                        size='small'
+                        onClick={() => {
+                          this.setState({ isEditMode: true })
+                        }}
+                        icon={<EditFilled />}
+                      ></Button>
+                    )
                   )}
                 </div>
               )}
@@ -399,15 +415,7 @@ class FolderList extends Component {
             <DragableList
               readOnly={readOnly}
               isEditMode={isEditMode}
-              folderList={folderList.filter(
-                f =>
-                  !f.isDeleted &&
-                  (f.id === -99 ||
-                    ((f.displayValue || '')
-                      .toUpperCase()
-                      .indexOf((filterValue || '').toUpperCase()) >= 0 &&
-                      (isShowEmptyTags || f.fileCount > 0))),
-              )}
+              folderList={fittedFolderList}
               selectedFolderFK={selectedFolderFK}
               onMoving={this.handleOnMoving}
               onItemClick={this.onItemClick}

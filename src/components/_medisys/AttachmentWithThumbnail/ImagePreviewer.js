@@ -93,7 +93,7 @@ class ImagePreviewer extends Component {
     }
   }
 
-  cacheImageList = (files, defaultSelectedFileId) => {
+  cacheImageList = (files, fileIndexFK) => {
     const imageList = files.map((m, i) => {
       const stateFile =
         (this.state.imageList || []).find(x => x.id === m.id) || {}
@@ -106,12 +106,10 @@ class ImagePreviewer extends Component {
         isSelected: false,
       }
     })
-
     const imageWH = this.getImageContainerWH()
     this.setState({ ...imageWH, imageList }, () => {
-      const currentImg = imageList.find(s => s.id === defaultSelectedFileId)
-      if (!currentImg || !currentImg.image)
-        this.fetchImage(imageList, defaultSelectedFileId)
+      const currentImg = imageList.find(s => s.fileIndexFK === fileIndexFK)
+      if (currentImg?.image) this.fetchImage(imageList, fileIndexFK)
       else {
         currentImg.isSelected = true
         this.setState({ imageList })
@@ -236,7 +234,6 @@ class ImagePreviewer extends Component {
     })
 
     const currentImg = imageList.find(s => s.slideNumber === current)
-    console.log(imageList)
     if (currentImg) {
       currentImg.isSelected = true
       if (currentImg.image) {
@@ -312,9 +309,12 @@ class ImagePreviewer extends Component {
       isEnableDeleteDocument = true,
       isEnableEditDocument = true,
       isEnableEditFolder = true,
+      isLimitingCurrentUser = () => false,
     } = this.props
     const selectedImage = this.state.imageList.find(s => s.isSelected) || {}
-
+    const limitingCurrentUser = isLimitingCurrentUser(
+      selectedImage.createByUserFK,
+    )
     return (
       <div
         style={{ display: 'table', height: '100%' }}
@@ -394,7 +394,7 @@ class ImagePreviewer extends Component {
                 this.setState({ imageList })
               }}
               disabled
-              text={readOnly || !isEnableEditDocument}
+              text={readOnly || limitingCurrentUser || !isEnableEditDocument}
               style={{ width: '100%' }}
             />
           </GridItem>
@@ -418,7 +418,9 @@ class ImagePreviewer extends Component {
                     variant='outlined'
                     label={folderEntity?.displayValue}
                     color='primary'
-                    disabled={!isEnableEditDocument}
+                    disabled={
+                      readOnly || limitingCurrentUser || !isEnableEditDocument
+                    }
                     onDelete={() => {
                       selectedImage.folderFKs = selectedImage.folderFKs.filter(
                         i => i !== item,
