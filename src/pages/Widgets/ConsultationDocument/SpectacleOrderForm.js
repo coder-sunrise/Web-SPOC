@@ -12,6 +12,7 @@ import {
   FastField,
 } from '@/components'
 import CopayerDropdownOption from '@/components/Select/optionRender/copayer'
+import { PRODUCT_CATEGORY } from './utils'
 
 @withFormikExtend({
   mapPropsToValues: ({
@@ -157,6 +158,10 @@ class SpectacleOrderForm extends PureComponent {
                       {...args}
                       code='inventoryconsumable'
                       labelField='displayValue'
+                      localFilter={item =>
+                        item.consumableCategory.id ===
+                        PRODUCT_CATEGORY.OPHTHALMIC_LENS
+                      }
                       label='Left Lens'
                     />
                   )}
@@ -170,6 +175,10 @@ class SpectacleOrderForm extends PureComponent {
                       {...args}
                       code='inventoryconsumable'
                       labelField='displayValue'
+                      localFilter={item =>
+                        item.consumableCategory.id ===
+                        PRODUCT_CATEGORY.OPHTHALMIC_LENS
+                      }
                       label='Right Lens'
                     />
                   )}
