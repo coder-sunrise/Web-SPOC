@@ -1,4 +1,10 @@
-import { Button, Field, MultipleTextField, Checkbox } from '@/components'
+import {
+  Button,
+  Field,
+  MultipleTextField,
+  Checkbox,
+  Popconfirm,
+} from '@/components'
 import { useRef } from 'react'
 import { compose } from 'redux'
 import { Delete, Add } from '@material-ui/icons'
@@ -71,7 +77,6 @@ const CoverTest = props => {
   let prefix = getPrefix()
   let ref = useRef(null)
   let isShowCloseBtn =
-    useHover(ref) &&
     _.get(values, propName)?.filter(
       coverTestItem =>
         coverTestItem.isDeleted == false ||
@@ -136,29 +141,24 @@ const CoverTest = props => {
           <td>
             <div ref={ref}>
               {isShowCloseBtn && (
-                <Button
-                  color='danger'
-                  style={{
-                    position: 'absolute',
-                    top: '2px',
-                    right: '0',
-                    zIndex: '99',
-                  }}
-                  size='sm'
-                  onClick={() => {
-                    dispatch({
-                      type: 'global/updateAppState',
-                      payload: {
-                        openConfirm: true,
-                        openConfirmContent: `Confirm to delete?`,
-                        onConfirmSave: deleteCoverTest,
-                      },
-                    })
-                  }}
-                  justIcon
+                <Popconfirm
+                  title='Confirm to delete?'
+                  onConfirm={deleteCoverTest}
                 >
-                  <Delete />
-                </Button>
+                  <Button
+                    color='danger'
+                    style={{
+                      position: 'absolute',
+                      top: '2px',
+                      right: '0',
+                      zIndex: '99',
+                    }}
+                    size='sm'
+                    justIcon
+                  >
+                    <Delete />
+                  </Button>
+                </Popconfirm>
               )}
               <Field
                 name={`${prefix}coverTestD`}

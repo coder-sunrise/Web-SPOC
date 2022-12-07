@@ -19,6 +19,9 @@ const styles = theme => ({
   },
 })
 
+const filterOptions = []
+
+
 const DiagnosisSelect = ({
   dispatch,
   theme,

@@ -33,8 +33,9 @@ export default ({ formContent, classes }) => {
             <th style={{ width: '20%' }}></th>
             <th style={{ width: 50 }}></th>
             <th style={{ width: 50 }}></th>
+            <th style={{ width: '10%' }}></th>
+            <th style={{ width: '10%' }}></th>
             <th style={{ width: '15%' }}></th>
-            <th style={{ width: '20%' }}></th>
             <th style={{ width: 50 }}></th>
             <th style={{ width: 50 }}></th>
             <th style={{ width: '15%' }}></th>
@@ -47,6 +48,7 @@ export default ({ formContent, classes }) => {
             {CellBordered(
               `${formContent.aided_RE_VA} / ${formContent.aided_RE_VA_Comments}`,
             )}
+            {CellBordered(formContent.aided_RE_PH)}
             <td className={classes.cellLabel}>Unaided</td>
             <td>RE</td>
             <td>VA</td>
@@ -61,6 +63,7 @@ export default ({ formContent, classes }) => {
             {CellBordered(
               `${formContent.aided_LE_VA} / ${formContent.aided_LE_VA_Comments}`,
             )}
+            {CellBordered(formContent.aided_LE_PH)}
             <td></td>
             <td>LE</td>
             <td>VA</td>

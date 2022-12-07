@@ -553,7 +553,6 @@ export const ContactPersonList = props => {
           color: 'red',
         }
 
-        console.log(record.id, targetPrintRowId)
         //=== Not Editing ===//
         if (editingKey === '') {
           return (

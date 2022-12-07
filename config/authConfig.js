@@ -14,9 +14,9 @@ export const msalConfig = {
     auth: {
         clientId: "56b05778-2130-4c80-873c-e83e7649ff1d",
         authority: "https://login.microsoftonline.com/organizations",
-        redirectUri: "http://localhost:9000/user/microsoftlogin",
+        redirectUri: "https://spoc-it-api-2022.semr2.com/user/microsoftlogin",
         navigateToLoginRequestUrl: false,
-        postLogoutRedirectUri: "http://localhost:9000/user/microsoftlogin"
+        postLogoutRedirectUri: "https://spoc-it-api-2022.semr2.com/user/microsoftlogin"
     },
     cache: {
         cacheLocation: "sessionStorage", // This configures where your cache will be stored

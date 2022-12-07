@@ -58,6 +58,7 @@ class Grid extends PureComponent {
       isEnableDeleteDocument = true,
       isEnableEditFolder = true,
       filterDocumentValue = '',
+      isLimitingCurrentUser = () => false,
     } = this.props
 
     return (
@@ -121,24 +122,26 @@ class Grid extends PureComponent {
                       </NavLink>
                     </div>
                   </Tooltip>
-                  {!readOnly && isEnableEditDocument && (
-                    <div
-                      style={{
-                        float: 'right',
-                        width: 40,
-                        marginRight: -40,
-                      }}
-                    >
-                      <IconButton
-                        color='primary'
-                        onClick={() => {
-                          onEditFileName(row)
+                  {!readOnly &&
+                    !isLimitingCurrentUser(row.createByUserFK) &&
+                    isEnableEditDocument && (
+                      <div
+                        style={{
+                          float: 'right',
+                          width: 40,
+                          marginRight: -40,
                         }}
                       >
-                        <EditOutlined />
-                      </IconButton>
-                    </div>
-                  )}
+                        <IconButton
+                          color='primary'
+                          onClick={() => {
+                            onEditFileName(row)
+                          }}
+                        >
+                          <EditOutlined />
+                        </IconButton>
+                      </div>
+                    )}
                 </div>
               )
             },
@@ -163,39 +166,42 @@ class Grid extends PureComponent {
                         </Tag>
                       ))}
                   </div>
-                  {!readOnly && isEnableEditDocument && (
-                    <div
-                      style={{
-                        float: 'right',
-                        width: 40,
-                        marginRight: -40,
-                      }}
-                    >
-                      <SetFolderWithPopover
-                        justIcon
-                        key={row.id}
-                        isEnableEditFolder={isEnableEditFolder}
-                        folderList={row.folderList}
-                        selectedFolderFKs={row.folderFKs || []}
-                        onClose={selectedFolder => {
-                          const originalFolders = _.sortedUniq(
-                            row.folderFKs || [],
-                          )
-                          const newFolders = _.sortedUniq(selectedFolder)
-
-                          if (
-                            originalFolders.length !== newFolders.length ||
-                            originalFolders.join(',') !== newFolders.join(',')
-                          ) {
-                            row.folderFKs = newFolders
-                            onFileUpdated(row)
-                          }
+                  {!readOnly &&
+                    !isLimitingCurrentUser(row.createByUserFK) &&
+                    isEnableEditDocument && (
+                      <div
+                        style={{
+                          float: 'right',
+                          width: 40,
+                          marginRight: -40,
                         }}
-                        type={this.props.type}
-                        onAddNewFolders={onAddNewFolders}
-                      />
-                    </div>
-                  )}
+                      >
+                        <SetFolderWithPopover
+                          justIcon
+                          readOnly={readOnly}
+                          key={row.id}
+                          isEnableEditFolder={isEnableEditFolder}
+                          folderList={row.folderList}
+                          selectedFolderFKs={row.folderFKs || []}
+                          onClose={selectedFolder => {
+                            const originalFolders = _.sortedUniq(
+                              row.folderFKs || [],
+                            )
+                            const newFolders = _.sortedUniq(selectedFolder)
+
+                            if (
+                              originalFolders.length !== newFolders.length ||
+                              originalFolders.join(',') !== newFolders.join(',')
+                            ) {
+                              row.folderFKs = newFolders
+                              onFileUpdated(row)
+                            }
+                          }}
+                          type={this.props.type}
+                          onAddNewFolders={onAddNewFolders}
+                        />
+                      </div>
+                    )}
                 </div>
               )
             },
@@ -231,32 +237,33 @@ class Grid extends PureComponent {
                       style={{ marginRight: 8 }}
                     ></Button>
                   </Tooltip>
-                  {isEnableDeleteDocument && (
-                    <Popconfirm
-                      title='Permanently delete this document in all tags?'
-                      onConfirm={() => {
-                        dispatch({
-                          type: `${modelName}/removeRow`,
-                          payload: {
-                            id: row.id,
-                          },
-                        }).then(() => {
+                  {!isLimitingCurrentUser(row.createByUserFK) &&
+                    isEnableDeleteDocument && (
+                      <Popconfirm
+                        title='Permanently delete this document in all tags?'
+                        onConfirm={() => {
                           dispatch({
-                            type: `${modelName}/query`,
+                            type: `${modelName}/removeRow`,
+                            payload: {
+                              id: row.id,
+                            },
+                          }).then(() => {
+                            dispatch({
+                              type: `${modelName}/query`,
+                            })
                           })
-                        })
-                      }}
-                    >
-                      <Tooltip title='Delete'>
-                        <Button
-                          size='small'
-                          disabled={readOnly}
-                          type='danger'
-                          icon={<DeleteFilled />}
-                        ></Button>
-                      </Tooltip>
-                    </Popconfirm>
-                  )}
+                        }}
+                      >
+                        <Tooltip title='Delete'>
+                          <Button
+                            size='small'
+                            disabled={readOnly}
+                            type='danger'
+                            icon={<DeleteFilled />}
+                          ></Button>
+                        </Tooltip>
+                      </Popconfirm>
+                    )}
                 </div>
               )
             },

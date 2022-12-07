@@ -270,6 +270,8 @@ const consultationDocumentTypes = [
     value: '3',
     name: 'Contact Lens Prescription',
     prop: 'corContactLensPrescription',
+    authority:
+      'queue.consultation.widgets.consultationdocument.contactlensprescription',
     downloadConfig: {
       id: 98,
       key: 'ContactLensPrescriptionId',
@@ -292,8 +294,10 @@ const consultationDocumentTypes = [
     value: '4',
     name: 'Contact Lens Order Form',
     prop: 'corContactLensOrderForm',
+    authority:
+      'queue.consultation.widgets.consultationdocument.contactlensorderform',
     downloadConfig: {
-      id: 11,
+      id: 100,
       key: 'ContactLensOrderFormId',
       subject: 'Contact Lens Order Form',
       draft: row => {
@@ -311,6 +315,7 @@ const consultationDocumentTypes = [
     value: '5',
     name: 'Referral Letter',
     prop: 'corReferralLetter',
+    authority: 'queue.consultation.widgets.consultationdocument.referralletter',
     downloadConfig: {
       id: 9,
       key: 'ReferralLetterId',
@@ -320,8 +325,8 @@ const consultationDocumentTypes = [
           ReferralLetterDetails: [
             {
               ...row,
-              referralDate: row.generateDate
-                ? moment(row.generateDate).format(dateFormatLong)
+              referralDate: row.referralDate
+                ? moment(row.referralDate).format(dateFormatLong)
                 : '',
             },
           ],
@@ -333,7 +338,7 @@ const consultationDocumentTypes = [
     value: '6',
     name: 'Medical Report',
     prop: 'corMedicalReport',
-    authority: 'queue.consultation.widgets.consultationdocument.medicalReport',
+    authority: 'queue.consultation.widgets.consultationdocument.medicalreport',
     downloadConfig: {
       id: 97,
       key: 'MedicalReportId',
@@ -1456,7 +1461,7 @@ const visitDoctorConsultationStatusColor = [
 ]
 
 const orderItemTypes = [
-  { type: 'Consumable', displayValue: 'Con' },
+  { type: 'Consumable', displayValue: 'Prd' },
   { type: 'Service', displayValue: 'Svc' },
 ]
 

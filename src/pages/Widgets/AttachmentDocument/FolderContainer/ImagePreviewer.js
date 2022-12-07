@@ -115,12 +115,10 @@ class ImagePreviewer extends Component {
         isSelected: false,
       }
     })
-
     const imageWH = this.getImageContainerWH()
     this.setState({ ...imageWH, imageList }, () => {
       const currentImg = imageList.find(s => s.fileIndexFK === fileIndexFK)
-      if (!currentImg || !currentImg.image)
-        this.fetchImage(imageList, fileIndexFK)
+      if (currentImg?.image) this.fetchImage(imageList, fileIndexFK)
       else {
         currentImg.isSelected = true
         this.setState({ imageList })
@@ -324,9 +322,12 @@ class ImagePreviewer extends Component {
       isEnableDeleteDocument = true,
       isEnableEditDocument = true,
       isEnableEditFolder = true,
+      isLimitingCurrentUser = () => false,
     } = this.props
     const selectedImage = this.state.imageList.find(s => s.isSelected) || {}
-
+    const limitingCurrentUser = isLimitingCurrentUser(
+      selectedImage.createByUserFK,
+    )
     return (
       <div
         style={{ display: 'table', height: '100%' }}
@@ -421,14 +422,14 @@ class ImagePreviewer extends Component {
                 selectedImage.fileName = e.target.value
                 this.setState({ imageList })
               }}
-              text={readOnly || !isEnableEditDocument}
+              text={readOnly || limitingCurrentUser || !isEnableEditDocument}
               style={{ width: '100%' }}
             />
           </GridItem>
           <GridItem md={12} style={{ marginTop: 10 }}>
             <div>
               <span style={{ marginRight: 10 }}>Tag as:</span>
-              {!readOnly && isEnableEditDocument && (
+              {!readOnly && !limitingCurrentUser && isEnableEditDocument && (
                 <SetFolderWithPopover
                   key={selectedImage.id}
                   folderList={folderList}
@@ -475,7 +476,7 @@ class ImagePreviewer extends Component {
                     variant='outlined'
                     label={folderEntity?.displayValue}
                     color='primary'
-                    disabled={!isEnableEditDocument}
+                    disabled={limitingCurrentUser || !isEnableEditDocument}
                     onDelete={() => {
                       selectedImage.folderFKs = selectedImage.folderFKs.filter(
                         i => i !== item,
@@ -505,7 +506,7 @@ class ImagePreviewer extends Component {
               >
                 Print
               </Button>
-              {!readOnly && (
+              {!readOnly && !limitingCurrentUser && (
                 <React.Fragment>
                   {isEnableEditDocument && (
                     <Button

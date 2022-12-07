@@ -52,8 +52,8 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
         }
       })
     } else if (imageExt.includes(fileExtension)) {
-      setShowImagePreview(true)
       setSelectedFileId(file.fileIndexFK)
+      setShowImagePreview(true)
     }
   }
 
@@ -113,6 +113,7 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
     onImageLoaded,
     onThumbnailLoaded,
   }
+
   return (
     <React.Fragment>
       <div style={{ height: window.innerHeight - 230, overflow: 'scroll' }}>
