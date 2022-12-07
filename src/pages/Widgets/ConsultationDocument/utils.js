@@ -20,3 +20,10 @@ export const getClinicianProfile = (codetable, visitEntity) => {
     return { userProfileFK: undefined }
   }
 }
+
+export const PRODUCT_CATEGORY = {
+  SPECTACLE_FRAMES: 1,
+  OPHTHALMIC_LENS: 2,
+  CONTACT_LENS: 3,
+  OTHERS: 4,
+}
