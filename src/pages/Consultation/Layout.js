@@ -91,10 +91,6 @@ class Layout extends PureComponent {
     let defaultLayout
     if (userDefaultLayout && userDefaultLayout.consultationTemplate) {
       defaultLayout = JSON.parse(userDefaultLayout.consultationTemplate)
-      defaultLayout = {
-        ...defaultLayout,
-        widgets: defaultLayout.widgets.filter(this.fitlerItemWithAccessRight),
-      }
     } else {
       // disable local setting(!localStorage.getItem('consultationLayout')) {
       defaultLayout =
@@ -103,6 +99,10 @@ class Layout extends PureComponent {
     }
     if (!defaultLayout.widgets) {
       defaultLayout = this.getDefaultLayout()
+    }
+    defaultLayout = {
+      ...defaultLayout,
+      widgets: defaultLayout.widgets.filter(this.fitlerItemWithAccessRight),
     }
     this.widgetMenu = (
       <Menu>
@@ -840,13 +840,12 @@ class Layout extends PureComponent {
               open={this.state.openDraw}
               onClose={this.toggleDrawer}
             >
-              <div style={{ width: 360, position: 'relative' }}>
+              <div style={{ width: 360, position: 'relative', left: -15 }}>
                 <h5
                   style={{
                     fontWeight: 500,
                     lineHeight: 1.3,
                     position: 'absolute',
-                    top: 8,
                     left: 16,
                   }}
                 >
