@@ -331,7 +331,18 @@ class SpectacleOrderForm extends PureComponent {
                 <FastField
                   name='frameMeasurement_LE_Binocular_PD'
                   render={args => {
-                    return <TextField label='Binocular PD' {...args} />
+                    return (
+                      <TextField
+                        label='Binocular PD'
+                        {...args}
+                        onChange={e => {
+                          this.props.setFieldValue(
+                            'frameMeasurement_RE_Binocular_PD',
+                            e.target.value,
+                          )
+                        }}
+                      />
+                    )
                   }}
                 />
               </GridItem>
@@ -369,7 +380,18 @@ class SpectacleOrderForm extends PureComponent {
                 <FastField
                   name='frameMeasurement_RE_Binocular_PD'
                   render={args => {
-                    return <TextField label='Binocular PD' {...args} />
+                    return (
+                      <TextField
+                        label='Binocular PD'
+                        {...args}
+                        onChange={e => {
+                          this.props.setFieldValue(
+                            'frameMeasurement_LE_Binocular_PD',
+                            e.target.value,
+                          )
+                        }}
+                      />
+                    )
                   }}
                 />
               </GridItem>
