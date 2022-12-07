@@ -43,18 +43,6 @@ class LabTrackingDetails extends PureComponent {
   }
   componentDidMount() {
     const { dispatch } = this.props
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctcasedescription',
-      },
-    })
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctcasetype',
-      },
-    })
   }
 
   toggleModal = () => {
@@ -160,7 +148,7 @@ class LabTrackingDetails extends PureComponent {
         </div>
         <CommonModal
           open={labTrackingDetails.showModal}
-          title='Edit External Tracking / Results'
+          title='Edit External Tracking'
           observe='LabResultsDetail'
           maxWidth='md'
           bodyNoPadding

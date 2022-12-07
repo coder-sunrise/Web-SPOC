@@ -18,15 +18,9 @@ import { getRawData } from '@/services/report'
 import { ReportViewer } from '@/components/_medisys'
 
 const PatientResultButton = ({ handlePrint, clinicSettings, row }) => {
-  const [
-    popperOpen,
-    setPopperOpen,
-  ] = useState(false)
+  const [popperOpen, setPopperOpen] = useState(false)
 
-  const [
-    reportViewerOpen,
-    setReportViewerOpen,
-  ] = useState(false)
+  const [reportViewerOpen, setReportViewerOpen] = useState(false)
 
   const openPopper = () => setPopperOpen(true)
   const closePopper = () => setPopperOpen(false)
@@ -67,7 +61,7 @@ const PatientResultButton = ({ handlePrint, clinicSettings, row }) => {
       >
         <ReportViewer
           reportID={53}
-          reportParameters={{ labTrackingDetailsId: row.id }}
+          reportParameters={{ externalTrackingId: row.id }}
         />
       </CommonModal>
     </React.Fragment>
