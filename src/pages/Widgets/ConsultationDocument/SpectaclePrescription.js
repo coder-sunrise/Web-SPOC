@@ -15,7 +15,7 @@ import AuthorizedContext from '@/components/Context/Authorized'
 import CommonPrescription from './CommonPrescription'
 
 const SpectaclePrescription = props => {
-  const { footer, handleSubmit } = props
+  const { footer, handleSubmit, mainDivHeight } = props
   const editEnable = ableToViewByAuthority(
     'queue.consultation.widgets.consultationdocument.spectacleprescription',
   )
@@ -26,7 +26,13 @@ const SpectaclePrescription = props => {
           rights: editEnable ? 'enable' : 'disable',
         }}
       >
-        <div style={{ paddingBottom: 8 }}>
+        <div
+          style={{
+            paddingBottom: 8,
+            maxHeight: mainDivHeight - 130,
+            overflowY: 'auto',
+          }}
+        >
           <GridContainer>
             <GridItem xs={4}>
               <FastField

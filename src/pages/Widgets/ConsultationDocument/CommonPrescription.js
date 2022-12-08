@@ -2,7 +2,9 @@ import { FastField } from 'formik'
 import { GridContainer, GridItem, TextField, DatePicker } from '@/components'
 const CommonPrescription = () => {
   return (
-    <div style={{ border: '0.5px solid #CCCCCC', padding: 8 }}>
+    <div
+      style={{ border: '0.5px solid #CCCCCC', padding: 8, borderRadius: '5px' }}
+    >
       <div style={{ fontWeight: 'bold' }}>Prescription</div>
       <div style={{ lineHeight: '16px' }}>Left Eye (LE)</div>
       <GridContainer>

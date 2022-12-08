@@ -41,16 +41,13 @@ class LabTrackingDetails extends PureComponent {
       visitPurpose: JSON.parse(props.clinicSettings.visitTypeSetting),
     }
   }
-  componentDidMount() {
-    const { dispatch } = this.props
-  }
-
   toggleModal = () => {
     const { labTrackingDetails } = this.props
     this.props.dispatch({
       type: 'labTrackingDetails/updateState',
       payload: {
         showModal: !labTrackingDetails.showModal,
+        entity: undefined,
       },
     })
   }
@@ -137,7 +134,7 @@ class LabTrackingDetails extends PureComponent {
             <PatientGrid
               readOnly={
                 isPatientInactive ||
-                editExternalTrackingRight.rights !== 'enable'
+                editExternalTrackingRight.rights === 'hidden'
               }
               dispatch={dispatch}
               visitPurpose={this.state.visitPurpose}

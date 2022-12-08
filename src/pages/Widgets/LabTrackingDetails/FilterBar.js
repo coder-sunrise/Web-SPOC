@@ -3,6 +3,7 @@ import { formatMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import { findGetParameter } from '@/utils/utils'
 import moment from 'moment'
+import { Badge } from 'antd'
 
 import {
   GridContainer,
@@ -30,8 +31,8 @@ const styles = theme => ({
   },
 })
 
-const searchResult = (values, props) => {
-  const { dispatch, IsOverallGrid, patientId, setState } = props
+const searchResult = (props, isFirstLoad = false) => {
+  const { dispatch, IsOverallGrid, patientId, values } = props
   let patientID = patientId || Number(findGetParameter('pid'))
   const {
     orderedDate,
@@ -46,11 +47,15 @@ const searchResult = (values, props) => {
 
   const orderStartDate =
     orderedDate && orderedDate.length > 0
-      ? moment(orderedDate[0]).startOf('day')
+      ? moment(orderedDate[0])
+          .startOf('day')
+          .formatUTC()
       : undefined
   const orderEndDate =
     orderedDate && orderedDate.length > 1
-      ? moment(orderedDate[1]).endOf('day')
+      ? moment(orderedDate[1])
+          .endOf('day')
+          .formatUTC()
       : undefined
   const payload = {
     apiCriteria: {
@@ -61,27 +66,38 @@ const searchResult = (values, props) => {
       jobReferenceNo: jobReferenceNo || undefined,
       supplierIDs:
         supplierIDs && supplierIDs.length > 0 && supplierIDs.indexOf(-99) < 0
-          ? supplierIDs.join(',')
+          ? supplierIDs.join('|')
           : undefined,
       salesTypeIDs:
         salesTypeIDs && salesTypeIDs.length > 0 && salesTypeIDs.indexOf(-99) < 0
-          ? salesTypeIDs.join(',')
+          ? salesTypeIDs.join('|')
           : undefined,
       orderTypes:
         orderTypes && orderTypes.length > 0 && orderTypes.indexOf(-99) < 0
-          ? orderTypes.join(',')
+          ? orderTypes.join('|')
           : undefined,
       externalTrackingStatusIDs:
         externalTrackingStatusIDs &&
         externalTrackingStatusIDs.length > 0 &&
         externalTrackingStatusIDs.indexOf(-99) < 0
-          ? externalTrackingStatusIDs.join(',')
+          ? externalTrackingStatusIDs.join('|')
           : undefined,
     },
   }
   dispatch({
     type: 'labTrackingDetails/query',
-    payload,
+    payload: isFirstLoad
+      ? {
+          ...payload,
+          sorting: [
+            {
+              columnName: 'orderedDate',
+              direction: 'desc',
+              sortBy: 'orderedDate',
+            },
+          ],
+        }
+      : payload,
   })
 }
 
@@ -92,8 +108,7 @@ class FilterBar extends PureComponent {
   }
 
   componentDidMount = () => {
-    const { values } = this.props
-    searchResult(values, this.props)
+    searchResult(this.props, true)
   }
 
   render() {
@@ -237,6 +252,8 @@ class FilterBar extends PureComponent {
                 {...args}
                 code='ltlabtrackingstatus'
                 style={{ width: 140, marginLeft: 10 }}
+                dropdownMatchSelectWidth={false}
+                dropdownStyle={{ width: 160 }}
               />
             )}
           />
@@ -244,7 +261,9 @@ class FilterBar extends PureComponent {
             icon={<Search />}
             color='primary'
             size='sm'
-            onClick={handleSubmit}
+            onClick={() => {
+              searchResult(this.props)
+            }}
             style={{
               marginLeft: 20,
               position: 'relative',
@@ -253,30 +272,41 @@ class FilterBar extends PureComponent {
           >
             Search
           </ProgressButton>
-          <ProgressButton
-            icon={null}
-            size='sm'
-            //onClick={handleSubmit}
-            style={{
-              position: 'relative',
-              bottom: 6,
-              backgroundColor: '#14BACE',
-            }}
-          >
-            Export
-          </ProgressButton>
-          <ProgressButton
-            icon={null}
-            color='primary'
-            size='sm'
-            //onClick={handleSubmit}
-            style={{
-              position: 'relative',
-              bottom: 6,
-            }}
-          >
-            Write-Off
-          </ProgressButton>
+          {IsOverallGrid && (
+            <ProgressButton
+              icon={null}
+              size='sm'
+              //onClick={handleSubmit}
+              style={{
+                position: 'relative',
+                bottom: 6,
+                backgroundColor: '#14BACE',
+              }}
+            >
+              Export
+            </ProgressButton>
+          )}
+          {IsOverallGrid && (
+            <Badge
+              color='red'
+              count={100}
+              style={{ top: '-7px', right: 16 }}
+              size='small'
+            >
+              <ProgressButton
+                icon={null}
+                color='primary'
+                size='sm'
+                //onClick={handleSubmit}
+                style={{
+                  position: 'relative',
+                  bottom: 6,
+                }}
+              >
+                Write-Off
+              </ProgressButton>
+            </Badge>
+          )}
         </GridContainer>
       </div>
     )
@@ -285,9 +315,6 @@ class FilterBar extends PureComponent {
 
 export default memo(
   withFormikExtend({
-    handleSubmit: (values, { props, resetForm }) => {
-      searchResult(values, props)
-    },
     mapPropsToValues: () => ({
       orderedDate: [moment().toDate(), moment().toDate()],
       orderTypes: [-99],

@@ -171,12 +171,6 @@ const tenantCodesMap = new Map([
     },
   ],
   [
-    'ctcasedescription',
-    {
-      ...defaultParams,
-    },
-  ],
-  [
     'ctnumericreferencerange',
     {
       ...defaultParams,

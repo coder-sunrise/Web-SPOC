@@ -8,45 +8,54 @@ import Authorized from '@/utils/Authorized'
 class PatientGrid extends PureComponent {
   configs = {
     columns: [
-      { name: 'visitDate', title: 'Visit Date' },
+      { name: 'jobReferenceNo', title: 'Job Ref. No.' },
+      { name: 'orderType', title: 'Order Type' },
+      { name: 'salesType', title: 'Sales Type' },
+      { name: 'frame', title: 'Frame' },
       {
-        name: 'doctorProfileFKNavigation.ClinicianProfile.Name',
-        title: 'Doctor',
+        name: 'rightLensProduct',
+        title: 'Lens Product (RE)',
       },
-      { name: 'serviceName', title: 'Service Name' },
-      { name: 'serviceCenterName', title: 'Service Center Name' },
-      { name: 'visitPurposeFK', title: 'Visit Type' },
-      { name: 'sentBy', title: 'Sent By' },
-      { name: 'labTrackingStatusDisplayValue', title: 'Status' },
+      {
+        name: 'leftLensProduct',
+        title: 'Lens Product (LE)',
+      },
+      { name: 'supplier', title: 'Supplier' },
+      { name: 'orderedDate', title: 'Date Ordered' },
+      { name: 'requiredDate', title: 'Date Required' },
+      { name: 'receivedDate', title: 'Date Received' },
       { name: 'remarks', title: 'Remarks' },
+      { name: 'status', title: 'Status' },
       { name: 'action', title: 'Action' },
     ],
     columnExtensions: [
-      { columnName: 'sentBy', width: 100 },
-      { columnName: 'labTrackingStatusDisplayValue', width: 110 },
-      { columnName: 'visitDate', type: 'date' },
+      { columnName: 'jobReferenceNo', width: 120, sortingEnabled: false },
       {
-        columnName: 'doctorProfileFKNavigation.ClinicianProfile.Name',
-        render: row => {
-          return (
-            <Tooltip title={row.doctorName}>
-              <span>{row.doctorName}</span>
-            </Tooltip>
-          )
-        },
+        columnName: 'orderType',
+        width: 100,
+        sortingEnabled: false,
       },
       {
-        columnName: 'visitPurposeFK',
-        width: 80,
-        render: row => {
-          const { visitPurpose } = this.props
-          const pupose = visitPurpose.find(x => x.id === row.visitPurposeFK)
-          return (
-            <Tooltip title={pupose?.displayValue}>
-              <span>{pupose?.code}</span>
-            </Tooltip>
-          )
-        },
+        columnName: 'salesType',
+        width: 100,
+        sortingEnabled: false,
+      },
+      { columnName: 'frame', width: 120, sortingEnabled: false },
+      { columnName: 'rightLensProduct', width: 150, sortingEnabled: false },
+      { columnName: 'leftLensProduct', width: 150, sortingEnabled: false },
+      { columnName: 'supplier', width: 150, sortingEnabled: false },
+      { columnName: 'orderedDate', type: 'date', width: 120 },
+      { columnName: 'requiredDate', type: 'date', width: 120 },
+      { columnName: 'receivedDate', type: 'date', width: 120 },
+      {
+        columnName: 'remarks',
+        width: 200,
+        sortingEnabled: false,
+      },
+      {
+        columnName: 'status',
+        width: 130,
+        sortingEnabled: false,
       },
       {
         columnName: 'action',
@@ -58,7 +67,8 @@ class PatientGrid extends PureComponent {
           const accessRight = Authorized.check('reception/labtracking') || {
             rights: 'hidden',
           }
-          const readOnly = accessRight.rights !== 'enable'
+          const readOnly = accessRight.rights === 'hidden'
+
           return (
             <React.Fragment>
               <PatientResultButton
@@ -68,6 +78,7 @@ class PatientGrid extends PureComponent {
               />
               <Tooltip title='Edit Patient Lab Result' placement='bottom'>
                 <Button
+                  disabled={readOnly}
                   size='sm'
                   onClick={() => {
                     this.editRow(row)
@@ -75,7 +86,6 @@ class PatientGrid extends PureComponent {
                   justIcon
                   color='primary'
                   style={{ marginRight: 0 }}
-                  disabled={readOnly}
                 >
                   <Edit />
                 </Button>
@@ -85,19 +95,25 @@ class PatientGrid extends PureComponent {
         },
       },
     ],
+    leftColumns: ['jobReferenceNo', 'orderType', 'salesType'],
+    rightColumns: ['status', 'action'],
   }
 
   editRow = (row, e) => {
-    const { dispatch, labTrackingDetails, readOnly } = this.props
-    const { list } = labTrackingDetails
+    const { dispatch, readOnly } = this.props
     if (readOnly) return
-
     dispatch({
-      type: 'labTrackingDetails/updateState',
+      type: 'labTrackingDetails/queryOne',
       payload: {
-        showModal: true,
-        entity: list.find(o => o.id === row.id),
+        id: row.id,
       },
+    }).then(r => {
+      dispatch({
+        type: 'labTrackingDetails/updateState',
+        payload: {
+          showModal: true,
+        },
+      })
     })
   }
 

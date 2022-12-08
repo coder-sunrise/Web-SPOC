@@ -8,89 +8,62 @@ import Authorized from '@/utils/Authorized'
 class OverallGrid extends PureComponent {
   configs = {
     columns: [
-      { name: 'visitDate', title: 'Visit Date' },
-      { name: 'patientAccountNo', title: 'Acc. No' },
-      { name: 'referreceNo', title: 'Ref. No' },
+      { name: 'jobReferenceNo', title: 'Job Ref. No.' },
+      { name: 'orderType', title: 'Order Type' },
+      { name: 'salesType', title: 'Sales Type' },
+      { name: 'patientReferenceNo', title: 'Patient Ref. No' },
       { name: 'patientName', title: 'Patient name' },
-      { name: 'visitPurposeFK', title: 'Visit Type' },
+      { name: 'frame', title: 'Frame' },
       {
-        name: 'doctorProfileFKNavigation.ClinicianProfile.Name',
-        title: 'Doctor',
+        name: 'rightLensProduct',
+        title: 'Lens Product (RE)',
       },
-      { name: 'serviceName', title: 'Service Name' },
-      { name: 'serviceCenterName', title: 'Service Center Name' },
-      { name: 'supplierName', title: 'Supplier' },
-      { name: 'orderedDate', title: 'Ordered Date' },
-      { name: 'estimateReceiveDate', title: 'Est. Receive Date' },
-      { name: 'receivedDate', title: 'Received Date' },
-      { name: 'sentBy', title: 'Sent By' },
+      {
+        name: 'leftLensProduct',
+        title: 'Lens Product (LE)',
+      },
+      { name: 'supplier', title: 'Supplier' },
+      { name: 'orderedDate', title: 'Date Ordered' },
+      { name: 'requiredDate', title: 'Date Required' },
+      { name: 'receivedDate', title: 'Date Received' },
       { name: 'remarks', title: 'Remarks' },
-      { name: 'labTrackingStatusDisplayValue', title: 'Status' },
+      { name: 'status', title: 'Status' },
       { name: 'action', title: 'Action' },
     ],
     columnExtensions: [
-      { columnName: 'visitDate', type: 'date', width: 100 },
+      { columnName: 'jobReferenceNo', width: 120, sortingEnabled: false },
       {
-        columnName: 'referreceNo',
-        width: 90,
-        sortBy:
-          'VisitFKNavigation.PatientProfileFkNavigation.PatientReferenceNo',
+        columnName: 'orderType',
+        width: 100,
+        sortingEnabled: false,
       },
-      { columnName: 'patientAccountNo', width: 100 },
+      {
+        columnName: 'salesType',
+        width: 100,
+        sortingEnabled: false,
+      },
+      { columnName: 'patientReferenceNo', width: 110, sortingEnabled: false },
       {
         columnName: 'patientName',
         width: 180,
-        render: r => {
-          return (
-            <Tooltip title={r.patientName}>
-              <span
-                className='text-auto-hide'
-                style={{ position: 'relative', top: 2 }}
-              >
-                {r.patientName}
-              </span>
-            </Tooltip>
-          )
-        },
+        sortingEnabled: false,
       },
-      { columnName: 'estimateReceiveDate', type: 'date', width: 130 },
-      { columnName: 'orderedDate', type: 'date', width: 100 },
-      { columnName: 'receivedDate', type: 'date', width: 105 },
-      { columnName: 'serviceName', width: 200 },
+      { columnName: 'frame', width: 120, sortingEnabled: false },
+      { columnName: 'rightLensProduct', width: 150, sortingEnabled: false },
+      { columnName: 'leftLensProduct', width: 150, sortingEnabled: false },
+      { columnName: 'supplier', width: 150, sortingEnabled: false },
+      { columnName: 'orderedDate', type: 'date', width: 120 },
+      { columnName: 'requiredDate', type: 'date', width: 120 },
+      { columnName: 'receivedDate', type: 'date', width: 120 },
       {
-        columnName: 'serviceCenterName',
+        columnName: 'remarks',
         width: 200,
-        sortBy:
-          'ServiceCenterServiceFKNavigation.ServiceCenterFKNavigation.DisplayValue',
-      },
-      { columnName: 'supplierName', width: 150 },
-      { columnName: 'labTrackingStatusDisplayValue', width: 110 },
-      { columnName: 'sentBy', width: 100 },
-      { columnName: 'remarks', width: 200 },
-      {
-        columnName: 'doctorProfileFKNavigation.ClinicianProfile.Name',
-        width: 150,
-        render: row => {
-          return (
-            <Tooltip title={row.doctorName}>
-              <span>{row.doctorName}</span>
-            </Tooltip>
-          )
-        },
+        sortingEnabled: false,
       },
       {
-        columnName: 'visitPurposeFK',
-        width: 80,
-        sortBy: 'VisitFKNavigation.VisitPurposeFK',
-        render: row => {
-          const { visitPurpose } = this.props
-          var pupose = visitPurpose.find(x => x.id === row.visitPurposeFK)
-          return (
-            <Tooltip title={pupose?.displayValue}>
-              <span>{pupose?.code}</span>
-            </Tooltip>
-          )
-        },
+        columnName: 'status',
+        width: 130,
+        sortingEnabled: false,
       },
       {
         columnName: 'action',
@@ -102,7 +75,7 @@ class OverallGrid extends PureComponent {
           const accessRight = Authorized.check('reception/labtracking') || {
             rights: 'hidden',
           }
-          const readOnly = accessRight.rights !== 'enable'
+          const readOnly = accessRight.rights === 'hidden'
 
           return (
             <React.Fragment>
@@ -131,24 +104,33 @@ class OverallGrid extends PureComponent {
       },
     ],
     leftColumns: [
-      'visitDate',
-      'patientAccountNo',
-      'referreceNo',
+      'jobReferenceNo',
+      'orderType',
+      'salesType',
+      'patientReferenceNo',
       'patientName',
     ],
-    rightColumns: ['labTrackingStatusDisplayValue', 'action'],
+    rightColumns: ['status', 'action'],
   }
 
   editRow = (row, e) => {
-    const { dispatch, labTrackingDetails } = this.props
-    const { list } = labTrackingDetails
-
+    const accessRight = Authorized.check('reception/labtracking') || {
+      rights: 'hidden',
+    }
+    if (accessRight.rights === 'hidden') return
+    const { dispatch } = this.props
     dispatch({
-      type: 'labTrackingDetails/updateState',
+      type: 'labTrackingDetails/queryOne',
       payload: {
-        showModal: true,
-        entity: list.find(o => o.id === row.id),
+        id: row.id,
       },
+    }).then(r => {
+      dispatch({
+        type: 'labTrackingDetails/updateState',
+        payload: {
+          showModal: true,
+        },
+      })
     })
   }
 

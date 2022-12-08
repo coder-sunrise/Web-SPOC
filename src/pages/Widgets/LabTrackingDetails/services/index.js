@@ -1,7 +1,7 @@
 import * as service from '@/services/common'
 import request from '@/utils/request'
 
-const url = '/api/LabTrackingDetails'
+const url = '/api/ExternalTracking'
 
 const fns = {
   queryList: params => service.queryList(url, params),
