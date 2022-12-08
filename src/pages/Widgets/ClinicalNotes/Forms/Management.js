@@ -6,10 +6,14 @@ import {
   MultipleTextField,
   RadioGroup,
   FastField,
+  Button,
+  Tooltip,
+  Popconfirm,
 } from '@/components'
 import { PureComponent } from 'react'
 import { getUniqueId } from '@/utils/utils'
 import { withStyles } from '@material-ui/core/styles'
+import { Delete, Add } from '@material-ui/icons'
 import _ from 'lodash'
 const styles = theme => ({})
 
@@ -32,6 +36,19 @@ class Management extends PureComponent {
     const { setFieldValue } = this.arrayHelpers.form
     setFieldValue(this.listProp, [...rows, ...addedRows])
     return []
+  }
+
+  deleteRow = row => {
+    const { setFieldValue, values } = this.arrayHelpers.form
+    let rows = _.get(values, this.listProp) || []
+    if (!row.id) rows = rows.filter(r => r.uid != row.uid)
+    else rows.find(r => r.id == row.id).isDeleted = true
+    let s = 0
+    rows = rows.map((r, i) => {
+      if (!r.isDeleted) return { ...r, sequence: ++s }
+      return { ...r }
+    })
+    setFieldValue(this.listProp, rows)
   }
 
   handleCommitChanges = ({ rows, added, changed, deleted }) => {
@@ -72,26 +89,50 @@ class Management extends PureComponent {
                   rows={rows}
                   getRowId={r => r.id || r.uid}
                   columns={[
+                    { name: 'action', title: 'Action' },
                     { name: 'sequence', title: 'S/N' },
                     { name: 'assessment', title: 'Assessment' },
                     { name: 'managementPlan', title: 'Plan' },
                   ]}
                   columnExtensions={[
                     {
+                      columnName: 'action',
+                      precision: 0,
+                      width: 60,
+                      disabled: true,
+                      sortingEnabled: false,
+                      align: 'center',
+                      render: row => {
+                        return (
+                          <Popconfirm onConfirm={() => this.deleteRow(row)}>
+                            <Tooltip title='Delete'>
+                              <Button size='sm' color='danger' justIcon>
+                                <Delete />
+                              </Button>
+                            </Tooltip>
+                          </Popconfirm>
+                        )
+                      },
+                    },
+                    {
                       columnName: 'sequence',
                       type: 'number',
                       precision: 0,
+                      align: 'center',
+                      sortingEnabled: false,
                       width: 60,
                       disabled: true,
                     },
                     {
                       columnName: 'assessment',
+                      sortingEnabled: false,
                       type: 'text',
                       maxLength: 2000,
                       disabled: false,
                     },
                     {
                       columnName: 'managementPlan',
+                      sortingEnabled: false,
                       type: 'text',
                       maxLength: 2000,
                       disabled: false,
@@ -99,6 +140,7 @@ class Management extends PureComponent {
                   ]}
                   EditingProps={{
                     showAddCommand: true,
+                    showCommandColumn: false,
                     onAddedRowsChange: this.handleAddedRowsChange,
                     onCommitChanges: this.handleCommitChanges,
                   }}

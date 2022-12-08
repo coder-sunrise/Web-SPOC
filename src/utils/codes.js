@@ -270,6 +270,8 @@ const consultationDocumentTypes = [
     value: '3',
     name: 'Contact Lens Prescription',
     prop: 'corContactLensPrescription',
+    authority:
+      'queue.consultation.widgets.consultationdocument.contactlensprescription',
     downloadConfig: {
       id: 98,
       key: 'ContactLensPrescriptionId',
@@ -292,8 +294,10 @@ const consultationDocumentTypes = [
     value: '4',
     name: 'Contact Lens Order Form',
     prop: 'corContactLensOrderForm',
+    authority:
+      'queue.consultation.widgets.consultationdocument.contactlensorderform',
     downloadConfig: {
-      id: 11,
+      id: 100,
       key: 'ContactLensOrderFormId',
       subject: 'Contact Lens Order Form',
       draft: row => {
@@ -1457,7 +1461,7 @@ const visitDoctorConsultationStatusColor = [
 ]
 
 const orderItemTypes = [
-  { type: 'Consumable', displayValue: 'Con' },
+  { type: 'Consumable', displayValue: 'Prd' },
   { type: 'Service', displayValue: 'Svc' },
 ]
 

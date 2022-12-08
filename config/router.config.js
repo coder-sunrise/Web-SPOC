@@ -331,6 +331,7 @@ const _routes = [
             name: 'statement',
             mini: 'ST',
             component: './Finance/Statement',
+            hideInMenu: true,
             authority: ['finance/statement'],
           },
           {

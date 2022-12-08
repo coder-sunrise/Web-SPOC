@@ -23,16 +23,17 @@ import {
 } from '@material-ui/icons'
 import FolderList from './FolderList/index'
 import FolderContainer from './FolderContainer/index'
-import { FOLDER_TYPE } from '@/utils/constants'
+import { CLINICAL_ROLE, FOLDER_TYPE } from '@/utils/constants'
 
 const styles = theme => ({
   ...basicStyle(theme),
 })
 
-@connect(({ patientAttachment, folder, coPayerAttachment }) => ({
+@connect(({ patientAttachment, folder, coPayerAttachment, user }) => ({
   patientAttachment,
   folder,
   coPayerAttachment,
+  user,
 }))
 class AttachmentDocument extends Component {
   state = {
@@ -167,6 +168,7 @@ class AttachmentDocument extends Component {
     }
     this.setState({ fileFilters: [...newFilters] })
   }, 100)
+
   render() {
     const {
       folder,
@@ -174,7 +176,20 @@ class AttachmentDocument extends Component {
       coPayerAttachment,
       type,
       modelName,
+      user: {
+        data: {
+          clinicianProfile: { userProfile },
+        },
+      },
     } = this.props
+
+    const isLimitingCurrentUser = createByUserFK => {
+      return (
+        userProfile.role.clinicRoleFK === CLINICAL_ROLE.STUDENT &&
+        userProfile.id != createByUserFK
+      )
+    }
+
     const { viewMode, selectedFolderFK, zoom, fileFilters } = this.state
     const { list = [] } = this.props[modelName]
 
@@ -206,6 +221,7 @@ class AttachmentDocument extends Component {
               onSelectionChange={f => {
                 this.setState({ selectedFolderFK: f.id })
               }}
+              isLimitingCurrentUser={isLimitingCurrentUser}
               {...this.props}
             />
           </CardContainer>
@@ -302,6 +318,7 @@ class AttachmentDocument extends Component {
                   attachmentList={list}
                   selectedFolderFK={selectedFolderFK}
                   filterDocumentValue={filterDocumentValue}
+                  isLimitingCurrentUser={isLimitingCurrentUser}
                 />
               </GridItem>
             </GridContainer>

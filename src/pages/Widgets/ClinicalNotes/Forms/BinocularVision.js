@@ -91,6 +91,9 @@ class BinocularVision extends PureComponent {
       newCoverTest,
     ])
   }
+  componentDidMount() {
+    this.addCoverTest()
+  }
   render() {
     let {
       prefixProp,
@@ -321,7 +324,9 @@ class BinocularVision extends PureComponent {
             </tr>
           </table>
         </GridItem>
-
+        <GridItem md={12} style={{ marginBottom: '20px' }}>
+          {' + Compulsory Test for Paediatric (< 16 years old).'}
+        </GridItem>
         {/* Subjective Phoria Test  */}
         <GridItem md={12} className={classes.gridItem}>
           <table
