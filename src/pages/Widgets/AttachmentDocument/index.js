@@ -21,23 +21,23 @@ import {
   Apps as AppsIcon,
   ZoomIn as ZoomInIcon,
 } from '@material-ui/icons'
-import FolderList from './FolderList/index'
-import FolderContainer from './FolderContainer/index'
-import { CLINICAL_ROLE, FOLDER_TYPE } from '@/utils/constants'
+import TagList from './FolderList/index'
+import TagContainer from './FolderContainer/index'
+import { CLINICAL_ROLE, TAG_TYPE } from '@/utils/constants'
 
 const styles = theme => ({
   ...basicStyle(theme),
 })
 
-@connect(({ patientAttachment, folder, coPayerAttachment, user }) => ({
+@connect(({ patientAttachment, settingTag, coPayerAttachment, user }) => ({
   patientAttachment,
-  folder,
+  settingTag,
   coPayerAttachment,
   user,
 }))
 class AttachmentDocument extends Component {
   state = {
-    selectedFolderFK: -99, // all
+    selectedTagFK: -99, // all
     viewMode: 'card',
     zoom: 1,
     fileFilters: [],
@@ -46,18 +46,18 @@ class AttachmentDocument extends Component {
   componentDidMount() {
     const { dispatch, values, type } = this.props
     dispatch({
-      type: 'folder/query',
+      type: 'settingTag/query',
       payload: {
         pagesize: 9999,
         sorting: [{ columnName: 'sortOrder', direction: 'asc' }],
-        type,
+        category: type,
       },
     }).then(this.refreshDocuments)
   }
 
   refreshDocuments = () => {
     const { dispatch, values, type, modelName } = this.props
-    if (type === FOLDER_TYPE.PATIENT) {
+    if (type === TAG_TYPE.PATIENT) {
       dispatch({
         type: `${modelName}/query`,
         payload: {
@@ -65,7 +65,7 @@ class AttachmentDocument extends Component {
           'PatientProfileFKNavigation.Id': values.id,
         },
       })
-    } else if (type === FOLDER_TYPE.COPAYER) {
+    } else if (type === TAG_TYPE.COPAYER) {
       dispatch({
         type: `${modelName}/query`,
         payload: {
@@ -118,9 +118,9 @@ class AttachmentDocument extends Component {
           sortOrder: startOrder + index,
           fileIndexFK: attachment.fileIndexFK,
           displayValue: attachment.fileName,
-          [`${modelName}_Folder`]: attachment[`${modelName}_Folder`],
+          [`${modelName}_Tag`]: attachment[`${modelName}_Tag`],
         }
-        if (type === FOLDER_TYPE.PATIENT) {
+        if (type === TAG_TYPE.PATIENT) {
           payload = { ...payload, patientProfileFK: findGetParameter('pid') }
         } else {
           payload = { ...payload, coPayerFK: coPayerFK }
@@ -136,11 +136,11 @@ class AttachmentDocument extends Component {
   }
 
   filterDocumentCount = () => {
-    const { selectedFolderFK, fileFilters } = this.state
+    const { selectedTagFK, fileFilters } = this.state
     const { modelName } = this.props
     const { list = [] } = this.props[modelName]
     const filterDocumentValue =
-      (fileFilters.find(f => f.id === selectedFolderFK) || {})
+      (fileFilters.find(f => f.id === selectedTagFK) || {})
         .filterDocumentValue || ''
 
     const filterItems = list.filter(
@@ -148,21 +148,21 @@ class AttachmentDocument extends Component {
         (f.fileName || '')
           .toUpperCase()
           .indexOf(filterDocumentValue.toUpperCase()) >= 0 &&
-        (f.folderFKs.includes(selectedFolderFK) || selectedFolderFK === -99),
+        (f.tagFKs.includes(selectedTagFK) || selectedTagFK === -99),
     )
 
     return filterItems.length
   }
 
   debouncedAction = _.debounce(e => {
-    const { fileFilters, selectedFolderFK } = this.state
+    const { fileFilters, selectedTagFK } = this.state
     var newFilters = [...fileFilters]
-    var selectedFilter = newFilters.find(f => f.id === selectedFolderFK)
+    var selectedFilter = newFilters.find(f => f.id === selectedTagFK)
     if (selectedFilter) {
       selectedFilter.filterDocumentValue = e.target.value
     } else {
       newFilters.push({
-        id: selectedFolderFK,
+        id: selectedTagFK,
         filterDocumentValue: e.target.value,
       })
     }
@@ -171,7 +171,7 @@ class AttachmentDocument extends Component {
 
   render() {
     const {
-      folder,
+      settingTag,
       readOnly = false,
       coPayerAttachment,
       type,
@@ -186,25 +186,25 @@ class AttachmentDocument extends Component {
     const isLimitingCurrentUser = createByUserFK => {
       return (
         userProfile.role.clinicRoleFK === CLINICAL_ROLE.STUDENT &&
-        userProfile.id != createByUserFK
+        (!createByUserFK || userProfile.id != createByUserFK)
       )
     }
 
-    const { viewMode, selectedFolderFK, zoom, fileFilters } = this.state
+    const { viewMode, selectedTagFK, zoom, fileFilters } = this.state
     const { list = [] } = this.props[modelName]
 
-    let folderList = (folder.list || []).map(l => {
+    let tagList = (settingTag.list || []).map(l => {
       return {
         ...l,
-        fileCount: list.filter(f => f.folderFKs.includes(l.id)).length,
+        fileCount: list.filter(f => f.tagFKs.includes(l.id)).length,
       }
     })
-    folderList = [
+    tagList = [
       { id: -99, displayValue: 'All', sortOrder: -99, fileCount: list.length },
-      ...folderList,
+      ...tagList,
     ]
     const filterDocumentValue = (
-      fileFilters.find(f => f.id === selectedFolderFK) || {}
+      fileFilters.find(f => f.id === selectedTagFK) || {}
     ).filterDocumentValue
     return (
       <GridContainer>
@@ -213,13 +213,13 @@ class AttachmentDocument extends Component {
             hideHeader
             style={{ height: window.innerHeight - 150, overflow: 'scroll' }}
           >
-            <FolderList
+            <TagList
               readOnly={readOnly}
-              folderList={folderList}
-              selectedFolderFK={selectedFolderFK}
+              tagList={tagList}
+              selectedTagFK={selectedTagFK}
               updateAttachments={this.updateAttachments}
               onSelectionChange={f => {
-                this.setState({ selectedFolderFK: f.id })
+                this.setState({ selectedTagFK: f.id })
               }}
               isLimitingCurrentUser={isLimitingCurrentUser}
               {...this.props}
@@ -309,14 +309,14 @@ class AttachmentDocument extends Component {
                 </div>
               </GridItem>
               <GridItem md={12}>
-                <FolderContainer
+                <TagContainer
                   {...this.props}
                   zoom={zoom}
                   readOnly={readOnly}
-                  folderList={folderList}
+                  tagList={tagList}
                   viewMode={viewMode}
                   attachmentList={list}
-                  selectedFolderFK={selectedFolderFK}
+                  selectedTagFK={selectedTagFK}
                   filterDocumentValue={filterDocumentValue}
                   isLimitingCurrentUser={isLimitingCurrentUser}
                 />

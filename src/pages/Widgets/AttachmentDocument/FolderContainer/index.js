@@ -8,7 +8,7 @@ import CardView from './CardView'
 import ImagePreviewer from './ImagePreviewer'
 import TextEditor from '../TextEditor'
 
-const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
+const TagContainer = ({ viewMode, attachmentList, ...restProps }) => {
   const [showImagePreview, setShowImagePreview] = useState(false)
   const [selectedFileId, setSelectedFileId] = useState(undefined)
 
@@ -18,9 +18,9 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
 
   const imageExt = ['JPG', 'JPEG', 'PNG', 'BMP', 'GIF']
 
-  const refreshFolders = () => {
+  const refreshTags = () => {
     restProps.dispatch({
-      type: 'folder/query',
+      type: 'settingTag/query',
       payload: {
         pagesize: 999,
         sorting: [{ columnName: 'sortOrder', direction: 'asc' }],
@@ -28,12 +28,12 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
     })
   }
 
-  const onAddNewFolders = newFolder => {
+  const onAddNewTags = newTag => {
     const { dispatch } = restProps
     dispatch({
-      type: 'folder/upsert',
-      payload: newFolder,
-    }).then(refreshFolders)
+      type: 'settingTag/upsert',
+      payload: newTag,
+    }).then(refreshTags)
   }
 
   const onPreview = file => {
@@ -60,16 +60,16 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
   const onFileUpdated = file => {
     const { modelName, dispatch } = restProps
 
-    const attachment_Folder = file.folderFKs.map(f => {
+    const attachment_Tag = file.tagFKs.map(f => {
       return {
-        folderFK: f,
+        tagFK: f,
         [`${modelName}FK`]: file.id,
       }
     })
     const payload = {
       ...file,
       displayValue: file.fileName,
-      [`${modelName}_Folder`]: attachment_Folder,
+      [`${modelName}_Tag`]: attachment_Tag,
     }
 
     dispatch({
@@ -106,7 +106,7 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
         cachedImageDatas.find(f => f.fileIndexFK === a.fileIndexFK) || {}
       return { ...a, imageData: cached.imageData, thumbnail: cached.thumbnail }
     }),
-    onAddNewFolders,
+    onAddNewTags,
     onEditFileName,
     onFileUpdated,
     onPreview,
@@ -135,9 +135,9 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
           files={cfg.attachmentList.filter(f =>
             imageExt.includes(f.fileExtension.toUpperCase()),
           )}
-          onAddNewFolders={onAddNewFolders}
+          onAddNewTags={onAddNewTags}
           onFileUpdated={onFileUpdated}
-          onImageLoaded={cfg.onImageLoaded}
+          onImageLoaded={onImageLoaded}
         />
       </CommonModal>
       {editingFile && (
@@ -162,4 +162,4 @@ const FolderContainer = ({ viewMode, attachmentList, ...restProps }) => {
   )
 }
 
-export default FolderContainer
+export default TagContainer

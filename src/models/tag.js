@@ -1,6 +1,7 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import service from '../services/tag'
+import { notification } from '@/components'
 
 export default createListViewModel({
   namespace: 'settingTag',
@@ -22,7 +23,17 @@ export default createListViewModel({
         const { pathname, search, query = {} } = loct
       })
     },
-    effects: {},
+    effects: {
+      *upsertList({ payload }, { call, put }) {
+        const response = yield call(service.upsertList, payload)
+        if (response) notification.success({ message: 'Updated.' })
+        return response
+      },
+      *checkIfEmpty({ payload }, { call, put }) {
+        const response = yield call(service.checkIfEmpty, payload)
+        return response
+      },
+    },
     reducers: {
       queryDone(st, { payload }) {
         const { data } = payload

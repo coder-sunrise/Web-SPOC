@@ -12,7 +12,7 @@ const TagSelect = ({
   onChange = () => {},
   saveAsNewTag = () => {},
   displayField = 'displayValue',
-  isEnableEditFolder = true,
+  isEnableEditTag = true,
   isEnableEditDocument = true,
 }) => {
   const [inputVisible, setInputVisible] = useState(false)
@@ -130,7 +130,7 @@ const TagSelect = ({
               {newTagInput !== undefined &&
                 newTagInput !== null &&
                 newTagInput.trim().length > 0 &&
-                isEnableEditFolder && (
+                isEnableEditTag && (
                   <div>
                     <Divider style={{ margin: '4px 0' }} />
                     <div

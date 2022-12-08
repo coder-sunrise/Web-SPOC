@@ -669,6 +669,16 @@ const tagCategory = [
     render: () => <span>Patient</span>,
   },
   {
+    value: 'PatientDocument',
+    name: 'Patient Document',
+    render: () => <span>Patient Document</span>,
+  },
+  {
+    value: 'CopayerDocument',
+    name: 'Copayer Document',
+    render: () => <span>Copayer Document</span>,
+  },
+  {
     value: 'Service',
     name: 'Service',
     render: () => <span>Service</span>,

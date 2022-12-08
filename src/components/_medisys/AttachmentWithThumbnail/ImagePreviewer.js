@@ -52,8 +52,8 @@ const styles = theme => ({
   },
 })
 
-@connect(({ folder }) => ({
-  folder,
+@connect(({ settingtag }) => ({
+  settingtag,
 }))
 class ImagePreviewer extends Component {
   constructor(props) {
@@ -109,7 +109,8 @@ class ImagePreviewer extends Component {
     const imageWH = this.getImageContainerWH()
     this.setState({ ...imageWH, imageList }, () => {
       const currentImg = imageList.find(s => s.fileIndexFK === fileIndexFK)
-      if (currentImg?.image) this.fetchImage(imageList, fileIndexFK)
+      if (!currentImg || !currentImg.image)
+        this.fetchImage(imageList, fileIndexFK)
       else {
         currentImg.isSelected = true
         this.setState({ imageList })
@@ -263,11 +264,10 @@ class ImagePreviewer extends Component {
   checkFileChanged = (file, onConfirm) => {
     const origFile = this.props.files.find(f => f.id === file.id)
     if (origFile) {
-      const { fileName, folderFKs } = origFile
+      const { fileName, tagFKs } = origFile
       if (
         file.fileName !== fileName ||
-        _.sortedUniq(file.folderFKs).join(',') !==
-          _.sortedUniq(folderFKs).join(',')
+        _.sortedUniq(file.tagFKs).join(',') !== _.sortedUniq(tagFKs).join(',')
       ) {
         this.props.dispatch({
           type: 'global/updateAppState',
@@ -281,7 +281,7 @@ class ImagePreviewer extends Component {
               const { imageList } = this.state
               const changedFile = imageList.find(f => f.id === file.id)
               changedFile.fileName = fileName
-              changedFile.folderFKs = _.sortedUniq(folderFKs)
+              changedFile.tagFKs = _.sortedUniq(tagFKs)
               this.setState({ imageList })
               onConfirm()
             },
@@ -303,12 +303,12 @@ class ImagePreviewer extends Component {
     const {
       classes,
       readOnly,
-      folder: { list: folderList },
+      settingtag: { list: tagList },
       onFileUpdated,
-      onAddNewFolders,
+      onAddNewTags,
       isEnableDeleteDocument = true,
       isEnableEditDocument = true,
-      isEnableEditFolder = true,
+      isEnableEditTag = true,
       isLimitingCurrentUser = () => false,
     } = this.props
     const selectedImage = this.state.imageList.find(s => s.isSelected) || {}
@@ -398,7 +398,7 @@ class ImagePreviewer extends Component {
               style={{ width: '100%' }}
             />
           </GridItem>
-          {selectedImage.folderFKs && Array.isArray(selectedImage.folderFKs) && (
+          {selectedImage.tagFKs && Array.isArray(selectedImage.tagFKs) && (
             <GridItem
               md={12}
               style={{
@@ -408,21 +408,21 @@ class ImagePreviewer extends Component {
                 overflow: 'scroll',
               }}
             >
-              {_.uniq(selectedImage.folderFKs).map(item => {
-                const folderEntity = folderList.find(f => f.id === item)
+              {_.uniq(selectedImage.tagFKs).map(item => {
+                const tagEntity = tagList.find(f => f.id === item)
                 return (
                   <Chip
                     style={{ margin: 8 }}
                     key={item}
                     size='small'
                     variant='outlined'
-                    label={folderEntity?.displayValue}
+                    label={tagEntity?.displayValue}
                     color='primary'
                     disabled={
                       readOnly || limitingCurrentUser || !isEnableEditDocument
                     }
                     onDelete={() => {
-                      selectedImage.folderFKs = selectedImage.folderFKs.filter(
+                      selectedImage.tagFKs = selectedImage.tagFKs.filter(
                         i => i !== item,
                       )
                       this.setState({ imageList })
@@ -444,7 +444,7 @@ class ImagePreviewer extends Component {
                 }
                 onClick={() => {
                   printJS({
-                    printable: selectedImage.image.src,
+                    printable: selectedImage.image?.src,
                     type: 'image',
                     base64: true,
                     header: '',
