@@ -238,7 +238,7 @@ class NewVisit extends PureComponent {
         false,
       )
 
-    if (!values.id && alreadyRegisteredVisit)
+    if (alreadyRegisteredVisit)
       return dispatch({
         type: 'global/updateAppState',
         payload: {
