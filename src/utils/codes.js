@@ -260,6 +260,12 @@ const consultationDocumentTypes = [
           SpectacleOrderFormDetails: [
             {
               ...row,
+              dateOrdered: row.dateOrdered
+                ? moment(row.dateOrdered).format(dateFormatLong)
+                : '',
+              dateRequired: row.dateRequired
+                ? moment(row.dateRequired).format(dateFormatLong)
+                : '',
             },
           ],
         }
