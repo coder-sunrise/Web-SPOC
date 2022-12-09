@@ -21,9 +21,8 @@ const widgets = [
       loader: () => import('@/pages/Widgets/ClinicalNotes'),
       loading: Loading,
     }),
+    associatedProps: ['corDoctorNote'],
     model: 'clinicalnotes',
-    persist: true,
-    disabled: true,
     layoutConfig: {
       minW: 12,
       minH: 7,
