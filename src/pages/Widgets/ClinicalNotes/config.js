@@ -195,6 +195,15 @@ export const formConfigs = [
     thumbnailDisplaySize: { width: 260, height: 130 },
     defaultValue: {
       lastUpdateDate: moment(),
+      coverTest: [
+        {
+          uid: getUniqueId(),
+          withRx: false,
+          withoutRx: false,
+          coverTestD: undefined,
+          coverTestN: undefined,
+        },
+      ],
       recordStatusFK: 1,
       ocularMotilityScribbleNote: {
         thumbnail: CLINICALNOTE_FORMTHUMBNAIL.PAEDIATRIC,
@@ -220,6 +229,15 @@ export const formConfigs = [
     defaultValue: {
       lastChangeDate: moment(),
       recordStatusFK: 1,
+      coverTest: [
+        {
+          uid: getUniqueId(),
+          withRx: false,
+          withoutRx: false,
+          coverTestD: undefined,
+          coverTestN: undefined,
+        },
+      ],
       ocularMotilityScribbleNote: {
         thumbnail: CLINICALNOTE_FORMTHUMBNAIL.PAEDIATRIC,
         subject: 'Ocular Motility',
