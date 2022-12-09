@@ -198,12 +198,12 @@ export const menuData = [
     text: 'SMS Template',
     url: '/setting/smstemplate',
   },
-  {
-    authority: 'settings.templates.documenttemplate',
-    title: 'Templates',
-    text: 'Document Template',
-    url: '/setting/documenttemplate',
-  },
+  // {
+  //   authority: 'settings.templates.documenttemplate',
+  //   title: 'Templates',
+  //   text: 'Document Template',
+  //   url: '/setting/documenttemplate',
+  // },
   {
     authority: 'settings.contact.supplier',
     title: 'Contact',
@@ -272,5 +272,11 @@ export const menuData = [
     text: 'Type Of Test',
     textExtension: '(Investigative Tests)',
     url: '/setting/typeoftest',
+  },
+  {
+    authority: 'settings.clinicsetting.frametype',
+    title: 'Clinic Setting',
+    text: 'Frame Type',
+    url: '/setting/frametype',
   },
 ]
