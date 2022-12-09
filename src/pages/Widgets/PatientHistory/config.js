@@ -283,6 +283,11 @@ export const formWidgets = (props, scribbleNoteUpdateState = () => {}) => [
     position: { left: 175, top: 50 },
     thumbnailSize: { width: 300, height: 150 },
     thumbnailDisplaySize: { width: 260, height: 130 },
+    defaultThumbnail: {
+      pupillaryAssessmentScribbleNote:
+        CLINICALNOTE_FORMTHUMBNAIL.PUPILLARYASSESSMENT,
+      confrontationScribbleNote: CLINICALNOTE_FORMTHUMBNAIL.CONFRONTATION,
+    },
   },
   {
     id: WIDGETS_ID.ANTERIOREYEEXAMINATION,
@@ -390,6 +395,7 @@ export const formWidgets = (props, scribbleNoteUpdateState = () => {}) => [
     position: { left: 175, top: 50 },
     thumbnailSize: { width: 300, height: 150 },
     thumbnailDisplaySize: { width: 260, height: 130 },
+    defaultThumbnail: CLINICALNOTE_FORMTHUMBNAIL.PAEDIATRIC,
   },
   {
     id: WIDGETS_ID.PAEDIATRIC,
@@ -415,6 +421,7 @@ export const formWidgets = (props, scribbleNoteUpdateState = () => {}) => [
     position: { left: 175, top: 50 },
     thumbnailSize: { width: 300, height: 150 },
     thumbnailDisplaySize: { width: 260, height: 130 },
+    defaultThumbnail: CLINICALNOTE_FORMTHUMBNAIL.PAEDIATRIC,
   },
   {
     id: WIDGETS_ID.INVESTIGATIVETESTS,

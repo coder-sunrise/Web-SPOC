@@ -55,12 +55,12 @@ const PreliminaryAssessment = props => {
   const srcConfrontationScribbleNote = `${base64Prefix}${
     formContent.confrontationScribbleNote
       ? formContent.confrontationScribbleNote.thumbnail
-      : defaultThumbnail
+      : defaultThumbnail.confrontationScribbleNote
   }`
   const srcPupillaryAssessmentScribbleNote = `${base64Prefix}${
     formContent.pupillaryAssessmentScribbleNote
       ? formContent.pupillaryAssessmentScribbleNote.thumbnail
-      : defaultThumbnail
+      : defaultThumbnail.pupillaryAssessmentScribbleNote
   }`
 
   return (
