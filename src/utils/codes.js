@@ -255,11 +255,22 @@ const consultationDocumentTypes = [
       id: 99,
       key: 'SpectacleOrderFormId',
       subject: 'Spectacle Order Form',
-      draft: row => {
+      draft: (row, codetable) => {
+        const supplier = codetable.ctsupplier.find(t => t.id === row.supplierFK)
+          .displayValue
+        const leftLens = codetable.inventoryconsumable.find(
+          t => t.id === row.leftLensProductFK,
+        ).displayValue
+        const rightLens = codetable.inventoryconsumable.find(
+          t => t.id === row.rightLensProductFK,
+        ).displayValue
         return {
           SpectacleOrderFormDetails: [
             {
               ...row,
+              supplier: supplier,
+              rightLens: rightLens,
+              leftLens: leftLens,
               dateOrdered: row.dateOrdered
                 ? moment(row.dateOrdered).format(dateFormatLong)
                 : '',
