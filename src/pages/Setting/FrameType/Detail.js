@@ -4,39 +4,32 @@ import Yup from '@/utils/yup'
 import {
   withFormikExtend,
   FastField,
-  Select,
   GridContainer,
   GridItem,
   TextField,
   DateRangePicker,
 } from '@/components'
-import { tagCategory } from '@/utils/codes'
-import { connect } from 'dva'
 
-@connect(({ clinicSettings }) => ({
-  clinicSettings,
-}))
+const styles = theme => ({})
+
 @withFormikExtend({
-  mapPropsToValues: ({ settingTag }) => settingTag.entity || settingTag.default,
-  // Add validation
+  mapPropsToValues: ({ settingFrameType }) =>
+    settingFrameType.entity || settingFrameType.default,
   validationSchema: Yup.object().shape({
-    category: Yup.string().required(),
-    displayValue: Yup.string()
-      .required()
-      .matches(/^[0-9a-zA-Z \b]+$/, 'Cannot enter special characters'),
+    code: Yup.string().required(),
+    displayValue: Yup.string().required(),
     effectiveDates: Yup.array()
       .of(Yup.date())
       .min(2)
       .required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
-    const { effectiveDates, displayValue, ...restValues } = values
+    const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
     dispatch({
-      type: 'settingTag/upsert',
+      type: 'settingFrameType/upsert',
       payload: {
         ...restValues,
-        displayValue: displayValue.trim(),
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
       },
@@ -45,48 +38,43 @@ import { connect } from 'dva'
         resetForm()
         if (onConfirm) onConfirm()
         dispatch({
-          type: 'settingTag/query',
+          type: 'settingFrameType/query',
         })
       }
     })
   },
-  displayName: 'TagDetail',
+  displayName: 'FrameTypeDetail',
 })
 class Detail extends PureComponent {
-  state = {}
-
   render() {
-    const { theme, footer, settingTag, tagCategoryOptions } = this.props
-    console.log('tag detail render', this.props)
+    const { props } = this
+    const { theme, footer, settingFrameType } = props
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
           <GridContainer>
             <GridItem md={6}>
               <FastField
-                name='category'
-                render={args => (
-                  <Select
-                    label='Category'
-                    options={tagCategoryOptions}
-                    disabled={!!settingTag.entity}
-                    {...args}
-                  />
-                )}
-              />
+                name='code'
+                render={args => {
+                  return (
+                    <TextField
+                      label='Code'
+                      autoFocus
+                      {...args}
+                      disabled={!!settingFrameType.entity}
+                    />
+                  )
+                }}
+              ></FastField>
             </GridItem>
             <GridItem md={6}>
               <FastField
                 name='displayValue'
-                render={args => (
-                  <TextField
-                    label='Display Value'
-                    {...args}
-                    maxLength={20}
-                    inputProps={{ maxLength: 20 }}
-                  />
-                )}
-              />
+                render={args => {
+                  return <TextField label='Display Value' {...args} />
+                }}
+              ></FastField>
             </GridItem>
             <GridItem md={6}>
               <FastField
@@ -100,23 +88,8 @@ class Detail extends PureComponent {
                     />
                   )
                 }}
-              />
+              ></FastField>
             </GridItem>
-            {this.props.values.category == 'PatientDocument' && (
-              <GridItem md={6}>
-                <FastField
-                  name='folderMapping'
-                  render={args => (
-                    <TextField
-                      label='Folder Mapping'
-                      {...args}
-                      maxLength={2000}
-                      inputProps={{ maxLength: 2000 }}
-                    />
-                  )}
-                />
-              </GridItem>
-            )}
             <GridItem md={12}>
               <FastField
                 name='description'
@@ -127,8 +100,6 @@ class Detail extends PureComponent {
                       multiline
                       rowsMax={4}
                       {...args}
-                      maxLength={2000}
-                      inputProps={{ maxLength: 2000 }}
                     />
                   )
                 }}
@@ -138,7 +109,7 @@ class Detail extends PureComponent {
         </div>
         {footer &&
           footer({
-            onConfirm: this.props.handleSubmit,
+            onConfirm: props.handleSubmit,
             confirmBtnText: 'Save',
             confirmProps: {
               disabled: false,

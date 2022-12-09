@@ -17,7 +17,7 @@ import {
   CommonModal,
 } from '@/components'
 import AttachmentDocument from '@/pages/Widgets/AttachmentDocument'
-import { FOLDER_TYPE } from '@/utils/constants'
+import { TAG_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
 import { General } from './General'
 import { ContactPersonList } from './ContactPersonList'
@@ -301,14 +301,14 @@ const Detail = props => {
           <AttachmentDocument
             {...props}
             coPayerFK={props.values.id}
-            type={FOLDER_TYPE.COPAYER}
+            type={TAG_TYPE.COPAYER}
             modelName='coPayerAttachment'
             isEnableEditDocument={addDocumentAccessRight.rights === 'enable'}
             isEnableDeleteDocument={
               deleteDocumentAccessRight.rights === 'enable'
             }
-            isEnableEditFolder={addDocumentAccessRight.rights === 'enable'}
-            isEnableDeleteFolder={deleteDocumentAccessRight.rights === 'enable'}
+            isEnableEditTag={addDocumentAccessRight.rights === 'enable'}
+            isEnableDeleteTag={deleteDocumentAccessRight.rights === 'enable'}
           />
         </div>
       </CommonModal>

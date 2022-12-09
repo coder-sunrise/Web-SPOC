@@ -155,6 +155,7 @@ export default {
   'menu.setting.gradingchart': 'Grading Chart (Anterior Eye Examination)',
   'menu.setting.instrument': 'Instrument (Posterior Eye Examination)',
   'menu.setting.typeoftest': 'Type Of Test (Investigative Tests)',
+  'menu.setting.frametype': 'Frame Type',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',

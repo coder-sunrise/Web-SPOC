@@ -757,9 +757,9 @@ export const MODALITY_STATUS = {
   FAILED: 4,
 }
 
-export const FOLDER_TYPE = {
-  PATIENT: 'Patient',
-  COPAYER: 'CoPayer',
+export const TAG_TYPE = {
+  PATIENT: 'PatientDocument',
+  COPAYER: 'CoPayerDocument',
 }
 
 export const PRIORITY_VALUES = { NORMAL: 'Normal', URGENT: 'Urgent' }

@@ -24,7 +24,7 @@ import { Carousel } from 'antd'
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos'
 import _ from 'lodash'
 import { scaleImage } from '@/utils/image'
-import SetFolderWithPopover from './SetFolderWithPopover'
+import SetTagWithPopover from './SetFolderWithPopover'
 
 // import 'antd/dist/antd.css'
 import './style.css'
@@ -59,8 +59,8 @@ const styles = theme => ({
   },
 })
 
-@connect(({ folder }) => ({
-  folder,
+@connect(({ settingTag }) => ({
+  settingTag,
 }))
 class ImagePreviewer extends Component {
   constructor(props) {
@@ -118,7 +118,8 @@ class ImagePreviewer extends Component {
     const imageWH = this.getImageContainerWH()
     this.setState({ ...imageWH, imageList }, () => {
       const currentImg = imageList.find(s => s.fileIndexFK === fileIndexFK)
-      if (currentImg?.image) this.fetchImage(imageList, fileIndexFK)
+      if (!currentImg || !currentImg.image)
+        this.fetchImage(imageList, fileIndexFK)
       else {
         currentImg.isSelected = true
         this.setState({ imageList })
@@ -276,11 +277,10 @@ class ImagePreviewer extends Component {
   checkFileChanged = (file, onConfirm) => {
     const origFile = this.props.files.find(f => f.id === file.id)
     if (origFile) {
-      const { fileName, folderFKs } = origFile
+      const { fileName, tagFKs } = origFile
       if (
         file.fileName !== fileName ||
-        _.sortedUniq(file.folderFKs).join(',') !==
-          _.sortedUniq(folderFKs).join(',')
+        _.sortedUniq(file.tagFKs).join(',') !== _.sortedUniq(tagFKs).join(',')
       ) {
         this.props.dispatch({
           type: 'global/updateAppState',
@@ -294,7 +294,7 @@ class ImagePreviewer extends Component {
               const { imageList } = this.state
               const changedFile = imageList.find(f => f.id === file.id)
               changedFile.fileName = fileName
-              changedFile.folderFKs = _.sortedUniq(folderFKs)
+              changedFile.tagFKs = _.sortedUniq(tagFKs)
               this.setState({ imageList })
               onConfirm()
             },
@@ -316,12 +316,12 @@ class ImagePreviewer extends Component {
     const {
       classes,
       readOnly,
-      folder: { list: folderList },
+      settingTag: { list: tagList },
       onFileUpdated,
-      onAddNewFolders,
+      onAddNewTags,
       isEnableDeleteDocument = true,
       isEnableEditDocument = true,
-      isEnableEditFolder = true,
+      isEnableEditTag = true,
       isLimitingCurrentUser = () => false,
     } = this.props
     const selectedImage = this.state.imageList.find(s => s.isSelected) || {}
@@ -430,33 +430,33 @@ class ImagePreviewer extends Component {
             <div>
               <span style={{ marginRight: 10 }}>Tag as:</span>
               {!readOnly && !limitingCurrentUser && isEnableEditDocument && (
-                <SetFolderWithPopover
+                <SetTagWithPopover
                   key={selectedImage.id}
-                  folderList={folderList}
+                  tagList={tagList}
                   isEnableEditDocument={isEnableEditDocument}
-                  isEnableEditFolder={isEnableEditFolder}
-                  selectedFolderFKs={selectedImage.folderFKs || []}
-                  onClose={selectedFolder => {
-                    const originalFolders = _.sortedUniq(
-                      selectedImage.folderFKs || [],
+                  isEnableEditTag={isEnableEditTag}
+                  selectedTagFKs={selectedImage.tagFKs || []}
+                  onClose={selectedTag => {
+                    const originalTags = _.sortedUniq(
+                      selectedImage.tagFKs || [],
                     )
-                    const newFolders = _.sortedUniq(selectedFolder)
+                    const newTags = _.sortedUniq(selectedTag)
 
                     if (
-                      originalFolders.length !== newFolders.length ||
-                      originalFolders.join(',') !== newFolders.join(',')
+                      originalTags.length !== newTags.length ||
+                      originalTags.join(',') !== newTags.join(',')
                     ) {
-                      selectedImage.folderFKs = newFolders
+                      selectedImage.tagFKs = newTags
                       this.setState({ imageList })
                     }
                   }}
-                  onAddNewFolders={onAddNewFolders}
+                  onAddNewTags={onAddNewTags}
                   type={this.props.type}
                 />
               )}
             </div>
           </GridItem>
-          {selectedImage.folderFKs && Array.isArray(selectedImage.folderFKs) && (
+          {selectedImage.tagFKs && Array.isArray(selectedImage.tagFKs) && (
             <GridItem
               md={12}
               style={{
@@ -466,19 +466,19 @@ class ImagePreviewer extends Component {
                 overflow: 'scroll',
               }}
             >
-              {_.uniq(selectedImage.folderFKs).map(item => {
-                const folderEntity = folderList.find(f => f.id === item)
+              {_.uniq(selectedImage.tagFKs).map(item => {
+                const tagEntity = tagList.find(f => f.id === item)
                 return (
                   <Chip
                     style={{ margin: 8 }}
                     key={item}
                     size='small'
                     variant='outlined'
-                    label={folderEntity?.displayValue}
+                    label={tagEntity?.displayValue}
                     color='primary'
                     disabled={limitingCurrentUser || !isEnableEditDocument}
                     onDelete={() => {
-                      selectedImage.folderFKs = selectedImage.folderFKs.filter(
+                      selectedImage.tagFKs = selectedImage.tagFKs.filter(
                         i => i !== item,
                       )
                       this.setState({ imageList })
@@ -495,7 +495,7 @@ class ImagePreviewer extends Component {
                 type='primary'
                 onClick={() => {
                   printJS({
-                    printable: selectedImage.image.src,
+                    printable: selectedImage.image?.src,
                     type: 'image',
                     base64: true,
                     header: '',

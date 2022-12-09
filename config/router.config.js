@@ -331,6 +331,7 @@ const _routes = [
             name: 'statement',
             mini: 'ST',
             component: './Finance/Statement',
+            hideInMenu: true,
             authority: ['finance/statement'],
           },
           {
@@ -798,12 +799,12 @@ const _routes = [
             component: './Setting/SmsTemplate',
             authority: ['settings.templates.smstemplate'],
           },
-          {
-            path: '/setting/documenttemplate',
-            name: 'documenttemplate',
-            component: './Setting/DocumentTemplate',
-            authority: ['settings.templates.documenttemplate'],
-          },
+          // {
+          //   path: '/setting/documenttemplate',
+          //   name: 'documenttemplate',
+          //   component: './Setting/DocumentTemplate',
+          //   authority: ['settings.templates.documenttemplate'],
+          // },
           {
             path: '/setting/paymentmode',
             name: 'paymentmode',
@@ -875,6 +876,12 @@ const _routes = [
             name: 'typeoftest',
             component: './Setting/TypeOfTest',
             authority: ['settings.clinicsetting.typeoftest'],
+          },
+          {
+            path: '/setting/frametype',
+            name: 'frametype',
+            component: './Setting/FrameType',
+            authority: ['settings.clinicsetting.frametype'],
           },
         ],
       },

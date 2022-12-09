@@ -850,7 +850,13 @@ class Banner extends PureComponent {
           </span>
         </Col>
         <Col flex='auto' className={contentClass}>
-          <span>{info.referralSource ? info.referralSource : '-'}</span>
+          {info.referralSource ? (
+            <Tooltip enterDelay={100} title={info.referralSource}>
+              <span>{info.referralSource}</span>
+            </Tooltip>
+          ) : (
+            <span>-</span>
+          )}
         </Col>
       </Row>
     )

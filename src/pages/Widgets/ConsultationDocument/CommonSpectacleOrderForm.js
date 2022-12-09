@@ -1,5 +1,6 @@
 import { FastField } from 'formik'
 import { GridContainer, GridItem, TextField, CodeSelect } from '@/components'
+import { PRODUCT_CATEGORY } from './utils'
 const CommonSpectacleOrderForm = props => {
   const prefix = props.prefix ? `${props.prefix}.` : ''
   return (
@@ -22,6 +23,10 @@ const CommonSpectacleOrderForm = props => {
                   {...args}
                   code='inventoryconsumable'
                   labelField='displayValue'
+                  localFilter={item =>
+                    item.consumableCategory.id ===
+                    PRODUCT_CATEGORY.OPHTHALMIC_LENS
+                  }
                   label='Left Lens'
                 />
               )}
@@ -35,6 +40,10 @@ const CommonSpectacleOrderForm = props => {
                   {...args}
                   code='inventoryconsumable'
                   labelField='displayValue'
+                  localFilter={item =>
+                    item.consumableCategory.id ===
+                    PRODUCT_CATEGORY.OPHTHALMIC_LENS
+                  }
                   label='Right Lens'
                 />
               )}

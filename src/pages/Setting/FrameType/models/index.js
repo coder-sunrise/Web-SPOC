@@ -1,13 +1,12 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
-import { notification } from '@/components'
-import service from '../services/folder'
+import service from '../services'
 
 export default createListViewModel({
-  namespace: 'folder',
+  namespace: 'settingFrameType',
   codetable: {
-    message: 'Tag updated',
-    code: 'ctfolder',
+    message: 'Frame Type updated',
+    code: 'ctframetype',
   },
   param: {
     service,
@@ -26,17 +25,7 @@ export default createListViewModel({
         const { pathname, search, query = {} } = loct
       })
     },
-    effects: {
-      *upsertList({ payload }, { call, put }) {
-        const response = yield call(service.upsertList, payload)
-        if (response) notification.success({ message: 'Updated.' })
-        return response
-      },
-      *checkIfEmpty({ payload }, { call, put }) {
-        const response = yield call(service.checkIfEmpty, payload)
-        return response
-      },
-    },
+    effects: {},
     reducers: {
       queryDone(st, { payload }) {
         const { data } = payload

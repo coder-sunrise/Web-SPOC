@@ -9,7 +9,7 @@ import { DeleteFilled } from '@ant-design/icons'
 import { DragIndicator, ImportContactsOutlined } from '@material-ui/icons'
 
 const Types = {
-  Folder: 'Folder',
+  Tag: 'Tag',
 }
 const ItemSource = {
   canDrag(props, monitor, component) {
@@ -85,8 +85,8 @@ class DragableItem extends Component {
       onItemChanged,
       isEditMode,
       readOnly,
-      isEnableEditFolder = true,
-      isEnableDeleteFolder = true,
+      isEnableEditTag = true,
+      isEnableDeleteTag = true,
     } = this.props
 
     let opacity = isDragging ? 0.4 : 1
@@ -121,7 +121,7 @@ class DragableItem extends Component {
                       }}
                     />
                   </div>
-                  {isEnableDeleteFolder && (
+                  {isEnableDeleteTag && (
                     <Button
                       type='danger'
                       size='small'
@@ -148,7 +148,7 @@ class DragableItem extends Component {
               >
                 {!readOnly &&
                   !isItemAll &&
-                  isEnableEditFolder &&
+                  isEnableEditTag &&
                   connectDragSource(
                     <div style={{ cursor: 'move' }}>
                       <ListItemIcon style={{ minWidth: 25, marginTop: 5 }}>
@@ -179,7 +179,7 @@ class DragableItem extends Component {
                     style={{
                       marginRight: 15,
                       paddingLeft:
-                        isItemAll && !readOnly && isEnableEditFolder ? 25 : 0,
+                        isItemAll && !readOnly && isEnableEditTag ? 25 : 0,
                       overflow: 'hidden',
                     }}
                   />
@@ -205,6 +205,6 @@ class DragableItem extends Component {
 }
 
 export default _.flow(
-  DropTarget(Types.Folder, ItemTarget, dropCollect),
-  DragSource(Types.Folder, ItemSource, dragCollect),
+  DropTarget(Types.Tag, ItemTarget, dropCollect),
+  DragSource(Types.Tag, ItemSource, dragCollect),
 )(DragableItem)
