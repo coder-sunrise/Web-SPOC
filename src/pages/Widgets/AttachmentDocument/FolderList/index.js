@@ -25,10 +25,10 @@ import TextEditor from '../TextEditor'
 import DragableList from './DragableList'
 import Authorized from '@/utils/Authorized'
 
-class FolderList extends Component {
+class TagList extends Component {
   state = {
-    showNewFolder: false,
-    folderList: [],
+    showNewTag: false,
+    tagList: [],
     filterValue: '',
     isShowEmptyTags: false,
   }
@@ -46,18 +46,18 @@ class FolderList extends Component {
   }
 
   checkToSelectAll = props => {
-    const { onSelectionChange, selectedFolderFK } = props
-    if (selectedFolderFK === -99) return
+    const { onSelectionChange, selectedTagFK } = props
+    if (selectedTagFK === -99) return
     const {
-      folderList = [],
+      tagList = [],
       filterValue = '',
       isShowEmptyTags = true,
     } = this.state
     if (
-      !folderList.find(
+      !tagList.find(
         f =>
           !f.isDeleted &&
-          f.id === selectedFolderFK &&
+          f.id === selectedTagFK &&
           (f.displayValue || '')
             .toUpperCase()
             .indexOf((filterValue || '').toUpperCase()) >= 0 &&
@@ -70,14 +70,14 @@ class FolderList extends Component {
 
   // eslint-disable-next-line react/sort-comp
   UNSAFE_componentWillReceiveProps(nextProps) {
-    const { folderList: nextFolderList = [] } = nextProps
+    const { tagList: nextTagList = [] } = nextProps
 
     const nextList = _.orderBy(
-      nextFolderList.filter(f => !f.isDeleted),
+      nextTagList.filter(f => !f.isDeleted),
       'sortOrder',
     ).map(this.entityGenerator)
     const currentList = _.orderBy(
-      this.state.folderList.filter(f => !f.isDeleted),
+      this.state.tagList.filter(f => !f.isDeleted),
       'sortOrder',
     ).map(this.entityGenerator)
 
@@ -86,7 +86,7 @@ class FolderList extends Component {
     if (diff.length > 0) {
       this.setState(
         {
-          folderList: nextList,
+          tagList: nextList,
         },
         () => this.checkToSelectAll(nextProps),
       )
@@ -94,13 +94,13 @@ class FolderList extends Component {
   }
 
   mapPropsToStates = () => {
-    const { folderList = [] } = this.props
+    const { tagList = [] } = this.props
     const nextList = _.orderBy(
-      folderList.filter(f => !f.isDeleted),
+      tagList.filter(f => !f.isDeleted),
       'sortOrder',
     ).map(this.entityGenerator)
     this.setState({
-      folderList: nextList,
+      tagList: nextList,
     })
   }
 
@@ -116,9 +116,9 @@ class FolderList extends Component {
     }
   }
 
-  refreshFolders = () => {
+  refreshTags = () => {
     this.props.dispatch({
-      type: 'folder/query',
+      type: 'settingTag/query',
       payload: {
         pagesize: 999,
         sorting: [{ columnName: 'sortOrder', direction: 'asc' }],
@@ -126,31 +126,31 @@ class FolderList extends Component {
     })
   }
 
-  closeNewFolderModal = () => {
-    this.setState({ showNewFolder: false })
+  closeNewTagModal = () => {
+    this.setState({ showNewTag: false })
   }
 
-  onSaveNewFolder = name => {
-    const { folderList, dispatch } = this.props
+  onSaveNewTag = name => {
+    const { tagList, dispatch, type } = this.props
     const maxSort = _.maxBy(
-      folderList.filter(f => f.id > 0),
+      tagList.filter(f => f.id > 0),
       'sortOrder',
     )
 
     dispatch({
-      type: 'folder/upsert',
+      type: 'settingTag/upsert',
       payload: {
-        code: name,
         displayValue: name,
         description: name,
         effectiveStartDate: moment().formatUTC(true),
         effectiveEndDate: moment('2099-12-31').formatUTC(true),
         sortOrder: maxSort ? maxSort.sortOrder + 1 : 1,
-        type: this.props.type,
+        IsUserMaintainable: true,
+        category: type,
       },
-    }).then(this.refreshFolders)
+    }).then(this.refreshTags)
 
-    this.closeNewFolderModal()
+    this.closeNewTagModal()
   }
 
   onItemClick = item => {
@@ -160,40 +160,40 @@ class FolderList extends Component {
   handleOnMoving = (dragIndex, hoverIndex) => {
     if (hoverIndex <= 0 || dragIndex <= 0) return
 
-    let { folderList } = this.state
-    let tmp = folderList[dragIndex]
-    folderList.splice(dragIndex, 1)
-    folderList.splice(hoverIndex, 0, tmp)
+    let { tagList: tagList } = this.state
+    let tmp = tagList[dragIndex]
+    tagList.splice(dragIndex, 1)
+    tagList.splice(hoverIndex, 0, tmp)
 
-    folderList = folderList.map((m, i) => {
+    tagList = tagList.map((m, i) => {
       return {
         ...m,
         sortOrder: i,
       }
     })
     this.setState({
-      folderList,
+      tagList,
     })
   }
 
   handleOnEndDrag = p => {
-    const { folderList: origFolder = [] } = this.props
-    const { folderList } = this.state
+    const { tagList: origTag = [] } = this.props
+    const { tagList: tagList } = this.state
     const updated = []
-    origFolder
+    origTag
       .filter(fo => fo.id > 0)
       .map(f => {
-        const newFolder = folderList.find(o => o.id === f.id)
-        if (newFolder && newFolder.sortOrder !== f.sortOrder)
-          updated.push({ ...f, sortOrder: newFolder.sortOrder })
+        const newTag = tagList.find(o => o.id === f.id)
+        if (newTag && newTag.sortOrder !== f.sortOrder)
+          updated.push({ ...f, sortOrder: newTag.sortOrder })
       })
     if (updated.length > 0) {
       this.props
         .dispatch({
-          type: 'folder/upsertList',
+          type: 'settingTag/upsertList',
           payload: updated,
         })
-        .then(this.refreshFolders)
+        .then(this.refreshTags)
     }
   }
 
@@ -201,7 +201,7 @@ class FolderList extends Component {
     if (item.isDeleted) {
       this.props
         .dispatch({
-          type: 'folder/checkIfEmpty',
+          type: 'settingTag/checkIfEmpty',
           payload: item.id,
         })
         .then(r => {
@@ -218,37 +218,37 @@ class FolderList extends Component {
     }
   }
   updateList = item => {
-    const { folderList = [] } = this.state
-    let stateItem = folderList.find(i => i.id === item.id)
+    const { tagList: tagList = [] } = this.state
+    let stateItem = tagList.find(i => i.id === item.id)
     stateItem.displayValue = item.displayValue
     stateItem.isDeleted = item.isDeleted
-    this.setState({ folderList })
+    this.setState({ tagList })
   }
 
   handleOnSave = () => {
-    const { folderList: origFolder = [] } = this.props
-    const { folderList } = this.state
+    const { tagList: origTag = [] } = this.props
+    const { tagList: tagList } = this.state
     const updated = []
-    origFolder.map(f => {
-      const newFolder = folderList.find(o => o.id === f.id)
+    origTag.map(f => {
+      const newTag = tagList.find(o => o.id === f.id)
       if (
-        newFolder &&
-        (newFolder.displayValue !== f.displayValue ||
-          newFolder.isDeleted !== f.isDeleted)
+        newTag &&
+        (newTag.displayValue !== f.displayValue ||
+          newTag.isDeleted !== f.isDeleted)
       )
         updated.push({
           ...f,
-          displayValue: newFolder.displayValue,
-          isDeleted: newFolder.isDeleted,
+          displayValue: newTag.displayValue,
+          isDeleted: newTag.isDeleted,
         })
     })
     if (updated.length > 0) {
       this.props
         .dispatch({
-          type: 'folder/upsertList',
+          type: 'settingTag/upsertList',
           payload: updated,
         })
-        .then(this.refreshFolders)
+        .then(this.refreshTags)
     }
   }
 
@@ -256,46 +256,43 @@ class FolderList extends Component {
     const {
       readOnly,
       updateAttachments,
-      selectedFolderFK = -99,
+      selectedTagFK = -99,
       modelName,
-      isEnableEditFolder = true,
-      isEnableDeleteFolder = true,
+      isEnableEditTag = true,
+      isEnableDeleteTag = true,
       isEnableEditDocument = true,
       isLimitingCurrentUser = () => false,
     } = this.props
     const {
-      showNewFolder,
-      folderList,
+      showNewTag,
+      tagList,
       isEditMode,
       isShowEmptyTags = true,
       filterValue,
     } = this.state
-    const fittedFolderList = folderList.filter(
+    const fittedTagList = tagList.filter(
       f =>
         !f.isDeleted &&
-        (!isEditMode || !isLimitingCurrentUser(f.createByUserFK)) &&
         (f.id === -99 ||
           ((f.displayValue || '')
             .toUpperCase()
             .indexOf((filterValue || '').toUpperCase()) >= 0 &&
             (isShowEmptyTags || f.fileCount > 0))),
     )
-    const anyTagBelongCurrentUser = fittedFolderList.some(
-      f => !isLimitingCurrentUser(f.createByUserFK),
-    )
+    const limitingCurrentUser = isLimitingCurrentUser()
     return (
       <GridContainer style={{ height: 'auto' }}>
         {!readOnly && (
           <GridItem md={12}>
             <div>
               <div style={{ display: 'flex', float: 'left' }}>
-                {isEnableEditFolder && (
+                {!limitingCurrentUser && isEnableEditTag && (
                   <Tooltip title='Add New Tag'>
                     <Button
                       type='primary'
                       style={{ marginRight: 8, marginTop: 8 }}
                       onClick={() => {
-                        this.setState({ showNewFolder: true })
+                        this.setState({ showNewTag: true })
                       }}
                       size='small'
                       icon={<FolderAddFilled />}
@@ -313,14 +310,14 @@ class FolderList extends Component {
                             attachmentType={`${modelName}`}
                             handleUpdateAttachments={att => {
                               let { added = [] } = att
-                              const { selectedFolderFK: folderFK } = this.props
-                              if (folderFK > 0 && added.length > 0) {
+                              const { selectedTagFK: tagFK } = this.props
+                              if (tagFK > 0 && added.length > 0) {
                                 added = added.map(ad => {
                                   const { 0: fileDetails } = ad
                                   const retVal = {
                                     ...ad,
                                     ...fileDetails,
-                                    [`${modelName}_Folder`]: [{ folderFK }],
+                                    [`${modelName}_Tag`]: [{ tagFK }],
                                   }
                                   return retVal
                                 })
@@ -353,7 +350,7 @@ class FolderList extends Component {
                   />
                 </div>
               </div>
-              {isEnableEditFolder && (
+              {!limitingCurrentUser && isEnableEditTag && (
                 <div
                   style={{
                     display: 'flex',
@@ -389,16 +386,14 @@ class FolderList extends Component {
                       </Tooltip>
                     </React.Fragment>
                   ) : (
-                    anyTagBelongCurrentUser && (
-                      <Button
-                        type='primary'
-                        size='small'
-                        onClick={() => {
-                          this.setState({ isEditMode: true })
-                        }}
-                        icon={<EditFilled />}
-                      ></Button>
-                    )
+                    <Button
+                      type='primary'
+                      size='small'
+                      onClick={() => {
+                        this.setState({ isEditMode: true })
+                      }}
+                      icon={<EditFilled />}
+                    ></Button>
                   )}
                 </div>
               )}
@@ -415,28 +410,28 @@ class FolderList extends Component {
             <DragableList
               readOnly={readOnly}
               isEditMode={isEditMode}
-              folderList={fittedFolderList}
-              selectedFolderFK={selectedFolderFK}
+              tagList={fittedTagList}
+              selectedTagFK={selectedTagFK}
               onMoving={this.handleOnMoving}
               onItemClick={this.onItemClick}
               onEndDrag={this.handleOnEndDrag}
               onItemChanged={this.onItemChanged}
-              isEnableEditFolder={isEnableEditFolder}
-              isEnableDeleteFolder={isEnableDeleteFolder}
+              isEnableEditTag={isEnableEditTag}
+              isEnableDeleteTag={isEnableDeleteTag}
             />
           </div>
         </GridItem>
 
         <CommonModal
-          open={showNewFolder}
+          open={showNewTag}
           title='New Tag'
           maxWidth='sm'
-          onConfirm={this.closeNewFolderModal}
-          onClose={this.closeNewFolderModal}
+          onConfirm={this.closeNewTagModal}
+          onClose={this.closeNewTagModal}
         >
           <TextEditor
             item={{ label: 'New Tag' }}
-            handleSubmit={this.onSaveNewFolder}
+            handleSubmit={this.onSaveNewTag}
           />
         </CommonModal>
       </GridContainer>
@@ -444,4 +439,4 @@ class FolderList extends Component {
   }
 }
 
-export default FolderList
+export default TagList

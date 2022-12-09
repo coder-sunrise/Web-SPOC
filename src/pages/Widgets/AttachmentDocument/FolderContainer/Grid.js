@@ -26,7 +26,7 @@ import _ from 'lodash'
 import { NavLink } from 'react-router-dom'
 
 import { downloadAttachment } from '@/services/file'
-import SetFolderWithPopover from './SetFolderWithPopover'
+import SetTagWithPopover from './SetFolderWithPopover'
 
 class Grid extends PureComponent {
   downloadFile = row => {
@@ -47,16 +47,16 @@ class Grid extends PureComponent {
       dispatch,
       onPreview,
       attachmentList = [],
-      selectedFolderFK,
-      folderList = [],
+      selectedTagFK,
+      tagList = [],
       onEditFileName,
-      onAddNewFolders,
+      onAddNewTags,
       onFileUpdated,
       readOnly,
       modelName,
       isEnableEditDocument = true,
       isEnableDeleteDocument = true,
-      isEnableEditFolder = true,
+      isEnableEditTag = true,
       filterDocumentValue = '',
       isLimitingCurrentUser = () => false,
     } = this.props
@@ -71,13 +71,12 @@ class Grid extends PureComponent {
               (f.fileName || '')
                 .toUpperCase()
                 .indexOf(filterDocumentValue.toUpperCase()) >= 0 &&
-              (selectedFolderFK === -99 ||
-                f.folderFKs.includes(selectedFolderFK)),
+              (selectedTagFK === -99 || f.tagFKs.includes(selectedTagFK)),
           ),
           [data => (data.createDate || '').toLowerCase()],
           ['desc'],
         ).map(a => {
-          return { ...a, folderList: _.sortBy(folderList, 'sortOrder') }
+          return { ...a, tagList: _.sortBy(tagList, 'sortOrder') }
         })}
         FuncProps={{
           pager: true,
@@ -88,7 +87,7 @@ class Grid extends PureComponent {
             title: 'Document Name',
             sortBy: data => (data.fileName || '').toLowerCase(),
           },
-          { name: 'folderFKs', title: 'Tags' },
+          { name: 'tagFKs', title: 'Tags' },
           {
             name: 'createByUserName',
             title: 'Created By',
@@ -147,15 +146,15 @@ class Grid extends PureComponent {
             },
           },
           {
-            columnName: 'folderFKs',
+            columnName: 'tagFKs',
             disabled: true,
             sortingEnabled: false,
             render: row => {
               return (
                 <div style={{ marginRight: 20 }}>
                   <div style={{ whiteSpace: 'pre-wrap', float: 'left' }}>
-                    {row.folderList
-                      .filter(f => row.folderFKs.includes(f.id))
+                    {row.tagList
+                      .filter(f => row.tagFKs.includes(f.id))
                       .map(item => (
                         <Tag
                           style={{
@@ -176,29 +175,27 @@ class Grid extends PureComponent {
                           marginRight: -40,
                         }}
                       >
-                        <SetFolderWithPopover
+                        <SetTagWithPopover
                           justIcon
                           readOnly={readOnly}
                           key={row.id}
-                          isEnableEditFolder={isEnableEditFolder}
-                          folderList={row.folderList}
-                          selectedFolderFKs={row.folderFKs || []}
-                          onClose={selectedFolder => {
-                            const originalFolders = _.sortedUniq(
-                              row.folderFKs || [],
-                            )
-                            const newFolders = _.sortedUniq(selectedFolder)
+                          isEnableEditTag={isEnableEditTag}
+                          tagList={row.tagList}
+                          selectedTagFKs={row.tagFKs || []}
+                          onClose={selectedTag => {
+                            const originalTags = _.sortedUniq(row.tagFKs || [])
+                            const newTags = _.sortedUniq(selectedTag)
 
                             if (
-                              originalFolders.length !== newFolders.length ||
-                              originalFolders.join(',') !== newFolders.join(',')
+                              originalTags.length !== newTags.length ||
+                              originalTags.join(',') !== newTags.join(',')
                             ) {
-                              row.folderFKs = newFolders
+                              row.tagFKs = newTags
                               onFileUpdated(row)
                             }
                           }}
                           type={this.props.type}
-                          onAddNewFolders={onAddNewFolders}
+                          onAddNewTags={onAddNewTags}
                         />
                       </div>
                     )}

@@ -25,7 +25,7 @@ import excelIcon from '@/assets/thumbnail-icons/excel-icon.png'
 import dummyIcon from '@/assets/thumbnail-icons/dummy-thumbnail-icon.png'
 import pptIcon from '@/assets/thumbnail-icons/ppt-icon.png'
 import { InView } from 'react-intersection-observer'
-import SetFolderWithPopover from './SetFolderWithPopover'
+import SetTagWithPopover from './SetFolderWithPopover'
 
 const base64Prefix = 'data:image/png;base64,'
 const wordExt = ['DOC', 'DOCX']
@@ -146,9 +146,9 @@ class CardItem extends Component {
     const {
       classes,
       file,
-      folderList,
+      tagList,
       onFileUpdated,
-      onAddNewFolders,
+      onAddNewTags,
       dispatch,
       onPreview,
       onEditFileName,
@@ -158,7 +158,7 @@ class CardItem extends Component {
       modelName,
       isEnableDeleteDocument = true,
       isEnableEditDocument = true,
-      isEnableEditFolder = true,
+      isEnableEditTag = true,
       isLimitingCurrentUser = () => false,
     } = this.props
     const { loading, thumbnail } = this.state
@@ -190,29 +190,27 @@ class CardItem extends Component {
                       </Tooltip>
                     )}
                     {isEnableEditDocument && (
-                      <SetFolderWithPopover
+                      <SetTagWithPopover
                         key={file.id}
                         disabled={readOnly}
-                        folderList={folderList}
-                        isEnableEditFolder={isEnableEditFolder}
-                        selectedFolderFKs={file.folderFKs || []}
-                        onClose={selectedFolder => {
-                          const originalFolders = _.sortedUniq(
-                            file.folderFKs || [],
-                          )
-                          const newFolders = _.sortedUniq(selectedFolder)
+                        tagList={tagList}
+                        isEnableEditTag={isEnableEditTag}
+                        selectedTagFKs={file.tagFKs || []}
+                        onClose={selectedTag => {
+                          const originalTags = _.sortedUniq(file.tagFKs || [])
+                          const newTags = _.sortedUniq(selectedTag)
 
                           if (
-                            originalFolders.length !== newFolders.length ||
-                            originalFolders.join(',') !== newFolders.join(',')
+                            originalTags.length !== newTags.length ||
+                            originalTags.join(',') !== newTags.join(',')
                           ) {
                             onFileUpdated({
                               ...file,
-                              folderFKs: newFolders,
+                              tagFKs: newTags,
                             })
                           }
                         }}
-                        onAddNewFolders={onAddNewFolders}
+                        onAddNewTags={onAddNewTags}
                         type={this.props.type}
                       />
                     )}
@@ -304,8 +302,8 @@ class CardItem extends Component {
                 </Tooltip>
               </GridItem>
               <GridItem md={12} style={{ overflow: 'auto', height: 28 }}>
-                {folderList
-                  .filter(f => file.folderFKs.includes(f.id))
+                {tagList
+                  .filter(f => file.tagFKs.includes(f.id))
                   .map(item => (
                     <Tag style={{ margin: '2px 5px 2px 0px' }}>
                       {item.displayValue}

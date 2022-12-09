@@ -85,7 +85,7 @@ class CardView extends Component {
     const {
       classes,
       attachmentList = {},
-      selectedFolderFK,
+      selectedTagFK,
       zoom = 4,
       filterDocumentValue = '',
     } = this.props
@@ -99,8 +99,7 @@ class CardView extends Component {
               (f.fileName || '')
                 .toUpperCase()
                 .indexOf(filterDocumentValue.toUpperCase()) >= 0 &&
-              (f.folderFKs.includes(selectedFolderFK) ||
-                selectedFolderFK === -99),
+              (f.tagFKs.includes(selectedTagFK) || selectedTagFK === -99),
           ),
           [data => (data.createDate || '').toLowerCase()],
           ['desc'],

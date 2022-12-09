@@ -20,66 +20,66 @@ import ListItemIcon from '@material-ui/core/ListItemIcon'
 import { TagOutlined, TagFilled, PlusCircleFilled } from '@ant-design/icons'
 import TagSelect from './TagSelect'
 
-class SetFolderWithPopover extends Component {
+class SetTagWithPopover extends Component {
   constructor(props) {
     super(props)
-    this.state = { newFolder: '', folderFKs: [] }
+    this.state = { newTag: '', tagFKs: [] }
   }
 
-  setNewFolder = name => {
-    this.setState({ newFolder: name })
+  setNewTag = name => {
+    this.setState({ newTag: name })
   }
 
-  setFolderFKs = folderFKs => {
-    this.setState({ folderFKs })
+  setTagFKs = tagFKs => {
+    this.setState({ tagFKs })
   }
 
   componentDidMount = () => {
-    const { selectedFolderFKs = [] } = this.props
-    this.setFolderFKs(_.sortedUniq(selectedFolderFKs))
+    const { selectedTagFKs = [] } = this.props
+    this.setTagFKs(_.sortedUniq(selectedTagFKs))
   }
 
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps = nextProps => {
-    const folderFKs = _.sortedUniq(this.props.selectedFolderFKs)
-    const nextFolderFKs = _.sortedUniq(nextProps.selectedFolderFKs)
+    const tagFKs = _.sortedUniq(this.props.selectedTagFKs)
+    const nextTagFKs = _.sortedUniq(nextProps.selectedTagFKs)
     if (
-      folderFKs.length !== nextFolderFKs.length ||
-      nextFolderFKs.join(',') !== folderFKs.join(',')
+      tagFKs.length !== nextTagFKs.length ||
+      nextTagFKs.join(',') !== tagFKs.join(',')
     ) {
-      this.setFolderFKs(nextFolderFKs)
+      this.setTagFKs(nextTagFKs)
     }
   }
 
   saveAsNewTag = tagName => {
-    const { folderList = [], onAddNewFolders } = this.props
+    const { tagList = [], onAddNewTags, type } = this.props
     const maxSort = _.maxBy(
-      folderList.filter(f => f.id > 0),
+      tagList.filter(f => f.id > 0),
       'sortOrder',
     )
     const entity = {
-      code: tagName,
       displayValue: tagName,
       description: tagName,
       sortOrder: maxSort ? maxSort.sortOrder + 1 : 1,
       effectiveStartDate: moment().formatUTC(true),
       effectiveEndDate: moment('2099-12-31').formatUTC(true),
-      type: this.props.type,
+      IsUserMaintainable: true,
+      category: type,
     }
-    onAddNewFolders(entity)
+    onAddNewTags(entity)
   }
 
   render() {
     const {
-      folderList = [],
+      tagList = [],
       onClose,
-      onAddNewFolders,
+      onAddNewTags,
       justIcon,
-      selectedFolderFKs,
-      isEnableEditFolder,
+      selectedTagFKs,
+      isEnableEditTag,
       isEnableEditDocument,
     } = this.props
-    const { folderFKs, newFolder } = this.state
+    const { tagFKs, newTag } = this.state
 
     return (
       <Popover
@@ -87,13 +87,13 @@ class SetFolderWithPopover extends Component {
         content={
           <div style={{ width: 500 }}>
             <TagSelect
-              isEnableEditFolder={isEnableEditFolder}
+              isEnableEditTag={isEnableEditTag}
               isEnableEditDocument={isEnableEditDocument}
               saveAsNewTag={this.saveAsNewTag}
-              tagList={folderList.filter(f => f.id !== -99)}
-              defaultTagIds={selectedFolderFKs}
+              tagList={tagList.filter(f => f.id !== -99)}
+              defaultTagIds={selectedTagFKs}
               onChange={e => {
-                this.setFolderFKs(e)
+                this.setTagFKs(e)
               }}
             />
           </div>
@@ -103,7 +103,7 @@ class SetFolderWithPopover extends Component {
         placement='right'
         onVisibleChange={e => {
           if (e === false) {
-            onClose(folderFKs)
+            onClose(tagFKs)
           }
         }}
       >
@@ -128,4 +128,4 @@ class SetFolderWithPopover extends Component {
   }
 }
 
-export default SetFolderWithPopover
+export default SetTagWithPopover
