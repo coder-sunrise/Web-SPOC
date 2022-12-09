@@ -16,9 +16,12 @@ const fns = {
     })
     return r
   },
-  export: () => {
+  export: params => {
     return request(`${url}/export`, {
       method: 'GET',
+      body: {
+        ...params,
+      },
       xhrFields: {
         responseType: 'arraybuffer',
       },

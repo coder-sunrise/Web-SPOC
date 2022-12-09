@@ -100,15 +100,65 @@ class FilterBar extends PureComponent {
   }
 
   onExportClick = async () => {
-    this.setState({ isExporting: true })
-    setLoadingText('Exporting...')
+    const { dispatch, values } = this.props
+    const {
+      orderedDate,
+      isAllDateChecked,
+      externalTrackingStatusIDs,
+      jobReferenceNo,
+      searchValue,
+      orderTypes,
+      salesTypeIDs,
+      supplierIDs,
+    } = values
 
+    const orderStartDate =
+      orderedDate && orderedDate.length > 0
+        ? moment(orderedDate[0])
+            .startOf('day')
+            .formatUTC()
+        : undefined
+    const orderEndDate =
+      orderedDate && orderedDate.length > 1
+        ? moment(orderedDate[1])
+            .endOf('day')
+            .formatUTC()
+        : undefined
+    const payload = {
+      apiCriteria: {
+        orderStartDate: isAllDateChecked ? undefined : orderStartDate,
+        orderEndDate: isAllDateChecked ? undefined : orderEndDate,
+        searchValue: searchValue ? searchValue : undefined,
+        jobReferenceNo: jobReferenceNo || undefined,
+        supplierIDs:
+          supplierIDs && supplierIDs.length > 0 && supplierIDs.indexOf(-99) < 0
+            ? supplierIDs.join('|')
+            : undefined,
+        salesTypeIDs:
+          salesTypeIDs &&
+          salesTypeIDs.length > 0 &&
+          salesTypeIDs.indexOf(-99) < 0
+            ? salesTypeIDs.join('|')
+            : undefined,
+        orderTypes:
+          orderTypes && orderTypes.length > 0 && orderTypes.indexOf(-99) < 0
+            ? orderTypes.join('|')
+            : undefined,
+        externalTrackingStatusIDs:
+          externalTrackingStatusIDs &&
+          externalTrackingStatusIDs.length > 0 &&
+          externalTrackingStatusIDs.indexOf(-99) < 0
+            ? externalTrackingStatusIDs.join('|')
+            : undefined,
+      },
+    }
+    this.setState({ isExporting: true })
     dispatch({
       type: 'labTrackingDetails/export',
-      payload: {},
+      payload: payload,
     }).then(result => {
       if (result) {
-        downloadFile(result, 'ExternalTracking.xlsx')
+        downloadFile(result, 'ExternalTrackingReport.xlsx')
       }
 
       this.setState({ isExporting: false })
@@ -334,7 +384,12 @@ class FilterBar extends PureComponent {
 export default memo(
   withFormikExtend({
     mapPropsToValues: () => ({
-      orderedDate: [moment().toDate(), moment().toDate()],
+      orderedDate: [
+        moment()
+          .startOf('month')
+          .toDate(),
+        moment().toDate(),
+      ],
       orderTypes: [-99],
       salesTypeIDs: [-99],
       supplierIDs: [-99],

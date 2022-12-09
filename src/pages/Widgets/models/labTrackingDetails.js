@@ -23,8 +23,8 @@ export default createListViewModel({
         const response = yield call(service.writeOff, payload)
         return response
       },
-      *export(_, { call }) {
-        const result = yield call(service.export)
+      *export({ payload }, { call }) {
+        const result = yield call(service.export, payload)
         return result
       },
     },

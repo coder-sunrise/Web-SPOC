@@ -107,7 +107,7 @@ export default compose(
     }) => {
       if (consultationDocument.entity) return consultationDocument.entity
       const {
-        entity: { name = '', patientReferenceNo = '' },
+        entity: { name = '', patientReferenceNo = '', id },
       } = patient
       let formVisionRefraction = corVisionRefraction || {}
       if (forDispense) {
@@ -116,6 +116,7 @@ export default compose(
       }
       return {
         type: consultationDocument.type,
+        patientProfileFK: id,
         patientName: name,
         patientReferenceNo,
         dateofPrescription: moment(),
