@@ -79,11 +79,7 @@ class OverallGrid extends PureComponent {
 
           return (
             <React.Fragment>
-              <PatientResultButton
-                row={row}
-                clinicSettings={clinicSettings}
-                handlePrint={handlePrintClick}
-              />
+              <PatientResultButton row={row} />
               <Tooltip title='Edit Patient Lab Result' placement='bottom'>
                 <Button
                   disabled={readOnly}
@@ -104,6 +100,7 @@ class OverallGrid extends PureComponent {
       },
     ],
     leftColumns: [
+      0,
       'jobReferenceNo',
       'orderType',
       'salesType',
@@ -135,7 +132,7 @@ class OverallGrid extends PureComponent {
   }
 
   render() {
-    const { height } = this.props
+    const { height, onDataSelectChange, writeOffList } = this.props
     return (
       <CommonTableGrid
         type='labTrackingDetails'
@@ -144,6 +141,17 @@ class OverallGrid extends PureComponent {
           height,
         }}
         {...this.configs}
+        selection={writeOffList}
+        onSelectionChange={onDataSelectChange}
+        FuncProps={{
+          pager: true,
+          selectable: true,
+          selectConfig: {
+            showSelectAll: false,
+            isSelectionEnabled: true,
+            rowSelectionEnabled: row => row.status !== 'Write Off',
+          },
+        }}
       />
     )
   }

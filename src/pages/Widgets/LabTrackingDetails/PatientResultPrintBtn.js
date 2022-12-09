@@ -1,69 +1,99 @@
 import React, { useState } from 'react'
 // material ui
 import Print from '@material-ui/icons/Print'
-import {
-  MenuList,
-  ClickAwayListener,
-  MenuItem,
-  makeStyles,
-} from '@material-ui/core'
-// ant design
-import { InputNumber } from 'antd'
+import { List } from 'antd'
 // common components
-import { Button, Popper, CommonModal } from '@/components'
-import { REPORT_ID } from '@/utils/constants'
-import withWebSocket from '@/components/Decorator/withWebSocket'
-// services
-import { getRawData } from '@/services/report'
-import { ReportViewer } from '@/components/_medisys'
+import { Button, Popover } from '@/components'
 
-const PatientResultButton = ({ handlePrint, clinicSettings, row }) => {
-  const [popperOpen, setPopperOpen] = useState(false)
+const printTypes = [
+  {
+    id: 1,
+    name: 'Spectacle Order Form',
+    type: 'Spectacle',
+    dateType: 'orderFormId',
+    reportId: 99,
+    reportParameterName: 'SpectacleOrderFormId',
+  },
+  {
+    id: 2,
+    name: 'Spectacle Prescription',
+    type: 'Spectacle',
+    dateType: 'prescriptionId',
+    reportId: 96,
+    reportParameterName: 'SpectaclePrescriptionId',
+  },
+  {
+    id: 3,
+    name: 'Contact Lens Order Form',
+    type: 'Contact Lens',
+    dateType: 'orderFormId',
+    reportId: 100,
+    reportParameterName: 'ContactLensOrderFormId',
+  },
+  {
+    id: 4,
+    name: 'Contact Lens Prescription',
+    type: 'Contact Lens',
+    dateType: 'prescriptionId',
+    reportId: 98,
+    reportParameterName: 'ContactLensPrescriptionId',
+  },
+]
 
-  const [reportViewerOpen, setReportViewerOpen] = useState(false)
-
-  const openPopper = () => setPopperOpen(true)
-  const closePopper = () => setPopperOpen(false)
-
-  const openReportViewer = () => {
-    setReportViewerOpen(true)
-    setPopperOpen(false)
+const PatientResultButton = ({ row }) => {
+  const viewReport = (reportParameterName, reportDataId, reportId) => {
+    window.g_app._store.dispatch({
+      type: 'report/updateState',
+      payload: {
+        reportTypeID: reportId,
+        reportParameters: {
+          [reportParameterName]: reportDataId,
+          isSaved: true,
+        },
+      },
+    })
+    toggleVisibleChange()
   }
-  const closeReportViewer = () => setReportViewerOpen(false)
-
+  const [popperOpen, setPopperOpen] = useState(false)
+  const toggleVisibleChange = () => {
+    setPopperOpen(!popperOpen)
+  }
   return (
     <React.Fragment>
-      <Popper
-        open={popperOpen}
-        transition
-        overlay={
-          <ClickAwayListener onClickAway={closePopper}>
-            <MenuList role='menu'>
-              <MenuItem>
-                <Button color='primary' onClick={openReportViewer}>
-                  Patient Result
-                </Button>
-              </MenuItem>
-            </MenuList>
-          </ClickAwayListener>
+      <Popover
+        icon={null}
+        trigger='click'
+        placement='left'
+        visible={popperOpen}
+        onVisibleChange={toggleVisibleChange}
+        content={
+          <List
+            size='small'
+            bordered
+            dataSource={printTypes.filter(
+              item => row[item.dateType] && row.orderType === item.type,
+            )}
+            renderItem={item => (
+              <List.Item
+                onClick={() => {
+                  viewReport(
+                    item.reportParameterName,
+                    row[item.dateType],
+                    item.reportId,
+                  )
+                }}
+                style={{ cursor: 'pointer' }}
+              >
+                {item.name}
+              </List.Item>
+            )}
+          />
         }
       >
-        <Button color='primary' justIcon onClick={openPopper}>
+        <Button color='primary' justIcon onClick={toggleVisibleChange}>
           <Print />
         </Button>
-      </Popper>
-
-      <CommonModal
-        open={reportViewerOpen}
-        onClose={closeReportViewer}
-        title='Patient Result'
-        maxWidth='lg'
-      >
-        <ReportViewer
-          reportID={53}
-          reportParameters={{ externalTrackingId: row.id }}
-        />
-      </CommonModal>
+      </Popover>
     </React.Fragment>
   )
 }

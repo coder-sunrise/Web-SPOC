@@ -71,11 +71,7 @@ class PatientGrid extends PureComponent {
 
           return (
             <React.Fragment>
-              <PatientResultButton
-                row={row}
-                clinicSettings={clinicSettings}
-                handlePrint={handlePrintClick}
-              />
+              <PatientResultButton row={row} />
               <Tooltip title='Edit Patient Lab Result' placement='bottom'>
                 <Button
                   disabled={readOnly}

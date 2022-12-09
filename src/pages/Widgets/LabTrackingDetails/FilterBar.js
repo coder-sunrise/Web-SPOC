@@ -4,7 +4,7 @@ import Search from '@material-ui/icons/Search'
 import { findGetParameter } from '@/utils/utils'
 import moment from 'moment'
 import { Badge } from 'antd'
-
+import { LoadingWrapper } from '@/components/_medisys'
 import {
   GridContainer,
   FastField,
@@ -17,19 +17,7 @@ import {
   Tooltip,
   Checkbox,
 } from '@/components'
-
-const styles = theme => ({
-  filterBar: {
-    marginBottom: '20px',
-  },
-  filterBtn: {
-    lineHeight: standardRowHeight,
-    textAlign: 'left',
-    '& > button': {
-      marginRight: theme.spacing.unit,
-    },
-  },
-})
+import { downloadFile } from '@/services/file'
 
 const searchResult = (props, isFirstLoad = false) => {
   const { dispatch, IsOverallGrid, patientId, values } = props
@@ -104,15 +92,37 @@ const searchResult = (props, isFirstLoad = false) => {
 class FilterBar extends PureComponent {
   constructor(props) {
     super(props)
-    const { setFieldValue } = props
+    this.state = { isExporting: false }
   }
 
   componentDidMount = () => {
     searchResult(this.props, true)
   }
 
+  onExportClick = async () => {
+    this.setState({ isExporting: true })
+    setLoadingText('Exporting...')
+
+    dispatch({
+      type: 'labTrackingDetails/export',
+      payload: {},
+    }).then(result => {
+      if (result) {
+        downloadFile(result, 'ExternalTracking.xlsx')
+      }
+
+      this.setState({ isExporting: false })
+    })
+  }
+
   render() {
-    const { handleSubmit, IsOverallGrid, values } = this.props
+    const {
+      IsOverallGrid,
+      values,
+      onClickWriteOff,
+      writeOffCount = 0,
+      onDataSelectChange,
+    } = this.props
     return (
       <div>
         <GridContainer alignItems='flex-end'>
@@ -263,6 +273,7 @@ class FilterBar extends PureComponent {
             size='sm'
             onClick={() => {
               searchResult(this.props)
+              onDataSelectChange([])
             }}
             style={{
               marginLeft: 20,
@@ -273,23 +284,29 @@ class FilterBar extends PureComponent {
             Search
           </ProgressButton>
           {IsOverallGrid && (
-            <ProgressButton
-              icon={null}
-              size='sm'
-              //onClick={handleSubmit}
-              style={{
-                position: 'relative',
-                bottom: 6,
-                backgroundColor: '#14BACE',
-              }}
+            <LoadingWrapper
+              linear
+              loading={this.state.isExporting}
+              text='Exporting...'
             >
-              Export
-            </ProgressButton>
+              <ProgressButton
+                icon={null}
+                size='sm'
+                onClick={this.onExportClick}
+                style={{
+                  position: 'relative',
+                  bottom: 6,
+                  backgroundColor: '#14BACE',
+                }}
+              >
+                Export
+              </ProgressButton>
+            </LoadingWrapper>
           )}
           {IsOverallGrid && (
             <Badge
               color='red'
-              count={100}
+              count={writeOffCount}
               style={{ top: '-7px', right: 16 }}
               size='small'
             >
@@ -297,11 +314,12 @@ class FilterBar extends PureComponent {
                 icon={null}
                 color='primary'
                 size='sm'
-                //onClick={handleSubmit}
+                onClick={onClickWriteOff}
                 style={{
                   position: 'relative',
                   bottom: 6,
                 }}
+                disabled={!writeOffCount}
               >
                 Write-Off
               </ProgressButton>
