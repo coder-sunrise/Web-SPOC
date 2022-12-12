@@ -62,6 +62,7 @@ class Paediatric extends PureComponent {
       thumbnailDisplaySize,
       formContent,
       scribbleNoteUpdateState,
+      defaultThumbnail,
     } = this.props
     const base64Prefix = 'data:image/jpeg;base64,'
 

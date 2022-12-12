@@ -23,7 +23,16 @@ import {
   AuthorizedContext,
 } from '@/components'
 import AddConsultationDocument from './AddConsultationDocument'
-const styles = () => ({})
+const styles = () => ({
+  popContainer: {
+    '& .ant-popover-inner-content': {
+      padding: '0',
+    },
+    '& ul': {
+      cursor: 'pointer',
+    },
+  },
+})
 export const printRow = async (row, props) => {
   const type = consultationDocumentTypes.find(
     o => o.value === row.type || o.name === row.type || o.code === row.type,
@@ -207,19 +216,27 @@ class ConsultationDocument extends PureComponent {
   }
 
   openConsultationDocumentModal = item => {
-    this.props.dispatch({
-      type: 'consultationDocument/updateState',
-      payload: {
-        entity: undefined,
-        type: item.value,
-        showModal: true,
-      },
-    })
+    let {
+      consultationDocument: { rows = [] },
+      dispatch,
+    } = this.props
+    rows.find(subjectItem => subjectItem.type == item.value)
+      ? notification.error({
+          message: `${item.name} can only be added once for current visit.`,
+        })
+      : dispatch({
+          type: 'consultationDocument/updateState',
+          payload: {
+            entity: undefined,
+            type: item.value,
+            showModal: true,
+          },
+        })
     this.toggleVisibleChange()
   }
 
   render() {
-    const { consultationDocument, dispatch, theme } = this.props
+    const { consultationDocument, dispatch, theme, classes } = this.props
     const { showModal, rows, entity, type } = consultationDocument
     const selectType = consultationDocumentTypes.find(
       item => item.value === type,
@@ -318,49 +335,54 @@ class ConsultationDocument extends PureComponent {
                 : 'enable',
           }}
         >
-          <Popover
-            icon={null}
-            trigger='click'
-            placement='bottomLeft'
-            visible={this.state.openFormType}
-            onVisibleChange={this.toggleVisibleChange}
-            content={
-              <div>
-                <List
-                  size='small'
-                  bordered
-                  dataSource={consultationDocumentTypes
-                    .filter(item => ableToViewByAuthority(item.authority))
-                    .map(item => ({
-                      value: item.value,
-                      name: item.name,
-                    }))}
-                  renderItem={item => (
-                    <List.Item
-                      onClick={() => {
-                        this.openConsultationDocumentModal(item)
-                      }}
-                    >
-                      {item.name}
-                    </List.Item>
-                  )}
-                />
-              </div>
-            }
-          >
-            <Tooltip title='Add Consultation Document'>
-              <ProgressButton
-                color='primary'
-                icon={<Add />}
-                style={{ margin: theme.spacing(1) }}
-                onClick={() => {
-                  this.toggleVisibleChange()
-                }}
-              >
-                Add New
-              </ProgressButton>
-            </Tooltip>
-          </Popover>
+          <div className={classes.popContainer}>
+            <Popover
+              icon={null}
+              trigger='click'
+              placement='bottomLeft'
+              visible={this.state.openFormType}
+              onVisibleChange={this.toggleVisibleChange}
+              getPopupContainer={() =>
+                document.getElementsByClassName(classes.popContainer)[0]
+              }
+              content={
+                <div>
+                  <List
+                    size='small'
+                    bordered
+                    dataSource={consultationDocumentTypes
+                      .filter(item => ableToViewByAuthority(item.authority))
+                      .map(item => ({
+                        value: item.value,
+                        name: item.name,
+                      }))}
+                    renderItem={item => (
+                      <List.Item
+                        onClick={() => {
+                          this.openConsultationDocumentModal(item)
+                        }}
+                      >
+                        {item.name}
+                      </List.Item>
+                    )}
+                  />
+                </div>
+              }
+            >
+              <Tooltip title='Add Consultation Document'>
+                <ProgressButton
+                  color='primary'
+                  icon={<Add />}
+                  style={{ margin: theme.spacing(1) }}
+                  onClick={() => {
+                    this.toggleVisibleChange()
+                  }}
+                >
+                  Add New
+                </ProgressButton>
+              </Tooltip>
+            </Popover>
+          </div>
         </AuthorizedContext.Provider>
         {showModal && (
           <FastField

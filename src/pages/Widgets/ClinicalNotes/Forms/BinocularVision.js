@@ -91,9 +91,6 @@ class BinocularVision extends PureComponent {
       newCoverTest,
     ])
   }
-  componentDidMount() {
-    this.addCoverTest()
-  }
   render() {
     let {
       prefixProp,
