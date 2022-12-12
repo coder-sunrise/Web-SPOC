@@ -225,10 +225,11 @@ class Layout extends PureComponent {
   removeWidget = widgetId => {
     const { setFieldValue, values } = this.props
     const wg = widgets.find(o => o.id === widgetId)
-    const { associatedProps = [], onRemove, model } = wg
+    const { associatedProps = [], id, onRemove, model } = wg
     associatedProps.forEach(ap => {
+      console.log(ap)
       const v = values[ap]
-      if (v) {
+      if (v && id !== '1') {
         if (Array.isArray(v)) {
           // eslint-disable-next-line no-return-assign
           setFieldValue(
@@ -239,6 +240,12 @@ class Layout extends PureComponent {
             })),
           )
         }
+      } else if (id === '1') {
+        setFieldValue(ap, { ...v, isDeleted: true })
+        _.keys(v).forEach(form => {
+          const f = _.get(v, form)
+          if (_.isObject(f)) f.isDeleted = true
+        })
       }
     })
     if (onRemove) onRemove()
