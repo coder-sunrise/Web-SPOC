@@ -172,7 +172,8 @@ const VisitInfoCard = ({
                   notWaiting ||
                   isReadOnly ||
                   hasCOR ||
-                  visitRegistration.isRegisterOtc
+                  visitRegistration.isRegisterOtc ||
+                  visitRegistration?.visitInfo?.visit?.billFirstVisitFK
                 }
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.visitType',
