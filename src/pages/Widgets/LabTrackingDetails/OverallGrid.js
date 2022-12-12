@@ -47,6 +47,23 @@ class OverallGrid extends PureComponent {
         columnName: 'patientName',
         width: 180,
         sortingEnabled: false,
+        render: row => {
+          return (
+            <div
+              style={{
+                width: '100%',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                marginTop: 1,
+              }}
+            >
+              <Tooltip title={row.patientName}>
+                <span>{row.patientName}</span>
+              </Tooltip>
+            </div>
+          )
+        },
       },
       { columnName: 'frame', width: 120, sortingEnabled: false },
       { columnName: 'rightLensProduct', width: 150, sortingEnabled: false },

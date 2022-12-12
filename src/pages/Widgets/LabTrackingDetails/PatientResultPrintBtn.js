@@ -4,6 +4,7 @@ import Print from '@material-ui/icons/Print'
 import { List } from 'antd'
 // common components
 import { Button, Popover } from '@/components'
+import styles from './index.less'
 
 const printTypes = [
   {
@@ -66,6 +67,7 @@ const PatientResultButton = ({ row }) => {
         placement='left'
         visible={popperOpen}
         onVisibleChange={toggleVisibleChange}
+        popupClassName={styles.popover}
         content={
           <List
             size='small'
