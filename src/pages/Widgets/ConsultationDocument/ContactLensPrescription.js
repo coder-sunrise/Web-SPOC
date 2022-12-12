@@ -39,18 +39,18 @@ const _formik = withFormik({
       issuedByUser: user.data.clinicianProfile.name,
       issuedByUserTitle: user.data.clinicianProfile.title,
       /*  default left value */
-      leftSph: formVisionRefraction.subjectiveRefraction_LE_SPH,
-      leftCyl: formVisionRefraction.subjectiveRefraction_LE_CYL,
-      leftAxis: formVisionRefraction.subjectiveRefraction_LE_AXIS,
-      leftAdd: formVisionRefraction.subjectiveRefraction_NearAddition_LE_Value,
-      leftVa: `${formVisionRefraction.subjectiveRefraction_LE_VA ||
+      leftSPH: formVisionRefraction.subjectiveRefraction_LE_SPH,
+      leftCYL: formVisionRefraction.subjectiveRefraction_LE_CYL,
+      leftAXIS: formVisionRefraction.subjectiveRefraction_LE_AXIS,
+      leftADD: formVisionRefraction.subjectiveRefraction_NearAddition_LE_Value,
+      leftVA: `${formVisionRefraction.subjectiveRefraction_LE_VA ||
         ''}/${formVisionRefraction.subjectiveRefraction_LE_VA_Comments || ''}`,
       /*  default right value */
-      rightSph: formVisionRefraction.subjectiveRefraction_RE_SPH,
-      rightCyl: formVisionRefraction.subjectiveRefraction_RE_CYL,
-      rightAxis: formVisionRefraction.subjectiveRefraction_RE_AXIS,
-      rightAdd: formVisionRefraction.subjectiveRefraction_NearAddition_RE_Value,
-      rightVa: `${formVisionRefraction.subjectiveRefraction_RE_VA ||
+      rightSPH: formVisionRefraction.subjectiveRefraction_RE_SPH,
+      rightCYL: formVisionRefraction.subjectiveRefraction_RE_CYL,
+      rightAXIS: formVisionRefraction.subjectiveRefraction_RE_AXIS,
+      rightADD: formVisionRefraction.subjectiveRefraction_NearAddition_RE_Value,
+      rightVA: `${formVisionRefraction.subjectiveRefraction_RE_VA ||
         ''}/${formVisionRefraction.subjectiveRefraction_RE_VA_Comments || ''}`,
     }
   },

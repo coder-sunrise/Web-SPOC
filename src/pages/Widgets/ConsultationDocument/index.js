@@ -220,7 +220,9 @@ class ConsultationDocument extends PureComponent {
       consultationDocument: { rows = [] },
       dispatch,
     } = this.props
-    rows.find(subjectItem => subjectItem.type == item.value)
+    rows
+      .filter(subjectItem => subjectItem.isDeleted !== true)
+      .find(subjectItem => subjectItem.type == item.value)
       ? notification.error({
           message: `${item.name} can only be added once for current visit.`,
         })
