@@ -72,7 +72,7 @@ export const printRow = async (row, props) => {
         contentType: 'application/x-www-form-urlencoded',
         data: {
           reportContent: JSON.stringify(
-            commonDataReaderTransform(downloadConfig.draft(row)),
+            commonDataReaderTransform(downloadConfig.draft(row, codetable)),
           ),
         },
       },
@@ -117,7 +117,9 @@ export const viewReport = (row, props, useID = false) => {
         reportParameters: {
           isSaved: false,
           reportContent: JSON.stringify(
-            commonDataReaderTransform(downloadConfig.draft(reportParameters)),
+            commonDataReaderTransform(
+              downloadConfig.draft(reportParameters, codetable),
+            ),
           ),
         },
       },
