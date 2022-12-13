@@ -36,6 +36,7 @@ const _formik = withFormik({
       formVisionRefraction =
         consultation.entity?.latestCORVisionRefraction || {}
     }
+    console.log(formVisionRefraction)
     return {
       type: consultationDocument.type,
       dateOrdered: moment(),
@@ -49,6 +50,7 @@ const _formik = withFormik({
       leftADD: formVisionRefraction.subjectiveRefraction_NearAddition_LE_Value,
       leftVA: `${formVisionRefraction.subjectiveRefraction_LE_VA ||
         ''}/${formVisionRefraction.subjectiveRefraction_LE_VA_Comments || ''}`,
+      leftPH: formVisionRefraction.subjectiveRefraction_LE_PH,
       /*  default right value */
       rightSPH: formVisionRefraction.subjectiveRefraction_RE_SPH,
       rightCYL: formVisionRefraction.subjectiveRefraction_RE_CYL,
@@ -56,6 +58,7 @@ const _formik = withFormik({
       rightADD: formVisionRefraction.subjectiveRefraction_NearAddition_RE_Value,
       rightVA: `${formVisionRefraction.subjectiveRefraction_RE_VA ||
         ''}/${formVisionRefraction.subjectiveRefraction_RE_VA_Comments || ''}`,
+      rightPH: formVisionRefraction.subjectiveRefraction_RE_PH,
     }
   },
   validationSchema: Yup.object().shape({
