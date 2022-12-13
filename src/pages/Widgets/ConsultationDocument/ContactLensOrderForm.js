@@ -36,7 +36,6 @@ const _formik = withFormik({
       formVisionRefraction =
         consultation.entity?.latestCORVisionRefraction || {}
     }
-    console.log(formVisionRefraction)
     return {
       type: consultationDocument.type,
       dateOrdered: moment(),
