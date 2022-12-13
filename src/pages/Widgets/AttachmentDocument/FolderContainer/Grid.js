@@ -196,6 +196,7 @@ class Grid extends PureComponent {
                           }}
                           type={this.props.type}
                           onAddNewTags={onAddNewTags}
+                          isLimitingCurrentUser={isLimitingCurrentUser}
                         />
                       </div>
                     )}

@@ -452,6 +452,7 @@ class ImagePreviewer extends Component {
                   }}
                   onAddNewTags={onAddNewTags}
                   type={this.props.type}
+                  isLimitingCurrentUser={isLimitingCurrentUser}
                 />
               )}
             </div>

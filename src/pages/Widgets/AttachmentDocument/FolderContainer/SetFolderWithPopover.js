@@ -78,6 +78,7 @@ class SetTagWithPopover extends Component {
       selectedTagFKs,
       isEnableEditTag,
       isEnableEditDocument,
+      isLimitingCurrentUser = () => false,
     } = this.props
     const { tagFKs, newTag } = this.state
 
@@ -95,6 +96,7 @@ class SetTagWithPopover extends Component {
               onChange={e => {
                 this.setTagFKs(e)
               }}
+              isLimitingCurrentUser={isLimitingCurrentUser}
             />
           </div>
         }
