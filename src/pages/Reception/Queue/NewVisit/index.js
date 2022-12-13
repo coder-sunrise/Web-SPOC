@@ -222,33 +222,39 @@ class NewVisit extends PureComponent {
       errors,
       values,
     } = this.props
+    console.log(list)
 
-    const { doctorProfileFK, visitDoctor = [], visitPurposeFK } = values
+    const {
+      doctorProfileFK,
+      visitDoctor = [],
+      visitPurposeFK,
+      breVisitPurposeFK,
+    } = values
 
     if (Object.keys(errors).length > 0) return handleSubmit()
 
-    const alreadyRegisteredVisit = list
-      .filter(queue => !queue.isClinicSessionClosed)
-      .reduce(
-        (registered, queue) =>
-          !registered
-            ? queue.patientProfileFK === patientInfo.id &&
-              queue.visitPurposeFK == visitPurposeFK
-            : registered,
-        false,
+    if (!values.id || visitPurposeFK !== breVisitPurposeFK) {
+      const sameTypeVisit = list.filter(
+        queue =>
+          queue.patientProfileFK === patientInfo.id &&
+          queue.visitPurposeFK == visitPurposeFK &&
+          queue.id !== values.id,
       )
 
-    if (alreadyRegisteredVisit)
-      return dispatch({
-        type: 'global/updateAppState',
-        payload: {
-          openConfirm: true,
-          openConfirmTitle: 'Confirm Register New Visit',
-          openConfirmContent:
-            'This patient already registered for the same visit type in current session, are you sure to continue?',
-          onConfirmSave: handleSubmit,
-        },
-      })
+      if (sameTypeVisit.length > 0) {
+        return dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            openConfirm: true,
+            openConfirmTitle: 'Confirm Register New Visit',
+            openConfirmContent:
+              'This patient already registered for the same visit type in current session, are you sure to continue?',
+            onConfirmSave: handleSubmit,
+          },
+        })
+      }
+    }
+
     return handleSubmit()
   }
 
