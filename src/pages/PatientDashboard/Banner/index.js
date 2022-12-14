@@ -42,7 +42,7 @@ import HistoryDiagnosis from './HistoryDiagnosis'
 import { SwitcherTwoTone } from '@ant-design/icons'
 import { SCHEME_TYPE } from '@/utils/constants'
 import CopayerDetails from '@/pages/Setting/Company/CopayerDetails'
-import PatientResults from '@/pages/PatientDatabase/Detail/Results'
+import ExternalTracking from '@/pages/PatientDatabase/Detail/Results/ExternalTracking'
 
 const headerStyles = {
   color: 'darkblue',
@@ -658,6 +658,9 @@ class Banner extends PureComponent {
     const viewPatientProfileAccess = Authorized.check(
       'patientdatabase.patientprofiledetails',
     )
+    const viewExternalTrackingRight = Authorized.check(
+      'patientdatabase.patientprofiledetails.patientresults.viewexternaltracking',
+    ) || { rights: 'hidden' }
 
     const { entity } = patient
     if (!entity)
@@ -1077,19 +1080,21 @@ class Banner extends PureComponent {
                     <GridItem xs={12} md={12}></GridItem>
                   )}
                   <GridItem xs={12} md={12}>
-                    <span
-                      className={classes.header}
-                      style={{
-                        display: 'block',
-                        paddingRight: 10,
-                        textDecoration: 'underline',
-                        cursor: 'pointer',
-                      }}
-                      onClick={e => this.onViewExternalTrackingClick()}
-                      tabIndex='-1'
-                    >
-                      External Tracking
-                    </span>
+                    {viewExternalTrackingRight.rights !== 'hidden' && (
+                      <span
+                        className={classes.header}
+                        style={{
+                          display: 'block',
+                          paddingRight: 10,
+                          textDecoration: 'underline',
+                          cursor: 'pointer',
+                        }}
+                        onClick={e => this.onViewExternalTrackingClick()}
+                        tabIndex='-1'
+                      >
+                        External Tracking
+                      </span>
+                    )}
                     <span
                       className={classes.header}
                       style={{
@@ -1177,7 +1182,7 @@ class Banner extends PureComponent {
           onClose={this.closeExternalTracking}
           maxWidth='lg'
         >
-          <PatientResults
+          <ExternalTracking
             patient={patient}
             patientProfileFK={entity.id}
             defaultActiveKey='1'

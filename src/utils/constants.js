@@ -77,9 +77,11 @@ export const USER_ROLE = {
 
 export const LAB_TRACKING_STATUS = {
   NEW: 1,
-  ORDERED: 2,
-  RECEIVED: 3,
-  COMPLETED: 4,
+  SENDTOSUPPLIER: 2,
+  VERIFIED: 3,
+  CONTACTED: 4,
+  DELIVERED: 5,
+  WRITEOFF: 6,
 }
 
 export const COPAYER_TYPE = {

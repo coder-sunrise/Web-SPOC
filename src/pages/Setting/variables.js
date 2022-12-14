@@ -139,22 +139,10 @@ export const menuData = [
     url: '/setting/appointmenttype',
   },
   {
-    authority: 'settings.clinicsetting.casetype',
-    title: 'Clinic Setting',
-    text: 'Case Type',
-    url: '/setting/casetype',
-  },
-  {
     authority: 'settings.clinicsetting.salestype',
     title: 'Clinic Setting',
     text: 'Sales Type',
     url: '/setting/salestype',
-  },
-  {
-    authority: 'settings.clinicsetting.casedescription',
-    title: 'Clinic Setting',
-    text: 'Case Description',
-    url: '/setting/casedescription',
   },
   {
     authority: 'settings.clinicsetting.refractiontesttype',

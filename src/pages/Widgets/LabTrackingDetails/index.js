@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import $ from 'jquery'
 import { withStyles } from '@material-ui/core'
 import { PATIENT_LAB, REPORT_ID } from '@/utils/constants'
-import { CommonModal } from '@/components'
+import { CommonModal, TextField, Tooltip } from '@/components'
 import { findGetParameter } from '@/utils/utils'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 import { getRawData } from '@/services/report'
@@ -12,10 +12,6 @@ import Detail from './Detail'
 import FilterBar from './FilterBar'
 import OverallGrid from './OverallGrid'
 import PatientGrid from './PatientGrid'
-import clinicSettings from '@/models/clinicSettings'
-// import model from './models'
-
-// window.g_app.replaceModel(model)
 
 const styles = theme => ({
   gridRow: {
@@ -39,30 +35,18 @@ class LabTrackingDetails extends PureComponent {
     super(props)
     this.state = {
       visitPurpose: JSON.parse(props.clinicSettings.visitTypeSetting),
+      isShowWriteOffModel: false,
+      writeOffReason: undefined,
+      writeOffList: [],
     }
   }
-  componentDidMount() {
-    const { dispatch } = this.props
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctcasedescription',
-      },
-    })
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctcasetype',
-      },
-    })
-  }
-
   toggleModal = () => {
     const { labTrackingDetails } = this.props
     this.props.dispatch({
       type: 'labTrackingDetails/updateState',
       payload: {
         showModal: !labTrackingDetails.showModal,
+        entity: undefined,
       },
     })
   }
@@ -90,6 +74,40 @@ class LabTrackingDetails extends PureComponent {
     handlePrint(JSON.stringify(payload))
   }
 
+  onClickWriteOff = () => {
+    this.setState({ isShowWriteOffModel: true })
+  }
+
+  toggleShowWriteOffModel = () => {
+    this.setState({ isShowWriteOffModel: false, writeOffReason: undefined })
+  }
+
+  confirmWriteOff = () => {
+    if ((this.state.writeOffReason || '').trim().length === 0) return
+    const { dispatch } = this.props
+    dispatch({
+      type: 'labTrackingDetails/writeOff',
+      payload: {
+        writeOffReason: this.state.writeOffReason,
+        writeOffIds: this.state.writeOffList.join(','),
+      },
+    }).then(r => {
+      if (r) {
+        this.setState({
+          writeOffReason: undefined,
+          writeOffList: [],
+          isShowWriteOffModel: false,
+        })
+        dispatch({
+          type: 'labTrackingDetails/query',
+        })
+      }
+    })
+  }
+
+  onDataSelectChange = v => {
+    this.setState({ writeOffList: v })
+  }
   render() {
     const {
       resultType,
@@ -134,6 +152,9 @@ class LabTrackingDetails extends PureComponent {
             dispatch={dispatch}
             IsOverallGrid={IsOverallGrid}
             patientId={patientID}
+            onClickWriteOff={this.onClickWriteOff}
+            writeOffCount={this.state.writeOffList.length}
+            onDataSelectChange={this.onDataSelectChange}
           />
         </div>
 
@@ -143,13 +164,14 @@ class LabTrackingDetails extends PureComponent {
               dispatch={dispatch}
               {...this.props}
               {...cfg}
-              visitPurpose={this.state.visitPurpose}
+              writeOffList={this.state.writeOffList}
+              onDataSelectChange={this.onDataSelectChange}
             />
           ) : (
             <PatientGrid
               readOnly={
                 isPatientInactive ||
-                editExternalTrackingRight.rights !== 'enable'
+                editExternalTrackingRight.rights === 'hidden'
               }
               dispatch={dispatch}
               visitPurpose={this.state.visitPurpose}
@@ -160,7 +182,7 @@ class LabTrackingDetails extends PureComponent {
         </div>
         <CommonModal
           open={labTrackingDetails.showModal}
-          title='Edit External Tracking / Results'
+          title='Edit External Tracking'
           observe='LabResultsDetail'
           maxWidth='md'
           bodyNoPadding
@@ -168,6 +190,40 @@ class LabTrackingDetails extends PureComponent {
           onConfirm={this.toggleModal}
         >
           <Detail {...cfg} {...this.props} mode='integrated' />
+        </CommonModal>
+
+        <CommonModal
+          open={this.state.isShowWriteOffModel}
+          title='Confirm Write-Off'
+          maxWidth='sm'
+          bodyNoPadding
+          onClose={this.toggleShowWriteOffModel}
+          onConfirm={this.confirmWriteOff}
+          showFooter={true}
+        >
+          <div style={{ padding: '0px 16px 8px 16px' }}>
+            <div>
+              <span style={{ fontWeight: 'bold' }}>Write-Off Reason</span>
+              {(this.state.writeOffReason || '').trim().length === 0 && (
+                <Tooltip title='Write-Off reason is required'>
+                  <span style={{ color: 'red', marginLeft: 4 }}>*</span>
+                </Tooltip>
+              )}
+            </div>
+            <div style={{ fontStyle: 'italic', fontSize: '0.7rem' }}>
+              (This remarks will be indicated in all selected records)
+            </div>
+            <div>
+              <TextField
+                label='Remarks'
+                maxLength={2000}
+                value={this.state.writeOffReason}
+                onChange={e => {
+                  this.setState({ writeOffReason: e.target.value })
+                }}
+              />
+            </div>
+          </div>
         </CommonModal>
       </div>
     )

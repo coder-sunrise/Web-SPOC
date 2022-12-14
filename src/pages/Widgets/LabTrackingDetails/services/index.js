@@ -1,16 +1,30 @@
 import * as service from '@/services/common'
 import request from '@/utils/request'
 
-const url = '/api/LabTrackingDetails'
+const url = '/api/ExternalTracking'
 
 const fns = {
   queryList: params => service.queryList(url, params),
   query: params => service.query(url, params),
   upsert: params => service.upsert(url, params),
-  getLabTrackingDetailsForVisit: async params => {
-    return await request(`${url}/visit`, {
+  writeOff: async params => {
+    const r = await request(`${url}/WriteOff`, {
+      method: 'PUT',
+      body: {
+        ...params,
+      },
+    })
+    return r
+  },
+  export: params => {
+    return request(`${url}/export`, {
       method: 'GET',
-      body: { visitId: params.visitId },
+      body: {
+        ...params,
+      },
+      xhrFields: {
+        responseType: 'arraybuffer',
+      },
     })
   },
 }

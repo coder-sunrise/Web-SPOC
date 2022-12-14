@@ -114,7 +114,9 @@ const ContactLensPrescription = props => {
           </GridContainer>
         </header>
         <article>
-          <ContactLensPrescriptionModule />
+          <div style={{ padding: '0px 8px' }}>
+            <ContactLensPrescriptionModule />
+          </div>
         </article>
         <section>
           <GridItem>

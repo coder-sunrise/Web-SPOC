@@ -19,11 +19,13 @@ export default createListViewModel({
       })
     },
     effects: {
-      *getLabTrackingDetailsForVisit({ payload }, { call }) {
-        const r = yield call(service.getLabTrackingDetailsForVisit, payload)
-        const { status, data = [] } = r
-        if (status === '200') return data
-        return []
+      *writeOff({ payload }, { call }) {
+        const response = yield call(service.writeOff, payload)
+        return response
+      },
+      *export({ payload }, { call }) {
+        const result = yield call(service.export, payload)
+        return result
       },
     },
     reducers: {

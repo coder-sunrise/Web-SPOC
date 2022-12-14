@@ -3,118 +3,176 @@ import { formatMessage } from 'umi'
 import Search from '@material-ui/icons/Search'
 import { findGetParameter } from '@/utils/utils'
 import moment from 'moment'
-
+import { Badge } from 'antd'
+import { LoadingWrapper } from '@/components/_medisys'
 import {
-  Button,
-  CommonModal,
   GridContainer,
-  GridItem,
   FastField,
   TextField,
   Field,
   CodeSelect,
   withFormikExtend,
   DateRangePicker,
-  ClinicianSelect,
-  DatePicker,
-  Select,
-  reversedDateFormat,
   ProgressButton,
-  VisitTypeSelect,
   Tooltip,
   Checkbox,
 } from '@/components'
+import { downloadFile } from '@/services/file'
 
-const styles = theme => ({
-  filterBar: {
-    marginBottom: '20px',
-  },
-  filterBtn: {
-    lineHeight: standardRowHeight,
-    textAlign: 'left',
-    '& > button': {
-      marginRight: theme.spacing.unit,
-    },
-  },
-})
-
-const searchResult = (values, props) => {
-  const { dispatch, IsOverallGrid, patientId, setState } = props
+const searchResult = (props, isFirstLoad = false) => {
+  const { dispatch, IsOverallGrid, patientId, values } = props
   let patientID = patientId || Number(findGetParameter('pid'))
   const {
-    visitDate,
+    orderedDate,
     isAllDateChecked,
-    labTrackingStatusFK,
-    serviceName,
+    externalTrackingStatusIDs,
+    jobReferenceNo,
     searchValue,
-    visitTypeIDs,
-    serviceCenterIDs,
+    orderTypes,
+    salesTypeIDs,
+    supplierIDs,
   } = values
 
-  const visitStartDate =
-    visitDate && visitDate.length > 0
-      ? moment(visitDate[0])
-          .set({ hour: 0, minute: 0, second: 0 })
-          .formatUTC(false)
+  const orderStartDate =
+    orderedDate && orderedDate.length > 0
+      ? moment(orderedDate[0])
+          .startOf('day')
+          .formatUTC()
       : undefined
-  const visitEndDate =
-    visitDate && visitDate.length > 1
-      ? moment(visitDate[1])
-          .set({ hour: 23, minute: 59, second: 59 })
-          .formatUTC(false)
+  const orderEndDate =
+    orderedDate && orderedDate.length > 1
+      ? moment(orderedDate[1])
+          .endOf('day')
+          .formatUTC()
       : undefined
   const payload = {
-    visitFKNavigation: IsOverallGrid
-      ? undefined
-      : patientID
-      ? {
-          patientProfileFK: patientID,
-        }
-      : undefined,
-    lgteql_visitDate: isAllDateChecked
-      ? undefined
-      : visitStartDate || undefined,
-    lsteql_visitDate: isAllDateChecked ? undefined : visitEndDate || undefined,
-    labTrackingStatusFK: labTrackingStatusFK || undefined,
     apiCriteria: {
+      patientProfileFK: IsOverallGrid ? undefined : patientID,
+      orderStartDate: isAllDateChecked ? undefined : orderStartDate,
+      orderEndDate: isAllDateChecked ? undefined : orderEndDate,
       searchValue: searchValue ? searchValue : undefined,
-      serviceCenterIDs:
-        serviceCenterIDs && serviceCenterIDs.length > 0
-          ? serviceCenterIDs.join(',')
+      jobReferenceNo: jobReferenceNo || undefined,
+      supplierIDs:
+        supplierIDs && supplierIDs.length > 0 && supplierIDs.indexOf(-99) < 0
+          ? supplierIDs.join('|')
           : undefined,
-      visitTypeIDs:
-        visitTypeIDs && visitTypeIDs.length > 0
-          ? visitTypeIDs.join(',')
+      salesTypeIDs:
+        salesTypeIDs && salesTypeIDs.length > 0 && salesTypeIDs.indexOf(-99) < 0
+          ? salesTypeIDs.join('|')
+          : undefined,
+      orderTypes:
+        orderTypes && orderTypes.length > 0 && orderTypes.indexOf(-99) < 0
+          ? orderTypes.join('|')
+          : undefined,
+      externalTrackingStatusIDs:
+        externalTrackingStatusIDs &&
+        externalTrackingStatusIDs.length > 0 &&
+        externalTrackingStatusIDs.indexOf(-99) < 0
+          ? externalTrackingStatusIDs.join('|')
           : undefined,
     },
-    serviceName: serviceName || undefined,
   }
   dispatch({
     type: 'labTrackingDetails/query',
-    payload,
+    payload: isFirstLoad
+      ? {
+          ...payload,
+          sorting: [
+            {
+              columnName: 'orderedDate',
+              direction: 'desc',
+              sortBy: 'orderedDate',
+            },
+          ],
+        }
+      : payload,
   })
 }
 
 class FilterBar extends PureComponent {
   constructor(props) {
     super(props)
-    const { setFieldValue } = props
-
-    setTimeout(() => {
-      setFieldValue('visitDate', [moment().toDate(), moment().toDate()])
-      setFieldValue('visitTypeIDs', [-99])
-    }, 1)
+    this.state = { isExporting: false }
   }
 
   componentDidMount = () => {
-    setTimeout(() => {
-      const { values } = this.props
-      searchResult(values, this.props)
-    }, 100)
+    searchResult(this.props, true)
+  }
+
+  onExportClick = async () => {
+    const { dispatch, values } = this.props
+    const {
+      orderedDate,
+      isAllDateChecked,
+      externalTrackingStatusIDs,
+      jobReferenceNo,
+      searchValue,
+      orderTypes,
+      salesTypeIDs,
+      supplierIDs,
+    } = values
+
+    const orderStartDate =
+      orderedDate && orderedDate.length > 0
+        ? moment(orderedDate[0])
+            .startOf('day')
+            .formatUTC()
+        : undefined
+    const orderEndDate =
+      orderedDate && orderedDate.length > 1
+        ? moment(orderedDate[1])
+            .endOf('day')
+            .formatUTC()
+        : undefined
+    const payload = {
+      apiCriteria: {
+        orderStartDate: isAllDateChecked ? undefined : orderStartDate,
+        orderEndDate: isAllDateChecked ? undefined : orderEndDate,
+        searchValue: searchValue ? searchValue : undefined,
+        jobReferenceNo: jobReferenceNo || undefined,
+        supplierIDs:
+          supplierIDs && supplierIDs.length > 0 && supplierIDs.indexOf(-99) < 0
+            ? supplierIDs.join('|')
+            : undefined,
+        salesTypeIDs:
+          salesTypeIDs &&
+          salesTypeIDs.length > 0 &&
+          salesTypeIDs.indexOf(-99) < 0
+            ? salesTypeIDs.join('|')
+            : undefined,
+        orderTypes:
+          orderTypes && orderTypes.length > 0 && orderTypes.indexOf(-99) < 0
+            ? orderTypes.join('|')
+            : undefined,
+        externalTrackingStatusIDs:
+          externalTrackingStatusIDs &&
+          externalTrackingStatusIDs.length > 0 &&
+          externalTrackingStatusIDs.indexOf(-99) < 0
+            ? externalTrackingStatusIDs.join('|')
+            : undefined,
+      },
+    }
+    this.setState({ isExporting: true })
+    dispatch({
+      type: 'labTrackingDetails/export',
+      payload: payload,
+    }).then(result => {
+      if (result) {
+        downloadFile(result, 'ExternalTrackingReport.xlsx')
+      }
+
+      this.setState({ isExporting: false })
+    })
   }
 
   render() {
-    const { handleSubmit, IsOverallGrid, values } = this.props
+    const {
+      IsOverallGrid,
+      values,
+      onClickWriteOff,
+      writeOffCount = 0,
+      onDataSelectChange,
+    } = this.props
     return (
       <div>
         <GridContainer alignItems='flex-end'>
@@ -124,37 +182,38 @@ class FilterBar extends PureComponent {
               render={args => (
                 <TextField
                   {...args}
-                  label='Patient Name, Acc. no, Patient Referrence No'
+                  label='Patient Name/Ref. No.'
                   autoFocus
-                  style={{ width: 300, marginLeft: 10 }}
+                  style={{ width: 180, marginLeft: 10 }}
                 />
               )}
             />
           )}
           <FastField
-            name='serviceName'
+            name='jobReferenceNo'
             render={args => (
               <TextField
                 {...args}
-                label='Service Name'
-                style={{ width: 200, marginLeft: 10 }}
+                label='Job Ref. No.'
+                style={{ width: 140, marginLeft: 10 }}
               />
             )}
           />
           <FastField
-            name='serviceCenterIDs'
+            name='orderTypes'
             render={args => {
               return (
                 <CodeSelect
-                  code='ctServiceCenter'
-                  label='Service Center'
+                  label='Order Type'
                   mode='multiple'
+                  options={[
+                    { id: 'ContactLens', name: 'Contact Lens' },
+                    { id: 'Spectacle', name: 'Spectacle' },
+                  ]}
                   maxTagCount={0}
-                  maxTagPlaceholder='Service Centers'
                   allowClear={true}
                   style={{
-                    width: 200,
-
+                    width: 140,
                     marginLeft: 10,
                   }}
                   {...args}
@@ -163,26 +222,38 @@ class FilterBar extends PureComponent {
             }}
           />
           <FastField
-            name='visitTypeIDs'
-            initialValue={[-99]}
+            name='salesTypeIDs'
             render={args => (
-              <Tooltip
-                placement='right'
-                title='Select "All" will retrieve active and inactive visit type'
-              >
-                <VisitTypeSelect
-                  label='Visit Type'
-                  {...args}
-                  mode='multiple'
-                  maxTagCount={0}
-                  maxTagPlaceholder='Visit Types'
-                  allowClear={true}
-                  style={{
-                    width: 200,
-                    marginLeft: 10,
-                  }}
-                />
-              </Tooltip>
+              <CodeSelect
+                label='Sales Type'
+                mode='multiple'
+                code='ctSalesType'
+                maxTagCount={0}
+                allowClear={true}
+                style={{
+                  width: 140,
+                  marginLeft: 10,
+                }}
+                {...args}
+              />
+            )}
+          />
+          <FastField
+            name='supplierIDs'
+            render={args => (
+              <CodeSelect
+                label='Supplier'
+                mode='multiple'
+                code='ctSupplier'
+                labelField='displayValue'
+                maxTagCount={0}
+                allowClear={true}
+                style={{
+                  width: 180,
+                  marginLeft: 10,
+                }}
+                {...args}
+              />
             )}
           />
           <div
@@ -191,10 +262,10 @@ class FilterBar extends PureComponent {
             }}
           >
             <Field
-              name='visitDate'
+              name='orderedDate'
               render={args => (
                 <DateRangePicker
-                  label='Visit Date'
+                  label='Date Ordered'
                   label2='To'
                   {...args}
                   disabled={values.isAllDateChecked}
@@ -233,22 +304,27 @@ class FilterBar extends PureComponent {
             }}
           />
           <FastField
-            name='labTrackingStatusFK'
+            name='externalTrackingStatusIDs'
             render={args => (
               <CodeSelect
                 label='Status'
+                mode='multiple'
                 {...args}
                 code='ltlabtrackingstatus'
-                style={{ width: 110, marginLeft: 10 }}
+                style={{ width: 140, marginLeft: 10 }}
+                dropdownMatchSelectWidth={false}
+                dropdownStyle={{ width: 160 }}
               />
             )}
           />
           <ProgressButton
             icon={<Search />}
             color='primary'
-            style={{ position: 'relative', marginTop: '20px' }}
             size='sm'
-            onClick={handleSubmit}
+            onClick={() => {
+              searchResult(this.props)
+              onDataSelectChange([])
+            }}
             style={{
               marginLeft: 20,
               position: 'relative',
@@ -257,6 +333,48 @@ class FilterBar extends PureComponent {
           >
             Search
           </ProgressButton>
+          {IsOverallGrid && (
+            <LoadingWrapper
+              linear
+              loading={this.state.isExporting}
+              text='Exporting...'
+            >
+              <ProgressButton
+                icon={null}
+                size='sm'
+                onClick={this.onExportClick}
+                style={{
+                  position: 'relative',
+                  bottom: 6,
+                  backgroundColor: '#14BACE',
+                }}
+              >
+                Export
+              </ProgressButton>
+            </LoadingWrapper>
+          )}
+          {IsOverallGrid && (
+            <Badge
+              color='red'
+              count={writeOffCount}
+              style={{ top: '-7px', right: 16 }}
+              size='small'
+            >
+              <ProgressButton
+                icon={null}
+                color='primary'
+                size='sm'
+                onClick={onClickWriteOff}
+                style={{
+                  position: 'relative',
+                  bottom: 6,
+                }}
+                disabled={!writeOffCount}
+              >
+                Write-Off
+              </ProgressButton>
+            </Badge>
+          )}
         </GridContainer>
       </div>
     )
@@ -265,8 +383,17 @@ class FilterBar extends PureComponent {
 
 export default memo(
   withFormikExtend({
-    handleSubmit: (values, { props, resetForm }) => {
-      searchResult(values, props)
-    },
+    mapPropsToValues: () => ({
+      orderedDate: [
+        moment()
+          .startOf('month')
+          .toDate(),
+        moment().toDate(),
+      ],
+      orderTypes: [-99],
+      salesTypeIDs: [-99],
+      supplierIDs: [-99],
+      externalTrackingStatusIDs: [1, 2, 3, 4, 5],
+    }),
   })(FilterBar),
 )

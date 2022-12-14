@@ -135,12 +135,14 @@ export const viewReport = (row, props, useID = false) => {
     patient,
     consultation,
     visitRegistration,
+    global,
   }) => ({
     consultationDocument,
     codetable,
     patient,
     consultation,
     visitEntity: visitRegistration.entity || {},
+    mainDivHeight: global.mainDivHeight,
   }),
 )
 class ConsultationDocument extends PureComponent {
