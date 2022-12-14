@@ -317,11 +317,28 @@ const consultationDocumentTypes = [
       id: 100,
       key: 'ContactLensOrderFormId',
       subject: 'Contact Lens Order Form',
-      draft: row => {
+      draft: (row, codetable) => {
+        let supplier = codetable.ctsupplier?.find(t => t.id === row.supplierFK)
+          .displayValue
+        let leftLensProduct = codetable.inventoryconsumable?.find(
+          t => t.id === row.leftLensProductFK,
+        ).displayValue
+        let rightLensProduct = codetable.inventoryconsumable?.find(
+          t => t.id === row.rightLensProductFK,
+        ).displayValue
         return {
           ContactLensOrderFormDetails: [
             {
               ...row,
+              supplier,
+              leftLensProduct,
+              rightLensProduct,
+              dateOrdered: row.dateOrdered
+                ? moment(row.dateOrdered).format(dateFormatLong)
+                : '',
+              dateRequired: row.dateRequired
+                ? moment(row.dateRequired).format(dateFormatLong)
+                : '',
             },
           ],
         }
