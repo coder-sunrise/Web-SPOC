@@ -333,6 +333,12 @@ const consultationDocumentTypes = [
               supplier,
               leftLensProduct,
               rightLensProduct,
+              dateOrdered: row.dateOrdered
+                ? moment(row.dateOrdered).format(dateFormatLong)
+                : '',
+              dateRequired: row.dateRequired
+                ? moment(row.dateRequired).format(dateFormatLong)
+                : '',
             },
           ],
         }
