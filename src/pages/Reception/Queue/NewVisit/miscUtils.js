@@ -183,6 +183,7 @@ export const formikMapPropsToValues = ({
         ...visitEntries.visitDoctor.filter(d => !d.isPrimaryDoctor),
       ],
       visitPrimaryDoctor: visitEntries.visitDoctor.find(d => d.isPrimaryDoctor),
+      breVisitPurposeFK: visitEntries.visitPurposeFK,
     }
   } catch (error) {
     console.log({ error })
