@@ -10,9 +10,9 @@ export default ({ ...props }) => {
       icon={
         <ErrorOutline
           style={{
-            position: 'absolute',
+            float: 'left',
             color: 'orange',
-            top: 7,
+            // top: 7,
           }}
         />
       }
