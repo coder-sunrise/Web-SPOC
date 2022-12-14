@@ -194,6 +194,7 @@ class CoPayer extends Component {
       return
     }
     const gstValue = invoice.gstValue || 0
+    const isGstInclusive = invoice.isGstInclusive || 0
     const { selectedRows, invoiceItems } = this.state
     const invoicePayerItem = invoiceItems
       .filter(item => selectedRows.includes(item.id))
@@ -206,13 +207,19 @@ class CoPayer extends Component {
         0,
       ),
     )
-    const totalGst = roundTo((totalClaimAmountBeforeGST * gstValue) / 100)
+    const actualTotalGst = isGstInclusive
+      ? roundTo(
+          totalClaimAmountBeforeGST -
+            totalClaimAmountBeforeGST / (1 + gstValue / 100),
+        )
+      : roundTo((totalClaimAmountBeforeGST * gstValue) / 100)
+    const totalGST = isGstInclusive ? 0 : actualTotalGst
     const returnValue = {
       invoicePayerItem,
       payerDistributedAmtBeforeGST: totalClaimAmountBeforeGST,
-      payerDistributedAmt: roundTo(totalClaimAmountBeforeGST + totalGst),
-      gstAmount: totalGst,
-      payerOutstanding: roundTo(totalClaimAmountBeforeGST + totalGst),
+      payerDistributedAmt: roundTo(totalClaimAmountBeforeGST + totalGST),
+      gstAmount: actualTotalGst,
+      payerOutstanding: roundTo(totalClaimAmountBeforeGST + totalGST),
       payerTypeFK: INVOICE_PAYER_TYPE.COMPANY,
       name: copayerItem.displayValue,
       companyFK: copayerItem.id,

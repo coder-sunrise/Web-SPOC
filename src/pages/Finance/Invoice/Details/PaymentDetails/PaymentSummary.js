@@ -33,7 +33,7 @@ const PaymentSummary = ({
             />
           </GridItem>
         )}
-        {gstAmount !== undefined && (
+        {/* {gstAmount !== undefined && (
           <GridItem xs={6} md={12}>
             <NumberInput
               prefix='GST Amount:'
@@ -42,7 +42,7 @@ const PaymentSummary = ({
               {...amountProps}
             />
           </GridItem>
-        )}
+        )} */}
         <GridItem xs={6} md={12}>
           <NumberInput
             prefix='Outstanding:'

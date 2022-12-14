@@ -613,37 +613,26 @@ const ApplyClaims = ({
           0,
         ),
       )
-      let gstAmount = roundTo((total * (invoice.gstValue || 0)) / 100)
-
-      const isFullyClaimed =
-        _.sumBy(
-          tempInvoicePayer.filter(t => !t.isCancelled),
-          'payerDistributedAmtBeforeGST',
-        ) === invoice.totalAftAdj
-
-      // make sure the total gst of invoice payer will not over than invoice gst.
-      if (index === tempInvoicePayer.length - 1 && isFullyClaimed) {
-        const otherPayerGST =
-          _.sumBy(
-            tempInvoicePayer.filter(t => t.isCancelled),
-            t => t.gstAmount,
-          ) - tempInvoicePayer[index].gstAmount
-        gstAmount = invoice.gstAmount - otherPayerGST
-      }
-
+      let gstAmount = invoice.isGstInclusive
+        ? roundTo(total - total / (1 + invoice.gstValue || 0 / 100))
+        : roundTo((total * (invoice.gstValue || 0)) / 100)
+      const gstAmt = invoice.isGstInclusive ? 0 : gstAmount
       const updatedPayer = {
         ...tempInvoicePayer[index],
         payerDistributedAmtBeforeGST: total,
         gstAmount: gstAmount,
-        payerDistributedAmt: total + gstAmount,
+        payerDistributedAmt: total + gstAmt,
         payerOutstanding:
           total +
-          gstAmount -
-          _.sumBy(
-            (tempInvoicePayer[index].invoicePayment || []).filter(
-              p => !p.isCancelled,
-            ),
-            'totalAmtPaid',
+          gstAmt -
+          roundTo(
+            tempInvoicePayer[index].payerDistributedAmt -
+              _.sumBy(
+                (tempInvoicePayer[index].invoicePayment || []).filter(
+                  p => !p.isCancelled,
+                ),
+                'totalAmtPaid',
+              ),
           ),
         isModified: true,
         invoicePayerItem: invoiceItems,
@@ -703,21 +692,23 @@ const ApplyClaims = ({
         i => i.id === changedItem.invoiceItemFK,
       )
 
-      let eligibleAmount =
-        originalItem.totalBeforeGst - originalItem._claimedAmount
+      let eligibleAmount = roundTo(
+        originalItem.totalBeforeGst - originalItem._claimedAmount,
+      )
       if (eligibleAmount === 0) {
         const currentEditItemClaimedAmount = tempInvoicePayer
           .filter((_rest, i) => i !== index)
           .reduce(flattenInvoicePayersInvoiceItemList, [])
           .reduce((remainingClaimable, item) => {
             if (item.invoiceItemFK === changedItem.invoiceItemFK)
-              return remainingClaimable + item.claimAmountBeforeGST
+              return roundTo(remainingClaimable + item.claimAmountBeforeGST)
 
             return remainingClaimable
           }, 0)
 
-        eligibleAmount =
-          originalItem.totalBeforeGst - currentEditItemClaimedAmount
+        eligibleAmount = roundTo(
+          originalItem.totalBeforeGst - currentEditItemClaimedAmount,
+        )
       }
 
       let hasError = false
@@ -756,37 +747,7 @@ const ApplyClaims = ({
   const handleAddCoPayer = invoicePayer => {
     toggleCopayerModal()
     const newTempInvoicePayer = [...tempInvoicePayer, invoicePayer]
-
-    // recalculate GST
-    newTempInvoicePayer.forEach(payer => {
-      payer.gstAmount = roundTo(
-        (payer.payerDistributedAmtBeforeGST * invoice.gstValue) / 100,
-      )
-    })
-
-    const isFullyClaimed =
-      _.sumBy(
-        newTempInvoicePayer.filter(t => !t.isCancelled),
-        'payerDistributedAmtBeforeGST',
-      ) === invoice.totalAftAdj
-    if (isFullyClaimed) {
-      _.last(newTempInvoicePayer.filter(x => !x.isCancelled)).gstAmount =
-        invoice.gstAmount -
-        _.sumBy(
-          tempInvoicePayer.filter(x => !x.isCancelled),
-          'gstAmount',
-        )
-    }
-    newTempInvoicePayer.forEach(payer => {
-      if (!payer.isCancelled) {
-        payer.payerOutstanding =
-          payer.payerDistributedAmtBeforeGST + payer.gstAmount
-        payer.payerDistributedAmt =
-          payer.payerDistributedAmtBeforeGST + payer.gstAmount
-      }
-    })
-
-    setTempInvoicePayer([...tempInvoicePayer, invoicePayer])
+    setTempInvoicePayer(newTempInvoicePayer)
   }
 
   const handleAddClaimClick = () => {

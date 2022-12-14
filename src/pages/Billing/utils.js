@@ -21,6 +21,7 @@ export const constructPayload = values => {
   } = values
   const { invoiceItems, ...restInvoice } = invoice
   const gstValue = invoice.gstValue || 0
+  const isGstInclusive = invoice.isGstInclusive || 0
   let _invoicePayer = invoicePayer.filter(payer => {
     if (payer.id === undefined && payer.isCancelled) return false
     return true
@@ -35,16 +36,9 @@ export const constructPayload = values => {
       _invoicePayer[index].sequence = newsequence
     }
   }
-  let copayerTotalGstAmount = 0
-  let copayerTotalClaimedAmount = 0
   _invoicePayer = _invoicePayer.filter(payer =>
     payer.id ? payer.isModified : true,
   )
-  const isFullyClaimed =
-    _.sumBy(
-      _invoicePayer.filter(t => !t.isCancelled),
-      'payerDistributedAmtBeforeGST',
-    ) === invoice.totalAftAdj
   _invoicePayer = _invoicePayer.map((payer, index) => {
     const {
       schemeConfig,
@@ -65,10 +59,13 @@ export const constructPayload = values => {
         .filter(item => item.claimAmountBeforeGST > 0)
         .map(item => {
           if (typeof item.id !== 'string') {
-            const gstAmount = roundTo(
-              (item.claimAmountBeforeGST * gstValue) / 100,
-            )
-            // invoicePayerGstAmount += gstAmount
+            const actualGSTAmount = isGstInclusive
+              ? roundTo(
+                  item.claimAmountBeforeGST -
+                    item.claimAmountBeforeGST / (1 + gstValue / 100),
+                )
+              : roundTo((item.claimAmountBeforeGST * gstValue) / 100)
+            const gstAmount = isGstInclusive ? 0 : actualGSTAmount
             return {
               ...item,
               claimAmount: item.claimAmountBeforeGST + gstAmount,
@@ -90,8 +87,13 @@ export const constructPayload = values => {
             id,
             ...restItem
           } = item
-          const gstItemAmount = roundTo((claimAmountBeforeGST * gstValue) / 100)
-          // invoicePayerGstAmount += gstItemAmount
+          const actualGSTAmount = isGstInclusive
+            ? roundTo(
+                claimAmountBeforeGST -
+                  claimAmountBeforeGST / (1 + gstValue / 100),
+              )
+            : roundTo((claimAmountBeforeGST * gstValue) / 100)
+          const gstItemAmount = isGstInclusive ? 0 : actualGSTAmount
           const _invoicePayerItem = {
             ...restItem,
             invoiceItemFK,
@@ -105,34 +107,14 @@ export const constructPayload = values => {
           return _invoicePayerItem
         }),
     }
-
-    // copayerTotalGstAmount += invoicePayerGstAmount
-    // if (copayerTotalGstAmount > gstAmount) {
-    //   invoicePayerGstAmount = gstAmount - copayerTotalGstAmount
-    //   _payer.gstAmount = invoicePayerGstAmount
-    // } else {
-    //   _payer.gstAmount = invoicePayerGstAmount
-    // }
-    if (
-      isFullyClaimed &&
-      index === _invoicePayer.filter(t => !t.isCancelled).length - 1
-    ) {
-      _payer.gstAmount = roundTo(
-        invoice.gstAmount -
-          _.sumBy(
-            _invoicePayer.filter(
-              t => t.sequence !== _payer.sequence && !t.isCancelled,
-            ),
-            'gstAmount',
-          ),
-      )
-    } else {
-      _payer.gstAmount = roundTo(
-        (_payer.payerDistributedAmtBeforeGST * gstValue) / 100,
-      )
-    }
-    _payer.payerDistributedAmt =
-      _payer.gstAmount + _payer.payerDistributedAmtBeforeGST
+    _payer.gstAmount = isGstInclusive
+      ? roundTo(
+          _payer.payerDistributedAmtBeforeGST -
+            _payer.payerDistributedAmtBeforeGST / (1 + gstValue / 100),
+        )
+      : roundTo((_payer.payerDistributedAmtBeforeGST * gstValue) / 100)
+    const gstAmount = isGstInclusive ? 0 : _payer.gstAmount
+    _payer.payerDistributedAmt = _payer.payerDistributedAmtBeforeGST + gstAmount
     return _payer
   })
 
