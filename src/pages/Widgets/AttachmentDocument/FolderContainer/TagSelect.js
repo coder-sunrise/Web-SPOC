@@ -14,6 +14,7 @@ const TagSelect = ({
   displayField = 'displayValue',
   isEnableEditTag = true,
   isEnableEditDocument = true,
+  isLimitingCurrentUser = () => false,
 }) => {
   const [inputVisible, setInputVisible] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -170,11 +171,14 @@ const TagSelect = ({
           ))}
         </Select>
       )}
-      {!disabled && !inputVisible && isEnableEditDocument && (
-        <Tag className='site-tag-plus' onClick={showInput}>
-          <PlusOutlined /> New Tag
-        </Tag>
-      )}
+      {!disabled &&
+        !inputVisible &&
+        isEnableEditDocument &&
+        !isLimitingCurrentUser() && (
+          <Tag className='site-tag-plus' onClick={showInput}>
+            <PlusOutlined /> New Tag
+          </Tag>
+        )}
     </div>
   )
 }

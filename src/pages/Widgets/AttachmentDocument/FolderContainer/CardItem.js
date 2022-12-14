@@ -189,31 +189,33 @@ class CardItem extends Component {
                         ></Button>
                       </Tooltip>
                     )}
-                    {isEnableEditDocument && (
-                      <SetTagWithPopover
-                        key={file.id}
-                        disabled={readOnly}
-                        tagList={tagList}
-                        isEnableEditTag={isEnableEditTag}
-                        selectedTagFKs={file.tagFKs || []}
-                        onClose={selectedTag => {
-                          const originalTags = _.sortedUniq(file.tagFKs || [])
-                          const newTags = _.sortedUniq(selectedTag)
+                    {!isLimitingCurrentUser(file.createByUserFK) &&
+                      isEnableEditDocument && (
+                        <SetTagWithPopover
+                          key={file.id}
+                          disabled={readOnly}
+                          tagList={tagList}
+                          isEnableEditTag={isEnableEditTag}
+                          selectedTagFKs={file.tagFKs || []}
+                          onClose={selectedTag => {
+                            const originalTags = _.sortedUniq(file.tagFKs || [])
+                            const newTags = _.sortedUniq(selectedTag)
 
-                          if (
-                            originalTags.length !== newTags.length ||
-                            originalTags.join(',') !== newTags.join(',')
-                          ) {
-                            onFileUpdated({
-                              ...file,
-                              tagFKs: newTags,
-                            })
-                          }
-                        }}
-                        onAddNewTags={onAddNewTags}
-                        type={this.props.type}
-                      />
-                    )}
+                            if (
+                              originalTags.length !== newTags.length ||
+                              originalTags.join(',') !== newTags.join(',')
+                            ) {
+                              onFileUpdated({
+                                ...file,
+                                tagFKs: newTags,
+                              })
+                            }
+                          }}
+                          onAddNewTags={onAddNewTags}
+                          type={this.props.type}
+                          isLimitingCurrentUser={isLimitingCurrentUser}
+                        />
+                      )}
                     {isEnableDeleteDocument && (
                       <Popconfirm
                         title='Permanently delete this document in all tags?'

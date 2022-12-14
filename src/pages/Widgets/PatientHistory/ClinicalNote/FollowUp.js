@@ -46,14 +46,19 @@ export default ({ formContent, classes }) => {
             <td>RE</td>
             <td>VA</td>
             {CellBordered(
-              `${formContent.aided_RE_VA} / ${formContent.aided_RE_VA_Comments}`,
+              <span>
+                {formContent.aided_RE_VA} / {formContent.aided_RE_VA_Comments},
+              </span>,
             )}
             {CellBordered(formContent.aided_RE_PH)}
             <td className={classes.cellLabel}>Unaided</td>
             <td>RE</td>
             <td>VA</td>
             {CellBordered(
-              `${formContent.unaided_RE_VA} / ${formContent.unaided_RE_VA_Comments}`,
+              <span>
+                {formContent.unaided_RE_VA} /{' '}
+                {formContent.unaided_RE_VA_Comments}
+              </span>,
             )}
           </tr>
           <tr>
@@ -61,14 +66,19 @@ export default ({ formContent, classes }) => {
             <td>LE</td>
             <td>VA</td>
             {CellBordered(
-              `${formContent.aided_LE_VA} / ${formContent.aided_LE_VA_Comments}`,
+              <span>
+                {formContent.aided_LE_VA} / {formContent.aided_LE_VA_Comments}
+              </span>,
             )}
             {CellBordered(formContent.aided_LE_PH)}
             <td></td>
             <td>LE</td>
             <td>VA</td>
             {CellBordered(
-              `${formContent.unaided_LE_VA} / ${formContent.unaided_LE_VA_Comments}`,
+              <span>
+                {formContent.unaided_LE_VA} /{' '}
+                {formContent.unaided_LE_VA_Comments}
+              </span>,
             )}
           </tr>
         </table>
