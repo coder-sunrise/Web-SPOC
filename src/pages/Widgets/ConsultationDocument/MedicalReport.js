@@ -239,7 +239,7 @@ export default compose(
     }) => {
       if (consultationDocument.entity) return consultationDocument.entity
       const {
-        entity: { name = '' },
+        entity: { name = '', id: patientID },
       } = patient
       const formVisionRefraction =
         (forDispense
@@ -248,6 +248,7 @@ export default compose(
       return {
         type: consultationDocument.type,
         patientName: name,
+        patientProfileFK: patientID,
         subject:
           'Report on Eye Examination at Singapore Polytechnic Optometry Centre',
         generateDate: moment(),
