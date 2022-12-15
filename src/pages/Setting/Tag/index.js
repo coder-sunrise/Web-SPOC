@@ -50,7 +50,7 @@ class Tag extends PureComponent {
     let height = mainDivHeight - 120 - ($('.filterTagBar').height() || 0)
     if (height < 300) height = 300
 
-    let tagCategoryOptions = tagCategory.filter(c => c.value != 'Service')
+    let tagCategoryOptions = tagCategory
 
     return (
       <CardContainer hideHeader>
