@@ -182,6 +182,15 @@ class Management extends PureComponent {
                       description: 'Immediate (A&E)',
                     },
                   ]}
+                  onChange={v => {
+                    let { values, setFieldValue } = this.arrayHelpers.form
+                    let oldFormValue = _.get(values, `${this.props.prefixProp}`)
+                    const newFormValue = {
+                      ...oldFormValue,
+                      referralTimeline: v.target.value,
+                    }
+                    setFieldValue(`${this.props.prefixProp}`, newFormValue)
+                  }}
                   noUnderline
                   {...args}
                 />
