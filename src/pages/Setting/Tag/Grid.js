@@ -4,7 +4,7 @@ import { status } from '@/utils/codes'
 import Edit from '@material-ui/icons/Edit'
 
 class Grid extends PureComponent {
-  editRow = (row) => {
+  editRow = row => {
     const { dispatch, settingTag } = this.props
 
     const { list } = settingTag
@@ -12,17 +12,17 @@ class Grid extends PureComponent {
       type: 'settingTag/updateState',
       payload: {
         showModal: true,
-        entity: list.find((o) => o.id === row.id),
+        entity: list.find(o => o.id === row.id),
       },
     })
   }
 
-  render () {
-    const { height } = this.props
+  render() {
+    const { height, tagCategoryOptions } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
-        type="settingTag"
+        type='settingTag'
         onRowDoubleClick={this.editRow}
         TableProps={{
           height,
@@ -36,6 +36,19 @@ class Grid extends PureComponent {
         ]}
         columnExtensions={[
           {
+            columnName: 'category',
+            render: row => {
+              const { name: category } = tagCategoryOptions.find(
+                x => x.value == row.category,
+              ) || { name: row.category }
+              return (
+                <Tooltip title={category}>
+                  <span>{category}</span>
+                </Tooltip>
+              )
+            },
+          },
+          {
             columnName: 'isActive',
             sortingEnabled: false,
             align: 'center',
@@ -48,16 +61,16 @@ class Grid extends PureComponent {
             align: 'center',
             sortingEnabled: false,
             width: 100,
-            render: (row) => {
+            render: row => {
               return (
-                <Tooltip title="Edit Tag" placement="top-end">
+                <Tooltip title='Edit Tag' placement='top-end'>
                   <Button
-                    size="sm"
+                    size='sm'
                     onClick={() => {
                       this.editRow(row)
                     }}
                     justIcon
-                    color="primary"
+                    color='primary'
                     style={{ marginRight: 0 }}
                   >
                     <Edit />
