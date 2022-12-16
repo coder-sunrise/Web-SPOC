@@ -293,38 +293,45 @@ class ConsultationDocument extends PureComponent {
                 columnName: 'action',
                 width: 110,
                 render: row => {
+                  const consDocumentType = consultationDocumentTypes.find(
+                    x => x.value == row.type,
+                  )
+                  const editEnable =
+                    false && ableToViewByAuthority(consDocumentType.authority)
                   return (
-                    <React.Fragment>
-                      <Tooltip title='Edit'>
-                        <Button
-                          size='sm'
-                          onClick={() => {
-                            this.editRow(row)
-                          }}
-                          justIcon
-                          color='primary'
-                          style={{ marginRight: 5 }}
-                        >
-                          <Edit />
-                        </Button>
-                      </Tooltip>
-                      <Popconfirm
-                        onConfirm={() =>
-                          dispatch({
-                            type: 'consultationDocument/deleteRow',
-                            payload: {
-                              id: row.uid,
-                            },
-                          })
-                        }
-                      >
-                        <Tooltip title='Delete'>
-                          <Button size='sm' color='danger' justIcon>
-                            <Delete />
+                    editEnable && (
+                      <React.Fragment>
+                        <Tooltip title='Edit'>
+                          <Button
+                            size='sm'
+                            onClick={() => {
+                              this.editRow(row)
+                            }}
+                            justIcon
+                            color='primary'
+                            style={{ marginRight: 5 }}
+                          >
+                            <Edit />
                           </Button>
                         </Tooltip>
-                      </Popconfirm>
-                    </React.Fragment>
+                        <Popconfirm
+                          onConfirm={() =>
+                            dispatch({
+                              type: 'consultationDocument/deleteRow',
+                              payload: {
+                                id: row.uid,
+                              },
+                            })
+                          }
+                        >
+                          <Tooltip title='Delete'>
+                            <Button size='sm' color='danger' justIcon>
+                              <Delete />
+                            </Button>
+                          </Tooltip>
+                        </Popconfirm>
+                      </React.Fragment>
+                    )
                   )
                 },
               },
