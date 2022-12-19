@@ -29,6 +29,8 @@ class Tag extends PureComponent {
       type: 'settingTag/query',
       payload: {
         isActive: true,
+        category: undefined,
+        eql_category: undefined,
       },
     })
   }

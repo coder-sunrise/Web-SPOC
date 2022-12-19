@@ -760,7 +760,7 @@ export const MODALITY_STATUS = {
 
 export const TAG_TYPE = {
   PATIENT: 'PatientDocument',
-  COPAYER: 'CoPayerDocument',
+  COPAYER: 'CopayerDocument',
 }
 
 export const PRIORITY_VALUES = { NORMAL: 'Normal', URGENT: 'Urgent' }
