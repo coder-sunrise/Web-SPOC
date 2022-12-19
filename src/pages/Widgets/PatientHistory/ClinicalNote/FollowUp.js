@@ -47,7 +47,7 @@ export default ({ formContent, classes }) => {
             <td>VA</td>
             {CellBordered(
               <span>
-                {formContent.aided_RE_VA} / {formContent.aided_RE_VA_Comments},
+                {formContent.aided_RE_VA} / {formContent.aided_RE_VA_Comments}
               </span>,
             )}
             {CellBordered(formContent.aided_RE_PH)}
