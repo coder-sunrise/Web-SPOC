@@ -296,8 +296,9 @@ class ConsultationDocument extends PureComponent {
                   const consDocumentType = consultationDocumentTypes.find(
                     x => x.value == row.type,
                   )
-                  const editEnable =
-                    false && ableToViewByAuthority(consDocumentType.authority)
+                  const editEnable = ableToViewByAuthority(
+                    consDocumentType.authority,
+                  )
                   return (
                     editEnable && (
                       <React.Fragment>
