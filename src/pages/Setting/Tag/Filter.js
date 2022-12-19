@@ -3,7 +3,7 @@ import { FormattedMessage } from 'umi'
 import { connect } from 'dva'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
-import { status, tagCategory } from '@/utils/codes'
+import { status } from '@/utils/codes'
 import {
   withFormikExtend,
   FastField,
@@ -24,32 +24,38 @@ import {
   displayName: 'TagFilter',
 })
 class Filter extends PureComponent {
-  render () {
+  render() {
     const { classes, tagCategoryOptions } = this.props
     return (
       <div className={classes.filterBar}>
         <GridContainer>
           <GridItem xs={6} md={3}>
             <FastField
-              name="tagDisplayValue"
-              render={(args) => {
-                return <TextField label="Display Value" {...args} />
+              name='tagDisplayValue'
+              render={args => {
+                return <TextField label='Display Value' {...args} />
               }}
             />
           </GridItem>
           <GridItem xs={6} md={2}>
             <FastField
-              name="category"
-              render={(args) => {
-                return <Select label="Category" options={tagCategoryOptions} {...args} />
+              name='category'
+              render={args => {
+                return (
+                  <Select
+                    label='Category'
+                    options={tagCategoryOptions}
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>
           <GridItem xs={6} md={2}>
             <FastField
-              name="isActive"
-              render={(args) => {
-                return <Select label="Status" options={status} {...args} />
+              name='isActive'
+              render={args => {
+                return <Select label='Status' options={status} {...args} />
               }}
             />
           </GridItem>
@@ -59,25 +65,29 @@ class Filter extends PureComponent {
           <GridItem>
             <div className={classes.filterBtn}>
               <ProgressButton
-                color="primary"
+                color='primary'
                 icon={<Search />}
                 onClick={() => {
-                  const { tagDisplayValue, isActive, category } = this.props.values
+                  const {
+                    tagDisplayValue,
+                    isActive,
+                    category,
+                  } = this.props.values
                   this.props.dispatch({
                     type: 'settingTag/query',
                     payload: {
                       isActive,
-                      category,
+                      eql_category: category,
                       displayValue: tagDisplayValue,
                     },
                   })
                 }}
               >
-                <FormattedMessage id="form.search" />
+                <FormattedMessage id='form.search' />
               </ProgressButton>
 
               <Button
-                color="primary"
+                color='primary'
                 onClick={() => {
                   this.props.dispatch({
                     type: 'settingTag/updateState',

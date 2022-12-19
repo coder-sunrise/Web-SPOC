@@ -709,8 +709,8 @@ const tagCategory = [
   },
   {
     value: 'CopayerDocument',
-    name: 'Copayer Document',
-    render: () => <span>Copayer Document</span>,
+    name: 'Co-Payer Document',
+    render: () => <span>Co-Payer Document</span>,
   },
   {
     value: 'Service',

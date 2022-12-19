@@ -46,20 +46,14 @@ class Tag extends PureComponent {
     const { settingTag, mainDivHeight = 700, clinicSettings } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
+      tagCategoryOptions: tagCategory.map(x => ({ ...x })),
     }
     let height = mainDivHeight - 120 - ($('.filterTagBar').height() || 0)
     if (height < 300) height = 300
-
-    let tagCategoryOptions = tagCategory
-
     return (
       <CardContainer hideHeader>
         <div className='filterTagBar'>
-          <Filter
-            {...cfg}
-            {...this.props}
-            tagCategoryOptions={tagCategoryOptions}
-          />
+          <Filter {...cfg} {...this.props} />
         </div>
         <Grid {...cfg} {...this.props} height={height} />
         <CommonModal
@@ -71,11 +65,7 @@ class Tag extends PureComponent {
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
         >
-          <Detail
-            {...cfg}
-            {...this.props}
-            tagCategoryOptions={tagCategoryOptions}
-          />
+          <Detail {...cfg} {...this.props} />
         </CommonModal>
       </CardContainer>
     )
