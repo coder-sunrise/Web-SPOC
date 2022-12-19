@@ -23,7 +23,7 @@ const _formik = withFormik({
   }) => {
     if (consultationDocument.entity) return consultationDocument.entity
     const {
-      entity: { name = '', patientReferenceNo = '' },
+      entity: { name = '', patientReferenceNo = '', id },
     } = patient
     let formVisionRefraction = corVisionRefraction || {}
     if (forDispense) {
@@ -32,6 +32,7 @@ const _formik = withFormik({
     }
     return {
       type: consultationDocument.type,
+      patientProfileFK: id,
       patientName: name,
       patientReferenceNo,
       dateofPrescription: moment(),

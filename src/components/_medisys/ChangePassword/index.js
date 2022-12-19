@@ -18,13 +18,7 @@ import { changeCurrentUserPassword, changeUserPassword } from '@/services/user'
     ),
     newPassword: Yup.string().required('New Password is a required field'),
     confirmPassword: Yup.string()
-      .oneOf(
-        [
-          Yup.ref('newPassword'),
-          null,
-        ],
-        "Passwords don't match",
-      )
+      .oneOf([Yup.ref('newPassword'), null], "Passwords don't match")
       .required('Confirm Password is a required field'),
   }),
   mapPropsToValues: () => ({}),
@@ -60,7 +54,7 @@ import { changeCurrentUserPassword, changeUserPassword } from '@/services/user'
   },
 })
 class ChangePassword extends React.PureComponent {
-  render () {
+  render() {
     const {
       footer,
       handleSubmit,
@@ -71,36 +65,42 @@ class ChangePassword extends React.PureComponent {
     return (
       <div>
         {!changeTargetUser &&
-        !currentUser.clinicianProfile.userProfile.lastPasswordChangedDate && (
-          <p style={{ textAlign: 'center' }}>
-            The user&apos;s password must be changed before logging in the first
-            time.
-          </p>
-        )}
+          !currentUser.clinicianProfile.userProfile.lastPasswordChangedDate && (
+            <p style={{ textAlign: 'center' }}>
+              The user&apos;s password must be changed before logging in the
+              first time.
+            </p>
+          )}
 
         <GridContainer>
+          <input
+            style={{
+              zIndex: '-99',
+              height: '0',
+              width: '0',
+              opacity: 0,
+            }}
+          />
           <GridItem md={12}>
             <FastField
               name='currentPassword'
-              render={(args) => (
-                <React.Fragment>
-                  <TextField
-                    {...args}
-                    label='Current Password'
-                    type='password'
-                    autocomplete='off'
-                    inputProps={{
-                      autoComplete: 'off',
-                    }}
-                  />
-                </React.Fragment>
+              render={args => (
+                <TextField
+                  {...args}
+                  label='Current Password'
+                  type='password'
+                  autocomplete='off'
+                  inputProps={{
+                    autoComplete: 'off',
+                  }}
+                />
               )}
             />
           </GridItem>
           <GridItem md={12}>
             <FastField
               name='newPassword'
-              render={(args) => (
+              render={args => (
                 <TextField
                   {...args}
                   label='New Password'
@@ -115,7 +115,7 @@ class ChangePassword extends React.PureComponent {
           <GridItem md={12}>
             <FastField
               name='confirmPassword'
-              render={(args) => (
+              render={args => (
                 <TextField
                   {...args}
                   label='Confirm Password'
