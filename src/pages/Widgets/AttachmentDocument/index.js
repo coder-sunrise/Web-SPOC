@@ -50,7 +50,7 @@ class AttachmentDocument extends Component {
       payload: {
         pagesize: 9999,
         sorting: [{ columnName: 'sortOrder', direction: 'asc' }],
-        category: type,
+        eql_category: type,
       },
     }).then(this.refreshDocuments)
   }
