@@ -257,13 +257,13 @@ const consultationDocumentTypes = [
       subject: 'Spectacle Order Form',
       draft: (row, codetable) => {
         const supplier = codetable.ctsupplier.find(t => t.id === row.supplierFK)
-          .displayValue
+          ?.displayValue
         const leftLens = codetable.inventoryconsumable.find(
           t => t.id === row.leftLensProductFK,
-        ).displayValue
+        )?.displayValue
         const rightLens = codetable.inventoryconsumable.find(
           t => t.id === row.rightLensProductFK,
-        ).displayValue
+        )?.displayValue
         return {
           SpectacleOrderFormDetails: [
             {
