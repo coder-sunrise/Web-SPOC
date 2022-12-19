@@ -411,90 +411,27 @@ const Scheme = ({
                     Add Payment
                   </Button>
                 )}
-                <Popover
-                  icon={null}
-                  trigger='click'
-                  placement='right'
-                  visible={showPrintInvoiceMenu}
-                  onVisibleChange={() => {
-                    setShowPrintInvoiceMenu(!showPrintInvoiceMenu)
-                  }}
-                  content={
-                    <MenuList
-                      role='menu'
-                      onClick={() => setShowPrintInvoiceMenu(false)}
-                    >
-                      <MenuItem
-                        onClick={() =>
-                          onPrinterClick(
-                            'TaxInvoice',
-                            undefined,
-                            companyFK,
-                            id,
-                            index,
-                            INVOICE_REPORT_TYPES.CLAIMABLEITEMCATEGORYINVOICE,
-                          )
-                        }
-                      >
-                        Claimable Item Category Invoice
-                      </MenuItem>
-                      <MenuItem
-                        onClick={() =>
-                          onPrinterClick(
-                            'TaxInvoice',
-                            undefined,
-                            companyFK,
-                            id,
-                            index,
-                            INVOICE_REPORT_TYPES.ITEMCATEGORYINVOICE,
-                          )
-                        }
-                      >
-                        Item Category Invoice
-                      </MenuItem>
-                      <MenuItem
-                        onClick={() =>
-                          onPrinterClick(
-                            'TaxInvoice',
-                            undefined,
-                            companyFK,
-                            id,
-                            index,
-                            INVOICE_REPORT_TYPES.CLAIMABLEITEMINVOICE,
-                          )
-                        }
-                      >
-                        Claimable Item Invoice
-                      </MenuItem>
-                      <MenuItem
-                        onClick={() =>
-                          onPrinterClick(
-                            'TaxInvoice',
-                            undefined,
-                            companyFK,
-                            id,
-                            index,
-                            INVOICE_REPORT_TYPES.DETAILEDINVOICE,
-                          )
-                        }
-                      >
-                        Detailed Invoice
-                      </MenuItem>
-                    </MenuList>
+                <Button
+                  {...ButtonProps}
+                  disabled={
+                    shouldDisable() ||
+                    isUpdatedAppliedInvoicePayerInfo ||
+                    showRefreshOrder
+                  }
+                  onClick={() =>
+                    onPrinterClick(
+                      'TaxInvoice',
+                      undefined,
+                      companyFK,
+                      id,
+                      index,
+                      INVOICE_REPORT_TYPES.DETAILEDINVOICE,
+                    )
                   }
                 >
-                  <Button
-                    {...ButtonProps}
-                    disabled={
-                      shouldDisable() ||
-                      isUpdatedAppliedInvoicePayerInfo ||
-                      showRefreshOrder
-                    }
-                  >
-                    <Print />
-                    Print Invoice
-                  </Button>
-                </Popover>
+                  <Print />
+                  Print Invoice
+                </Button>
               </div>
             </GridItem>
             <GridItem

@@ -105,94 +105,24 @@ const PaymentActions = ({
             Transfer
           </Button>
         )}
-      <Popover
-        icon={null}
-        trigger='click'
-        placement='right'
-        visible={showPrintInvoiceMenu}
-        onVisibleChange={() => {
-          if (!companyFK) {
-            handlePrinterClick(
-              'TaxInvoice',
-              undefined,
-              companyFK,
-              invoicePayerFK,
-              INVOICE_REPORT_TYPES.INDIVIDUALINVOICE,
-            )
-          } else {
-            setShowPrintInvoiceMenu(!showPrintInvoiceMenu)
-          }
-        }}
-        content={
-          <MenuList role='menu' onClick={() => setShowPrintInvoiceMenu(false)}>
-            {companyFK && (
-              <MenuItem
-                onClick={() =>
-                  handlePrinterClick(
-                    'TaxInvoice',
-                    undefined,
-                    companyFK,
-                    invoicePayerFK,
-                    INVOICE_REPORT_TYPES.CLAIMABLEITEMCATEGORYINVOICE,
-                  )
-                }
-              >
-                Claimable Item Category Invoice
-              </MenuItem>
-            )}
-            {companyFK && (
-              <MenuItem
-                onClick={() =>
-                  handlePrinterClick(
-                    'TaxInvoice',
-                    undefined,
-                    companyFK,
-                    invoicePayerFK,
-                    INVOICE_REPORT_TYPES.ITEMCATEGORYINVOICE,
-                  )
-                }
-              >
-                Item Category Invoice
-              </MenuItem>
-            )}
-            {companyFK && (
-              <MenuItem
-                onClick={() =>
-                  handlePrinterClick(
-                    'TaxInvoice',
-                    undefined,
-                    companyFK,
-                    invoicePayerFK,
-                    INVOICE_REPORT_TYPES.CLAIMABLEITEMINVOICE,
-                  )
-                }
-              >
-                Claimable Item Invoice
-              </MenuItem>
-            )}
-            <MenuItem
-              onClick={() =>
-                handlePrinterClick(
-                  'TaxInvoice',
-                  undefined,
-                  companyFK,
-                  invoicePayerFK,
-                  companyFK
-                    ? INVOICE_REPORT_TYPES.DETAILEDINVOICE
-                    : INVOICE_REPORT_TYPES.INDIVIDUALINVOICE,
-                )
-              }
-            >
-              {companyFK ? 'Detailed Invoice' : 'Individual Invoice'}
-            </MenuItem>
-          </MenuList>
+      <Button
+        disabled={!handlePrinterClick}
+        {...ButtonProps}
+        onClick={() =>
+          handlePrinterClick(
+            'TaxInvoice',
+            undefined,
+            companyFK,
+            invoicePayerFK,
+            companyFK
+              ? INVOICE_REPORT_TYPES.DETAILEDINVOICE
+              : INVOICE_REPORT_TYPES.INDIVIDUALINVOICE,
+          )
         }
       >
-        <Button disabled={!handlePrinterClick} {...ButtonProps}>
-          <Printer />
-          Print Invoice
-        </Button>
-      </Popover>
+        <Printer />
+        Print Invoice
+      </Button>
     </div>
   )
 }
